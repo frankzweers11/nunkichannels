@@ -5,9 +5,15 @@ from __future__ import annotations
 import json
 import re
 import textwrap
+import os
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
+
+
+def write_public(path: Path, text: str) -> None:
+    path.write_text(text, encoding="utf-8")
+    os.chmod(path, 0o644)
 
 ROOT = Path(__file__).resolve().parents[1]
 HTTPDOCS = ROOT / "httpdocs"
@@ -265,11 +271,14 @@ def main() -> None:
         og_path = OG_DIR / f"{slug}.jpg"
         generate_og(page, og_path)
         block = social_block(page, site)
-        html_path.write_text(inject_social(html, block), encoding="utf-8")
+        write_public(html_path, inject_social(html, block))
         pages.append(page)
 
     payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": pages}
-    PAGES_JSON.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    write_public(
+        PAGES_JSON,
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+    )
 
     index_path = HTTPDOCS / "index.html"
     if index_path.is_file():
@@ -281,9 +290,9 @@ def main() -> None:
         }
         generate_og({**home, "slug": "index", "theme": "#13202b"}, OG_DIR / "index.jpg")
         html = index_path.read_text(encoding="utf-8")
-        index_path.write_text(
+        write_public(
+            index_path,
             inject_social(html, social_block(home, site, is_home=True)),
-            encoding="utf-8",
         )
 
     print(f"Built {len(pages)} pages → {PAGES_JSON.relative_to(ROOT)}")

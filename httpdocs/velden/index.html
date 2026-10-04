@@ -1137,7 +1137,7 @@ P.push(function(){
   const amp=x=>80*(1-.7*(x-x0w)/1400);
   const bump=x=>{const u=(x-860)/100;return u<=0||u>=1?0:Math.sin(u*Math.PI)};
   const bands=[['radio',100,430,[150,164,218]],['microgolf',430,650,[236,142,188]],['infrarood',650,860,[255,128,86]],['licht',860,960,null],
-    ['uv',960,1140,[178,128,248]],['roentgen',1140,1330,[96,178,248]],['gamma',1330,1500,[140,140,238]]];
+    ['uv',960,1140,[178,128,248]],['röntgen',1140,1330,[96,178,248]],['gamma',1330,1500,[140,140,238]]];
   // soft coloured washes behind the wave, band by band: light on the dark
   COMP='lighter';
   for(const [nm,xa,xb,col] of bands){
@@ -1210,7 +1210,7 @@ P.push(function(){
   }
   dustBatch(dust,[220,214,255]);
   COMP=null;
-  say(R,'ook tussen de sterren stroomt een veld',true,true);
+  say(R,'ook tussen de sterren zijn er elektrische stromen',true,true);
   spine(R,2,0,1230);
   motes(R,2,1090,1300,30,70);
   whispers(R,100,1000,true,2);
@@ -1323,7 +1323,7 @@ P.push(function(){
   fillPoly([[300,hy-64],[338,hy-64],[338,hy-42],[300,hy-42]],[18,22,28],.95);
   glow(R,318,hy-52,46,[255,210,120],.5);
   fillPoly([[310,hy-58],[326,hy-58],[326,hy-46],[310,hy-46]],[255,214,120],.95);
-  say(R,'de aarde vangt de storm op en maakt er licht van',true,true,1100,24);
+  say(R,'de aarde maakt er noorderlicht van',true,true,1100,24);
   spine(R,4,0,1230);
   motes(R,4,1090,1300,30,70);
   whispers(R,100,720,true,2);
@@ -1350,7 +1350,7 @@ P.push(function(){
     birdW(R,p[0]+rd(R,-40,40),p[1]+rd(R,-40,40),s2,[246,240,255],rd(R,.75,.95),1.5+s2*.045);
   }
   restless(200,330,1280,440,RR=>{for(let k=0;k<3;k++){const t=rd(RR,.2,.85),p=bez(3,t),s2=rd(RR,17,27);birdW(RR,p[0]+rd(RR,-30,30),p[1]+rd(RR,-30,30),s2,[246,240,255],.8,1.5+s2*.045)}});
-  say(R,'hoe weet een vogel waar het noorden is?',false,true);
+  say(R,'door magnetische stromen weet de vogel waar het noorden is',false,true);
   spine(R,5,0,1230);
   motes(R,5,1090,1300,34,70);
   whispers(R,100,1000,true,2);
@@ -1383,7 +1383,7 @@ P.push(function(){
   spark(R,sp0[0],sp0[1],14,{col:AUR_T,a:.95,w:1.8,nR:6});
   const el=ax.filter(p=>p[0]>nx+170&&p[0]<nx+640);
   restless(nx+140,ny-20,640,340,RR=>{const q=pk(RR,el);spark(RR,q[0],q[1],14,{col:AUR_T,a:.95,w:1.8,nR:ri(RR,5,8)})});
-  say(R,'hoe komt die gedachte in je hoofd?',true,true);
+  say(R,'waar komt die gedachte vandaan?',true,true);
   spine(R,6,0,1230);
   motes(R,6,1080,1300,46,80);
   whispers(R,100,780,true,2);
@@ -1409,7 +1409,7 @@ P.push(function(){
   heartShape(R,hx,hy,hs*.8,tilt,[255,222,214]);
   spark(R,hx-12,hy-hs*.2,18,{col:LAMPW,a:.95,w:2,nR:7});
   restless(hx-470,100,940,760,RR=>{COMP='lighter';loops(RR,[rd(RR,1.4,2.8)],.5);COMP=null});
-  say(R,'wat doet je hart bij iedere slag?',false,true);
+  say(R,'hoe groot is het veld rondom je hart?',false,true);
   motes(R,7,1090,1300,28,70);
   whispers(R,160,900,true,2);
 });
@@ -1445,7 +1445,7 @@ P.push(function(){
   }
   seg(1,true);seg(-1,true);
   COMP=null;
-  say(R,'is dna een antenne?',true,true);
+  say(R,'vormt het dna een antenne?',true,true);
   spine(R,8,0,1230);
   motes(R,8,1090,1300,30,70);
   whispers(R,100,1000,true,2);
@@ -1477,7 +1477,7 @@ P.push(function(){
   sk(R,[[fx,fy+10],[fx-22,fy+110]],{col:C,w:2.8,a:.9,amp:.4});sk(R,[[fx,fy+10],[fx+22,fy+110]],{col:C,w:2.8,a:.9,amp:.4});
   spark(R,fx+4,fy-62,18,{col:LAMPW,a:.95,w:2,nR:8});
   restless(fx-34,fy-98,76,76,RR=>spark(RR,fx+4,fy-62,18+rd(RR,0,6),{col:LAMPW,a:.95,w:2,nR:ri(RR,7,10)}));
-  say(R,'ook jij staat midden in het veld',false,true,1040);
+  say(R,'ook jij staat midden in een zee van golven',false,true,1040);
   spine(R,9,0,1230);
   motes(R,9,1000,1300,34,80);
   whispers(R,100,860,true,2);
@@ -1515,7 +1515,7 @@ P.push(function(){
   grassHatch(R,hz+6,1200,260,keep);
   meadowBlades(R,hz+8,1190,560,10,62,keep,{kf:y=>.3+.7*(y-hz)/(1200-hz)});
   tinyFlowers(R,30,hz+30,1180,3,7,keep);
-  say(R,'ook wij voegen golven toe aan het veld',true,false);
+  say(R,'mensen voegen kunstmatige velden toe aan het milieu',true,false);
   spine(R,10,0,1230);
   motes(R,10,1000,1300,30,70);
   whispers(R,200,860,false,2);
@@ -1557,7 +1557,7 @@ P.push(function(){
   // the grass in front, so the stem comes out of it
   meadowBlades(R,900,1175,340,60,170,keepT,{kf:y=>.9+.4*(y-900)/275,bias:1.6});
   tinyFlowers(R,6,980,1120,7,13,keepT);
-  say(R,'hoe vindt de bij de bloem?',false,false);
+  say(R,'en de bij vindt de bloem op de golven',false,false);
   spine(R,11,0,392);
   whispers(R,160,1000,false,2);
   // under the grass the ground, and under that the title of the wall, low and in the middle, and the signature under it
