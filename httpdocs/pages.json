@@ -1,0 +1,40 @@
+{
+  "site": {
+    "name": "Nunki Channels",
+    "baseUrl": "https://nunkichannels.nl"
+  },
+  "pages": [
+    {
+      "slug": "getij",
+      "path": "/getij/",
+      "title": "getij",
+      "subtitle": "a wall about the tide",
+      "theme": "#13202b",
+      "ogImage": "/images/og/getij.jpg"
+    },
+    {
+      "slug": "ringen",
+      "path": "/ringen/",
+      "title": "ringen",
+      "subtitle": "a wall about a tree, and the years it keeps",
+      "theme": "#1a1712",
+      "ogImage": "/images/og/ringen.jpg"
+    },
+    {
+      "slug": "velden",
+      "path": "/velden/",
+      "title": "velden",
+      "subtitle": "elektromagnetisch universum",
+      "theme": "#0e1020",
+      "ogImage": "/images/og/velden.jpg"
+    },
+    {
+      "slug": "zelfportret",
+      "path": "/zelfportret/",
+      "title": "fable",
+      "subtitle": "a wall, from the inside",
+      "theme": "#181410",
+      "ogImage": "/images/og/zelfportret.jpg"
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+#!/usr/bin/env python3
+"""Scan httpdocs/*/index.html, write pages.json, OG images, and social meta in head."""
+from __future__ import annotations
+
+import json
+import re
+import textwrap
+from pathlib import Path
+
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT = Path(__file__).resolve().parents[1]
+HTTPDOCS = ROOT / "httpdocs"
+SITE_JSON = HTTPDOCS / "site.json"
+PAGES_JSON = HTTPDOCS / "pages.json"
+OG_DIR = HTTPDOCS / "images" / "og"
+SKIP_DIRS = {"images", "css", "js", "assets"}
+
+W, H = 1200, 630
+CREAM = (246, 241, 228)
+MUTED = (180, 172, 158)
+
+SOCIAL_START = "<!-- nunki:social -->"
+SOCIAL_END = "<!-- /nunki:social -->"
+
+
+def load_site() -> dict:
+    data = json.loads(SITE_JSON.read_text(encoding="utf-8"))
+    base = (data.get("baseUrl") or "").rstrip("/")
+    env = __import__("os").environ.get("NUNKI_BASE_URL", "").rstrip("/")
+    if env:
+        base = env
+    data["baseUrl"] = base
+    return data
+
+
+def slug_dirs() -> list[Path]:
+    out = []
+    for p in sorted(HTTPDOCS.iterdir()):
+        if not p.is_dir() or p.name in SKIP_DIRS:
+            continue
+        if (p / "index.html").is_file():
+            out.append(p)
+    return out
+
+
+def parse_theme(html: str) -> str:
+    m = re.search(r"background:(#[0-9a-fA-F]{3,8})", html)
+    return m.group(1) if m else "#181410"
+
+
+def parse_comment_subtitle(html: str) -> str | None:
+    m = re.search(
+        r"//\s*-+\s*\n//\s*[^\n]+—\s*([^\n]+)",
+        html,
+        re.MULTILINE,
+    )
+    if not m:
+        return None
+    line = m.group(1).strip()
+    if line.endswith("."):
+        line = line[:-1]
+    return line.strip()
+
+
+def parse_page(slug: str, html: str) -> dict:
+    tm = re.search(r"<title>([^<]+)</title>", html, re.IGNORECASE)
+    raw = (tm.group(1).strip() if tm else slug)
+    title, subtitle = raw, None
+    if " · " in raw:
+        title, subtitle = raw.split(" · ", 1)
+        title, subtitle = title.strip(), subtitle.strip()
+    if not subtitle:
+        subtitle = parse_comment_subtitle(html) or ""
+    theme = parse_theme(html)
+    path = f"/{slug}/"
+    og_image = f"/images/og/{slug}.jpg"
+    return {
+        "slug": slug,
+        "path": path,
+        "title": title,
+        "subtitle": subtitle,
+        "theme": theme,
+        "ogImage": og_image,
+    }
+
+
+def hex_to_rgb(h: str) -> tuple[int, int, int]:
+    h = h.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+def load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    candidates = [
+        "/System/Library/Fonts/Supplemental/Avenir Next.ttc",
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ]
+    for path in candidates:
+        if Path(path).is_file():
+            try:
+                index = 1 if bold and path.endswith(".ttc") else 0
+                return ImageFont.truetype(path, size, index=index)
+            except OSError:
+                continue
+    return ImageFont.load_default()
+
+
+def wrap_text(text: str, font: ImageFont.ImageFont, max_width: int, draw: ImageDraw.ImageDraw) -> list[str]:
+    words = text.split()
+    if not words:
+        return []
+    lines: list[str] = []
+    cur = words[0]
+    for word in words[1:]:
+        trial = f"{cur} {word}"
+        if draw.textlength(trial, font=font) <= max_width:
+            cur = trial
+        else:
+            lines.append(cur)
+            cur = word
+    lines.append(cur)
+    return lines
+
+
+def generate_og(page: dict, out_path: Path) -> None:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    bg = hex_to_rgb(page["theme"])
+    img = Image.new("RGB", (W, H), bg)
+    draw = ImageDraw.Draw(img)
+
+    # soft vignette / band
+    for y in range(H):
+        t = y / H
+        shade = 1.0 - 0.22 * t
+        row = tuple(int(c * shade) for c in bg)
+        draw.line([(0, y), (W, y)], fill=row)
+
+    accent = tuple(min(255, c + 28) for c in bg)
+    draw.rectangle([0, H - 8, W, H], fill=accent)
+
+    slug = page["slug"]
+    extra = HTTPDOCS / "images" / "claude-self-portrait-website.webp"
+    if slug == "zelfportret" and extra.is_file():
+        try:
+            art = Image.open(extra).convert("RGB")
+            art.thumbnail((520, H), Image.Resampling.LANCZOS)
+            img.paste(art, (W - art.width - 48, (H - art.height) // 2))
+        except OSError:
+            pass
+
+    title_font = load_font(72, bold=True)
+    sub_font = load_font(32)
+    brand_font = load_font(22)
+
+    margin_x, margin_y = 64, 72
+    max_text_w = 640 if slug == "zelfportret" else W - margin_x * 2
+
+    title = page["title"]
+    subtitle = page.get("subtitle") or ""
+
+    draw.text((margin_x, margin_y), title, font=title_font, fill=CREAM)
+
+    y = margin_y + 88
+    for line in wrap_text(subtitle, sub_font, max_text_w, draw):
+        draw.text((margin_x, y), line, font=sub_font, fill=MUTED)
+        y += 40
+
+    draw.text((margin_x, H - 56), "Nunki Channels", font=brand_font, fill=accent)
+
+    img.save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
+
+
+def abs_url(site: dict, path: str) -> str:
+    base = site.get("baseUrl") or ""
+    if not base:
+        return path
+    if not path.startswith("/"):
+        path = "/" + path
+    return base + path
+
+
+def social_block(page: dict, site: dict, *, is_home: bool = False) -> str:
+    title = page["title"]
+    if is_home:
+        title = site["name"]
+    desc = page.get("subtitle") or site["name"]
+    url = abs_url(site, page["path"] if not is_home else "/")
+    img = abs_url(site, page["ogImage"])
+    alt = f"{page['title']} — {desc}" if desc else page["title"]
+    return textwrap.dedent(
+        f"""
+        {SOCIAL_START}
+        <meta name="description" content="{esc(desc)}">
+        <link rel="canonical" href="{esc(url)}">
+        <meta property="og:site_name" content="{esc(site['name'])}">
+        <meta property="og:title" content="{esc(title)}">
+        <meta property="og:description" content="{esc(desc)}">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{esc(url)}">
+        <meta property="og:image" content="{esc(img)}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="{esc(alt)}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{esc(title)}">
+        <meta name="twitter:description" content="{esc(desc)}">
+        <meta name="twitter:image" content="{esc(img)}">
+        <meta name="twitter:image:alt" content="{esc(alt)}">
+        {SOCIAL_END}
+        """
+    ).strip()
+
+
+def esc(s: str) -> str:
+    return (
+        s.replace("&", "&amp;")
+        .replace('"', "&quot;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
+def strip_julius(html: str) -> str:
+    html = re.sub(r"\s*<meta[^>]*data-julius-public-artifact-og[^>]*>", "", html)
+    html = re.sub(
+        r"\s*<script[^>]*data-julius-public-artifact-analytics[^>]*></script>",
+        "",
+        html,
+    )
+    return html
+
+
+def inject_social(html: str, block: str) -> str:
+    html = strip_julius(html)
+    pattern = re.compile(
+        re.escape(SOCIAL_START) + r".*?" + re.escape(SOCIAL_END),
+        re.DOTALL,
+    )
+    if pattern.search(html):
+        return pattern.sub(block, html)
+    m = re.search(
+        r'(<meta name="viewport"[^>]*>\s*)',
+        html,
+        re.IGNORECASE,
+    )
+    if m:
+        return html[: m.end()] + "\n" + block + "\n" + html[m.end() :]
+    m = re.search(r"(<head[^>]*>\s*)", html, re.IGNORECASE)
+    if m:
+        return html[: m.end()] + block + "\n" + html[m.end() :]
+    return html
+
+
+def main() -> None:
+    site = load_site()
+    pages: list[dict] = []
+    for d in slug_dirs():
+        slug = d.name
+        html_path = d / "index.html"
+        html = html_path.read_text(encoding="utf-8")
+        page = parse_page(slug, html)
+        og_path = OG_DIR / f"{slug}.jpg"
+        generate_og(page, og_path)
+        block = social_block(page, site)
+        html_path.write_text(inject_social(html, block), encoding="utf-8")
+        pages.append(page)
+
+    payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": pages}
+    PAGES_JSON.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    index_path = HTTPDOCS / "index.html"
+    if index_path.is_file():
+        home = {
+            "title": site["name"],
+            "subtitle": "Wanden — getekend, scrollend, levend.",
+            "path": "/",
+            "ogImage": "/images/og/index.jpg",
+        }
+        generate_og({**home, "slug": "index", "theme": "#13202b"}, OG_DIR / "index.jpg")
+        html = index_path.read_text(encoding="utf-8")
+        index_path.write_text(
+            inject_social(html, social_block(home, site, is_home=True)),
+            encoding="utf-8",
+        )
+
+    print(f"Built {len(pages)} pages → {PAGES_JSON.relative_to(ROOT)}")
+
+
+if __name__ == "__main__":
+    main()
