@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ringen</title>
+<style>
+  html,body{margin:0;padding:0;background:#1a1712}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  #wall{position:relative;width:100vw}
+  #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+</style>
+</head>
+<body>
+<div id="wall"></div>
+<canvas id="trail"></canvas>
+<script>
+'use strict';
+// ---------------------------------------------------------------------------
+// ringen — a wall about a tree, and the years it keeps.
+// one tall sheet of drawings about growing, drought, fire, falling and
+// what a fall becomes. every mark is laid down by a wandering hand while
+// you watch; nothing here is ruled. the engine (tiles, queued strokes,
+// torn paper, pencil lettering) follows the technique of the fable wall
+// that inspired it.
+// ---------------------------------------------------------------------------
+const TAU = Math.PI*2;
+const qs = new URLSearchParams(location.search);
+const SEED = +(qs.get('s')||7);
+const FAST = qs.has('fast');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------- rng ----------------
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function stream(n){const f=mul32((n*2654435761)>>>0);for(let i=0;i<9;i++)f();return f}
+const rd=(R,a,b)=>a+R()*(b-a);
+const ri=(R,a,b)=>Math.floor(rd(R,a,b+1));
+const ch_=(R,p)=>R()<p;
+const pk=(R,arr)=>arr[(R()*arr.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// ---------------- noise ----------------
+function h2(x,y,s){const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)}
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+  const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  return h2(xi,yi,s)*(1-u)*(1-v)+h2(xi+1,yi,s)*u*(1-v)+h2(xi,yi+1,s)*(1-u)*v+h2(xi+1,yi+1,s)*u*v}
+function fbm(x,y,s,o){let a=.5,f=1,t=0,n=0;for(let i=0;i<o;i++){t+=vn(x*f,y*f,s+i*17)*a;n+=a;a*=.5;f*=2.03}return t/n}
+
+// ---------------- colour ----------------
+const CREAM=[246,241,228], BLUSH=[237,220,208], SAGEP=[223,226,206],
+      PLUMD=[47,42,36], INDIGO=[34,32,29], VOID=[24,20,17];
+const INK=[42,37,31], CINK=[238,231,210], CLAY=[172,80,54], OCHRE=[176,132,50],
+      GOLD=[214,178,108], SAGE=[104,126,86], SLATE=[88,112,148], ROSE=[196,130,122],
+      PLUM=[152,126,98], TEAL=[92,134,130], STEEL=[136,144,156];
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const shade=(c,k)=>[c[0]*(1-k),c[1]*(1-k),c[2]*(1-k)];
+const tint=(c,k)=>[c[0]+(255-c[0])*k,c[1]+(255-c[1])*k,c[2]+(255-c[2])*k];
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+let CUR=INK;
+
+// ---------------- the wall ----------------
+const LW=1600, TILEH=1200, TOTALH=13200;
+const NT=Math.ceil(TOTALH/TILEH);
+let S=Math.min(1.35, Math.max(1, window.devicePixelRatio||1));
+if(navigator.deviceMemory && navigator.deviceMemory<8) S=1.1;
+const wallEl=document.getElementById('wall');
+wallEl.style.height=(TOTALH/LW*100)+'vw';
+const TILES=[];
+for(let i=0;i<NT;i++){
+  const y0=i*TILEH, h=Math.min(TILEH+2, TOTALH-y0);
+  const cv=document.createElement('canvas');
+  cv.width=Math.round(LW*S); cv.height=Math.round(h*S);
+  cv.style.top=(y0/LW*100)+'vw';
+  cv.style.height=(h/LW*100)+'vw';
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.lineCap='round'; cx.lineJoin='round';
+  TILES.push({cv,cx,y0,h,q:[],qi:0,done:false,active:i===0});
+}
+let GENDONE=false;
+// route one drawing act to every tile it touches; whole passages of the wall
+// can be shifted down as one piece by GEN_DY
+let DIRECT=null, GEN_DY=0;
+function emit(y0,y1,fn){
+  if(DIRECT){
+    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
+    else fn(DIRECT.cx);
+    return;
+  }
+  const dy=GEN_DY;
+  const f=dy?cx=>{cx.save();cx.translate(0,dy);fn(cx);cx.restore()}:fn;
+  const a=clamp(Math.floor((y0+dy-60)/TILEH),0,NT-1), b=clamp(Math.floor((y1+dy+60)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++) TILES[i].q.push(f);
+}
+
+// ---------------- geometry ----------------
+function resample(pts,step){
+  if(pts.length<2)return pts.slice();
+  const out=[[pts[0][0],pts[0][1]]];let need=step;
+  for(let i=1;i<pts.length;i++){
+    let x0=pts[i-1][0],y0=pts[i-1][1];
+    const x1=pts[i][0],y1=pts[i][1];
+    let d=Math.hypot(x1-x0,y1-y0);
+    while(d>=need&&d>0){const t=need/d;x0+=(x1-x0)*t;y0+=(y1-y0)*t;out.push([x0,y0]);d=Math.hypot(x1-x0,y1-y0);need=step}
+    need-=d;
+  }
+  const last=pts[pts.length-1],le=out[out.length-1];
+  if(Math.hypot(last[0]-le[0],last[1]-le[1])>step*.2||out.length<2)out.push([last[0],last[1]]);
+  return out;
+}
+function chaikin(pts,closed,it){
+  while(it-->0){
+    const out=[],n=pts.length;
+    if(n<3)return pts;
+    if(!closed)out.push(pts[0]);
+    const end=closed?n:n-1;
+    for(let i=0;i<end;i++){
+      const a=pts[i],b=pts[(i+1)%n];
+      out.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);
+    }
+    if(!closed)out.push(pts[n-1]);
+    pts=out;
+  }
+  return pts;
+}
+function bbox(pts){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+  return[x0,y0,x1,y1]}
+function blob(R,cx,cy,rx,ry){
+  const rot=rd(R,0,TAU),ph=rd(R,0,7),n=14,pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const m=1+.16*Math.sin(t*2+ph)+.09*Math.sin(t*5+ph*2.1);
+    const x=Math.cos(t)*rx*m,y=Math.sin(t)*ry*m;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  return chaikin(pts,true,1);
+}
+function rotPts(pts,cx,cy,rot){
+  const co=Math.cos(rot),sn=Math.sin(rot);
+  return pts.map(p=>[cx+(p[0]-cx)*co-(p[1]-cy)*sn, cy+(p[0]-cx)*sn+(p[1]-cy)*co]);
+}
+function spiralPts(cx,cy,rOut,rIn,turns,ph,dir=1){
+  const n=Math.max(24,Math.round(turns*30)),pts=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n,th=ph+dir*t*turns*TAU,r=rOut+(rIn-rOut)*t;
+    pts.push([cx+Math.cos(th)*r,cy+Math.sin(th)*r]);
+  }
+  return pts;
+}
+
+// ---------------- the hand ----------------
+// every mark wanders off its intended path a little. pressed marks get a
+// second pass, the way a pen goes back over a line it means.
+function wob(R,rs,amp){
+  const n=rs.length,q=[];
+  const P1=rd(R,0,7),P2=rd(R,0,7),P3=rd(R,0,7);
+  const F1=rd(R,1.6,3.2),F2=rd(R,5,9);
+  for(let i=0;i<n;i++){
+    const t=i/(n-1);
+    const A=rs[Math.max(0,i-1)],B=rs[Math.min(n-1,i+1)];
+    let nx=-(B[1]-A[1]),ny=B[0]-A[0];
+    const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;
+    const off=amp*(.62*Math.sin(t*F1*2+P1)+.28*Math.sin(t*F2+P2)+.10*Math.sin(t*17+P3));
+    q.push([rs[i][0]+nx*off+rd(R,-.3,.3),rs[i][1]+ny*off+rd(R,-.3,.3)]);
+  }
+  return q;
+}
+function sk(R,pts,o={}){
+  const w=o.w??1.3, a0=o.a??.7;
+  const rs=resample(pts,Math.max(2.4,w*1.5));
+  const n=rs.length;
+  if(n<2)return;
+  const col=(o.col||CUR).slice();
+  const passes=o.passes??1;
+  const [bx0,by0,bx1,by1]=bbox(rs);
+  for(let p=0;p<passes;p++){
+    const amp=(o.amp??(w*.38+.55))*(p?1.5:1);
+    const alpha=a0*(p?.35:1);
+    const q=wob(R,rs,amp);
+    if(o.taper){
+      const segs=[];
+      for(let i=1;i<n;i++){
+        const t=i/(n-1);
+        let e;
+        if(o.taper==='out')e=.3+.7*(1-t);
+        else if(o.taper==='in')e=.3+.7*t;
+        else e=.35+.65*Math.min(1,Math.min(t,1-t)/.25);
+        segs.push([q[i-1],q[i],rgba(col,alpha*rd(R,.8,1)),Math.max(.5,w*e*rd(R,.85,1.15))]);
+      }
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';
+        for(const s of segs){
+          cx.strokeStyle=s[2];cx.lineWidth=s[3];
+          cx.beginPath();cx.moveTo(s[0][0],s[0][1]);cx.lineTo(s[1][0],s[1][1]);cx.stroke();
+        }
+      });
+    } else {
+      const lifts=[];
+      for(let i=0;i<n;i++)lifts.push(o.gap?ch_(R,o.gap):false);
+      const st=rgba(col,alpha), lw=w*rd(R,.85,1.12);
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';cx.lineJoin='round';
+        cx.beginPath();
+        let lift=false;
+        for(let i=0;i<n;i++){
+          if(!i||lift)cx.moveTo(q[i][0],q[i][1]);else cx.lineTo(q[i][0],q[i][1]);
+          lift=lifts[i];
+        }
+        cx.strokeStyle=st;cx.lineWidth=lw;cx.stroke();
+      });
+    }
+    if(p===0&&w>=1.9&&!o.noDust){
+      const specks=[];
+      for(let i=0;i<n;i+=3){
+        if(ch_(R,.6))continue;
+        const sz=rd(R,.6,1.2);
+        specks.push([q[i][0]+rd(R,-w,w)-sz/2,q[i][1]+rd(R,-w,w)-sz/2,sz,rgba(col,a0*rd(R,.14,.3))]);
+      }
+      if(specks.length)emit(by0,by1,cx=>{for(const s of specks){cx.fillStyle=s[3];cx.fillRect(s[0],s[1],s[2],s[2])}});
+    }
+  }
+}
+// a stroke that dies away toward x1 — for things i only half-hold
+function fadeStroke(R,pts,o,x0,x1){
+  const rs=resample(pts,4);
+  let run=[],runA=1;
+  const span=x1-x0;
+  const flush=()=>{if(run.length>1)sk(R,run,{...o,a:(o.a??.6)*runA});run=[]};
+  for(const p of rs){
+    const m=clamp((x1-p[0])/span,0,1);
+    if(m<.06){flush();continue}
+    if(run.length===0)runA=m;
+    run.push(p);
+    if(Math.abs(m-runA)>.22){flush();run=[p];runA=m}
+  }
+  flush();
+}
+function dotF(R,x,y,r,a,col){
+  const c=(col||CUR).slice(),pts=[];
+  const n=8,ph=rd(R,0,7);
+  for(let i=0;i<=n;i++){
+    const t=i/n*TAU,m=1+.2*Math.sin(t*2+ph);
+    pts.push([x+Math.cos(t)*r*m+rd(R,-.2,.2),y+Math.sin(t)*r*m+rd(R,-.2,.2)]);
+  }
+  emit(y-r-2,y+r+2,cx=>{
+    cx.beginPath();
+    for(let i=0;i<pts.length;i++){i?cx.lineTo(pts[i][0],pts[i][1]):cx.moveTo(pts[i][0],pts[i][1])}
+    cx.closePath();cx.fillStyle=rgba(c,a);cx.fill();
+  });
+}
+function ell(R,cx,cy,rx,ry,o={}){
+  const n=Math.max(10,Math.round((rx+ry)/2)),rot=rd(R,0,TAU),pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const x=Math.cos(t)*rx,y=Math.sin(t)*ry;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  pts.push(pts[0]);
+  sk(R,pts,o);
+}
+function fillPoly(pts,col,a){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const st=rgba(col,a),P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.fillStyle=st;cx.fill();
+  });
+}
+// scribble a region full, clipped, in one act
+function scribFill(R,pts,sp,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1;
+  const lines=[],slope=rd(R,-.2,.2);
+  for(let y=y0-sp;y<y1+sp;y+=sp*rd(R,.8,1.2)){
+    const raw=[],ph=rd(R,0,7);
+    for(let x=x0;x<=x1;x+=4)raw.push([x,y+(x-x0)*slope+Math.sin(x*.5+ph)*sp*.42+rd(R,-.8,.8)]);
+    if(raw.length>1)lines.push([wob(R,resample(raw,3.2),.55),rgba(col,a*rd(R,.6,1.05)),w*rd(R,.85,1.12)]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap='round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+function hatchFill(R,pts,sp,ang,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1.1, straight=o.straight;
+  const diag=Math.hypot(x1-x0,y1-y0),cx0=(x0+x1)/2,cy0=(y0+y1)/2;
+  const px=Math.cos(ang+Math.PI/2),py=Math.sin(ang+Math.PI/2);
+  const dx=Math.cos(ang),dy=Math.sin(ang);
+  const lines=[],n=Math.ceil(diag/sp);
+  for(let i=-n;i<=n;i++){
+    const t=i*sp+(straight?0:rd(R,-.2,.2)*sp);
+    const raw=[[cx0+px*t-dx*diag*.6,cy0+py*t-dy*diag*.6],[cx0+px*t+dx*diag*.6,cy0+py*t+dy*diag*.6]];
+    lines.push([straight?raw:wob(R,resample(raw,4),.7),rgba(col,a*(straight?1:rd(R,.6,1.1))),w*(straight?1:rd(R,.85,1.15))]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap=straight?'butt':'round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+// a soft coloured-pencil scrub, never quite inside the lines
+function scrub(R,cx,cy,r,col,a=.4){
+  const b=blob(R,cx,cy,r*rd(R,1,1.12),r*rd(R,.82,1));
+  fillPoly(b,col,.1);
+  scribFill(R,b,Math.max(3,r*.13),a,{col});
+}
+function spatter(R,x,y,r,n,col,a=.5){
+  const sd=ri(R,0,99999),c=col.slice();
+  emit(y-r,y+r,cx=>{
+    const RR=mul32(sd);
+    for(let i=0;i<n;i++){
+      const t=RR()*TAU,d=Math.sqrt(RR())*r;
+      const s=.8+RR()*RR()*2.2;
+      cx.fillStyle=rgba(c,a*(.3+RR()*.7));
+      cx.fillRect(x+Math.cos(t)*d,y+Math.sin(t)*d*.7,s,s*(.8+RR()*.5));
+    }
+  });
+}
+function drip(R,x,y,len,col,a=.3,w=2){
+  const pts=[[x,y]];
+  let px=x;
+  for(let d=0;d<len;d+=9){px+=rd(R,-1.4,1.4);pts.push([px,y+d])}
+  sk(R,pts,{col,w,a,taper:'out',amp:.4});
+  dotF(R,px,y+len,w*1.1,a*1.2,col);
+}
+function arrowHead(R,x,y,ang,sz,a,col,w=1.6){
+  for(const sd of[-1,1])
+    sk(R,[[x,y],[x-Math.cos(ang+sd*.5)*sz,y-Math.sin(ang+sd*.5)*sz]],{col,w,a,taper:'out'});
+}
+function zigOut(R,x,y,rx,ry){
+  const pts=[];
+  const n=ri(R,6,9);
+  for(let i=0;i<=n;i++)pts.push([x+(i/n*2-1)*rx+rd(R,-4,4),y+((i%2)?-1:1)*ry*rd(R,.5,1)]);
+  sk(R,pts,{w:1.4,a:.55,amp:1});
+}
+function spark(R,x,y,r,o={}){
+  const n=o.nR??ri(R,5,8);
+  const rot=rd(R,0,TAU),col=o.col||CUR;
+  for(let i=0;i<n;i++){
+    const a=rot+i/n*TAU+rd(R,-.14,.14)/n*TAU;
+    const r0=r*rd(R,.22,.34),r1=r*rd(R,.85,1.1)*(i%2?.78:1);
+    sk(R,[[x+Math.cos(a)*r0,y+Math.sin(a)*r0],[x+Math.cos(a)*r1,y+Math.sin(a)*r1]],
+      {col,w:o.w??1.3,a:(o.a??.75)*rd(R,.8,1),taper:'out',amp:.3});
+  }
+  if(!o.noCenter&&ch_(R,.55))dotF(R,x,y,Math.max(1,r*.13),(o.a??.75),col);
+}
+
+// ---------------- asemic writing ----------------
+// a few drawings need writing that only looks like writing: a field journal nobody can read.
+function aword(R,x,y,h,nl,o={}){
+  const pts=[[x,y+rd(R,-.1,.1)*h]];
+  let cx=x;
+  for(let i=0;i<nl;i++){
+    const up=y-h*rd(R,.32,.62)-(ch_(R,.13)?h*rd(R,.4,.75):0);
+    const dn=y+(ch_(R,.09)?h*rd(R,.3,.55):h*rd(R,-.06,.12));
+    cx+=h*rd(R,.18,.3);pts.push([cx,up]);
+    cx+=h*rd(R,.18,.3);pts.push([cx,dn]);
+  }
+  sk(R,chaikin(pts,false,1),{col:o.col,w:o.w??.9,a:o.a??.55,amp:.28});
+  return cx-x;
+}
+function atext(R,xa,xb,y,h,o={}){
+  let cx=xa,guard=0;
+  while(cx<xb-h*.9&&guard++<70){
+    let nl=ri(R,2,5);
+    const est=nl*h*.5;
+    if(cx+est>xb)nl=Math.max(1,Math.floor((xb-cx)/(h*.5)));
+    if(nl<1)break;
+    const adv=aword(R,cx,y,h,nl,o);
+    cx+=adv+h*rd(R,.45,.75);
+  }
+}
+
+// ---------------- hand lettering ----------------
+// a real alphabet, one wobbly stroke at a time. used rarely, like pencil notes.
+const A_=(cx,cy,rx,ry,a0,a1,n=9)=>{const p=[];for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*rx,cy+Math.sin(t)*ry])}return p};
+const GL={};
+const G=(chr,w,...strokes)=>GL[chr]={w,s:strokes};
+G('a',.62,A_(.27,.73,.23,.26,-.5,5.8),[[.5,.48],[.52,.96],[.6,1]]);
+G('b',.6,[[.1,.05],[.1,1]],[[.1,.56],[.34,.47],[.54,.62],[.53,.86],[.3,1],[.1,.9]]);
+G('c',.58,A_(.3,.74,.25,.26,.6,5.68));
+G('d',.62,A_(.28,.74,.24,.26,-.5,5.8),[[.52,.05],[.53,.95],[.6,1]]);
+G('e',.56,[[.08,.73],[.48,.7],[.49,.54],[.3,.45],[.1,.56],[.07,.8],[.26,1],[.5,.93]]);
+G('f',.46,[[.44,.12],[.32,.05],[.22,.14],[.2,1]],[[.05,.48],[.42,.46]]);
+G('g',.6,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.48],[.53,1.12],[.42,1.36],[.16,1.32]]);
+G('h',.58,[[.1,.05],[.1,1]],[[.1,.62],[.3,.47],[.48,.56],[.5,1]]);
+G('i',.26,[[.13,.5],[.13,.96],[.18,1]],[[.11,.27],[.15,.3]]);
+G('j',.34,[[.22,.5],[.24,1.15],[.12,1.36],[-.02,1.28]],[[.2,.27],[.24,.3]]);
+G('k',.52,[[.1,.05],[.1,1]],[[.44,.48],[.12,.76]],[[.2,.68],[.46,1]]);
+G('l',.3,[[.14,.05],[.14,.93],[.22,1]]);
+G('m',.68,[[.07,1],[.07,.5]],[[.07,.62],[.2,.46],[.33,.56],[.34,1]],[[.34,.62],[.47,.46],[.6,.56],[.61,1]]);
+G('n',.56,[[.09,1],[.09,.5]],[[.09,.62],[.28,.46],[.46,.56],[.48,1]]);
+G('o',.6,A_(.29,.73,.24,.26,-1.2,-1.2+TAU*.97,10));
+G('p',.6,[[.1,.5],[.1,1.36]],[[.1,.57],[.34,.47],[.53,.62],[.52,.86],[.3,.98],[.1,.9]]);
+G('q',.62,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.5],[.52,1.22],[.62,1.34]]);
+G('r',.44,[[.1,1],[.1,.5]],[[.1,.68],[.22,.5],[.42,.46]]);
+G('s',.52,[[.46,.52],[.24,.45],[.09,.58],[.22,.72],[.42,.8],[.46,.93],[.24,1],[.06,.92]]);
+G('t',.48,[[.26,.12],[.25,.9],[.36,1]],[[.08,.44],[.46,.43]]);
+G('u',.58,[[.08,.5],[.08,.84],[.22,1],[.42,.9],[.45,.5]],[[.45,.6],[.47,.96],[.54,1]]);
+G('v',.5,[[.06,.5],[.26,1],[.46,.5]]);
+G('w',.62,[[.04,.5],[.17,1],[.3,.62],[.43,1],[.57,.5]]);
+G('x',.52,[[.07,.5],[.47,1]],[[.47,.5],[.07,1]]);
+G('y',.54,[[.07,.5],[.28,1]],[[.5,.5],[.24,1.14],[.06,1.34]]);
+G('z',.52,[[.07,.5],[.45,.5],[.06,1],[.47,1]]);
+G('2',.54,[[.08,.3],[.18,.12],[.38,.12],[.44,.32],[.07,1],[.47,1]]);
+G('0',.56,A_(.27,.55,.22,.44,-1.3,-1.3+TAU*.97,10));
+G('6',.52,[[.4,.1],[.18,.34],[.09,.68],[.2,.98],[.4,.94],[.46,.7],[.3,.56],[.11,.66]]);
+G('8',.54,A_(.27,.31,.16,.2,-1.57,-1.57+TAU),A_(.27,.76,.2,.23,-1.57,-1.57+TAU));
+G('.',.24,[[.1,.93],[.13,.97]]);
+G(',',.24,[[.14,.9],[.15,1.02],[.04,1.16]]);
+G("'",.2,[[.12,.05],[.09,.26]]);
+G('-',.44,[[.05,.7],[.38,.68]]);
+G('—',.66,[[.03,.7],[.6,.67]]);
+G('·',.24,[[.08,.68],[.12,.72]]);
+G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
+G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
+G(' ',.42);
+function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+function write(R,t,x,y,sz,o={}){
+  const a=o.a??.7,col=o.col;
+  let px=o.cen?x-measure(t,sz)/2:x;
+  const ph=rd(R,0,7);
+  for(let i=0;i<t.length;i++){
+    const c=t[i],g=GL[c]||GL[' '];
+    const yb=y+Math.sin(i*.8+ph)*sz*.045;
+    for(const st of(g.s||[])){
+      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
+      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
+    }
+    px+=(g.w+.1)*sz;
+  }
+}
+
+// ---------------- torn paper ----------------
+// the wall is a collage: sheets of coloured paper glued down, edges torn by
+// hand, each showing its white fibrous core where it ripped.
+function tornPath(R,x0,y0,x1,y1,rough,sd){
+  const pts=[];
+  const side=(ax,ay,bx,by,nx,ny,id)=>{
+    const L=Math.hypot(bx-ax,by-ay),steps=Math.max(3,Math.round(L/26));
+    for(let i=0;i<steps;i++){
+      const t=i/steps;
+      let off=(fbm(t*3.1+id*7,id*3.3,sd,3)-.5)*2*rough;
+      if(h2(i*1.7,id*9.1,sd)>0.93)off+=rd(R,8,22)*(h2(i,id,sd+3)>.5?1:-1);
+      pts.push([ax+(bx-ax)*t+nx*off,ay+(by-ay)*t+ny*off]);
+    }
+  };
+  side(x0,y0,x1,y0,0,1,0);
+  side(x1,y0,x1,y1,-1,0,1);
+  side(x1,y1,x0,y1,0,-1,2);
+  side(x0,y1,x0,y0,1,0,3);
+  return pts;
+}
+function sheet(R,x0,y0,x1,y1,col,o={}){
+  const rough=o.rough??16;
+  const sd=ri(R,0,9999);
+  let P=tornPath(R,x0,y0,x1,y1,rough,sd);
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  // the shadow the paper casts on what is beneath it
+  fillPoly(P.map(p=>[p[0]+6,p[1]+8]),[12,9,7],.28);
+  fillPoly(P,col,1);
+  fillPoly(P,col,1);
+  const [bx0,by0,bx1,by1]=bbox(P);
+  const PP=P.map(p=>p.slice());
+  // grain: the tooth of the paper
+  const gsd=ri(R,0,99999);
+  emit(by0,by1,cx=>{
+    const RR=mul32(gsd);
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<PP.length;i++){i?cx.lineTo(PP[i][0],PP[i][1]):cx.moveTo(PP[i][0],PP[i][1])}
+    cx.closePath();cx.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/1900);
+    for(let i=0;i<n;i++){
+      const s=.8+RR()*1.1;
+      const dark=RR()<.62;
+      cx.fillStyle=dark?'rgba(45,40,34,.05)':'rgba(255,252,244,.07)';
+      cx.fillRect(bx0+RR()*(bx1-bx0),by0+RR()*(by1-by0),s,s);
+    }
+    for(let i=0;i<n/22;i++){
+      const fx=bx0+RR()*(bx1-bx0),fy=by0+RR()*(by1-by0),fa=RR()*TAU,fl=3+RR()*7;
+      cx.strokeStyle='rgba(45,40,34,.05)';cx.lineWidth=.7;
+      cx.beginPath();cx.moveTo(fx,fy);cx.lineTo(fx+Math.cos(fa)*fl,fy+Math.sin(fa)*fl);cx.stroke();
+    }
+    cx.restore();
+  });
+  // torn edge: the white fibrous core
+  if(!o.noCore){
+    const core=P.concat([P[0]]);
+    sk(R,core,{col:[251,247,237],w:2,a:.42,amp:.4,gap:.24,noDust:true});
+    sk(R,core.map(p=>[p[0]+rd(R,1,3),p[1]+rd(R,1,3)]),{col:shade(col,.22),w:1,a:.2,amp:.5,gap:.4,noDust:true});
+  }
+  return P;
+}
+// a little pinned study: torn scrap + shadow + tape at two corners
+function scrap(R,x,y,w,h,col,rot){
+  const P=sheet(R,x-w/2,y-h/2,x+w/2,y+h/2,col,{rough:8,rot});
+  const [bx0,by0,bx1,by1]=bbox(P);
+  for(const cnr of[[bx0+14,by0+12],[bx1-16,by1-12]]){
+    const tp=rotPts([[cnr[0]-22,cnr[1]-8],[cnr[0]+22,cnr[1]-8],[cnr[0]+22,cnr[1]+9],[cnr[0]-22,cnr[1]+9]],cnr[0],cnr[1],rd(R,.5,.9));
+    fillPoly(tp,[240,234,216],.35);
+    sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+  }
+}
+
+// ---------------- small things ----------------
+function enso(R,cx,cy,r,frac,col,o={}){
+  const a0=rd(R,0,TAU),pts=[];
+  const n=Math.round(40*frac);
+  for(let i=0;i<=n;i++){
+    const t=a0+i/n*TAU*frac;
+    const rr2=r*(1+.03*Math.sin(i*.7));
+    pts.push([cx+Math.cos(t)*rr2,cy+Math.sin(t)*rr2]);
+  }
+  sk(R,pts,{col,w:o.w??9,a:o.a??.75,amp:3,taper:'out',noDust:true});
+  sk(R,pts.map(p=>[p[0]+rd(R,2,5),p[1]+rd(R,2,4)]),{col,w:(o.w??9)*.4,a:(o.a??.75)*.3,amp:3.4,gap:.12,noDust:true});
+  return a0+TAU*frac; // where the brush lifted
+}
+function moth(R,x,y,s,col,a=.6){
+  for(const sd of[-1,1]){
+    const wing=blob(R,x+sd*s*.55,y-s*.1,s*.62,s*.45);
+    sk(R,wing.concat([wing[0]]),{col,w:1.1,a,amp:.5});
+    scribFill(R,wing,s*.3,a*.4,{col});
+    const wl=blob(R,x+sd*s*.38,y+s*.34,s*.34,s*.26);
+    sk(R,wl.concat([wl[0]]),{col,w:1,a:a*.85,amp:.4});
+  }
+  sk(R,[[x,y-s*.45],[x,y+s*.5]],{col,w:1.6,a,amp:.3});
+  for(const sd of[-1,1])
+    sk(R,[[x,y-s*.42],[x+sd*s*.3,y-s*.75]],{col,w:.9,a:a*.8,amp:.3,taper:'out'});
+}
+function shellSpiral(R,cx,cy,r,col){
+  const pts=[];
+  for(let t=0;t<=1;t+=.012){
+    const th=t*3.2*TAU, rr2=r*Math.pow(.78,3.2*2-t*3.2*2);
+    pts.push([cx+Math.cos(th)*rr2,cy+Math.sin(th)*rr2*.86]);
+  }
+  sk(R,pts,{col,w:1.6,a:.6,amp:.7});
+  for(let k=0;k<7;k++){
+    const t=.4+k*.09,th=t*3.2*TAU,rr2=r*Math.pow(.78,3.2*2-t*3.2*2);
+    sk(R,[[cx+Math.cos(th)*rr2*.55,cy+Math.sin(th)*rr2*.5],[cx+Math.cos(th)*rr2,cy+Math.sin(th)*rr2*.86]],{col,w:.9,a:.35,amp:.3});
+  }
+}
+function fern(R,x,y,h,col){
+  const spine=[];
+  for(let t=0;t<=1;t+=.07)spine.push([x+Math.sin(t*2.6)*h*.14,y-t*h]);
+  sk(R,spine,{col,w:1.5,a:.6,amp:.5,taper:'out'});
+  for(let t=.08;t<.95;t+=.06){
+    const i=Math.min(spine.length-1,Math.round(t*spine.length));
+    const p=spine[i],L=h*.16*(1-t*.8);
+    for(const sd of[-1,1]){
+      const tip=[p[0]+sd*L,p[1]-L*.5];
+      sk(R,[p,tip],{col,w:1,a:.5,amp:.4,taper:'out'});
+    }
+  }
+}
+function birdM(R,x,y,s,col,a=.6){
+  sk(R,[[x-s,y],[x-s*.4,y-s*.55],[x,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+  sk(R,[[x,y],[x+s*.4,y-s*.55],[x+s,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+}
+function noteHead(R,x,y,up,col,a=.8){
+  dotF(R,x,y,4.2,a,col);
+  sk(R,[[x+(up?4:-4),y],[x+(up?4:-4),y+(up?-26:26)]],{col,w:1.4,a:a*.85,amp:.3});
+}
+
+// ---------------- replay engine ----------------
+let CSSK=innerWidth/LW;
+addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+function tick(now){
+  const sy=scrollY/CSSK, vh=innerHeight/CSSK;
+  for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
+  const budget=(FAST||RM)?200:7;
+  const t0=performance.now();
+  for(const T of TILES){
+    if(!T.active||T.done)continue;
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){
+      T.q[T.qi++](T.cx);
+      if(performance.now()-t0>budget)break;
+    }
+    if(GENDONE&&T.qi>=T.q.length){T.done=true;T.q=null;readyRestless(T)}
+    if(performance.now()-t0>budget)break;
+  }
+  runRestless(now);
+  drawTrail(now);
+  requestAnimationFrame(tick);
+}
+
+// ---------------- restlessness ----------------
+// a few marks cannot hold still. every so often one erases itself and is
+// drawn again, never quite the same, like a ring that keeps being added.
+const RESTLESS=[];
+function restless(x,y,w,h,fn){RESTLESS.push({x,y:y+GEN_DY,w,h,fn,dy:GEN_DY,img:null,next:0,tile:null})}
+function readyRestless(T){
+  if(RM)return;
+  for(const r of RESTLESS){
+    if(r.img)continue;
+    if(r.y>=T.y0&&r.y+r.h<=T.y0+T.h&&T.done){
+      r.tile=T;
+      const px=Math.round(r.x*S),py=Math.round((r.y-T.y0)*S);
+      const pw=Math.round(r.w*S),ph=Math.round(r.h*S);
+      try{r.img=T.cx.getImageData(px,py,pw,ph);r.px=px;r.py=py;
+          r.next=performance.now()+2000+Math.random()*3000;}catch(e){}
+    }
+  }
+}
+let restR=stream(SEED*77+3);
+function runRestless(now){
+  for(const r of RESTLESS){
+    if(!r.img||now<r.next)continue;
+    r.tile.cx.putImageData(r.img,r.px,r.py);
+    DIRECT=r.tile; GEN_DY=r.dy;
+    r.fn(restR);
+    GEN_DY=0; DIRECT=null;
+    r.next=now+2600+Math.random()*4200;
+  }
+}
+
+// ---------------- the visitor ----------------
+// where you move, you leave graphite on the wall. it fades, like a
+// breath on cold glass.
+const trailCv=document.getElementById('trail');
+const trailCx=trailCv.getContext('2d');
+let TP=[];
+function sizeTrail(){
+  const d=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*d;trailCv.height=innerHeight*d;
+  trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
+  trailCx.setTransform(d,0,0,d,0,0);
+  trailCx.lineCap='round';
+}
+sizeTrail();
+addEventListener('pointermove',e=>{
+  const t=performance.now();
+  const L=TP[TP.length-1];
+  if(L&&Math.hypot(e.clientX-L.x,e.clientY-L.y)<3)return;
+  TP.push({x:e.clientX,y:e.clientY,t});
+  if(TP.length>400)TP.shift();
+},{passive:true});
+const DARKP=new Set([1,5,7,10]);
+function drawTrail(now){
+  if(RM){trailCx.clearRect(0,0,innerWidth,innerHeight);return}
+  trailCx.clearRect(0,0,innerWidth,innerHeight);
+  if(TP.length<2)return;
+  const pidx=Math.floor((scrollY+innerHeight/2)/CSSK/TILEH);
+  const col=DARKP.has(pidx)?CINK:INK;
+  const LIFE=3800;
+  while(TP.length&&now-TP[0].t>LIFE)TP.shift();
+  for(let i=1;i<TP.length;i++){
+    const a=TP[i-1],b=TP[i];
+    if(b.t-a.t>110)continue;
+    const age=(now-b.t)/LIFE;
+    const k=1-age;
+    if(k<=0)continue;
+    const wobx=Math.sin(now*.0011+i*.7)*1.3*age, woby=Math.cos(now*.0009+i*1.1)*1.3*age;
+    trailCx.strokeStyle=rgba(col,.2*k*k);
+    trailCx.lineWidth=.8+1.6*k;
+    trailCx.beginPath();
+    trailCx.moveTo(a.x+wobx,a.y+woby);
+    trailCx.lineTo(b.x+wobx,b.y+woby);
+    trailCx.stroke();
+  }
+}
+
+// ---------------- margin whispers ----------------
+function whispers(R,y0,y1,dark,n){
+  const col=dark?CINK:INK;
+  for(let i=0;i<n;i++){
+    const left=ch_(R,.5);
+    const x=left?rd(R,26,140):rd(R,1460,1574);
+    const y=rd(R,y0+40,y1-40);
+    const a=rd(R,.25,.45);
+    const k=ri(R,0,6);
+    if(k===0)sk(R,spiralPts(x,y,rd(R,8,16),2,rd(R,1.5,2.5),rd(R,0,7)),{col,w:1,a,amp:.4});
+    else if(k===1){for(let j=0;j<ri(R,3,6);j++)dotF(R,x+j*7,y+rd(R,-2,2),1.2,a,col)}
+    else if(k===2){sk(R,[[x-6,y],[x+6,y]],{col,w:1,a,amp:.3});sk(R,[[x,y-6],[x,y+6]],{col,w:1,a,amp:.3})}
+    else if(k===3)spark(R,x,y,rd(R,6,11),{col,a,w:1,nR:4,noCenter:true});
+    else if(k===4)aword(R,x-15,y,rd(R,8,12),ri(R,2,4),{col,a});
+    else if(k===5)ell(R,x,y,rd(R,5,9),rd(R,5,9),{col,w:1,a,amp:.4});
+    else birdM(R,x,y,rd(R,6,10),col,a);
+  }
+}
+
+
+// ===========================================================================
+// ringen — eleven panels of 1200 units, top to bottom. every panel is drawn
+// in local coordinates 0..1600 x 0..1200; GEN_DY lifts it to its place.
+// ===========================================================================
+const MOSS=[96,116,64], BARK=[86,62,44], WOOD=[216,178,124], AMBER=[228,164,62],
+      BIRCH=[236,230,212], SOIL=[54,40,32], CHAR=[28,24,22], FIRE=[204,80,42],
+      FOREST=[26,38,30], PAPER=[238,230,208], DRY=[196,168,112], LEAFG=[110,134,70];
+const PH=1200;
+const P=[];
+
+function hblob(R,cx,cy,rx,ry){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<14;i++){const t=i/14*TAU,m=1+.1*Math.sin(t*2+ph)+.05*Math.sin(t*5+ph*2.1);pts.push([cx+Math.cos(t)*rx*m,cy+Math.sin(t)*ry*m])}
+  return chaikin(pts,true,1);
+}
+function caption(R,t,x,y,sz,dark){write(R,t,x,y,sz,{a:.85,cen:true,col:dark?CINK:INK})}
+function fall(R,x,y0,y1,col,a){
+  for(let y=y0;y<y1;y+=rd(R,34,52))dotF(R,x+Math.sin(y*.012)*9+rd(R,-3,3),y,rd(R,1.5,2.6),a*rd(R,.6,1),col);
+}
+// a leaf with a midrib and veins, pointing along ang
+function leaf(R,x,y,s,ang,col,a=.8,lobes=true){
+  const L=[],Rr=[],co=Math.cos(ang),sn=Math.sin(ang);
+  for(let i=0;i<=14;i++){
+    const t=i/14,w=s*.36*Math.pow(Math.sin(Math.PI*t),.8)*(lobes?1+.16*Math.sin(t*20):1);
+    L.push([t*s,-w]);Rr.push([t*s,w]);
+  }
+  const loc=L.concat(Rr.reverse());
+  const pts=loc.map(p=>[x+p[0]*co-p[1]*sn,y+p[0]*sn+p[1]*co]);
+  fillPoly(pts,col,.3);scribFill(R,pts,Math.max(3,s*.07),a*.45,{col,w:1});
+  sk(R,pts.concat([pts[0]]),{col:shade(col,.4),w:1.3,a,amp:.5});
+  const m=[[x,y],[x+co*s,y+sn*s]];
+  sk(R,m,{col:shade(col,.5),w:1.4,a,amp:.4});
+  for(let t=.18;t<.85;t+=.14){
+    const px=x+co*s*t,py=y+sn*s*t,w=s*.28*Math.sin(Math.PI*t);
+    for(const sd of[-1,1])sk(R,[[px,py],[px+co*s*.14-sn*sd*w,py+sn*s*.14+co*sd*w]],{col:shade(col,.5),w:.9,a:a*.6,amp:.3,taper:'out'});
+  }
+}
+// a bare winter branch, growing outward by chance
+function branch(R,x,y,ang,len,depth,col,w){
+  const x2=x+Math.cos(ang)*len,y2=y+Math.sin(ang)*len;
+  sk(R,[[x,y],[(x+x2)/2+rd(R,-len*.05,len*.05),(y+y2)/2+rd(R,-len*.05,len*.05)],[x2,y2]],{col,w,a:.85,amp:.8,taper:'out'});
+  if(depth<=0)return;
+  const n=ri(R,2,3);
+  for(let i=0;i<n;i++)branch(R,x2,y2,ang+rd(R,-.7,.7),len*rd(R,.6,.75),depth-1,col,Math.max(.8,w*.65));
+}
+// rings of a cut trunk. widths[] gives the thickness of each year.
+function ringPath(R,cx,cy,r,i,sd,ecc){
+  const pts=[];
+  for(let a=0;a<TAU;a+=.14){
+    const k=1+.05*(fbm(Math.cos(a)*1.6+i*.4,Math.sin(a)*1.6,sd,2)-.5)*2+ecc*Math.cos(a-.7);
+    pts.push([cx+Math.cos(a)*r*k,cy+Math.sin(a)*r*k*.96]);
+  }
+  pts.push(pts[0]);
+  return pts;
+}
+function flame(R,x,y,h,w){
+  const cols=[FIRE,AMBER,[240,210,120]];
+  for(let k=0;k<7;k++){
+    const bx=x+rd(R,-w,w),hh=h*rd(R,.4,1)*(1-Math.abs(bx-x)/(w*1.6));
+    const pts=[];
+    for(let t=0;t<=1;t+=.08)pts.push([bx+Math.sin(t*5+k)*w*.28*t,y-t*hh]);
+    sk(R,pts,{col:pk(R,cols),w:rd(R,3,6),a:rd(R,.5,.85),amp:1.6,taper:'out',noDust:true});
+  }
+}
+function trunk(R,x,y0,y1,wb,wt,col){
+  const poly=[[x-wb,y1],[x-wt,y0],[x+wt,y0],[x+wb,y1]];
+  fillPoly(poly,col,.9);
+  for(let k=0;k<12;k++){
+    const t=-1+k/5.5,px0=x+t*wt,px1=x+t*wb;
+    sk(R,[[px0,y0],[px1,y1]],{col:shade(col,.5),w:rd(R,1,2.4),a:rd(R,.35,.7),amp:2.4,gap:.05});
+  }
+  sk(R,[[x-wb,y1],[x-wt,y0]],{col:shade(col,.6),w:2,a:.7,amp:1.2});
+  sk(R,[[x+wt,y0],[x+wb,y1]],{col:shade(col,.6),w:2,a:.7,amp:1.2});
+}
+// small creatures and things
+function beetle(R,x,y,s,col){
+  const b=hblob(R,x,y,s*.9,s*.62);fillPoly(b,[40,60,50],.7);
+  sk(R,b.concat([b[0]]),{col,w:1.6,a:.85,amp:.5});
+  sk(R,[[x-s*.85,y],[x+s*.8,y]],{col,w:1,a:.5,amp:.3});
+  const h=hblob(R,x+s*1.05,y,s*.26,s*.28);fillPoly(h,col,.8);
+  for(const sd of[-1,1]){
+    for(let k=0;k<3;k++)sk(R,[[x-s*.3+k*s*.4,y+sd*s*.55],[x-s*.5+k*s*.45,y+sd*s*1.05]],{col,w:1.1,a:.7,amp:.3});
+    sk(R,[[x+s*1.2,y+sd*s*.15],[x+s*1.6,y+sd*s*.5]],{col,w:1,a:.7,amp:.3});
+  }
+}
+function owl(R,x,y,s,col){
+  const b=hblob(R,x,y+s*.2,s*.8,s*1.1);fillPoly(b,[140,116,86],.6);scribFill(R,b,3.5,.45,{col:BARK,w:1});
+  sk(R,b.concat([b[0]]),{col,w:1.7,a:.85,amp:.7});
+  for(const sd of[-1,1]){
+    ell(R,x+sd*s*.33,y-s*.35,s*.28,s*.28,{col,w:1.5,a:.85,amp:.4});
+    dotF(R,x+sd*s*.33,y-s*.35,s*.1,.9,col);
+    sk(R,[[x+sd*s*.55,y-s*.75],[x+sd*s*.4,y-s*.95]],{col,w:1.6,a:.8,amp:.3});
+  }
+  sk(R,[[x-s*.08,y-s*.2],[x,y-s*.05],[x+s*.08,y-s*.2]],{col:AMBER,w:2.2,a:.9,amp:.2});
+  for(let k=0;k<5;k++)sk(R,[[x-s*.4+k*s*.2,y+s*.3],[x-s*.4+k*s*.2,y+s*.55]],{col,w:1,a:.4,amp:.3});
+  sk(R,[[x-s*1.1,y+s*1.2],[x+s*1.1,y+s*1.2]],{col:BARK,w:4,a:.8,amp:.8});
+}
+function shroom(R,x,y,s,col){
+  const cap=[];
+  for(let i=0;i<=14;i++){const t=Math.PI+i/14*Math.PI;cap.push([x+Math.cos(t)*s,y-s*.1+Math.sin(t)*s*.7])}
+  cap.push([x+s*.9,y-s*.05],[x-s*.9,y-s*.05]);
+  fillPoly(cap,FIRE,.55);scribFill(R,cap,4,.4,{col:FIRE,w:1});
+  sk(R,cap.concat([cap[0]]),{col,w:1.6,a:.85,amp:.5});
+  for(let k=0;k<6;k++)dotF(R,x+rd(R,-s*.7,s*.7),y-s*rd(R,.15,.55),rd(R,2,4),.8,BIRCH);
+  const st=[[x-s*.18,y],[x-s*.14,y+s*.9],[x+s*.14,y+s*.9],[x+s*.18,y]];
+  fillPoly(st,BIRCH,.9);sk(R,st,{col,w:1.4,a:.8,amp:.4});
+}
+function snail(R,x,y,s,col){
+  sk(R,spiralPts(x,y-s*.5,s*.7,s*.08,2.8,rd(R,0,7)),{col:BARK,w:2.2,a:.85,amp:.5});
+  const body=[[x-s*1.2,y+s*.2],[x-s*.4,y+s*.12],[x+s*.8,y+s*.15],[x+s*1.2,y-s*.1],[x+s*1.35,y-s*.55]];
+  sk(R,body,{col,w:4,a:.6,amp:.6,taper:'out'});
+  sk(R,[[x+s*1.2,y-s*.3],[x+s*1.3,y-s*.8]],{col,w:1.2,a:.7,amp:.3});sk(R,[[x+s*1.35,y-s*.3],[x+s*1.6,y-s*.75]],{col,w:1.2,a:.7,amp:.3});
+  sk(R,wave0(x-s*1.4,x+s*.6,y+s*.35,3,.6),{col:SEA0,w:1.2,a:.3,amp:.5});
+}
+const SEA0=[130,150,150];
+function wave0(x0,x1,y,amp,f){const p=[];for(let x=x0;x<=x1;x+=6)p.push([x,y+Math.sin(x*f)*amp]);return p}
+function nest(R,x,y,s,col){
+  for(let k=0;k<26;k++){
+    const a0=rd(R,.1,Math.PI-.1),a1=a0+rd(R,.4,1),r=s*rd(R,.7,1.05);
+    sk(R,A_(x,y,r,r*.55,a0,a1,5),{col:BARK,w:rd(R,1,2.2),a:rd(R,.4,.8),amp:.5});
+  }
+  for(const dx of[-s*.35,0,s*.35]){
+    const e=hblob(R,x+dx,y-s*.12,s*.24,s*.32);
+    fillPoly(e,[190,214,206],.85);sk(R,e.concat([e[0]]),{col,w:1.3,a:.8,amp:.3});
+    for(let k=0;k<4;k++)dotF(R,x+dx+rd(R,-8,8),y-s*.12+rd(R,-12,12),1.2,.6,BARK);
+  }
+}
+function mosspatch(R,x,y,s,col){
+  for(let k=0;k<110;k++){
+    const px=x+rd(R,-s,s),py=y+rd(R,-s*.5,s*.5);
+    if(((px-x)/s)**2+((py-y)/(s*.5))**2>1)continue;
+    sk(R,[[px,py],[px+rd(R,-3,3),py-rd(R,6,14)]],{col,w:1.2,a:rd(R,.4,.8),amp:.3,taper:'out'});
+  }
+}
+function ant(R,x,y,s,col){
+  for(let k=0;k<3;k++){const b=hblob(R,x-k*s*.9+(k===2?-s*.2:0),y,s*(k===1?.45:.55),s*(k===1?.3:.4));fillPoly(b,col,.8);}
+  for(let k=0;k<3;k++)for(const sd of[-1,1])sk(R,[[x-k*s*.9,y],[x-k*s*.9+rd(R,-s*.3,s*.3),y+sd*s*.8],[x-k*s*.9+rd(R,-s*.5,s*.5),y+sd*s*1.1]],{col,w:1,a:.7,amp:.3});
+  for(const sd of[-1,1])sk(R,[[x+s*.4,y],[x+s*1,y+sd*s*.5]],{col,w:1,a:.7,amp:.3});
+}
+function barkpiece(R,x,y,s,col){
+  const p=[[x-s,y-s*.9],[x+s*.9,y-s],[x+s,y+s*.9],[x-s*.9,y+s]];
+  fillPoly(p,BARK,.85);
+  for(let k=0;k<14;k++){const px=x-s+k*s*.15;sk(R,[[px,y-s*.9],[px+rd(R,-8,8),y],[px+rd(R,-8,8),y+s*.9]],{col:shade(BARK,.6),w:rd(R,1,2.2),a:.6,amp:2.2,gap:.06});}
+  sk(R,p.concat([p[0]]),{col,w:1.5,a:.7,amp:.8});
+}
+
+// P0 · the seed ------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+0);
+  sheet(R,-26,-40,1626,TOTALH+40,PAPER,{rough:14});
+  write(R,'ringen',800,330,130,{a:.88,cen:true});
+  write(R,'een muur over een boom en zijn jaren',800,420,24,{a:.7,cen:true});
+  // an acorn, the whole tree in a small closed hand
+  const ax=800,ay=640;
+  const nut=hblob(R,ax,ay+20,34,44);
+  fillPoly(nut,[170,128,70],.8);scribFill(R,nut,3.5,.5,{col:BARK,w:1.1});
+  sk(R,nut.concat([nut[0]]),{col:INK,w:2,a:.85,amp:.6});
+  const cap=[];for(let i=0;i<=12;i++){const t=Math.PI+i/12*Math.PI;cap.push([ax+Math.cos(t)*38,ay-6+Math.sin(t)*22])}
+  fillPoly(cap,BARK,.9);hatchFill(R,cap,5,.6,.6,{col:CHAR,w:1.1});
+  sk(R,cap.concat([cap[0]]),{col:INK,w:1.8,a:.85,amp:.5});
+  sk(R,[[ax,ay-28],[ax+6,ay-48]],{col:INK,w:3,a:.9,amp:.3});
+  spark(R,ax+24,ay-68,26,{col:AMBER,a:.95,w:2.4,nR:8});
+  restless(ax-20,ay-120,100,100,RR=>spark(RR,ax+24,ay-68,26,{col:AMBER,a:.95,w:2.4,nR:ri(RR,7,10)}));
+  // falling toward the ground it does not yet know
+  fall(R,806,760,1000,INK,.55);
+  sk(R,wave0(100,1500,1040,2,.01),{col:INK,w:2.6,a:.7,amp:2});
+  for(let i=0;i<40;i++)sk(R,[[rd(R,120,1480),1040],[rd(R,120,1480),1040+rd(R,8,26)]],{col:BARK,w:1,a:.4,amp:.5,taper:'out'});
+  arrowHead(R,809,1170,Math.PI/2,16,.6,INK,1.5);
+  drip(R,1260,-6,rd(R,70,100),shade(PAPER,.3),.6,2.4);
+  drip(R,330,-6,rd(R,40,70),shade(PAPER,.25),.5,2);
+  for(let k=0;k<4;k++)leaf(R,rd(R,200,1400),rd(R,120,300),rd(R,26,40),rd(R,0,TAU),LEAFG,.5);
+  whispers(R,500,1100,false,3);
+});
+
+// P1 · the first direction is down ----------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+1);
+  sheet(R,50,40,1550,1160,SOIL,{rough:15});
+  // strata
+  for(let y=90;y<1150;y+=rd(R,60,110)){
+    sk(R,wave0(90,1510,y,rd(R,6,16),rd(R,.006,.012)),{col:tint(SOIL,.25),w:rd(R,1.2,2.4),a:.4,amp:2,gap:.04});
+  }
+  for(let i=0;i<14;i++){const b=hblob(R,rd(R,120,1480),rd(R,200,1120),rd(R,14,50),rd(R,10,32));fillPoly(b,[106,92,80],.55);sk(R,b.concat([b[0]]),{col:[150,138,120],w:1.2,a:.5,amp:.5})}
+  for(let i=0;i<500;i++)dotF(R,rd(R,70,1530),rd(R,70,1150),rd(R,.5,1.4),.2,CINK);
+  // the root: first one thread, then more, each doubting its way
+  const root=(x,y,ang,len,w,d)=>{
+    const pts=[[x,y]];let px=x,py=y,a=ang;
+    for(let t=0;t<len;t+=22){a+=rd(R,-.28,.28);px+=Math.cos(a)*22;py+=Math.sin(a)*22;pts.push([px,py]);if(py>1120||px<80||px>1520)break}
+    sk(R,pts,{col:[216,190,150],w,a:.85,amp:1.2,taper:'out',noDust:true});
+    if(d>0&&pts.length>4){
+      for(let k=0;k<ri(R,2,4);k++){const p=pts[ri(R,2,pts.length-2)];root(p[0],p[1],ang+rd(R,-1.2,1.2),len*.55,Math.max(1,w*.55),d-1)}
+    }
+  };
+  root(800,70,Math.PI/2,950,9,3);
+  root(800,70,Math.PI/2+.5,500,6,2);
+  // fungus threads, the quiet ones
+  for(let k=0;k<20;k++){
+    const x=rd(R,150,1450),y=rd(R,300,1100),pts=[[x,y]];let px=x,py=y,a=rd(R,0,TAU);
+    for(let t=0;t<9;t++){a+=rd(R,-.7,.7);px+=Math.cos(a)*rd(R,18,34);py+=Math.sin(a)*rd(R,18,34);pts.push([px,py])}
+    sk(R,pts,{col:FOAM0,w:.9,a:.4,amp:.6,taper:'out'});
+  }
+  spark(R,800,1100,20,{col:AMBER,a:.9,w:2,nR:7});
+  write(R,'eerst naar beneden',800,160,36,{col:CINK,a:.85,cen:true});
+  write(R,'de boom is al wat hij nog niet is',1130,1100,19,{col:CINK,a:.65,cen:true});
+  whispers(R,100,1100,true,4);
+});
+const FOAM0=[236,240,230];
+
+// P2 · the years ----------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+2);
+  const cx=800,cy=640;
+  // the trunk, cut
+  const widths=[];
+  for(let i=0;i<64;i++){
+    let w=3.6+fbm(i*.35,3,11,2)*6.4;
+    if(i>=26&&i<=30)w*=.36;       // dry years
+    if(i===44)w=1.6;
+    widths.push(w);
+  }
+  let r=14,radii=[];
+  for(const w of widths){r+=w;radii.push(r)}
+  const outer=ringPath(R,cx,cy,radii[radii.length-1]+6,200,8,.04);
+  fillPoly(outer.map(p=>[p[0]+8,p[1]+10]),[10,8,6],.25);
+  fillPoly(outer,BARK,.95);
+  const inner=ringPath(R,cx,cy,radii[radii.length-1],201,8,.04);
+  fillPoly(inner,WOOD,.95);
+  radii.forEach((rr,i)=>{
+    const dark=i>=26&&i<=30;
+    sk(R,ringPath(R,cx,cy,rr,i,5,.04),{col:dark?shade(WOOD,.6):shade(WOOD,.42),w:dark?1.8:1.1,a:dark?.75:.5,amp:.5,gap:.01});
+  });
+  // the fire year: a wound that the next rings grew over
+  const sa0=-.5,sa1=.1,r0=radii[39],r1=radii[44];
+  const scar=[];
+  for(let a=sa0;a<=sa1;a+=.04)scar.push([cx+Math.cos(a)*r0,cy+Math.sin(a)*r0*.96]);
+  for(let a=sa1;a>=sa0;a-=.04)scar.push([cx+Math.cos(a)*r1,cy+Math.sin(a)*r1*.96]);
+  fillPoly(scar,CHAR,.7);
+  sk(R,scar.concat([scar[0]]),{col:CHAR,w:1.6,a:.7,amp:.6});
+  // cracks from the rim inward
+  for(let k=0;k<5;k++){const a=rd(R,0,TAU),r2=radii[radii.length-1];sk(R,[[cx+Math.cos(a)*r2,cy+Math.sin(a)*r2*.96],[cx+Math.cos(a)*r2*rd(R,.55,.8),cy+Math.sin(a)*r2*rd(R,.55,.8)*.96]],{col:BARK,w:1.8,a:.7,amp:1.2,taper:'out'})}
+  spark(R,cx,cy,18,{col:AMBER,a:.95,w:2,nR:7});
+  // labels: tiny ticks and a few words, pencil notes in the margin
+  const tag=(ang,rr,txt,dx,dy)=>{
+    const x0=cx+Math.cos(ang)*rr,y0=cy+Math.sin(ang)*rr*.96;
+    sk(R,[[x0,y0],[x0+dx*.5,y0+dy*.5],[x0+dx,y0+dy]],{w:1,a:.55,amp:.8,taper:'out'});
+    write(R,txt,x0+dx+(dx>0?8:-8-measure(txt,18)),y0+dy+5,18,{a:.75});
+  };
+  tag(2.5,4,'het eerste jaar',-190,70);
+  tag(3.6,radii[28],'een droog jaar',-230,-80);
+  tag(-.2,radii[41],'het vuur',260,-90);
+  tag(.9,radii[58],'dit jaar',250,150);
+  write(R,'elk jaar een lijn',800,140,40,{a:.88,cen:true});
+  write(R,'ook wat pijn deed blijft zichtbaar, en groeit mee',800,1120,22,{a:.7,cen:true});
+  whispers(R,100,1100,false,4);
+});
+
+// P3 · seasons --------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+3);
+  sheet(R,44,40,1558,1170,[232,222,198],{rough:13,rot:-.004});
+  write(R,'vier keer hetzelfde, nooit hetzelfde',800,125,32,{a:.85,cen:true});
+  const names=['lente','zomer','herfst','winter'];
+  const cols=[[236,242,224],[226,236,208],[246,230,204],[226,230,236]];
+  const centers=[[420,500],[1180,500],[420,950],[1180,950]];
+  for(let i=0;i<4;i++){
+    const [cx0,cy0]=centers[i];
+    scrap(R,cx0,cy0,600,360,cols[i],rd(R,-.03,.03));
+    if(i===0){
+      sk(R,[[cx0-220,cy0+120],[cx0-40,cy0+10],[cx0+160,cy0-60]],{col:BARK,w:5,a:.85,amp:1,taper:'out'});
+      for(let k=0;k<7;k++){const t=k/6;const px=cx0-200+t*340,py=cy0+105-t*150;leaf(R,px,py,rd(R,22,34),-1.2+rd(R,-.4,.4),[150,184,100],.75,false)}
+      spark(R,cx0+170,cy0-70,16,{col:AMBER,a:.9,w:1.8,nR:7});
+    }else if(i===1){
+      for(let k=0;k<9;k++)leaf(R,cx0-120+rd(R,0,240),cy0+rd(R,-60,110),rd(R,70,100),rd(R,-.5,.5)+(k%2?Math.PI*.9:0),pk(R,[LEAFG,MOSS,[80,110,60]]),.7);
+    }else if(i===2){
+      for(let k=0;k<7;k++)leaf(R,cx0-170+rd(R,0,300),cy0-80+rd(R,0,160),rd(R,70,100),rd(R,0,TAU),pk(R,[AMBER,FIRE,[196,130,50],[160,100,50]]),.75);
+    }else{
+      branch(R,cx0-60,cy0+130,-1.5,110,5,INK,5);
+      branch(R,cx0-60,cy0+130,-1.1,70,4,INK,3);
+      for(let k=0;k<30;k++)dotF(R,cx0+rd(R,-220,220),cy0+rd(R,-140,140),rd(R,1,2.2),.5,STEEL);
+    }
+    caption(R,names[i],cx0,cy0+158,22,false);
+  }
+  whispers(R,160,1130,false,4);
+});
+
+// P4 · who lived here --------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+4);
+  sheet(R,44,40,1558,1170,[226,214,184],{rough:13,rot:.004});
+  write(R,'wie er woonde',800,125,32,{a:.85,cen:true});
+  const names=['kever','uil','zwam','slak','nest','mos','mier','schors'];
+  const items=[
+    (x,y)=>beetle(R,x-10,y,40,INK),
+    (x,y)=>owl(R,x,y,52,INK),
+    (x,y)=>shroom(R,x,y-20,62,INK),
+    (x,y)=>snail(R,x,y+14,46,INK),
+    (x,y)=>nest(R,x,y+20,86,INK),
+    (x,y)=>mosspatch(R,x,y,100,MOSS),
+    (x,y)=>ant(R,x+50,y,20,INK),
+    (x,y)=>barkpiece(R,x,y,84,INK)];
+  for(let i=0;i<8;i++){
+    const cx0=250+(i%4)*368,cy0=420+Math.floor(i/4)*480;
+    scrap(R,cx0,cy0,310,360,pk(R,[PAPER,[236,238,222],[244,232,208]]),rd(R,-.05,.05));
+    items[i](cx0,cy0-6);
+    caption(R,names[i],cx0,cy0+150,20,false);
+  }
+  whispers(R,160,1130,false,4);
+});
+
+// P5 · what they share underground -------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+5);
+  sheet(R,40,30,1560,1170,FOREST,{rough:15,rot:-.003});
+  write(R,'onder de grond praat het',800,130,36,{col:CINK,a:.85,cen:true});
+  const trees=[];
+  for(let i=0;i<7;i++)trees.push([170+i*210+rd(R,-30,30),rd(R,360,440)]);
+  for(const t of trees){
+    trunk(R,t[0],200,t[1],rd(R,16,22),rd(R,10,14),[96,76,58]);
+    for(let k=0;k<ri(R,3,5);k++)sk(R,[[t[0]+rd(R,-8,8),t[1]],[t[0]+rd(R,-90,90),t[1]+rd(R,80,200)]],{col:[190,166,126],w:rd(R,1.5,3),a:.7,amp:1.4,taper:'out'});
+    for(let k=0;k<5;k++)leaf(R,t[0]+rd(R,-60,60),rd(R,170,250),rd(R,30,50),rd(R,0,TAU),LEAFG,.5);
+  }
+  sk(R,wave0(70,1530,thr(),3,.01),{col:CINK,w:2,a:.5,amp:1.4});
+  function thr(){return 440}
+  // the network
+  const nodes=[];
+  for(const t of trees)nodes.push([t[0],t[1]+70]);
+  for(let i=0;i<30;i++)nodes.push([rd(R,120,1480),rd(R,560,1120)]);
+  const E=[];
+  for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+    const d=Math.hypot(nodes[i][0]-nodes[j][0],nodes[i][1]-nodes[j][1]);
+    if(d<(i<7&&j<7?260:230)&&ch_(R,.7))E.push([i,j])
+  }
+  for(const [i,j] of E){
+    const a=nodes[i],b=nodes[j],mx=(a[0]+b[0])/2+rd(R,-30,30),my=(a[1]+b[1])/2+rd(R,-30,30);
+    const pts=[];for(let t=0;t<=1;t+=.1)pts.push([(1-t)*(1-t)*a[0]+2*t*(1-t)*mx+t*t*b[0],(1-t)*(1-t)*a[1]+2*t*(1-t)*my+t*t*b[1]]);
+    sk(R,pts,{col:FOAM0,w:1.1,a:.55,amp:.8});
+    if(ch_(R,.6))dotF(R,pts[ri(R,2,7)][0],pts[ri(R,2,7)][1],2,.8,AMBER);
+  }
+  for(let i=0;i<nodes.length;i++)dotF(R,nodes[i][0],nodes[i][1],i<7?4:2.4,.8,i<7?AMBER:FOAM0);
+  restless(60,520,1480,640,RR=>{for(let k=0;k<4;k++)dotF(RR,rd(RR,200,1400),rd(RR,600,1100),2.4,.7,AMBER)});
+  for(let y=500;y<1130;y+=rd(R,26,34))atext(R,rd(R,100,300),rd(R,700,1500),y,10,{col:CINK,a:.12,w:1});
+  write(R,'een berk geeft suiker aan wat in de schaduw staat',800,1130,19,{col:CINK,a:.65,cen:true});
+  whispers(R,500,1100,true,3);
+});
+
+// P6 · narrow years ---------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+6);
+  sheet(R,60,40,1540,1160,DRY,{rough:16,rot:.003});
+  write(R,'smalle jaren',900,140,44,{a:.88,cen:true});
+  // the sun, no longer kind
+  const sx=1200,sy=330;
+  enso(R,sx,sy,100,.97,INK,{w:7});
+  spark(R,sx,sy,170,{col:FIRE,a:.5,w:2,nR:15});
+  spark(R,sx,sy,40,{col:AMBER,a:.95,w:3,nR:10});
+  restless(sx-190,sy-190,380,380,RR=>spark(RR,sx,sy,170,{col:FIRE,a:.5,w:2,nR:ri(RR,13,17)}));
+  // cracked earth: plates separated by thin dark lines
+  for(let i=0;i<60;i++){
+    const x=rd(R,100,1500),y=rd(R,560,1140),pts=[[x,y]];let px=x,py=y,a=rd(R,0,TAU);
+    for(let t=0;t<ri(R,4,9);t++){a+=rd(R,-.8,.8);px+=Math.cos(a)*rd(R,18,46);py+=Math.sin(a)*rd(R,12,30);pts.push([px,py])}
+    sk(R,pts,{col:shade(DRY,.72),w:rd(R,1.2,3),a:.7,amp:1,taper:'out'});
+  }
+  sk(R,wave0(70,1530,540,4,.008),{col:BARK,w:2,a:.5,amp:2});
+  // the dry tree: leaves already letting go
+  branch(R,360,540,-1.5,200,5,INK,8);
+  for(let k=0;k<9;k++)leaf(R,rd(R,200,520),rd(R,640,1100),rd(R,16,28),rd(R,0,TAU),[170,130,70],.7);
+  // one ring, shown thin
+  const rings=[[420,980,40],[420,980,52],[420,980,57],[420,980,60],[420,980,72]];
+  write(R,'hij vraagt niets, hij wordt smal',800,1110,22,{a:.7,cen:true});
+  whispers(R,160,1100,false,4);
+});
+
+// P7 · fire ---------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+7);
+  sheet(R,40,30,1560,1170,CHAR,{rough:17,rot:.003});
+  for(let i=0;i<220;i++)dotF(R,rd(R,70,1530),rd(R,70,1130),rd(R,.5,1.4),rd(R,.1,.35),CINK);
+  // charred trunks
+  const xs=[260,560,880,1180,1440];
+  xs.forEach((x,i)=>{
+    const tw=rd(R,28,44);
+    trunk(R,x+rd(R,-20,20),360,1160,tw,tw*.7,[50,44,40]);
+    hatchFill(R,[[x-tw,360],[x+tw,360],[x+tw,1160],[x-tw,1160]],6,1.35,.2,{col:FIRE,w:1});
+  });
+  // flames that do not read as flame so much as as direction
+  for(let k=0;k<9;k++)flame(R,rd(R,160,1450),rd(R,1000,1130),rd(R,220,420),rd(R,40,90));
+  restless(60,640,1480,520,RR=>{for(let k=0;k<4;k++)flame(RR,rd(RR,160,1450),rd(RR,1040,1130),rd(RR,200,380),rd(RR,40,80))});
+  spatter(R,800,700,640,500,AMBER,.55);spatter(R,800,500,600,300,FIRE,.4);
+  for(let k=0;k<14;k++)birdM(R,rd(R,200,1400),rd(R,120,300),rd(R,6,10),CINK,.4);
+  write(R,'het litteken wordt hout',800,170,44,{col:CINK,a:.9,cen:true});
+  write(R,'wat de boom niet kan weren, groeit hij omheen',800,225,20,{col:CINK,a:.7,cen:true});
+  whispers(R,100,1100,true,3);
+});
+
+// P8 · what falls becomes ground ---------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+8);
+  write(R,'wat valt wordt grond',800,130,44,{a:.88,cen:true});
+  // the fallen log, long and soft with moss
+  const ly=760;
+  const log=[[110,ly-60],[1480,ly-86],[1500,ly+70],[100,ly+84]];
+  fillPoly(log.map(p=>[p[0]+6,p[1]+10]),[10,8,6],.2);
+  fillPoly(log,BARK,.95);
+  for(let k=0;k<16;k++){const t=k/15,y0=ly-60+t*144;sk(R,[[130,y0],[600,y0+rd(R,-14,14)],[1480,y0+rd(R,-20,20)]],{col:shade(BARK,.55),w:rd(R,1,2.4),a:.6,amp:3,gap:.05})}
+  const endcut=ringPath(R,1480,ly-8,80,200,12,0);
+  fillPoly(endcut,WOOD,.9);
+  for(let i=1;i<9;i++)sk(R,ringPath(R,1480,ly-8,i*9+8,i,4,0),{col:shade(WOOD,.45),w:1,a:.5,amp:.4});
+  sk(R,log.concat([log[0]]).slice(0,5),{col:INK,w:1.8,a:.6,amp:1.4});
+  for(let k=0;k<5;k++)mosspatch(R,rd(R,200,1300),ly-70+rd(R,-8,8),rd(R,60,120),MOSS);
+  for(let k=0;k<3;k++)shroom(R,rd(R,400,1200),ly-80,rd(R,16,28),INK);
+  // the first green on it: seedlings, the next ones
+  for(let k=0;k<6;k++){const x=rd(R,300,1300),y=ly-84;sk(R,[[x,y],[x+rd(R,-5,5),y-rd(R,30,70)]],{col:MOSS,w:2,a:.85,amp:.6,taper:'out'});
+    leaf(R,x,y-48,rd(R,16,24),-1.9,[150,184,100],.8,false);leaf(R,x,y-44,rd(R,16,24),-1.2,[150,184,100],.8,false)}
+  // below, the work: beetles, threads, a slow brown becoming soil
+  for(let k=0;k<26;k++)dotF(R,rd(R,200,1400),rd(R,ly+120,1120),rd(R,1.5,4),.4,BARK);
+  for(let y=ly+130;y<1140;y+=rd(R,24,34))sk(R,wave0(100,1500,y,rd(R,3,6),rd(R,.01,.02)),{col:BARK,w:1.1,a:.35,amp:1,gap:.05});
+  for(let k=0;k<12;k++){const x=rd(R,200,1400),y=rd(R,ly+120,1100),pts=[[x,y]];let px=x,py=y,a=rd(R,0,TAU);for(let t=0;t<7;t++){a+=rd(R,-.7,.7);px+=Math.cos(a)*18;py+=Math.sin(a)*18;pts.push([px,py])}sk(R,pts,{col:BIRCH,w:.9,a:.6,amp:.5,taper:'out'})}
+  beetle(R,500,ly+190,18,INK);ant(R,980,ly+210,10,INK);
+  write(R,'niets gaat weg, het wordt iets anders',800,1150,22,{a:.75,cen:true});
+  whispers(R,160,500,false,3);
+});
+
+// P9 · and again ----------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+9);
+  sheet(R,50,40,1550,1160,[232,236,214],{rough:14,rot:.003});
+  // the light comes in slanted
+  for(let k=0;k<16;k++){const x=300+k*60;sk(R,[[x,40],[x-260,1160]],{col:AMBER,w:rd(R,1,3),a:rd(R,.1,.25),amp:2,taper:'out',noDust:true})}
+  write(R,'en weer een eerste lijn',800,140,40,{a:.88,cen:true});
+  // a sapling, still thin, with a ring not yet counted
+  const bx=800,by=1000;
+  sk(R,[[bx,by],[bx+8,by-160],[bx-4,by-330],[bx+12,by-460]],{col:BARK,w:9,a:.85,amp:1.6,taper:'out'});
+  const tips=[[bx+8,by-160,.9],[bx-4,by-330,-.9],[bx+12,by-460,-1.5],[bx+8,by-250,2.5]];
+  for(const [x,y,a] of tips){sk(R,[[x,y],[x+Math.cos(a)*90,y+Math.sin(a)*90*.6-20]],{col:BARK,w:4,a:.8,amp:1,taper:'out'});
+    for(let k=0;k<4;k++)leaf(R,x+Math.cos(a)*30*k,y+Math.sin(a)*18*k-10,rd(R,34,50),a+rd(R,-.6,.6),[150,184,100],.8)}
+  for(let k=0;k<4;k++)leaf(R,bx+10+rd(R,-20,20),by-460+rd(R,-20,20),rd(R,30,44),rd(R,-2,-1),[150,184,100],.8);
+  // on the log that was the old tree
+  const lg=[[260,by+4],[1340,by-6],[1360,by+120],[240,by+130]];
+  fillPoly(lg,BARK,.9);
+  for(let k=0;k<9;k++){const y=by+4+k*14;sk(R,[[270,y],[800,y+rd(R,-6,6)],[1340,y]],{col:shade(BARK,.55),w:1.4,a:.6,amp:2.2,gap:.05})}
+  mosspatch(R,800,by-6,360,MOSS);
+  spark(R,bx+14,by-490,28,{col:AMBER,a:.95,w:2.4,nR:9});
+  restless(bx-40,by-560,110,110,RR=>spark(RR,bx+14,by-490,28,{col:AMBER,a:.95,w:2.4,nR:ri(RR,8,11)}));
+  for(let k=0;k<8;k++)birdM(R,rd(R,200,1400),rd(R,200,400),rd(R,6,12),INK,.4);
+  whispers(R,300,1100,false,4);
+});
+
+// P10 · the first ring -----------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+10);
+  sheet(R,40,30,1560,1170,FOREST,{rough:16});
+  const cx=800,cy=480;
+  // rings spreading out, each a little different, none finished before the next
+  for(let i=0;i<14;i++){
+    const rr=18+i*20+(i>9?(i-9)*7:0);
+    sk(R,ringPath(R,cx,cy,rr,i,5,.02),{col:i<2?AMBER:tint([180,160,110],i*.02),w:i<2?3:1.6,a:.85-i*.04,amp:.8,gap:.02});
+  }
+  spark(R,cx,cy,16,{col:AMBER,a:.95,w:2.2,nR:8});
+  restless(cx-30,cy-30,60,60,RR=>spark(RR,cx,cy,16,{col:AMBER,a:.95,w:2.2,nR:ri(RR,7,10)}));
+  write(R,'elk jaar iets erbij, nooit iets weg',800,860,36,{col:CINK,a:.9,cen:true});
+  write(R,'zelfs wat verloren ging staat er nog in',800,912,22,{col:CINK,a:.7,cen:true});
+  write(R,'ringen · jaar na jaar · 2026',800,1040,18,{col:CINK,a:.8,cen:true});
+  aword(R,690,1082,13,5,{col:CINK,a:.6});
+  write(R,'(mijn echte handtekening)',830,1088,12,{col:CINK,a:.6});
+  whispers(R,100,780,true,3);
+});
+
+// ---------------------------------------------------------------------------
+// boot
+// ---------------------------------------------------------------------------
+history.scrollRestoration='manual';
+if(!qs.has('y'))scrollTo(0,0);
+let pi=0;
+function genStep(){
+  const t0=performance.now();
+  while(pi<P.length&&performance.now()-t0<24){GEN_DY=pi*PH;P[pi]();GEN_DY=0;pi++}
+  if(pi<P.length)setTimeout(genStep,0);
+  else{
+    GENDONE=true;
+    if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
+  }
+}
+genStep();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

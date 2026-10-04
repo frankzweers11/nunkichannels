@@ -1,0 +1,1572 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>velden · elektromagnetisch universum</title>
+<style>
+  html,body{margin:0;padding:0;background:#0e1020}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  #wall{position:relative;width:100vw}
+  #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+</style>
+</head>
+<body>
+<div id="wall"></div>
+<canvas id="trail"></canvas>
+<script>
+'use strict';
+// ---------------------------------------------------------------------------
+// velden — an electromagnetic universe, drawn as one journey.
+// a single wall, no frames, from night to day: one line of force runs from a
+// magnet in the dark through light, a galaxy, a solar storm, an aurora, birds,
+// a brain, a heart and a strand of dna, through the one who looks, and with the
+// first light of morning down to the masts on the horizon and the flower in the
+// grass where a bee is flying.
+// every mark is laid down by a wandering hand while you watch; nothing here
+// is ruled. a sentence is something known, a question is something open.
+// the engine (tiles, queued strokes, pencil lettering) follows the technique
+// of the fable wall that inspired it.
+// ---------------------------------------------------------------------------
+const TAU = Math.PI*2;
+const qs = new URLSearchParams(location.search);
+const SEED = +(qs.get('s')||7);
+const FAST = qs.has('fast');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------- rng ----------------
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function stream(n){const f=mul32((n*2654435761)>>>0);for(let i=0;i<9;i++)f();return f}
+const rd=(R,a,b)=>a+R()*(b-a);
+const ri=(R,a,b)=>Math.floor(rd(R,a,b+1));
+const ch_=(R,p)=>R()<p;
+const pk=(R,arr)=>arr[(R()*arr.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// ---------------- noise ----------------
+function h2(x,y,s){const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)}
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+  const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  return h2(xi,yi,s)*(1-u)*(1-v)+h2(xi+1,yi,s)*u*(1-v)+h2(xi,yi+1,s)*(1-u)*v+h2(xi+1,yi+1,s)*u*v}
+function fbm(x,y,s,o){let a=.5,f=1,t=0,n=0;for(let i=0;i<o;i++){t+=vn(x*f,y*f,s+i*17)*a;n+=a;a*=.5;f*=2.03}return t/n}
+
+// ---------------- colour ----------------
+const INK=[42,37,31], CINK=[238,231,210];
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const shade=(c,k)=>[c[0]*(1-k),c[1]*(1-k),c[2]*(1-k)];
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+let CUR=INK;
+
+// ---------------- the wall ----------------
+const LW=1600, TILEH=1200, TOTALH=14400+260;
+const NT=Math.ceil(TOTALH/TILEH);
+let S=Math.min(1.35, Math.max(1, window.devicePixelRatio||1));
+if(navigator.deviceMemory && navigator.deviceMemory<8) S=1.1;
+const wallEl=document.getElementById('wall');
+wallEl.style.height=(TOTALH/LW*100)+'vw';
+const TILES=[];
+for(let i=0;i<NT;i++){
+  const y0=i*TILEH, h=Math.min(TILEH+2, TOTALH-y0);
+  const cv=document.createElement('canvas');
+  cv.width=Math.round(LW*S); cv.height=Math.round(h*S);
+  cv.style.top=(y0/LW*100)+'vw';
+  cv.style.height=(h/LW*100)+'vw';
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.lineCap='round'; cx.lineJoin='round';
+  TILES.push({cv,cx,y0,h,q:[],qi:0,done:false,active:i===0});
+}
+let GENDONE=false;
+// route one drawing act to every tile it touches; whole passages of the wall
+// can be shifted down as one piece by GEN_DY
+let DIRECT=null, GEN_DY=0;
+let COMP=null; // when set (e.g. 'lighter'), every mark queued meanwhile is drawn with that blend: light on dark glows
+function emit(y0,y1,fn){
+  if(COMP){const f0=fn,cm=COMP;fn=c=>{c.save();c.globalCompositeOperation=cm;f0(c);c.restore()}}
+  if(DIRECT){
+    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
+    else fn(DIRECT.cx);
+    return;
+  }
+  const dy=GEN_DY;
+  const f=dy?cx=>{cx.save();cx.translate(0,dy);fn(cx);cx.restore()}:fn;
+  const a=clamp(Math.floor((y0+dy-60)/TILEH),0,NT-1), b=clamp(Math.floor((y1+dy+60)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++) TILES[i].q.push(f);
+}
+
+// ---------------- geometry ----------------
+function resample(pts,step){
+  if(pts.length<2)return pts.slice();
+  const out=[[pts[0][0],pts[0][1]]];let need=step;
+  for(let i=1;i<pts.length;i++){
+    let x0=pts[i-1][0],y0=pts[i-1][1];
+    const x1=pts[i][0],y1=pts[i][1];
+    let d=Math.hypot(x1-x0,y1-y0);
+    while(d>=need&&d>0){const t=need/d;x0+=(x1-x0)*t;y0+=(y1-y0)*t;out.push([x0,y0]);d=Math.hypot(x1-x0,y1-y0);need=step}
+    need-=d;
+  }
+  const last=pts[pts.length-1],le=out[out.length-1];
+  if(Math.hypot(last[0]-le[0],last[1]-le[1])>step*.2||out.length<2)out.push([last[0],last[1]]);
+  return out;
+}
+function chaikin(pts,closed,it){
+  while(it-->0){
+    const out=[],n=pts.length;
+    if(n<3)return pts;
+    if(!closed)out.push(pts[0]);
+    const end=closed?n:n-1;
+    for(let i=0;i<end;i++){
+      const a=pts[i],b=pts[(i+1)%n];
+      out.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);
+    }
+    if(!closed)out.push(pts[n-1]);
+    pts=out;
+  }
+  return pts;
+}
+function bbox(pts){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+  return[x0,y0,x1,y1]}
+function blob(R,cx,cy,rx,ry){
+  const rot=rd(R,0,TAU),ph=rd(R,0,7),n=14,pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const m=1+.16*Math.sin(t*2+ph)+.09*Math.sin(t*5+ph*2.1);
+    const x=Math.cos(t)*rx*m,y=Math.sin(t)*ry*m;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  return chaikin(pts,true,1);
+}
+function spiralPts(cx,cy,rOut,rIn,turns,ph,dir=1){
+  const n=Math.max(24,Math.round(turns*30)),pts=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n,th=ph+dir*t*turns*TAU,r=rOut+(rIn-rOut)*t;
+    pts.push([cx+Math.cos(th)*r,cy+Math.sin(th)*r]);
+  }
+  return pts;
+}
+
+// ---------------- the hand ----------------
+// every mark wanders off its intended path a little. pressed marks get a
+// second pass, the way a pen goes back over a line it means.
+function wob(R,rs,amp){
+  const n=rs.length,q=[];
+  const P1=rd(R,0,7),P2=rd(R,0,7),P3=rd(R,0,7);
+  const F1=rd(R,1.6,3.2),F2=rd(R,5,9);
+  for(let i=0;i<n;i++){
+    const t=i/(n-1);
+    const A=rs[Math.max(0,i-1)],B=rs[Math.min(n-1,i+1)];
+    let nx=-(B[1]-A[1]),ny=B[0]-A[0];
+    const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;
+    const off=amp*(.62*Math.sin(t*F1*2+P1)+.28*Math.sin(t*F2+P2)+.10*Math.sin(t*17+P3));
+    q.push([rs[i][0]+nx*off+rd(R,-.3,.3),rs[i][1]+ny*off+rd(R,-.3,.3)]);
+  }
+  return q;
+}
+function sk(R,pts,o={}){
+  const w=o.w??1.3, a0=o.a??.7;
+  const rs=resample(pts,Math.max(2.4,w*1.5));
+  const n=rs.length;
+  if(n<2)return;
+  const col=(o.col||CUR).slice();
+  const passes=o.passes??1;
+  const [bx0,by0,bx1,by1]=bbox(rs);
+  for(let p=0;p<passes;p++){
+    const amp=(o.amp??(w*.38+.55))*(p?1.5:1);
+    const alpha=a0*(p?.35:1);
+    const q=wob(R,rs,amp);
+    if(o.taper){
+      const segs=[];
+      for(let i=1;i<n;i++){
+        const t=i/(n-1);
+        let e;
+        if(o.taper==='out')e=.3+.7*(1-t);
+        else if(o.taper==='in')e=.3+.7*t;
+        else e=.35+.65*Math.min(1,Math.min(t,1-t)/.25);
+        segs.push([q[i-1],q[i],rgba(col,alpha*rd(R,.8,1)),Math.max(.5,w*e*rd(R,.85,1.15))]);
+      }
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';
+        for(const s of segs){
+          cx.strokeStyle=s[2];cx.lineWidth=s[3];
+          cx.beginPath();cx.moveTo(s[0][0],s[0][1]);cx.lineTo(s[1][0],s[1][1]);cx.stroke();
+        }
+      });
+    } else {
+      const lifts=[];
+      for(let i=0;i<n;i++)lifts.push(o.gap?ch_(R,o.gap):false);
+      const st=rgba(col,alpha), lw=w*rd(R,.85,1.12);
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';cx.lineJoin='round';
+        cx.beginPath();
+        let lift=false;
+        for(let i=0;i<n;i++){
+          if(!i||lift)cx.moveTo(q[i][0],q[i][1]);else cx.lineTo(q[i][0],q[i][1]);
+          lift=lifts[i];
+        }
+        cx.strokeStyle=st;cx.lineWidth=lw;cx.stroke();
+      });
+    }
+    if(p===0&&w>=1.9&&!o.noDust){
+      const specks=[];
+      for(let i=0;i<n;i+=3){
+        if(ch_(R,.6))continue;
+        const sz=rd(R,.6,1.2);
+        specks.push([q[i][0]+rd(R,-w,w)-sz/2,q[i][1]+rd(R,-w,w)-sz/2,sz,rgba(col,a0*rd(R,.14,.3))]);
+      }
+      if(specks.length)emit(by0,by1,cx=>{for(const s of specks){cx.fillStyle=s[3];cx.fillRect(s[0],s[1],s[2],s[2])}});
+    }
+  }
+}
+function dotF(R,x,y,r,a,col){
+  const c=(col||CUR).slice(),pts=[];
+  const n=8,ph=rd(R,0,7);
+  for(let i=0;i<=n;i++){
+    const t=i/n*TAU,m=1+.2*Math.sin(t*2+ph);
+    pts.push([x+Math.cos(t)*r*m+rd(R,-.2,.2),y+Math.sin(t)*r*m+rd(R,-.2,.2)]);
+  }
+  emit(y-r-2,y+r+2,cx=>{
+    cx.beginPath();
+    for(let i=0;i<pts.length;i++){i?cx.lineTo(pts[i][0],pts[i][1]):cx.moveTo(pts[i][0],pts[i][1])}
+    cx.closePath();cx.fillStyle=rgba(c,a);cx.fill();
+  });
+}
+function ell(R,cx,cy,rx,ry,o={}){
+  const n=Math.max(10,Math.round((rx+ry)/2)),rot=rd(R,0,TAU),pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const x=Math.cos(t)*rx,y=Math.sin(t)*ry;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  pts.push(pts[0]);
+  sk(R,pts,o);
+}
+function fillPoly(pts,col,a){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const st=rgba(col,a),P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.fillStyle=st;cx.fill();
+  });
+}
+// scribble a region full, clipped, in one act
+function scribFill(R,pts,sp,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1;
+  const lines=[],slope=rd(R,-.2,.2);
+  for(let y=y0-sp;y<y1+sp;y+=sp*rd(R,.8,1.2)){
+    const raw=[],ph=rd(R,0,7);
+    for(let x=x0;x<=x1;x+=4)raw.push([x,y+(x-x0)*slope+Math.sin(x*.5+ph)*sp*.42+rd(R,-.8,.8)]);
+    if(raw.length>1)lines.push([wob(R,resample(raw,3.2),.55),rgba(col,a*rd(R,.6,1.05)),w*rd(R,.85,1.12)]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap='round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+// a soft coloured-pencil scrub, never quite inside the lines
+function scrub(R,cx,cy,r,col,a=.4){
+  const b=blob(R,cx,cy,r*rd(R,1,1.12),r*rd(R,.82,1));
+  fillPoly(b,col,.1);
+  scribFill(R,b,Math.max(3,r*.13),a,{col});
+}
+function spatter(R,x,y,r,n,col,a=.5){
+  const sd=ri(R,0,99999),c=col.slice();
+  emit(y-r,y+r,cx=>{
+    const RR=mul32(sd);
+    for(let i=0;i<n;i++){
+      const t=RR()*TAU,d=Math.sqrt(RR())*r;
+      const s=.8+RR()*RR()*2.2;
+      cx.fillStyle=rgba(c,a*(.3+RR()*.7));
+      cx.fillRect(x+Math.cos(t)*d,y+Math.sin(t)*d*.7,s,s*(.8+RR()*.5));
+    }
+  });
+}
+function drip(R,x,y,len,col,a=.3,w=2){
+  const pts=[[x,y]];
+  let px=x;
+  for(let d=0;d<len;d+=9){px+=rd(R,-1.4,1.4);pts.push([px,y+d])}
+  sk(R,pts,{col,w,a,taper:'out',amp:.4});
+  dotF(R,px,y+len,w*1.1,a*1.2,col);
+}
+function arrowHead(R,x,y,ang,sz,a,col,w=1.6){
+  for(const sd of[-1,1])
+    sk(R,[[x,y],[x-Math.cos(ang+sd*.5)*sz,y-Math.sin(ang+sd*.5)*sz]],{col,w,a,taper:'out'});
+}
+function spark(R,x,y,r,o={}){
+  const n=o.nR??ri(R,5,8);
+  const rot=rd(R,0,TAU),col=o.col||CUR;
+  for(let i=0;i<n;i++){
+    const a=rot+i/n*TAU+rd(R,-.14,.14)/n*TAU;
+    const r0=r*rd(R,.22,.34),r1=r*rd(R,.85,1.1)*(i%2?.78:1);
+    sk(R,[[x+Math.cos(a)*r0,y+Math.sin(a)*r0],[x+Math.cos(a)*r1,y+Math.sin(a)*r1]],
+      {col,w:o.w??1.3,a:(o.a??.75)*rd(R,.8,1),taper:'out',amp:.3});
+  }
+  if(!o.noCenter&&ch_(R,.55))dotF(R,x,y,Math.max(1,r*.13),(o.a??.75),col);
+}
+
+// ---------------- asemic writing ----------------
+// a few marks need writing that only looks like writing: field notes nobody can read.
+function aword(R,x,y,h,nl,o={}){
+  const pts=[[x,y+rd(R,-.1,.1)*h]];
+  let cx=x;
+  for(let i=0;i<nl;i++){
+    const up=y-h*rd(R,.32,.62)-(ch_(R,.13)?h*rd(R,.4,.75):0);
+    const dn=y+(ch_(R,.09)?h*rd(R,.3,.55):h*rd(R,-.06,.12));
+    cx+=h*rd(R,.18,.3);pts.push([cx,up]);
+    cx+=h*rd(R,.18,.3);pts.push([cx,dn]);
+  }
+  sk(R,chaikin(pts,false,1),{col:o.col,w:o.w??.9,a:o.a??.55,amp:.28});
+  return cx-x;
+}
+
+// ---------------- hand lettering ----------------
+// a real alphabet, one wobbly stroke at a time. used rarely, like pencil notes.
+const A_=(cx,cy,rx,ry,a0,a1,n=9)=>{const p=[];for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*rx,cy+Math.sin(t)*ry])}return p};
+const GL={};
+const G=(chr,w,...strokes)=>GL[chr]={w,s:strokes};
+G('a',.62,A_(.27,.73,.23,.26,-.5,5.8),[[.5,.48],[.52,.96],[.6,1]]);
+G('b',.6,[[.1,.05],[.1,1]],[[.1,.56],[.34,.47],[.54,.62],[.53,.86],[.3,1],[.1,.9]]);
+G('c',.58,A_(.3,.74,.25,.26,.6,5.68));
+G('d',.62,A_(.28,.74,.24,.26,-.5,5.8),[[.52,.05],[.53,.95],[.6,1]]);
+G('e',.56,[[.08,.73],[.48,.7],[.49,.54],[.3,.45],[.1,.56],[.07,.8],[.26,1],[.5,.93]]);
+G('f',.46,[[.44,.12],[.32,.05],[.22,.14],[.2,1]],[[.05,.48],[.42,.46]]);
+G('g',.6,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.48],[.53,1.12],[.42,1.36],[.16,1.32]]);
+G('h',.58,[[.1,.05],[.1,1]],[[.1,.62],[.3,.47],[.48,.56],[.5,1]]);
+G('i',.26,[[.13,.5],[.13,.96],[.18,1]],[[.11,.27],[.15,.3]]);
+G('j',.34,[[.22,.5],[.24,1.15],[.12,1.36],[-.02,1.28]],[[.2,.27],[.24,.3]]);
+G('k',.52,[[.1,.05],[.1,1]],[[.44,.48],[.12,.76]],[[.2,.68],[.46,1]]);
+G('l',.3,[[.14,.05],[.14,.93],[.22,1]]);
+G('m',.68,[[.07,1],[.07,.5]],[[.07,.62],[.2,.46],[.33,.56],[.34,1]],[[.34,.62],[.47,.46],[.6,.56],[.61,1]]);
+G('n',.56,[[.09,1],[.09,.5]],[[.09,.62],[.28,.46],[.46,.56],[.48,1]]);
+G('o',.6,A_(.29,.73,.24,.26,-1.2,-1.2+TAU*.97,10));
+G('p',.6,[[.1,.5],[.1,1.36]],[[.1,.57],[.34,.47],[.53,.62],[.52,.86],[.3,.98],[.1,.9]]);
+G('q',.62,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.5],[.52,1.22],[.62,1.34]]);
+G('r',.44,[[.1,1],[.1,.5]],[[.1,.68],[.22,.5],[.42,.46]]);
+G('s',.52,[[.46,.52],[.24,.45],[.09,.58],[.22,.72],[.42,.8],[.46,.93],[.24,1],[.06,.92]]);
+G('t',.48,[[.26,.12],[.25,.9],[.36,1]],[[.08,.44],[.46,.43]]);
+G('u',.58,[[.08,.5],[.08,.84],[.22,1],[.42,.9],[.45,.5]],[[.45,.6],[.47,.96],[.54,1]]);
+G('v',.5,[[.06,.5],[.26,1],[.46,.5]]);
+G('w',.62,[[.04,.5],[.17,1],[.3,.62],[.43,1],[.57,.5]]);
+G('x',.52,[[.07,.5],[.47,1]],[[.47,.5],[.07,1]]);
+G('y',.54,[[.07,.5],[.28,1]],[[.5,.5],[.24,1.14],[.06,1.34]]);
+G('z',.52,[[.07,.5],[.45,.5],[.06,1],[.47,1]]);
+G('2',.54,[[.08,.3],[.18,.12],[.38,.12],[.44,.32],[.07,1],[.47,1]]);
+G('0',.56,A_(.27,.55,.22,.44,-1.3,-1.3+TAU*.97,10));
+G('6',.52,[[.4,.1],[.18,.34],[.09,.68],[.2,.98],[.4,.94],[.46,.7],[.3,.56],[.11,.66]]);
+G('8',.54,A_(.27,.31,.16,.2,-1.57,-1.57+TAU),A_(.27,.76,.2,.23,-1.57,-1.57+TAU));
+G('.',.24,[[.1,.93],[.13,.97]]);
+G(',',.24,[[.14,.9],[.15,1.02],[.04,1.16]]);
+G("'",.2,[[.12,.05],[.09,.26]]);
+G('-',.44,[[.05,.7],[.38,.68]]);
+G('—',.66,[[.03,.7],[.6,.67]]);
+G('·',.24,[[.08,.68],[.12,.72]]);
+G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
+G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
+G(' ',.42);
+function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+function write(R,t,x,y,sz,o={}){
+  const a=o.a??.7,col=o.col;
+  let px=o.cen?x-measure(t,sz)/2:x;
+  const ph=rd(R,0,7);
+  for(let i=0;i<t.length;i++){
+    const c=t[i],g=GL[c]||GL[' '];
+    const yb=y+Math.sin(i*.8+ph)*sz*.045;
+    for(const st of(g.s||[])){
+      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
+      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
+    }
+    px+=(g.w+.1)*sz;
+  }
+}
+
+// ---------------- small things ----------------
+function birdM(R,x,y,s,col,a=.6){
+  sk(R,[[x-s,y],[x-s*.4,y-s*.55],[x,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+  sk(R,[[x,y],[x+s*.4,y-s*.55],[x+s,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+}
+
+// ---------------- replay engine ----------------
+let CSSK=innerWidth/LW;
+addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+function tick(now){
+  const sy=scrollY/CSSK, vh=innerHeight/CSSK;
+  for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
+  const budget=(FAST||RM)?200:7;
+  const t0=performance.now();
+  for(const T of TILES){
+    if(!T.active||T.done)continue;
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){
+      T.q[T.qi++](T.cx);
+      if(performance.now()-t0>budget)break;
+    }
+    if(GENDONE&&T.qi>=T.q.length){T.done=true;T.q=null;readyRestless(T)}
+    if(performance.now()-t0>budget)break;
+  }
+  runRestless(now);
+  drawTrail(now);
+  requestAnimationFrame(tick);
+}
+
+// ---------------- restlessness ----------------
+// a few marks cannot hold still. every so often one erases itself and is
+// drawn again, never quite the same, like a field line that is only drawn once it is felt.
+const RESTLESS=[];
+function restless(x,y,w,h,fn){RESTLESS.push({x,y:y+GEN_DY,w,h,fn,dy:GEN_DY,img:null,next:0,tile:null})}
+function readyRestless(T){
+  if(RM)return;
+  for(const r of RESTLESS){
+    if(r.img)continue;
+    if(r.y>=T.y0&&r.y+r.h<=T.y0+T.h&&T.done){
+      r.tile=T;
+      const px=Math.round(r.x*S),py=Math.round((r.y-T.y0)*S);
+      const pw=Math.round(r.w*S),ph=Math.round(r.h*S);
+      try{r.img=T.cx.getImageData(px,py,pw,ph);r.px=px;r.py=py;
+          r.next=performance.now()+2000+Math.random()*3000;}catch(e){}
+    }
+  }
+}
+let restR=stream(SEED*77+3);
+function runRestless(now){
+  for(const r of RESTLESS){
+    if(!r.img||now<r.next)continue;
+    const cx=r.tile.cx;
+    cx.putImageData(r.img,r.px,r.py);
+    cx.save();
+    cx.setTransform(S,0,0,S,0,-r.tile.y0*S);
+    cx.beginPath();cx.rect(r.x,r.y,r.w,r.h);cx.clip();
+    DIRECT=r.tile; GEN_DY=r.dy;
+    r.fn(restR);
+    GEN_DY=0; DIRECT=null;
+    cx.restore();
+    r.next=now+2600+Math.random()*4200;
+  }
+}
+
+// ---------------- the visitor ----------------
+// where you move, you leave graphite on the wall. it fades, like iron
+// filings that fall back when the magnet moves on.
+const trailCv=document.getElementById('trail');
+const trailCx=trailCv.getContext('2d');
+let TP=[];
+function sizeTrail(){
+  const d=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*d;trailCv.height=innerHeight*d;
+  trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
+  trailCx.setTransform(d,0,0,d,0,0);
+  trailCx.lineCap='round';
+}
+sizeTrail();
+addEventListener('pointermove',e=>{
+  const t=performance.now();
+  const L=TP[TP.length-1];
+  if(L&&Math.hypot(e.clientX-L.x,e.clientY-L.y)<3)return;
+  TP.push({x:e.clientX,y:e.clientY,t});
+  if(TP.length>400)TP.shift();
+},{passive:true});
+function drawTrail(now){
+  if(RM){trailCx.clearRect(0,0,innerWidth,innerHeight);return}
+  trailCx.clearRect(0,0,innerWidth,innerHeight);
+  if(TP.length<2)return;
+  const col=lumAt((scrollY+innerHeight/2)/CSSK)<.45?CINK:INK;
+  const LIFE=3800;
+  while(TP.length&&now-TP[0].t>LIFE)TP.shift();
+  for(let i=1;i<TP.length;i++){
+    const a=TP[i-1],b=TP[i];
+    if(b.t-a.t>110)continue;
+    const age=(now-b.t)/LIFE;
+    const k=1-age;
+    if(k<=0)continue;
+    const wobx=Math.sin(now*.0011+i*.7)*1.3*age, woby=Math.cos(now*.0009+i*1.1)*1.3*age;
+    trailCx.strokeStyle=rgba(col,.2*k*k);
+    trailCx.lineWidth=.8+1.6*k;
+    trailCx.beginPath();
+    trailCx.moveTo(a.x+wobx,a.y+woby);
+    trailCx.lineTo(b.x+wobx,b.y+woby);
+    trailCx.stroke();
+  }
+}
+
+// ---------------- margin whispers ----------------
+function whispers(R,y0,y1,dark,n){
+  const col=dark?CINK:INK;
+  for(let i=0;i<n;i++){
+    const left=ch_(R,.5);
+    const x=left?rd(R,26,140):rd(R,1460,1574);
+    const y=rd(R,y0+40,y1-40);
+    const a=rd(R,.25,.45);
+    const k=ri(R,0,6);
+    if(k===0)sk(R,spiralPts(x,y,rd(R,8,16),2,rd(R,1.5,2.5),rd(R,0,7)),{col,w:1,a,amp:.4});
+    else if(k===1){for(let j=0;j<ri(R,3,6);j++)dotF(R,x+j*7,y+rd(R,-2,2),1.2,a,col)}
+    else if(k===2){sk(R,[[x-6,y],[x+6,y]],{col,w:1,a,amp:.3});sk(R,[[x,y-6],[x,y+6]],{col,w:1,a,amp:.3})}
+    else if(k===3)spark(R,x,y,rd(R,6,11),{col,a,w:1,nR:4,noCenter:true});
+    else if(k===4)aword(R,x-15,y,rd(R,8,12),ri(R,2,4),{col,a});
+    else if(k===5)ell(R,x,y,rd(R,5,9),rd(R,5,9),{col,w:1,a,amp:.4});
+    else birdM(R,x,y,rd(R,6,10),col,a);
+  }
+}
+
+// ===========================================================================
+// velden — twelve scenes on one wall, top to bottom. every scene is drawn in
+// local coordinates 0..1600 x 0..1200; GEN_DY lifts it to its place.
+//
+// there are no cards: the wall itself is one long sheet that goes from night
+// to day as you scroll, and the scenes are drawn straight onto it.
+// one braided line of force (the spine) runs the whole way down. it leaves a
+// magnet in the dark, turns into light, rides through a galaxy, a solar storm
+// and an aurora, passes birds, a thought, a heart and a strand of dna, runs
+// through the one who looks, and with the first light of morning comes down to
+// the masts on the horizon and, below them, to the flower in the grass where a
+// bee is flying. each scene carries one sentence or one question: a sentence
+// is something known, a question is something open.
+// ===========================================================================
+const PAPER=[238,232,214], FIL=[40,36,32], LAMPW=[250,244,214];
+const ELEC=[78,152,214], MAGR=[198,68,58], COPPER=[190,114,62], VIOL=[128,100,180];
+const AUR_G=[96,214,150], AUR_T=[70,200,200], AUR_P=[224,110,190], AUR_V=[150,110,232], AUR_B=[90,140,240];
+const SOL_Y=[255,226,130], SOL_O=[255,170,70], SOL_R=[236,84,60], GOLD2=[236,196,110];
+const HONEY=[244,232,196], WARM=[242,228,214], PALE=[236,238,232], CHARC=[34,30,28];
+const GRASS=[96,138,66], GRASS2=[132,168,76], GRASSD=[62,100,54];
+const VIS=[[214,60,56],[232,120,50],[226,176,40],[96,170,84],[64,150,196],[80,100,200],[140,84,190]];
+const PH=1200;
+const P=[];
+// one extra glyph for the questions
+G('?',.5,[[.08,.2],[.2,.1],[.38,.14],[.42,.34],[.26,.58],[.24,.72]],[[.24,.94],[.27,.98]]);
+
+// ---------------- the wall: night that turns into day ----------------
+// the colour of the sheet in each of the dark scenes; they run into each other around every seam
+const NIGHT=[[14,12,30],[14,14,34],[16,13,34],[24,12,22],[8,13,26],[22,26,62],[14,15,36],[30,12,28],[22,17,42],[12,14,28]];
+const SEAMW=[110,110,140,140,150,150,130,130,140];
+// then the morning: the sky goes from the dark of the last scene to the light of
+// the day, down to the horizon, and under the horizon the ground begins
+const HZ=12900;
+const MEAD=[212,225,174];
+const DAWN=[[11700,NIGHT[9]],[11900,[32,36,90]],[12060,[96,84,152]],[12220,[206,136,152]],[12360,[246,200,160]],[12500,[222,232,238]],[HZ-16,[248,240,222]],[HZ+10,[214,226,176]],[13250,MEAD],[13900,[222,226,180]],[14400,[230,224,188]],[14700,[234,226,192]]];
+const sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+function bgAt(y){
+  if(y<11700){
+    for(let i=0;i<9;i++){
+      const b=(i+1)*PH,w=SEAMW[i];
+      if(y<b-w)return NIGHT[i];
+      if(y<=b+w)return mix(NIGHT[i],NIGHT[i+1],sm((y-(b-w))/(2*w)));
+    }
+    return NIGHT[9];
+  }
+  for(let i=1;i<DAWN.length;i++){
+    if(y<=DAWN[i][0]){const a=DAWN[i-1],b=DAWN[i];return mix(a[1],b[1],(y-a[0])/(b[0]-a[0]))}
+  }
+  return DAWN[DAWN.length-1][1];
+}
+const lumOf=c=>(.299*c[0]+.587*c[1]+.114*c[2])/255;
+function lumAt(y){return lumOf(bgAt(y))}
+// the sheet itself, laid down in strips, with the tooth of the paper over it
+function wallPaint(R){
+  const st=30;
+  for(let y=-10;y<TOTALH;y+=st){
+    const c0=bgAt(y),c1=bgAt(y+st),ya=y;
+    emit(ya-2,ya+st+2,c=>{
+      const g=c.createLinearGradient(0,ya,0,ya+st);
+      g.addColorStop(0,rgba(c0,1));g.addColorStop(1,rgba(c1,1));
+      c.fillStyle=g;c.fillRect(-10,ya-1,LW+20,st+2.5);
+    });
+  }
+  for(let y0=-10;y0<TOTALH;y0+=400){
+    const gsd=ri(R,0,99999),y1=Math.min(TOTALH,y0+400);
+    emit(y0,y1,c=>{
+      const RR=mul32(gsd),n=Math.round(LW*(y1-y0)/1900);
+      for(let i=0;i<n;i++){
+        const s=.8+RR()*1.1,x=RR()*LW,y=y0+RR()*(y1-y0),lt=lumAt(y)>.5;
+        // on the dark sheet the tooth is a little lighter, on the light sheet a little darker
+        c.fillStyle=lt?(RR()<.62?'rgba(45,40,34,.05)':'rgba(255,252,244,.07)'):(RR()<.55?'rgba(255,250,240,.035)':'rgba(0,0,0,.08)');
+        c.fillRect(x,y,s,s);
+      }
+      for(let i=0;i<n/22;i++){
+        const fx=RR()*LW,fy=y0+RR()*(y1-y0),fa=RR()*TAU,fl=3+RR()*7;
+        c.strokeStyle=lumAt(fy)>.5?'rgba(45,40,34,.05)':'rgba(255,250,240,.04)';c.lineWidth=.7;
+        c.beginPath();c.moveTo(fx,fy);c.lineTo(fx+Math.cos(fa)*fl,fy+Math.sin(fa)*fl);c.stroke();
+      }
+    });
+  }
+}
+// the morning is shaded by hand: loose pencil strokes across the sky, thickest
+// where the night is turning into colour, thinning out toward the light
+function shadeDawn(R){
+  const ya=11640,yb=12520,cr=[[11700,[120,108,200]],[11950,[150,122,206]],[12150,[232,150,160]],[12320,[252,204,156]],[12500,[252,232,200]]];
+  const n=Math.round((yb-ya)*1.7);
+  for(let k=0;k<n;k++){
+    const u=R(),y=ya+u*(yb-ya),p=Math.sin(clamp(u,0,1)*Math.PI);
+    if(R()>p*.95+.04)continue;
+    const len=rd(R,260,860),x=rd(R,-140,LW-len+140),sl=rd(R,-.03,.03),pts=[];
+    for(let xx=x;xx<=x+len;xx+=14)pts.push([xx,y+(xx-x)*sl+Math.sin(xx*.004+k)*4]);
+    sk(R,pts,{col:ramp(cr,y),w:rd(R,1,2.2),a:rd(R,.07,.17)*(.4+p*.8),amp:.9,noDust:true,gap:.03});
+  }
+  for(let k=0;k<(yb-ya)*.5;k++){
+    const u=R(),y=ya+u*(yb-ya),p=Math.sin(clamp(u,0,1)*Math.PI);
+    if(R()>p*p*.6)continue;
+    const x=rd(R,-20,LW+20),an=rd(R,.75,1.25)*(R()<.5?1:-1),len=rd(R,30,110);
+    sk(R,[[x,y],[x+Math.cos(an)*len,y+Math.sin(an)*len]],{col:ramp(cr,y),w:rd(R,.9,1.6),a:rd(R,.06,.14),amp:.6,noDust:true,taper:'both'});
+  }
+}
+// the night sky is one sky: stars wherever the sheet is dark
+function starfield(R){
+  const spec=[[0,250,-90,1290],[1,230,-90,1290],[2,470,-90,1290],[3,320,-90,1290],[4,430,-90,800],[5,300,-90,1290],[6,300,-90,1290],[7,260,-90,1290],[8,300,-90,1290],[9,420,-90,1500]];
+  const out=[];
+  for(const [pn,n,a,b] of spec){
+    for(let i=0;i<n;i++){
+      const y=pn*PH+rd(R,a,b),x=rd(R,10,1590),dk=clamp((.5-lumAt(y))/.3,0,1);
+      if(R()>dk)continue;
+      out.push([x,y,rd(R,.5,1.6),rd(R,.1,.55)*dk]);
+    }
+  }
+  out.sort((p,q)=>p[1]-q[1]);
+  dustBatch(out,CINK);
+}
+
+// ---------------- the journey: colour and the spine ----------------
+const JC=[[0,ELEC],[1,[120,110,225]],[2.1,[170,100,215]],[3.2,[255,170,70]],[4.2,AUR_G],[5.2,[120,170,240]],
+  [6.2,AUR_V],[7.2,[232,92,122]],[8.2,[90,150,214]],[9.3,[240,196,120]],[10.3,[104,122,214]],[11.2,[232,120,150]],[12,[240,176,70]]];
+function ramp(st,t){
+  if(t<=st[0][0])return st[0][1];
+  for(let i=1;i<st.length;i++)if(t<=st[i][0]){const a=st[i-1],b=st[i];return mix(a[1],b[1],(t-a[0])/((b[0]-a[0])||1))}
+  return st[st.length-1][1];
+}
+// waypoints of the spine in wall coordinates: it zigzags so each scene keeps
+// one bottom corner free for its sentence
+const SMID=[0,820,780,850,800,760,900,800,840,820,800,820];
+const SWX={1:[[560,1330],[800,1330]],9:[[110,1000],[290,905],[408,872]],11:[[200,1010],[340,1004]]};
+const SW=[[700,950],[800,1012]];
+for(let i=0;i<12;i++){
+  if(i>0)for(const m of(SWX[i]||[[600,SMID[i]]]))SW.push([i*PH+m[0],m[1]]);
+  // the line ends in the bee, so the last scene has no way out
+  if(i<11)SW.push([i*PH+1150,i%2===0?940:640]);
+}
+function spineX(gy){
+  let i=0;
+  while(i<SW.length-2&&SW[i+1][0]<gy)i++;
+  const [ya,xa]=SW[i],[yb,xb]=SW[i+1];
+  let t=clamp((gy-ya)/(yb-ya||1),0,1);
+  t=t*t*(3-2*t);
+  return xa+(xb-xa)*t+Math.sin(gy*.0047+1)*10;
+}
+const SPEND=392;
+// five strands, braided. on dark paper they glow, on light paper they are pencil
+function spine(R,pi,y0,y1){
+  const base=pi*PH,N=5,old=COMP;
+  for(let k=0;k<N;k++){
+    let y=y0;
+    while(y<y1){
+      const y2=Math.min(y1,y+rd(R,240,380)),pts=[];
+      for(let yy=y;yy<=y2;yy+=11){
+        const gy=yy+base;
+        let off=(k-2)*(5+4*Math.sin(gy*.0021+k))+11*Math.sin(gy*(.0062+.0009*k)+k*1.3);
+        // the lines fan out from the pole, come together in the one who looks and open up again,
+        // and gather once more in the bee
+        if(pi===0)off*=clamp((yy-700)/150,0,1);
+        if(pi===9)off*=clamp(Math.abs(yy-408)/210,.04,1);
+        if(pi===11)off*=clamp((SPEND-yy)/200,.04,1);
+        pts.push([spineX(gy)+off,yy]);
+      }
+      if(pts.length>1){
+        const dark=lumAt(base+(y+y2)/2)<.5;
+        const W=dark?[2.6,1.9,1.6,1.4,1.2]:[3,2.3,2,1.7,1.5];
+        const c0=ramp(JC,(y+base)/PH),c1=ramp(JC,(y+base+700)/PH),col=mix(c0,c1,k/(N-1));
+        COMP=dark?'lighter':null;
+        sk(R,pts,{col:dark?col:shade(col,pi>=10?.3:.12),w:W[k],a:dark?.6:.9,amp:.9,taper:'both',noDust:true});
+      }
+      if(y2>=y1)break;
+      y=y2-6;
+    }
+  }
+  COMP=old;
+}
+// specks of the spine's own colour that drift off it where one scene turns into the next
+function dotsBatch(pts){
+  pts.sort((a,b)=>a[1]-b[1]);
+  for(let i=0;i<pts.length;i+=100){
+    const batch=pts.slice(i,i+100),y0=batch[0][1]-4,y1=batch[batch.length-1][1]+4;
+    emit(y0,y1,c2=>{for(const p of batch){c2.fillStyle=rgba(p[4],p[3]);c2.beginPath();c2.arc(p[0],p[1],p[2],0,TAU);c2.fill()}});
+  }
+}
+function motes(R,pi,ya,yb,n,spread){
+  const lt=[],dk=[];
+  for(let i=0;i<n;i++){
+    const y=rd(R,ya,yb),gy=pi*PH+y,x=spineX(gy)+(R()+R()+R()-1.5)*spread*.7;
+    const dark=lumAt(gy)<.5,c=ramp(JC,gy/PH+rd(R,-.12,.12));
+    (dark?dk:lt).push([x,y,rd(R,.6,2),rd(R,.25,.7),dark?mix(c,[255,255,255],.25):shade(c,.15)]);
+  }
+  const old=COMP;
+  COMP='lighter';dotsBatch(dk);
+  COMP=null;dotsBatch(lt);
+  COMP='lighter';
+  for(const p of dk.filter(q=>q[2]>1.6))spark(R,p[0],p[1],rd(R,7,11),{col:p[4],a:.5,w:1,nR:4,noCenter:true});
+  COMP=null;
+  for(const p of lt.filter(q=>q[2]>1.6))spark(R,p[0],p[1],rd(R,7,11),{col:p[4],a:.55,w:1,nR:4,noCenter:true});
+  COMP=old;
+}
+
+// ---------------- small helpers ----------------
+function hblob(R,cx,cy,rx,ry){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<14;i++){const t=i/14*TAU,m=1+.1*Math.sin(t*2+ph)+.05*Math.sin(t*5+ph*2.1);pts.push([cx+Math.cos(t)*rx*m,cy+Math.sin(t)*ry*m])}
+  return chaikin(pts,true,1);
+}
+function circ(R,cx,cy,r){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<40;i++){const t=i/40*TAU,m=1+.012*Math.sin(t*3+ph)+.008*Math.sin(t*7+ph*2.1);pts.push([cx+Math.cos(t)*r*m,cy+Math.sin(t)*r*m])}
+  return pts;
+}
+function ePts(cx,cy,rx,ry,rot,n=16){
+  const o=[];
+  for(let i=0;i<n;i++){const t=i/n*TAU,ux=Math.cos(t)*rx,uy=Math.sin(t)*ry;o.push([cx+ux*Math.cos(rot)-uy*Math.sin(rot),cy+ux*Math.sin(rot)+uy*Math.cos(rot)])}
+  return o;
+}
+function offsetPath(pts,d){
+  return pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny)||1;return[p[0]+nx/l*d,p[1]+ny/l*d]});
+}
+// the same line drawn several times, a little apart, each strand its own colour
+function strands(R,pts,colFn,n,spread,o){
+  for(let s=0;s<n;s++){
+    const u=n>1?s/(n-1):.5,col=colFn(u);
+    sk(R,n>1?offsetPath(pts,(u-.5)*spread):pts,{...o,col,noDust:true});
+  }
+}
+// a soft light; it may run over into the next scene, so it is only clipped far outside its own
+function glow(R,x,y,r,col,a,sx=1){
+  const t=Math.max(y-r,-70),bt=Math.min(y+r,1270);
+  if(bt<=t)return;
+  emit(t,bt,c2=>{
+    c2.save();c2.beginPath();c2.rect(x-r*sx,t,2*r*sx,bt-t);c2.clip();
+    c2.translate(x,y);c2.scale(sx,1);
+    const g=c2.createRadialGradient(0,0,0,0,0,r);
+    g.addColorStop(0,rgba(col,a));g.addColorStop(.4,rgba(col,a*.35));g.addColorStop(1,rgba(col,0));
+    c2.fillStyle=g;c2.fillRect(-r,-r,2*r,2*r);c2.restore();
+  });
+}
+function say(R,txt,left,dark,y=1100,sz=26){
+  const w=measure(txt,sz),x=left?112:1488-w;
+  write(R,txt,x,y,sz,{col:dark?CINK:INK,a:.9});
+}
+function inPoly(Pp,x,y){let c=false;for(let i=0,j=Pp.length-1;i<Pp.length;j=i++){const a=Pp[i],b=Pp[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+function dipLine(cx,cy,L,tilt,side,r0){
+  const pts=[];
+  const a=Math.max(.05,Math.asin(Math.sqrt(Math.min(1,r0/L)))),b=Math.PI-a;
+  for(let t=a;t<=b;t+=.035){
+    const r=L*Math.sin(t)*Math.sin(t);
+    const x=side*r*Math.sin(t),y=-r*Math.cos(t);
+    pts.push([cx+x*Math.cos(tilt)-y*Math.sin(tilt),cy+x*Math.sin(tilt)+y*Math.cos(tilt)]);
+  }
+  return pts;
+}
+function dustBatch(pts,col,B=150){
+  const c=col.slice();
+  for(let i=0;i<pts.length;i+=B){
+    const batch=pts.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    for(const p of batch){if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+    emit(y0-4,y1+4,c2=>{for(const p of batch){c2.fillStyle=rgba(c,p[3]);c2.beginPath();c2.arc(p[0],p[1],p[2],0,TAU);c2.fill()}});
+  }
+}
+// iron filings, laid down from the source outward
+function filings(R,fn,cx,cy,rx,ry,n,o={}){
+  const segs=[],ref=o.ref||1;
+  for(let i=0;i<n;i++){
+    const t=rd(R,0,TAU),d=Math.sqrt(R());
+    const x=cx+Math.cos(t)*rx*d,y=cy+Math.sin(t)*ry*d;
+    if(o.skip&&o.skip(x,y))continue;
+    const f=fn(x,y),mag=Math.hypot(f[0],f[1]);
+    if(!(mag>0))continue;
+    const p=clamp(Math.pow(mag/ref,o.pw??.42),o.pmin??.1,1)*(1-d*d*d);
+    if(R()>p)continue;
+    segs.push([x,y,Math.atan2(f[1],f[0])+rd(R,-.09,.09),rd(R,6,11)*(o.len??1),rd(R,.4,.85)*(o.am??1),rd(R,1,1.7)]);
+  }
+  const ox=o.ox??cx,oy=o.oy??cy;
+  segs.sort((a,b)=>Math.hypot(a[0]-ox,a[1]-oy)-Math.hypot(b[0]-ox,b[1]-oy));
+  const col=(o.col||FIL).slice(),B=70;
+  for(let i=0;i<segs.length;i+=B){
+    const batch=segs.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    for(const s of batch){if(s[1]<y0)y0=s[1];if(s[1]>y1)y1=s[1]}
+    emit(y0-12,y1+12,c2=>{
+      c2.lineCap='round';
+      for(const s of batch){
+        const c=Math.cos(s[2])*s[3]/2,sn=Math.sin(s[2])*s[3]/2;
+        c2.strokeStyle=rgba(col,s[4]);c2.lineWidth=s[5];
+        c2.beginPath();c2.moveTo(s[0]-c,s[1]-sn);c2.lineTo(s[0]+c,s[1]+sn);c2.stroke();
+      }
+    });
+  }
+}
+const magField=(cx,cy,d)=>(x,y)=>{
+  let bx=0,by=0;
+  for(const [px,q] of [[cx-d,1],[cx+d,-1]]){
+    const dx=x-px,dy=y-cy,r2=dx*dx+dy*dy+25,r=Math.sqrt(r2);
+    bx+=q*dx/(r2*r);by+=q*dy/(r2*r);
+  }
+  return [bx,by];
+};
+// a curtain of light: a wavy lower edge, rays that bend like drapery, a brightness that folds
+function curtain(R,x0,x1,yb,hgt,ph,pal,n,o={}){
+  const aM=o.a??1,my=o.my||(y=>y),soft=o.soft??1;
+  const base=x=>yb+58*Math.sin(x*.0043+ph)+26*Math.sin(x*.0108+ph*1.7)+(fbm(x*.004,ph,3,2)-.5)*80;
+  const env=x=>{const e=.5+.5*Math.sin(x*.0066+ph*2.3+Math.sin(x*.0021+ph)*1.6);return .42+.58*e*e};
+  const rays=[];
+  for(let i=0;i<n;i++){
+    const x=x0+(x1-x0)*i/(n-1)+rd(R,-2.5,2.5),b=base(x),e=env(x),uu=(x-x0)/(x1-x0),sm2=t=>{t=clamp(t,0,1);return t*t*(3-2*t)},fade=sm2(uu/.13)*sm2((1-uu)/.13);
+    const L=Math.min(hgt*(.42+.62*e)*(.75+.5*fbm(x*.012+ph,2.1,4,2))*(.45+.55*fade),b-90);
+    const lean=Math.sin(x*.0062+ph)*50+(fbm(x*.01,ph,6,2)-.5)*50;
+    const sw=rd(R,-12,12)+Math.sin(x*.02+ph)*10;
+    rays.push([x,b,L,lean,sw,rd(R,1.2,3),(.4+.6*e)*rd(R,.55,1.05)*aM*fade]);
+  }
+  const B=36;
+  for(let i=0;i<rays.length;i+=B){
+    const batch=rays.slice(i,i+B);
+    let ya=1e9,yz=-1e9;
+    for(const r of batch){const t=my(r[1]-r[2]),bt=my(r[1]);ya=Math.min(ya,t,bt);yz=Math.max(yz,t,bt)}
+    emit(ya-14,yz+14,c2=>{
+      c2.lineCap='round';
+      for(const [x,b,L,lean,sw,w,a] of batch){
+        const g=c2.createLinearGradient(x,my(b),x+lean,my(b-L));
+        g.addColorStop(0,rgba(pal[0],.9*a));g.addColorStop(.14,rgba(pal[0],.7*a));g.addColorStop(.45,rgba(pal[1],.45*a));g.addColorStop(.8,rgba(pal[2],.2*a));g.addColorStop(1,rgba(pal[2],0));
+        c2.strokeStyle=g;
+        c2.beginPath();c2.moveTo(x,my(b));c2.bezierCurveTo(x+sw,my(b-L*.33),x+lean-sw,my(b-L*.66),x+lean,my(b-L));
+        c2.lineWidth=w*6;c2.globalAlpha=.1*soft;c2.stroke();
+        c2.globalAlpha=1;c2.lineWidth=w;c2.stroke();
+      }
+    });
+  }
+  // the lower edge itself shines: a ribbon the whole curtain hangs from
+  const ep=[];for(let x=x0;x<=x1;x+=8)ep.push([x,my(base(x))]);
+  strands(R,ep,u=>mix(pal[0],pal[1],.15+.5*u),3,8,{w:2.2,a:.55*aM,amp:.7,taper:'both'});
+}
+
+// ---------------- small drawings ----------------
+function flowerDraw(R,x,y,s){
+  sk(R,[[x,y+s*.9],[x+14,y+s*2.4],[x-6,y+s*4.1],[x+4,y+s*5.1]],{col:[88,120,66],w:7,a:.85,amp:1.4,taper:'out'});
+  for(const [dx,dy,rot] of [[-44,y+s*3.0,-.5],[46,y+s*2.2,.5]]){
+    const lf=ePts(x+dx,dy,s*.62,s*.2,rot);
+    fillPoly(lf,[104,138,76],.8);sk(R,lf.concat([lf[0]]),{col:INK,w:1.3,a:.7,amp:.4});
+  }
+  for(let k=0;k<12;k++){
+    const a=k/12*TAU+rd(R,-.06,.06),pc=[x+Math.cos(a)*s*1.0,y+Math.sin(a)*s*1.0];
+    const pet=ePts(pc[0],pc[1],s*.58,s*.24,a);
+    fillPoly(pet,[252,248,238],.95);
+    sk(R,pet.concat([pet[0]]),{col:INK,w:1.4,a:.8,amp:.4});
+  }
+  const cd=hblob(R,x,y,s*.5,s*.5);
+  fillPoly(cd,[218,150,52],.95);
+  sk(R,cd.concat([cd[0]]),{col:INK,w:1.6,a:.85,amp:.4});
+  spatter(R,x,y,s*.45,70,COPPER,.7);
+}
+function beeDraw(R,x,y,s,ang){
+  const co=Math.cos(ang),sn=Math.sin(ang);
+  const T=(px,py)=>[x+px*co-py*sn,y+px*sn+py*co];
+  const LE=(px,py,rx,ry,rot,n=16)=>ePts(px,py,rx,ry,rot,n).map(p=>T(p[0],p[1]));
+  for(const sd of[-1,1]){
+    const w=LE(s*.2,sd*s*.85,s*.75,s*.3,sd*.3);
+    fillPoly(w,[226,238,246],.5);sk(R,w.concat([w[0]]),{col:INK,w:1.2,a:.55,amp:.4});
+  }
+  for(let k=0;k<4;k++){const lx=s*(.1+k*.3);for(const sd of[-1,1])sk(R,[T(lx,sd*s*.4),T(lx-s*.2,sd*s*1.1)],{col:INK,w:1.1,a:.7,amp:.3})}
+  const ab=LE(-s*.75,0,s*.72,s*.48,0);
+  fillPoly(ab,[238,192,60],.95);
+  for(let k=0;k<3;k++)sk(R,[T(-s*1.05+k*s*.4,-s*.42),T(-s*1.0+k*s*.4,s*.42)],{col:CHARC,w:s*.16,a:.85,amp:.5});
+  sk(R,ab.concat([ab[0]]),{col:INK,w:1.6,a:.85,amp:.4});
+  const th=LE(s*.28,0,s*.42,s*.4,0,14);
+  fillPoly(th,[116,86,48],.9);
+  for(let k=0;k<26;k++){const t=rd(R,0,TAU);sk(R,[T(s*.28+Math.cos(t)*s*.38,Math.sin(t)*s*.36),T(s*.28+Math.cos(t)*s*.56,Math.sin(t)*s*.53)],{col:[170,126,66],w:.9,a:.7,amp:.2})}
+  const hd=LE(s*.86,0,s*.26,s*.28,0,12);
+  fillPoly(hd,CHARC,.9);
+  dotF(R,...T(s*.95,-s*.12),2,.9,CINK);dotF(R,...T(s*.95,s*.12),2,.9,CINK);
+  for(const sd of[-1,1])sk(R,[T(s*1.05,sd*s*.1),T(s*1.35,sd*s*.45),T(s*1.5,sd*s*.4)],{col:INK,w:1.1,a:.8,amp:.2});
+  for(let k=0;k<3;k++)for(const sd of[-1,1])sk(R,[T(s*(.05+k*.28),sd*s*.35),T(s*(-.05+k*.3),sd*s*.8),T(s*(-.2+k*.32),sd*s*.95)],{col:INK,w:1.1,a:.75,amp:.3});
+}
+function branch(R,x,y,ang,len,depth,col,w){
+  const x2=x+Math.cos(ang)*len,y2=y+Math.sin(ang)*len;
+  sk(R,[[x,y],[(x+x2)/2+rd(R,-len*.06,len*.06),(y+y2)/2+rd(R,-len*.06,len*.06)],[x2,y2]],{col,w,a:.85,amp:.8,taper:'out'});
+  if(depth<=0)return;
+  const n=ri(R,2,3);
+  for(let i=0;i<n;i++)branch(R,x2,y2,ang+rd(R,-.7,.7),len*rd(R,.6,.75),depth-1,col,Math.max(.8,w*.65));
+}
+function heartShape(R,hx,hy,s,tilt,oc=INK){
+  const base=[[0,-.66],[.34,-1.02],[.78,-.98],[1.04,-.5],[.9,.14],[.46,.68],[0,1.18],[-.46,.68],[-.9,.14],[-1.04,-.5],[-.78,-.98],[-.34,-1.02]];
+  const co=Math.cos(tilt),sn=Math.sin(tilt);
+  const T=(px,py)=>[hx+(px*co-py*sn)*s,hy+(px*sn+py*co)*s];
+  const outline=chaikin(base.map(p=>T(p[0],p[1])),true,2);
+  emit(hy-s*1.3,hy+s*1.3,c2=>{
+    c2.save();c2.beginPath();outline.forEach((p,i)=>i?c2.lineTo(p[0],p[1]):c2.moveTo(p[0],p[1]));c2.closePath();c2.clip();
+    const g=c2.createRadialGradient(hx-s*.3,hy-s*.4,s*.08,hx,hy,s*1.3);
+    g.addColorStop(0,'rgb(246,142,130)');g.addColorStop(.55,'rgb(210,76,78)');g.addColorStop(1,'rgb(160,40,54)');
+    c2.fillStyle=g;c2.globalAlpha=.93;c2.fillRect(hx-s*1.4,hy-s*1.4,s*2.8,s*2.8);c2.restore();
+  });
+  scribFill(R,outline,4,.2,{col:[150,40,38],w:1.1});
+  sk(R,outline.concat([outline[0]]),{col:oc,w:2,a:oc===INK?.85:.6,amp:.8});
+  sk(R,[T(.02,-.62),T(.1,.1),T(0,.8)],{col:[120,30,30],w:1.4,a:.35,amp:.6});
+}
+function mast(R,x,yb,h,col){
+  const w=h*.12;
+  sk(R,[[x-w,yb],[x-w*.12,yb-h]],{col,w:2.4,a:.9,amp:.8});
+  sk(R,[[x+w,yb],[x+w*.12,yb-h]],{col,w:2.4,a:.9,amp:.8});
+  const n=9;
+  for(let i=0;i<n;i++){
+    const t0=i/n,t1=(i+1)/n;
+    const l0=x-w*(1-t0*.88),r0=x+w*(1-t0*.88),l1=x-w*(1-t1*.88),r1=x+w*(1-t1*.88);
+    const y0=yb-h*t0,y1=yb-h*t1;
+    sk(R,[[l0,y0],[r1,y1]],{col,w:1.2,a:.7,amp:.4});
+    sk(R,[[r0,y0],[l1,y1]],{col,w:1.2,a:.7,amp:.4});
+    sk(R,[[l1,y1],[r1,y1]],{col,w:1.2,a:.7,amp:.3});
+  }
+  for(const dx of[-w*.4,0,w*.4]){
+    const px=x+dx,pan=[[px-4,yb-h-22],[px+4,yb-h-22],[px+4,yb-h+16],[px-4,yb-h+16]];
+    fillPoly(pan,[222,222,214],.95);sk(R,pan.concat([pan[0]]),{col,w:1.3,a:.8,amp:.3});
+  }
+  sk(R,[[x,yb-h-22],[x,yb-h-54]],{col,w:1.6,a:.8,amp:.3});
+  dotF(R,x,yb-h-58,3.2,.9,MAGR);
+}
+// a stroke whose strength follows a function of position: rings use it to die away toward the edge of their box
+function fsk(R,pts,o,kf){
+  const w=o.w??1.6,a0=o.a??.6,rs=resample(pts,Math.max(2.4,w*1.5));
+  if(rs.length<2)return;
+  const q=wob(R,rs,o.amp??.8),col=(o.col||CUR).slice(),n=q.length,segs=[];
+  let y0=1e9,y1=-1e9;
+  for(let i=1;i<n;i++){
+    const t=i/(n-1),m=kf(q[i][0],q[i][1])*(.3+.7*Math.min(1,Math.min(t,1-t)/.2));
+    if(m<.03)continue;
+    segs.push([q[i-1],q[i],rgba(col,a0*m*rd(R,.8,1)),Math.max(.5,w*(.6+.4*m)*rd(R,.85,1.15))]);
+    y0=Math.min(y0,q[i-1][1],q[i][1]);y1=Math.max(y1,q[i-1][1],q[i][1]);
+  }
+  if(!segs.length)return;
+  emit(y0-3,y1+3,cx=>{cx.lineCap='round';for(const s of segs){cx.strokeStyle=s[2];cx.lineWidth=s[3];cx.beginPath();cx.moveTo(s[0][0],s[0][1]);cx.lineTo(s[1][0],s[1][1]);cx.stroke()}});
+}
+function fstrands(R,pts,colFn,n,spread,o,kf){
+  for(let s=0;s<n;s++){const u=n>1?s/(n-1):.5;fsk(R,n>1?offsetPath(pts,(u-.5)*spread):pts,{...o,col:colFn(u)},kf)}
+}
+function wobbleRing(R,cx,cy,r,ry,ph,col,w,a,from=0,to=TAU,clip=null,fade=0){
+  let run=[];
+  const kf=(x,y)=>clamp(Math.min(x-clip[0],clip[2]-x,y-clip[1],clip[3]-y)/fade,0,1);
+  const flush=()=>{
+    if(run.length>2){if(clip&&fade)fsk(R,run,{col,w,a,amp:.7},kf);else sk(R,run,{col,w,a,amp:.7,taper:'both',noDust:true})}
+    run=[];
+  };
+  for(let t=from;t<=to;t+=.05){
+    const m=1+.03*Math.sin(t*3+ph)+.018*Math.sin(t*7+ph*1.9);
+    const p=[cx+Math.cos(t)*r*m,cy+Math.sin(t)*ry*m];
+    if(clip&&(p[0]<clip[0]||p[0]>clip[2]||p[1]<clip[1]||p[1]>clip[3])){flush();continue}
+    run.push(p);
+  }
+  flush();
+}
+// a line whose colour changes along its length
+function gradLine(R,pts,colFn,o,segs=9){
+  const n=pts.length;
+  for(let i=0;i<segs;i++){
+    const a=Math.floor((n-1)*i/segs),b=Math.min(n-1,Math.floor((n-1)*(i+1)/segs)+2);
+    if(b-a<1)continue;
+    sk(R,pts.slice(a,b+1),{...o,col:colFn((i+.5)/segs),noDust:true,taper:undefined});
+  }
+}
+// a flying bird: two wings that bend, a little body
+function birdW(R,x,y,s,col,a,w=2){
+  const up=rd(R,-.2,.85),k=rd(R,.85,1.15),dip=rd(R,-.2,.3);
+  for(const sd of[-1,1]){
+    const pts=chaikin([[x,y],[x+sd*s*.5,y-s*up],[x+sd*s*1.0*k,y-s*up*.55+s*dip*.4],[x+sd*s*1.4*k,y+s*(.1+dip*.6)]],false,2);
+    sk(R,pts,{col,w,a,amp:.25,taper:'out',noDust:true});
+  }
+  dotF(R,x,y,w*.9,a,col);
+}
+
+// ---------------- the meadow ----------------
+// blades of grass: thin filled slivers that lean and bend, laid down in batches.
+// each is [x, base y, height, lean, width, colour, alpha]
+function bladesBatch(R,list){
+  list.sort((a,b)=>a[1]-b[1]);
+  const B=48;
+  for(let i=0;i<list.length;i+=B){
+    const batch=list.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    const shapes=batch.map(b=>{
+      const [x,y,h,lean,w,col,a]=b,bend=rd(R,-.5,.5)*h*.3,L=[],Rr=[],n=7;
+      for(let k=0;k<=n;k++){
+        const t=k/n,cx=x+lean*h*t+bend*t*t,cy=y-h*t,ww=w*.5*Math.pow(1-t,.85)+.12;
+        L.push([cx-ww,cy]);Rr.push([cx+ww,cy]);
+      }
+      y0=Math.min(y0,y-h-4);y1=Math.max(y1,y+4);
+      return {poly:L.concat(Rr.reverse()),fill:rgba(col,a),edge:rgba(shade(col,.35),a*.55),mid:[x+lean*h*.5+bend*.25,y-h*.5]};
+    });
+    emit(y0,y1,c2=>{
+      for(const s of shapes){
+        c2.beginPath();s.poly.forEach((p,j)=>j?c2.lineTo(p[0],p[1]):c2.moveTo(p[0],p[1]));c2.closePath();
+        c2.fillStyle=s.fill;c2.fill();
+        c2.strokeStyle=s.edge;c2.lineWidth=.7;c2.stroke();
+      }
+    });
+  }
+}
+// a stretch of meadow between two heights: blades whose size grows with the distance down (a field seen from above, going away)
+// keep(x,y) says where the blades must stay out of (a sentence, a stem)
+function meadowBlades(R,ya,yb,n,hmin,hmax,keep,o={}){
+  const list=[],cols=[GRASS,GRASS2,GRASSD,[150,180,86],[88,128,70]];
+  for(let i=0;i<n;i++){
+    const u=Math.pow(R(),o.bias??1),y=ya+u*(yb-ya),x=rd(R,-10,1610);
+    if(keep&&keep(x,y))continue;
+    const k=o.kf?o.kf(y):1,h=rd(R,hmin,hmax)*k;
+    list.push([x,y,h,rd(R,-.22,.22),rd(R,2,4.4)*(.6+.5*k),pk(R,cols),rd(R,.5,.9)]);
+  }
+  bladesBatch(R,list);
+}
+// small flowers in the grass: five petals and a heart, white, rose or pale yellow
+function tinyFlowers(R,n,ya,yb,rmin,rmax,keep){
+  const pals=[[[252,250,242],[236,178,52]],[[250,206,214],[236,178,52]],[[252,236,160],[214,140,40]],[[236,226,252],[236,178,52]]];
+  for(let i=0;i<n;i++){
+    const x=rd(R,20,1580),y=rd(R,ya,yb);
+    if(keep&&keep(x,y))continue;
+    const r=rd(R,rmin,rmax),pl=pk(R,pals),rot=rd(R,0,TAU),np=ri(R,5,6);
+    sk(R,[[x,y+r*.6],[x+rd(R,-r*.3,r*.3),y+r*2.6]],{col:GRASSD,w:1.4,a:.7,amp:.3,noDust:true});
+    for(let k=0;k<np;k++){
+      const a=rot+k/np*TAU,pc=[x+Math.cos(a)*r*.62,y+Math.sin(a)*r*.62];
+      fillPoly(ePts(pc[0],pc[1],r*.52,r*.26,a,10),pl[0],.95);
+    }
+    dotF(R,x,y,r*.28,.95,pl[1]);
+  }
+}
+// a loose scribble of grass-coloured pencil over a stretch of ground, so the meadow is drawn, not filled
+function grassHatch(R,ya,yb,n,keep){
+  for(let i=0;i<n;i++){
+    const y=rd(R,ya,yb),x=rd(R,0,1600),len=rd(R,10,34);
+    if(keep&&keep(x,y))continue;
+    const an=-Math.PI/2+rd(R,-.5,.5);
+    sk(R,[[x,y],[x+Math.cos(an)*len,y+Math.sin(an)*len]],{col:pk(R,[GRASS,GRASSD,[150,180,86]]),w:rd(R,1,1.8),a:rd(R,.18,.42),amp:.4,noDust:true,taper:'out'});
+  }
+}
+
+// a cloud, as a pastel smudge with a loose pencil line under it
+function cloud(R,x,y,w){
+  const n=Math.round(w/42)+3;
+  for(let i=0;i<n;i++){
+    const u=(i+.5)/n,px=x-w/2+u*w+rd(R,-10,10),hh=Math.sin(u*Math.PI)*w*.085+9,py=y-hh*.35+rd(R,-3,3);
+    glow(R,px,py+9,hh*1.5+8,[250,196,170],.2,2.6);
+  }
+  for(let i=0;i<n;i++){
+    const u=(i+.5)/n,px=x-w/2+u*w+rd(R,-10,10),hh=Math.sin(u*Math.PI)*w*.085+9,py=y-hh*.4+rd(R,-3,3);
+    glow(R,px,py,hh*1.5+8,[255,252,248],.5,2.6);
+  }
+  sk(R,[[x-w*.5,y+10],[x-w*.2,y+13],[x+w*.2,y+12],[x+w*.5,y+9]],{col:[176,170,208],w:1,a:.3,amp:1.4,noDust:true,taper:'both'});
+  sk(R,[[x-w*.34,y+21],[x+w*.28,y+20]],{col:[176,170,208],w:.9,a:.2,amp:1.2,noDust:true,taper:'both'});
+}
+
+// P0 · the magnet --------------------------------------------------------------
+// the wall starts in the dark: a magnet, and the field it makes in the air around it
+P.push(function(){
+  const R=stream(SEED*101+0),RW=stream(SEED*101+90);
+  // the wall first: the sheet, the first light of the morning far below, the stars
+  wallPaint(RW);
+  shadeDawn(RW);
+  starfield(RW);
+  write(R,'velden',800,215,130,{col:CINK,a:.9,cen:true});
+  write(R,'elektromagnetisch universum',800,284,26,{col:CINK,a:.74,cen:true});
+  const cx=800,cy=700,hw=150,ht=31,d=105;
+  // soft washes of colour at the two ends, then the field as coloured lines of light:
+  // they go on past where the filings stop
+  COMP='lighter';
+  glow(R,cx-hw-30,cy,320,[236,104,104],.2);glow(R,cx+hw+30,cy,320,[92,150,238],.2);
+  const lineCol=t=>ramp([[0,ELEC],[.5,VIOL],[1,[232,82,112]]],t);
+  [210,270,350,450,570,700].forEach((L,i)=>{
+    for(const side of[-1,1]){
+      const pts=dipLine(cx,cy,L,Math.PI/2,side,70);
+      for(let k=0;k<3;k++)gradLine(R,offsetPath(pts,(k-1)*8),t=>mix(mix(lineCol(t),[255,255,255],.22),[255,255,255],k*.07),{w:1.9,a:.6-i*.055,amp:.8},8);
+    }
+  });
+  COMP=null;
+  const nP=[[cx-hw,cy-ht],[cx,cy-ht],[cx,cy+ht],[cx-hw,cy+ht]],sP=[[cx,cy-ht],[cx+hw,cy-ht],[cx+hw,cy+ht],[cx,cy+ht]];
+  fillPoly(nP,MAGR,.92);scribFill(R,nP,4,.35,{col:[140,36,32],w:1.1});
+  fillPoly(sP,ELEC,.92);scribFill(R,sP,4,.35,{col:[40,90,150],w:1.1});
+  sk(R,[[cx-hw,cy-ht],[cx+hw,cy-ht],[cx+hw,cy+ht],[cx-hw,cy+ht],[cx-hw,cy-ht]],{col:CINK,w:2,a:.7,amp:.8});
+  sk(R,[[cx,cy-ht],[cx,cy+ht]],{col:CINK,w:1.4,a:.5,amp:.4});
+  filings(R,magField(cx,cy,d),cx,cy,540,300,5200,{ref:1/(200*200),col:[214,210,232],am:.95,skip:(x,y)=>(Math.abs(x-cx)<hw+8&&Math.abs(y-cy)<ht+8)||y<385||y>1010});
+  spark(R,cx,cy,22,{col:LAMPW,a:.95,w:2.2,nR:8});
+  restless(cx-60,cy-60,120,120,RR=>spark(RR,cx,cy,22,{col:LAMPW,a:.95,w:2.2,nR:ri(RR,7,11)}));
+  drip(R,1260,-6,rd(R,70,100),[150,140,200],.3,2.4);
+  drip(R,330,-6,rd(R,40,70),[150,140,200],.25,2);
+  spine(R,0,700,1230);
+  motes(R,0,1020,1280,26,60);
+  whispers(R,330,1000,true,2);
+});
+
+// P1 · light ---------------------------------------------------------------------
+// one wave, stretched from very long to very short. only a thin stretch of it
+// is what we see: there the single line opens into the colours
+P.push(function(){
+  const R=stream(SEED*101+1);
+  const yc=540,x0w=100,SK=Math.log(300/16)/1400;
+  const phs=x=>TAU/(300*SK)*(Math.exp(SK*(x-x0w))-1);
+  const amp=x=>80*(1-.7*(x-x0w)/1400);
+  const bump=x=>{const u=(x-860)/100;return u<=0||u>=1?0:Math.sin(u*Math.PI)};
+  const bands=[['radio',100,430,[150,164,218]],['microgolf',430,650,[236,142,188]],['infrarood',650,860,[255,128,86]],['licht',860,960,null],
+    ['uv',960,1140,[178,128,248]],['roentgen',1140,1330,[96,178,248]],['gamma',1330,1500,[140,140,238]]];
+  // soft coloured washes behind the wave, band by band: light on the dark
+  COMP='lighter';
+  for(const [nm,xa,xb,col] of bands){
+    if(col){const n=Math.max(1,Math.round((xb-xa)/160));for(let j=0;j<n;j++)scrub(R,xa+(j+.5)/n*(xb-xa)+rd(R,-18,18),yc+rd(R,-18,18),rd(R,50,76),col,nm==='radio'?.07:.12)}
+    else VIS.forEach((c,k)=>scrub(R,xa+(k+.5)/7*(xb-xa),yc+rd(R,-14,14),rd(R,30,42),c,.2));
+  }
+  glow(R,910,yc,230,[255,240,200],.16,1.1);
+  const wave=(xa,xb,ph,col,w,a,tp)=>{
+    const pts=[];for(let x=xa;x<=xb;x+=2)pts.push([x,yc+amp(x)*Math.sin(phs(x)+ph)]);
+    sk(R,pts,{col,w,a,amp:.4,noDust:true,taper:tp});
+  };
+  for(const [nm,xa,xb,col] of bands){
+    if(col){
+      wave(xa-1,xb+1,0,col,2.6,.9);
+      wave(xa,xb,.55,mix(col,[255,255,255],.3),1.5,.5,'both');
+      wave(xa,xb,-.55,mix(col,[255,255,255],.1),1.5,.4,'both');
+    }else{
+      VIS.forEach((c,k)=>{
+        const pts=[];
+        for(let x=xa-1;x<=xb+1;x+=2){const u=bump(x);pts.push([x,yc+(k-3)*6*u+amp(x)*Math.sin(phs(x)+(k-3)*.1*u)])}
+        sk(R,pts,{col:c,w:2.8,a:.95,amp:.3,noDust:true});
+      });
+    }
+  }
+  spark(R,1534,yc-8,14,{col:[176,156,252],a:.85,w:1.6,nR:7});
+  COMP=null;
+  // the kinds of radiation, under the wave, and the one stretch we can see
+  const ry=664;
+  sk(R,[[100,ry],[1500,ry]],{col:CINK,w:1.1,a:.4,amp:.5,gap:.01});
+  for(const [nm,xa,xb] of bands){
+    sk(R,[[xa,ry-11],[xa,ry+13]],{col:CINK,w:1.3,a:.6,amp:.3});
+    write(R,nm,(xa+xb)/2+(nm==='uv'?16:0),ry+58,21,{col:CINK,a:.86,cen:true});
+  }
+  sk(R,[[1500,ry-11],[1500,ry+13]],{col:CINK,w:1.3,a:.6,amp:.3});
+  VIS.forEach((c,k)=>sk(R,[[860+k*100/7-(k?1:0),ry],[860+(k+1)*100/7,ry]],{col:c,w:5.5,a:.95,amp:.15,noDust:true}));
+  write(R,'dit zien wij',910,372,21,{col:CINK,a:.9,cen:true});
+  sk(R,[[910,386],[910,448]],{col:CINK,w:1.6,a:.8,amp:.5});
+  arrowHead(R,910,460,Math.PI/2,10,.8,CINK,1.6);
+  restless(850,yc-90,120,180,RR=>{
+    const ph=rd(RR,0,TAU);
+    VIS.forEach((c,k)=>{
+      const pts=[];
+      for(let x=862;x<=958;x+=2){const u=bump(x);pts.push([x,yc+(k-3)*6*u+amp(x)*Math.sin(phs(x)+ph+(k-3)*.1*u)])}
+      sk(RR,pts,{col:c,w:2.4,a:.5,amp:.3,noDust:true,taper:'both'});
+    });
+  });
+  say(R,'licht is een veld dat golft',false,true);
+  spine(R,1,0,1230);
+  motes(R,1,1080,1300,40,80);
+  whispers(R,100,1000,true,2);
+});
+
+// P2 · a galaxy of field lines --------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+2);
+  COMP='lighter';
+  const gx=800,gy=560,rot=-.42,flat=.56;
+  const G2=(r,th)=>{const u=Math.cos(th)*r,v=Math.sin(th)*r*flat;return[gx+u*Math.cos(rot)-v*Math.sin(rot),gy+u*Math.sin(rot)+v*Math.cos(rot)]};
+  glow(R,gx,gy,380,[220,140,200],.3);glow(R,gx,gy,150,[255,220,180],.35);
+  for(let s=0;s<70;s++){
+    const arm=s%2,th0=arm*Math.PI+rd(R,-.3,.3),rm=rd(R,.9,1.1),pts=[];
+    for(let th=1.2;th<=9.6;th+=.07)pts.push(G2(22*Math.exp(.3*th)*rm*1.3,th0+th));
+    const n=pts.length,cuts=[0,.38,.72,1],cols=[[255,206,160],[216,124,226],[96,146,246]];
+    for(let c=0;c<3;c++){const seg=pts.slice(Math.floor(n*cuts[c]),Math.floor(n*cuts[c+1])+1);if(seg.length>1)sk(R,seg,{col:cols[c],w:rd(R,1,2),a:.3,amp:.8,taper:'both',noDust:true})}
+  }
+  const dust=[];
+  for(let k=0;k<2400;k++){
+    const th=rd(R,1.2,9.6),arm=k%2,r=22*Math.exp(.3*th)*1.3+rd(R,-1,1)*(10+th*5),p=G2(r,arm*Math.PI+th+rd(R,-.1,.1));
+    dust.push([p[0],p[1],rd(R,.5,1.7),rd(R,.25,.8)]);
+  }
+  dustBatch(dust,[220,214,255]);
+  COMP=null;
+  say(R,'ook tussen de sterren stroomt een veld',true,true);
+  spine(R,2,0,1230);
+  motes(R,2,1090,1300,30,70);
+  whispers(R,100,1000,true,2);
+});
+
+// P3 · a solar storm ---------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+3);
+  const sx=250,sy=570,sr=190;
+  COMP='lighter';
+  glow(R,sx,sy,560,[255,120,60],.3);glow(R,sx,sy,330,[255,190,100],.35);
+  // the storm: streamers of field and plasma leaving the sun
+  for(let k=0;k<22;k++){
+    const a0=rd(R,-.8,.8),p0=[sx+Math.cos(a0)*sr*.98,sy+Math.sin(a0)*sr*.98],p1=[rd(R,1250,1500),570+a0*520+rd(R,-90,90)];
+    const c1=[p0[0]+rd(R,180,360),p0[1]+rd(R,-160,160)],c2=[p1[0]-rd(R,300,520),p1[1]+rd(R,-220,220)];
+    for(let s=0;s<3;s++){
+      const o=(s-1)*rd(R,3,9),pts=[];
+      for(let t=0;t<=1.001;t+=.025){
+        const u=1-t;
+        pts.push([u*u*u*p0[0]+3*u*u*t*c1[0]+3*u*t*t*c2[0]+t*t*t*p1[0],
+          u*u*u*p0[1]+3*u*u*t*c1[1]+3*u*t*t*c2[1]+t*t*t*p1[1]+o+Math.sin(t*14+k+s)*8*t]);
+      }
+      const n=pts.length,cs=[SOL_Y,SOL_O,SOL_R,AUR_P];
+      for(let c=0;c<4;c++){const seg=pts.slice(Math.floor(n*c/4),Math.floor(n*(c+1)/4)+1);if(seg.length>1)sk(R,seg,{col:cs[c],w:rd(R,1.2,2.4),a:.36,amp:.6,noDust:true,taper:c===3?'out':undefined})}
+    }
+  }
+  // the shock front, ring after ring
+  for(let r=430,i=0;r<=860;r+=62,i++){
+    const pts=[];for(let t=-.55;t<=.55;t+=.03)pts.push([sx+Math.cos(t)*r+Math.sin(t*9+i)*5,sy+Math.sin(t)*r]);
+    strands(R,pts,u=>ramp([[0,SOL_O],[.5,SOL_R],[1,AUR_P]],clamp((r-430)/430+u*.2,0,1)),2,6,{w:1.5,a:.34-i*.025,amp:.8,taper:'both'});
+  }
+  const sp=[];for(let k=0;k<420;k++){const x=rd(R,520,1500),y=570+(x-520)*rd(R,-.3,.3)+rd(R,-160,160);sp.push([x,y,rd(R,.6,1.8),rd(R,.15,.6)*(1-(x-520)/1100)])}
+  dustBatch(sp,SOL_Y);
+  // some of the storm keeps going: it falls toward the earth and, below, turns into the light of the next scene
+  for(let j=0;j<6;j++){
+    const p0=[620+j*52+rd(R,-20,20),600+j*22+rd(R,-30,30)];
+    const c1=[p0[0]+rd(R,100,220),p0[1]+rd(R,200,320)],c2=[740+j*8+rd(R,-40,40),1020+rd(R,-40,40)],p1=[730+j*9+rd(R,-20,20),1440+rd(R,0,70)];
+    const pts=[];
+    for(let t=0;t<=1.001;t+=.02){const u=1-t;pts.push([u*u*u*p0[0]+3*u*u*t*c1[0]+3*u*t*t*c2[0]+t*t*t*p1[0],u*u*u*p0[1]+3*u*u*t*c1[1]+3*u*t*t*c2[1]+t*t*t*p1[1]+Math.sin(t*12+j)*5*t])}
+    for(let k=0;k<3;k++){
+      const op=offsetPath(pts,(k-1)*7),w=rd(R,1.2,2.2),segs=14;
+      for(let s=0;s<segs;s++){
+        const i0=Math.floor((op.length-1)*s/segs),i1=Math.min(op.length-1,Math.floor((op.length-1)*(s+1)/segs)+2);
+        sk(R,op.slice(i0,i1+1),{col:ramp([[0,SOL_Y],[.3,SOL_O],[.55,SOL_R],[.78,AUR_P],[1,AUR_G]],(s+.5)/segs),w,a:.36,amp:.8,noDust:true,taper:s===segs-1?'out':undefined});
+      }
+    }
+  }
+  COMP=null;
+  // the sun itself, drawn over the roots of its own storm
+  const sun=circ(R,sx,sy,sr);
+  emit(sy-sr-6,sy+sr+6,c2=>{
+    c2.save();c2.beginPath();sun.forEach((p,i)=>i?c2.lineTo(p[0],p[1]):c2.moveTo(p[0],p[1]));c2.closePath();c2.clip();
+    const g=c2.createRadialGradient(sx-sr*.28,sy-sr*.22,sr*.08,sx,sy,sr*1.04);
+    g.addColorStop(0,'rgb(255,250,224)');g.addColorStop(.5,'rgb(255,226,136)');g.addColorStop(.85,'rgb(255,186,84)');g.addColorStop(1,'rgb(244,130,56)');
+    c2.fillStyle=g;c2.fillRect(sx-sr-8,sy-sr-8,2*sr+16,2*sr+16);c2.restore();
+  });
+  scribFill(R,sun,5,.2,{col:SOL_O,w:1.1});
+  // the surface keeps moving: loose swirls and a few darker places
+  for(let k=0;k<30;k++){
+    const a0=rd(R,0,TAU),rr=sr*rd(R,.1,.8),cxk=sx+Math.cos(a0)*rr,cyk=sy+Math.sin(a0)*rr,len=rd(R,40,120),ang=rd(R,0,TAU),bend=rd(R,-.9,.9),pts=[];
+    for(let t=0;t<=1.001;t+=.12)pts.push([cxk+Math.cos(ang+bend*t)*len*(t-.5),cyk+Math.sin(ang+bend*t)*len*(t-.5)+Math.sin(t*5)*6]);
+    if(pts.every(p=>Math.hypot(p[0]-sx,p[1]-sy)<sr*.94))sk(R,pts,{col:pk(R,[SOL_O,SOL_R,[255,250,224]]),w:rd(R,1.2,2.6),a:rd(R,.2,.42),amp:.8,taper:'both',noDust:true});
+  }
+  for(let k=0;k<4;k++){const a0=rd(R,0,TAU),rr=sr*rd(R,.2,.62);glow(R,sx+Math.cos(a0)*rr,sy+Math.sin(a0)*rr,rd(R,26,44),[150,56,30],.4)}
+  sk(R,sun.concat([sun[0]]),{col:[255,238,180],w:2,a:.8,amp:.8});
+  COMP='lighter';
+  const loop=(RR,a1,sp2,col,w,a,hm=1.5)=>{
+    const p1=[sx+Math.cos(a1)*sr*.97,sy+Math.sin(a1)*sr*.97],p2=[sx+Math.cos(a1+sp2)*sr*.97,sy+Math.sin(a1+sp2)*sr*.97];
+    const am=a1+sp2/2,nx=Math.cos(am),ny=Math.sin(am),c=Math.hypot(p2[0]-p1[0],p2[1]-p1[1]),hh=c*rd(RR,.5,hm),pts=[];
+    for(let t=0;t<=1.001;t+=.05){const h=Math.sin(Math.PI*t)*hh;pts.push([p1[0]+(p2[0]-p1[0])*t+nx*h,p1[1]+(p2[1]-p1[1])*t+ny*h])}
+    sk(RR,pts,{col,w,a,amp:.7,taper:'both',noDust:true});
+  };
+  for(let k=0;k<20;k++)loop(R,rd(R,-1.6,1.6),rd(R,.14,1.0),pk(R,[SOL_Y,SOL_O,SOL_R,LAMPW]),rd(R,1.6,3.2),rd(R,.5,.85));
+  COMP=null;
+  restless(sx-10,sy-450,520,900,RR=>{COMP='lighter';for(let k=0;k<3;k++)loop(RR,rd(RR,-1.4,1.4),rd(RR,.25,.8),pk(RR,[SOL_Y,SOL_O,LAMPW]),rd(RR,1.8,3),.7,1.3);COMP=null});
+  say(R,'een zonnestorm is een veld dat losbreekt',false,true);
+  spine(R,3,0,1230);
+  motes(R,3,1090,1300,30,70);
+  whispers(R,100,1000,true,2);
+});
+
+// P4 · the aurora -----------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+4);
+  const hy=800,lake=y=>hy+(hy-y)*.42;
+  glow(R,800,740,820,[20,96,92],.34);
+  COMP='lighter';
+  glow(R,800,300,560,[110,80,200],.14);
+  curtain(R,40,1560,560,520,2.1,[AUR_B,AUR_V,AUR_P],340,{a:.6});
+  curtain(R,50,1550,610,470,.4,[AUR_G,AUR_T,AUR_P],460);
+  curtain(R,40,1440,690,250,4.0,[[150,236,120],AUR_G,[220,120,200]],310,{a:.85});
+  // loose ribbons of the same light, high up
+  [[250,.8,0.2],[330,1.3,1.7]].forEach(([y,f,p],i)=>{
+    const pts=[];for(let x=-10;x<=1610;x+=8)pts.push([x,y+Math.sin(x*.0041*f+p)*60+Math.sin(x*.0117+p*2)*16]);
+    strands(R,pts,u=>ramp([[0,AUR_G],[.5,AUR_T],[1,AUR_P]],clamp(i*.4+u*.5,0,1)),3,10,{w:1.7,a:.22,amp:.8,taper:'both'});
+  });
+  // the lake keeps the colours, a little
+  curtain(R,50,1550,610,470,.4,[AUR_G,AUR_T,AUR_P],230,{a:.34,soft:.4,my:lake});
+  COMP=null;
+  restless(330,80,940,670,RR=>{COMP='lighter';curtain(RR,420,1180,rd(RR,520,600),360,rd(RR,0,6),[AUR_G,AUR_T,AUR_P],70,{a:.5});COMP=null});
+  // dark land, a lake, and a window with a lamp
+  fillPoly([[-30,hy+4],[-30,hy-80],[40,hy-70],[180,hy-96],[320,hy-60],[470,hy-30],[620,hy-8],[760,hy],[1000,hy],[1160,hy-14],[1340,hy-60],[1480,hy-90],[1630,hy-60],[1630,hy+4]],[5,8,14],.97);
+  emit(hy,hy+400,c2=>{
+    const g=c2.createLinearGradient(0,hy,0,hy+400);
+    g.addColorStop(0,'rgba(10,18,30,.55)');g.addColorStop(.7,'rgba(10,18,30,.5)');g.addColorStop(1,'rgba(10,18,30,0)');
+    c2.fillStyle=g;c2.fillRect(-10,hy,LW+20,400);
+  });
+  for(let k=0;k<26;k++){const x=rd(R,-10,520),y=hy-rd(R,10,80)*clamp((x-40)/400,.3,1);const h=rd(R,24,50);fillPoly([[x-9,y],[x,y-h],[x+9,y]],[4,8,10],.95)}
+  for(let k=0;k<20;k++){const x=rd(R,1160,1610),y=hy-rd(R,6,70);const h=rd(R,24,50);fillPoly([[x-9,y],[x,y-h],[x+9,y]],[4,8,10],.95)}
+  fillPoly([[300,hy-64],[338,hy-64],[338,hy-42],[300,hy-42]],[18,22,28],.95);
+  glow(R,318,hy-52,46,[255,210,120],.5);
+  fillPoly([[310,hy-58],[326,hy-58],[326,hy-46],[310,hy-46]],[255,214,120],.95);
+  say(R,'de aarde vangt de storm op en maakt er licht van',true,true,1100,24);
+  spine(R,4,0,1230);
+  motes(R,4,1090,1300,30,70);
+  whispers(R,100,720,true,2);
+});
+
+// P5 · birds on invisible lines -------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+5);
+  COMP='lighter';
+  glow(R,800,1040,120,[232,120,150],.4,5);
+  const bez=(j,t)=>{
+    const p0=[-20,1020-j*62],c1=[520,920-j*150],c2=[1020,260+j*84],p1=[1620,400+j*72],u=1-t;
+    return[u*u*u*p0[0]+3*u*u*t*c1[0]+3*u*t*t*c2[0]+t*t*t*p1[0],u*u*u*p0[1]+3*u*u*t*c1[1]+3*u*t*t*c2[1]+t*t*t*p1[1]];
+  };
+  for(let j=0;j<7;j++){
+    const pts=[];for(let t=0;t<=1.001;t+=.02){const q=bez(j,t);if(q[0]>-12&&q[0]<1612)pts.push(q)}
+    strands(R,pts,u=>ramp([[0,AUR_T],[.5,AUR_B],[1,AUR_P]],clamp(j/6*.7+u*.3,0,1)),3,12,{w:2.5,a:.62,amp:1.2,taper:'both'});
+  }
+  COMP=null;
+  // the flock keeps to one of them
+  for(let k=0;k<30;k++){
+    const t=clamp(.12+k/30*.78+rd(R,-.025,.025),0,1),p=bez(3,t);
+    const s2=rd(R,16,27)*(.65+t*.75);
+    birdW(R,p[0]+rd(R,-40,40),p[1]+rd(R,-40,40),s2,[246,240,255],rd(R,.75,.95),1.5+s2*.045);
+  }
+  restless(200,330,1280,440,RR=>{for(let k=0;k<3;k++){const t=rd(RR,.2,.85),p=bez(3,t),s2=rd(RR,17,27);birdW(RR,p[0]+rd(RR,-30,30),p[1]+rd(RR,-30,30),s2,[246,240,255],.8,1.5+s2*.045)}});
+  say(R,'hoe weet een vogel waar het noorden is?',false,true);
+  spine(R,5,0,1230);
+  motes(R,5,1090,1300,34,70);
+  whispers(R,100,1000,true,2);
+});
+
+// P6 · the brain ---------------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+7);
+  const nx=520,ny=500,ns=150;
+  COMP='lighter';
+  glow(R,nx,ny,360,[130,100,230],.36);
+  // brain waves, flowing across the whole wall
+  [[3,40,860],[7,30,920],[12,24,980],[22,17,1040]].forEach(([f,a,y],i)=>{
+    const pts=[];for(let x=-20;x<=1620;x+=4)pts.push([x,y+Math.sin(x/1400*f*TAU+i)*a*.6*(1+.3*Math.sin(x*.01))]);
+    strands(R,pts,u=>ramp([[0,AUR_B],[.5,AUR_V],[1,AUR_P]],clamp(i/3*.6+u*.4,0,1)),3,7,{w:2,a:.58,amp:.6});
+  });
+  for(let i=0;i<9;i++)wobbleRing(R,nx,ny,70+i*34,(70+i*34)*.9,i*.8,ramp([[0,AUR_P],[.5,AUR_V],[1,AUR_T]],i/8),2.1,.62-i*.045);
+  COMP=null;
+  const so=hblob(R,nx,ny,ns*.46,ns*.4);
+  fillPoly(so,[122,102,170],.8);scribFill(R,so,4,.3,{col:CINK,w:1});
+  sk(R,so.concat([so[0]]),{col:CINK,w:1.8,a:.85,amp:.5});
+  dotF(R,nx,ny,ns*.13,.85,CINK);
+  for(let k=0;k<6;k++)branch(R,nx+rd(R,-ns*.25,ns*.25),ny-ns*.2,-Math.PI/2+rd(R,-1.2,1.2),ns*rd(R,.7,1.05),3,CINK,3.2);
+  for(let k=0;k<3;k++)branch(R,nx-ns*.3,ny+ns*.15,Math.PI*.8+rd(R,-.4,.4),ns*.85,2,CINK,2.6);
+  const ax=chaikin([[nx+60,ny+20],[nx+210,ny+80],[nx+380,ny+60],[nx+560,ny+150],[nx+680,ny+230]],false,2);
+  sk(R,ax,{col:CINK,w:4,a:.85,amp:1,noDust:true});
+  for(let k=1;k<ax.length-4;k+=4){const a2=ax[k],b2=ax[k+2],m=ePts((a2[0]+b2[0])/2,(a2[1]+b2[1])/2,18,7,Math.atan2(b2[1]-a2[1],b2[0]-a2[0]),12);fillPoly(m,[150,120,190],.6);sk(R,m.concat([m[0]]),{col:CINK,w:1,a:.5,amp:.3})}
+  for(let k=0;k<4;k++){const e=ax[ax.length-1],a=Math.PI/2+rd(R,-.9,.9);sk(R,[[e[0],e[1]],[e[0]+Math.cos(a)*40,e[1]+Math.sin(a)*40]],{col:CINK,w:2,a:.8,amp:.4,taper:'out'});dotF(R,e[0]+Math.cos(a)*44,e[1]+Math.sin(a)*44,4,.8,CINK)}
+  const sp0=ax[Math.floor(ax.length*.4)];
+  spark(R,sp0[0],sp0[1],14,{col:AUR_T,a:.95,w:1.8,nR:6});
+  const el=ax.filter(p=>p[0]>nx+170&&p[0]<nx+640);
+  restless(nx+140,ny-20,640,340,RR=>{const q=pk(RR,el);spark(RR,q[0],q[1],14,{col:AUR_T,a:.95,w:1.8,nR:ri(RR,5,8)})});
+  say(R,'hoe komt die gedachte in je hoofd?',true,true);
+  spine(R,6,0,1230);
+  motes(R,6,1080,1300,46,80);
+  whispers(R,100,780,true,2);
+});
+
+// P7 · the heart ----------------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+8);
+  const hx=800,hy=520,hs=150,tilt=.2;
+  const gr=u=>ramp([[0,[255,104,124]],[.5,[240,122,200]],[1,[164,134,252]]],u);
+  const loops=(RR,ks,a0)=>{ks.forEach((k,i)=>{for(const side of[-1,1]){
+    const pts=dipLine(hx,hy,hs*k,tilt,side,hs*.55);
+    strands(RR,pts,u=>gr(clamp(i/Math.max(1,ks.length-1)*.8+u*.2,0,1)),4,10,{w:2.1,a:a0-i*.045,amp:.8,taper:'both'});
+  }})};
+  COMP='lighter';
+  glow(R,hx,hy,560,[240,110,150],.24);glow(R,hx,hy,250,[255,120,130],.26);
+  COMP=null;
+  spine(R,7,0,1230);
+  COMP='lighter';
+  loops(R,[1.4,1.7,2.1,2.5,2.9,3.3,3.7],.8);
+  for(let i=0;i<3;i++){const ep=ePts(hx,hy+10,hs*(1.5+i*.8),hs*(.34+i*.14),tilt,40);sk(R,ep.concat([ep[0]]),{col:gr(i/2),w:1.2,a:.28,amp:.8})}
+  COMP=null;
+  heartShape(R,hx,hy,hs*.8,tilt,[255,222,214]);
+  spark(R,hx-12,hy-hs*.2,18,{col:LAMPW,a:.95,w:2,nR:7});
+  restless(hx-470,100,940,760,RR=>{COMP='lighter';loops(RR,[rd(RR,1.4,2.8)],.5);COMP=null});
+  say(R,'wat doet je hart bij iedere slag?',false,true);
+  motes(R,7,1090,1300,28,70);
+  whispers(R,160,900,true,2);
+});
+
+// P8 · the strand ------------------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+9);
+  const hx=470,y0=170,y1=1020,per=210,amp=122;
+  COMP='lighter';
+  glow(R,hx,600,420,[120,80,220],.2);
+  // waves that arrive from far away, as flowing as the rest
+  // (they fade in from above and out below instead of simply stopping)
+  const akf=(x,y)=>clamp((y+60)/200,0,1)*clamp((1180-y)/200,0,1);
+  const arcs=(RR,rs,a0,plo,phi,xlo)=>rs.forEach((r,i)=>{
+    const pts=[];for(let t=Math.PI-.8;t<=Math.PI+.8;t+=.02){const m=1+.02*Math.sin(t*9+i);const px=1900+Math.cos(t)*r*m,py=600+Math.sin(t)*r*m;if(px>xlo&&py>plo&&py<phi)pts.push([px,py])}
+    if(pts.length>2)fstrands(RR,pts,u=>ramp([[0,AUR_T],[.5,AUR_B],[1,AUR_P]],clamp(i/8*.7+u*.3,0,1)),3,8,{w:2.2,a:Math.max(.2,a0-i*.035),amp:.9},akf);
+  });
+  arcs(R,[760,826,892,958,1024,1090,1156,1222,1290],.78,-60,1180,560);
+  restless(560,120,950,1010,RR=>{COMP='lighter';arcs(RR,[rd(RR,740,1290)],.5,150,1000,600);COMP=null});
+  const seg=(sgn,front)=>{
+    for(let y=y0;y<y1;y+=5){
+      const ph1=(y-y0)/per*TAU,ph2=(y+5-y0)/per*TAU,z=Math.cos((ph1+ph2)/2)*sgn;
+      if((z>0)!==front)continue;
+      sk(R,[[hx+sgn*Math.sin(ph1)*amp,y],[hx+sgn*Math.sin(ph2)*amp,y+5]],{col:sgn>0?AUR_B:[236,130,180],w:front?5:2.2,a:front?.95:.5,amp:.2,noDust:true});
+    }
+  };
+  seg(1,false);seg(-1,false);
+  for(let y=y0;y<=y1;y+=17){
+    const ph=(y-y0)/per*TAU,sx=Math.sin(ph)*amp;
+    if(Math.abs(sx)<16)continue;
+    const pr=pk(R,[[SOL_Y,AUR_B],[AUR_P,AUR_G]]);
+    sk(R,[[hx+sx,y],[hx,y]],{col:pr[0],w:2.4,a:.72,amp:.3});sk(R,[[hx,y],[hx-sx,y]],{col:pr[1],w:2.4,a:.72,amp:.3});
+  }
+  seg(1,true);seg(-1,true);
+  COMP=null;
+  say(R,'is dna een antenne?',true,true);
+  spine(R,8,0,1230);
+  motes(R,8,1090,1300,30,70);
+  whispers(R,100,1000,true,2);
+});
+
+// P9 · you ----------------------------------------------------------------------------------------
+// the last of the night: a person under the stars, with the field going through them.
+// below, the sky is already turning
+P.push(function(){
+  const R=stream(SEED*101+11);
+  const fx=spineX(9*PH+470),fy=470;
+  COMP='lighter';
+  glow(R,fx,fy+30,520,[120,110,230],.22);glow(R,fx,fy-20,200,[240,130,170],.28);
+  // the layers around a person: the heart's own, the earth's, everyone else's
+  for(let i=0;i<9;i++){
+    const rx=120+i*50,ry=180+i*35,col=ramp([[0,[240,120,160]],[.45,AUR_V],[1,AUR_T]],i/8),cl=[20,0,1580,1300];
+    wobbleRing(R,fx,fy+50,rx,ry,i*.7,col,1.7,.5-i*.035,0,TAU,cl);
+    wobbleRing(R,fx,fy+50,rx*1.03,ry*1.03,i*.7+2,mix(col,[255,255,255],.3),1,.3-i*.025,0,TAU,cl);
+  }
+  COMP=null;
+  filings(R,(x,y)=>{
+    const dx=x-fx,dy=y-fy,r2=dx*dx+dy*dy+400,r=Math.sqrt(r2),Mg=Math.pow(150,3)/2,dm=-dy/r;
+    return [Mg*(3*dm*dx/r)/(r2*r),Mg*(3*dm*dy/r+1)/(r2*r)-1];
+  },fx,fy+40,640,330,2600,{col:[200,200,220],am:.55,ref:1.2,pw:.3,pmin:.3,ox:fx,oy:fy,skip:(x,y)=>Math.abs(x-fx)<40&&y>fy-130&&y<fy+300||y<220||y>880});
+  const C=CINK;
+  ell(R,fx,fy-118,15,16,{col:C,w:2.2,a:.9,amp:.3});
+  sk(R,[[fx,fy-100],[fx,fy+10]],{col:C,w:3,a:.9,amp:.4});
+  sk(R,[[fx,fy-80],[fx-28,fy-20]],{col:C,w:2.6,a:.85,amp:.3});sk(R,[[fx,fy-80],[fx+28,fy-20]],{col:C,w:2.6,a:.85,amp:.3});
+  sk(R,[[fx,fy+10],[fx-22,fy+110]],{col:C,w:2.8,a:.9,amp:.4});sk(R,[[fx,fy+10],[fx+22,fy+110]],{col:C,w:2.8,a:.9,amp:.4});
+  spark(R,fx+4,fy-62,18,{col:LAMPW,a:.95,w:2,nR:8});
+  restless(fx-34,fy-98,76,76,RR=>spark(RR,fx+4,fy-62,18+rd(RR,0,6),{col:LAMPW,a:.95,w:2,nR:ri(RR,7,10)}));
+  say(R,'ook jij staat midden in het veld',false,true,1040);
+  spine(R,9,0,1230);
+  motes(R,9,1000,1300,34,80);
+  whispers(R,100,860,true,2);
+});
+
+// P10 · what we add ------------------------------------------------------------------------------
+// the day has come: masts on the horizon, and the waves they add to the sky
+P.push(function(){
+  const R=stream(SEED*101+10);
+  const hz=900,masts=[[330,430],[1270,360]],CL=[30,30,1570,1180],FD=130;
+  // the sun is only just up behind the horizon: a wide warm light, and long low clouds
+  glow(R,800,hz+16,760,[255,216,150],.5,2.2);
+  glow(R,800,hz+16,300,[255,242,206],.55,1.7);
+  [[540,660,250],[1040,716,300],[150,790,200],[1480,648,230],[800,572,210]].forEach(([x,y,w])=>cloud(R,x,y,w));
+  masts.forEach(([x,h],mi)=>{
+    glow(R,x,hz-h,360,mi?[190,150,235]:[130,170,240],.22);
+    for(let i=0;i<14;i++){
+      const r=50+i*54,col=ramp([[0,[66,124,214]],[.5,[124,90,196]],[1,[214,84,160]]],i/13);
+      wobbleRing(R,x,hz-h,r,r,i*.9+mi,col,2.4,.84-i*.04,Math.PI,TAU,CL,FD);
+    }
+  });
+  restless(20,20,1560,880,RR=>{for(const [x,h] of masts){const r=rd(RR,90,520);wobbleRing(RR,x,hz-h,r,r,rd(RR,0,7),pk(RR,[[66,124,214],[124,90,196],[214,84,160]]),2,.6,Math.PI,TAU,CL,FD)}});
+  // the horizon, with a few houses and trees on it
+  for(let k=0;k<14;k++){
+    const x=rd(R,30,1570);if(masts.some(m=>Math.abs(m[0]-x)<70)||Math.abs(x-800)<80)continue;
+    const w=rd(R,26,46),h=rd(R,18,28);
+    fillPoly([[x-w/2,hz],[x+w/2,hz],[x+w/2,hz-h],[x-w/2,hz-h]],[250,244,230],.95);
+    sk(R,[[x-w/2,hz],[x-w/2,hz-h],[x,hz-h-w*.35],[x+w/2,hz-h],[x+w/2,hz]],{col:INK,w:1.4,a:.8,amp:.4});
+  }
+  for(let k=0;k<16;k++){const x=rd(R,20,1580),b=hblob(R,x,hz-14,rd(R,9,16),rd(R,12,20));fillPoly(b,[110,150,84],.7);sk(R,[[x,hz],[x,hz-8]],{col:INK,w:1.4,a:.7,amp:.2})}
+  sk(R,[[-20,hz],[1620,hz+2]],{w:2.4,a:.75,amp:1.4});
+  masts.forEach(([x,h])=>mast(R,x,hz,h,INK));
+  // the field below the horizon: grass that grows as it comes closer
+  const keep=(x,y)=>x<720&&y>1052&&y<1128;
+  grassHatch(R,hz+6,1200,260,keep);
+  meadowBlades(R,hz+8,1190,560,10,62,keep,{kf:y=>.3+.7*(y-hz)/(1200-hz)});
+  tinyFlowers(R,30,hz+30,1180,3,7,keep);
+  say(R,'ook wij voegen golven toe aan het veld',true,false);
+  spine(R,10,0,1230);
+  motes(R,10,1000,1300,30,70);
+  whispers(R,200,860,false,2);
+});
+
+// P11 · the flower and the bee -------------------------------------------------------------------
+// the field ends in the grass: a flower, and a bee that finds it
+P.push(function(){
+  const R=stream(SEED*101+6);
+  const fx=560,fy=540,fs=92,bx=1010,by=450;
+  const keepT=(x,y)=>x>960&&y>1066;
+  const kf=y=>1+2*(y+40)/1100;
+  // the grass behind: the field goes on
+  grassHatch(R,-20,1130,420,keepT);
+  meadowBlades(R,-30,1000,560,10,64,keepT,{kf});
+  tinyFlowers(R,34,40,1040,5,12,(x,y)=>keepT(x,y)||Math.hypot(x-fx,y-fy)<190||Math.hypot(x-bx,y-by)<120);
+  // soft washes of colour behind the rings, like a halo that has not been decided yet
+  [[-90,-40,[240,140,170],.2],[70,80,[246,196,100],.2],[-10,-150,[110,190,190],.16],[120,-70,[200,150,220],.14]].forEach(([dx,dy,c,a])=>glow(R,fx+dx,fy+dy,330,c,a));
+  // the flower's own field
+  for(let i=0;i<11;i++){
+    const r=fs*1.6+i*31,col=ramp([[0,[226,84,140]],[.5,[236,160,50]],[1,[52,150,160]]],i/10);
+    wobbleRing(R,fx,fy,r,r*.92,i*.7,col,2.2,.7-i*.04);
+  }
+  flowerDraw(R,fx,fy,fs);
+  // and the bee's way to it
+  for(let k=0;k<6;k++){
+    const pts=[];
+    for(let u=0;u<=1.001;u+=.08)pts.push([fx+fs*1.2+(bx-fs*1.2-fx-fs*1.2)*u,fy-fs*.3+(by-fy+fs*.3)*u+Math.sin(u*Math.PI)*(k-2.5)*26]);
+    strands(R,pts,u=>mix([240,176,70],[232,110,150],u),2,5,{w:1.5,a:.55,amp:1,taper:'both'});
+  }
+  beeDraw(R,bx,by,70,Math.PI+.12);
+  restless(bx-95,by-125,200,250,RR=>{for(const sd of[-1,1]){const w=ePts(bx+14,by+sd*70,56,20,sd*(.3+rd(RR,-.35,.35)));sk(RR,w.concat([w[0]]),{col:INK,w:1.1,a:.5,amp:.4})}});
+  // pollen, drifting between them
+  {
+    const pl=[];
+    for(let i=0;i<48;i++){const t=R(),x=fx+120+(bx-fx-200)*t+rd(R,-60,60),y=fy-30+(by-fy+30)*t+rd(R,-90,90);pl.push([x,y,rd(R,.8,2.3),rd(R,.35,.85),pk(R,[[240,184,60],[232,120,150],[250,214,120]])])}
+    dotsBatch(pl);
+  }
+  // the grass in front, so the stem comes out of it
+  meadowBlades(R,900,1175,340,60,170,keepT,{kf:y=>.9+.4*(y-900)/275,bias:1.6});
+  tinyFlowers(R,6,980,1120,7,13,keepT);
+  say(R,'hoe vindt de bij de bloem?',false,false);
+  spine(R,11,0,392);
+  whispers(R,160,1000,false,2);
+  // under the grass the ground, and under that the title of the wall, low and in the middle, and the signature under it
+  grassHatch(R,1140,1330,70,(x,y)=>Math.abs(x-800)<430&&y>1280);
+  const ty=1322;
+  write(R,'velden - elektromagnetisch universum - 2026',800,ty,22,{col:INK,a:.84,cen:true});
+  const aside='(mijn echte handtekening)',mw=measure(aside,12),x0=800-(46+18+mw)/2;
+  aword(R,x0,ty+54,13,5,{col:INK,a:.62});
+  write(R,aside,x0+64,ty+58,12,{col:INK,a:.62});
+});
+
+// ---------------------------------------------------------------------------
+// boot
+// ---------------------------------------------------------------------------
+history.scrollRestoration='manual';
+if(!qs.has('y'))scrollTo(0,0);
+let pi=0;
+function genStep(){
+  const t0=performance.now();
+  while(pi<P.length&&performance.now()-t0<24){GEN_DY=pi*PH;P[pi]();GEN_DY=0;pi++}
+  if(pi<P.length)setTimeout(genStep,0);
+  else{
+    GENDONE=true;
+    if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
+  }
+}
+genStep();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

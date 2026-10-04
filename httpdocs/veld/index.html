@@ -1,0 +1,1444 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>veld</title>
+<style>
+  html,body{margin:0;padding:0;background:#12141f}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  #wall{position:relative;width:100vw}
+  #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+</style>
+</head>
+<body>
+<div id="wall"></div>
+<canvas id="trail"></canvas>
+<script>
+'use strict';
+// ---------------------------------------------------------------------------
+// veld — a wall about the fields we cannot see.
+// one tall sheet of drawings about magnets, light, birds, bees, hearts and
+// masts. every mark is laid down by a wandering hand while you watch;
+// nothing here is ruled. a solid line is something measured, a broken line
+// something suspected, a small spiral a question that is still open. the
+// engine (tiles, queued strokes, torn paper, pencil lettering) follows the
+// technique of the fable wall that inspired it.
+// ---------------------------------------------------------------------------
+const TAU = Math.PI*2;
+const qs = new URLSearchParams(location.search);
+const SEED = +(qs.get('s')||7);
+const FAST = qs.has('fast');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------- rng ----------------
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function stream(n){const f=mul32((n*2654435761)>>>0);for(let i=0;i<9;i++)f();return f}
+const rd=(R,a,b)=>a+R()*(b-a);
+const ri=(R,a,b)=>Math.floor(rd(R,a,b+1));
+const ch_=(R,p)=>R()<p;
+const pk=(R,arr)=>arr[(R()*arr.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// ---------------- noise ----------------
+function h2(x,y,s){const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)}
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+  const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  return h2(xi,yi,s)*(1-u)*(1-v)+h2(xi+1,yi,s)*u*(1-v)+h2(xi,yi+1,s)*(1-u)*v+h2(xi+1,yi+1,s)*u*v}
+function fbm(x,y,s,o){let a=.5,f=1,t=0,n=0;for(let i=0;i<o;i++){t+=vn(x*f,y*f,s+i*17)*a;n+=a;a*=.5;f*=2.03}return t/n}
+
+// ---------------- colour ----------------
+const CREAM=[246,241,228], BLUSH=[237,220,208], SAGEP=[223,226,206],
+      PLUMD=[47,42,36], INDIGO=[34,32,29], VOID=[24,20,17];
+const INK=[42,37,31], CINK=[238,231,210], CLAY=[172,80,54], OCHRE=[176,132,50],
+      GOLD=[214,178,108], SAGE=[104,126,86], SLATE=[88,112,148], ROSE=[196,130,122],
+      PLUM=[152,126,98], TEAL=[92,134,130], STEEL=[136,144,156];
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const shade=(c,k)=>[c[0]*(1-k),c[1]*(1-k),c[2]*(1-k)];
+const tint=(c,k)=>[c[0]+(255-c[0])*k,c[1]+(255-c[1])*k,c[2]+(255-c[2])*k];
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+let CUR=INK;
+
+// ---------------- the wall ----------------
+const LW=1600, TILEH=1200, TOTALH=13200;
+const NT=Math.ceil(TOTALH/TILEH);
+let S=Math.min(1.35, Math.max(1, window.devicePixelRatio||1));
+if(navigator.deviceMemory && navigator.deviceMemory<8) S=1.1;
+const wallEl=document.getElementById('wall');
+wallEl.style.height=(TOTALH/LW*100)+'vw';
+const TILES=[];
+for(let i=0;i<NT;i++){
+  const y0=i*TILEH, h=Math.min(TILEH+2, TOTALH-y0);
+  const cv=document.createElement('canvas');
+  cv.width=Math.round(LW*S); cv.height=Math.round(h*S);
+  cv.style.top=(y0/LW*100)+'vw';
+  cv.style.height=(h/LW*100)+'vw';
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.lineCap='round'; cx.lineJoin='round';
+  TILES.push({cv,cx,y0,h,q:[],qi:0,done:false,active:i===0});
+}
+let GENDONE=false;
+// route one drawing act to every tile it touches; whole passages of the wall
+// can be shifted down as one piece by GEN_DY
+let DIRECT=null, GEN_DY=0;
+function emit(y0,y1,fn){
+  if(DIRECT){
+    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
+    else fn(DIRECT.cx);
+    return;
+  }
+  const dy=GEN_DY;
+  const f=dy?cx=>{cx.save();cx.translate(0,dy);fn(cx);cx.restore()}:fn;
+  const a=clamp(Math.floor((y0+dy-60)/TILEH),0,NT-1), b=clamp(Math.floor((y1+dy+60)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++) TILES[i].q.push(f);
+}
+
+// ---------------- geometry ----------------
+function resample(pts,step){
+  if(pts.length<2)return pts.slice();
+  const out=[[pts[0][0],pts[0][1]]];let need=step;
+  for(let i=1;i<pts.length;i++){
+    let x0=pts[i-1][0],y0=pts[i-1][1];
+    const x1=pts[i][0],y1=pts[i][1];
+    let d=Math.hypot(x1-x0,y1-y0);
+    while(d>=need&&d>0){const t=need/d;x0+=(x1-x0)*t;y0+=(y1-y0)*t;out.push([x0,y0]);d=Math.hypot(x1-x0,y1-y0);need=step}
+    need-=d;
+  }
+  const last=pts[pts.length-1],le=out[out.length-1];
+  if(Math.hypot(last[0]-le[0],last[1]-le[1])>step*.2||out.length<2)out.push([last[0],last[1]]);
+  return out;
+}
+function chaikin(pts,closed,it){
+  while(it-->0){
+    const out=[],n=pts.length;
+    if(n<3)return pts;
+    if(!closed)out.push(pts[0]);
+    const end=closed?n:n-1;
+    for(let i=0;i<end;i++){
+      const a=pts[i],b=pts[(i+1)%n];
+      out.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);
+    }
+    if(!closed)out.push(pts[n-1]);
+    pts=out;
+  }
+  return pts;
+}
+function bbox(pts){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+  return[x0,y0,x1,y1]}
+function blob(R,cx,cy,rx,ry){
+  const rot=rd(R,0,TAU),ph=rd(R,0,7),n=14,pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const m=1+.16*Math.sin(t*2+ph)+.09*Math.sin(t*5+ph*2.1);
+    const x=Math.cos(t)*rx*m,y=Math.sin(t)*ry*m;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  return chaikin(pts,true,1);
+}
+function rotPts(pts,cx,cy,rot){
+  const co=Math.cos(rot),sn=Math.sin(rot);
+  return pts.map(p=>[cx+(p[0]-cx)*co-(p[1]-cy)*sn, cy+(p[0]-cx)*sn+(p[1]-cy)*co]);
+}
+function spiralPts(cx,cy,rOut,rIn,turns,ph,dir=1){
+  const n=Math.max(24,Math.round(turns*30)),pts=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n,th=ph+dir*t*turns*TAU,r=rOut+(rIn-rOut)*t;
+    pts.push([cx+Math.cos(th)*r,cy+Math.sin(th)*r]);
+  }
+  return pts;
+}
+
+// ---------------- the hand ----------------
+// every mark wanders off its intended path a little. pressed marks get a
+// second pass, the way a pen goes back over a line it means.
+function wob(R,rs,amp){
+  const n=rs.length,q=[];
+  const P1=rd(R,0,7),P2=rd(R,0,7),P3=rd(R,0,7);
+  const F1=rd(R,1.6,3.2),F2=rd(R,5,9);
+  for(let i=0;i<n;i++){
+    const t=i/(n-1);
+    const A=rs[Math.max(0,i-1)],B=rs[Math.min(n-1,i+1)];
+    let nx=-(B[1]-A[1]),ny=B[0]-A[0];
+    const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;
+    const off=amp*(.62*Math.sin(t*F1*2+P1)+.28*Math.sin(t*F2+P2)+.10*Math.sin(t*17+P3));
+    q.push([rs[i][0]+nx*off+rd(R,-.3,.3),rs[i][1]+ny*off+rd(R,-.3,.3)]);
+  }
+  return q;
+}
+function sk(R,pts,o={}){
+  const w=o.w??1.3, a0=o.a??.7;
+  const rs=resample(pts,Math.max(2.4,w*1.5));
+  const n=rs.length;
+  if(n<2)return;
+  const col=(o.col||CUR).slice();
+  const passes=o.passes??1;
+  const [bx0,by0,bx1,by1]=bbox(rs);
+  for(let p=0;p<passes;p++){
+    const amp=(o.amp??(w*.38+.55))*(p?1.5:1);
+    const alpha=a0*(p?.35:1);
+    const q=wob(R,rs,amp);
+    if(o.taper){
+      const segs=[];
+      for(let i=1;i<n;i++){
+        const t=i/(n-1);
+        let e;
+        if(o.taper==='out')e=.3+.7*(1-t);
+        else if(o.taper==='in')e=.3+.7*t;
+        else e=.35+.65*Math.min(1,Math.min(t,1-t)/.25);
+        segs.push([q[i-1],q[i],rgba(col,alpha*rd(R,.8,1)),Math.max(.5,w*e*rd(R,.85,1.15))]);
+      }
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';
+        for(const s of segs){
+          cx.strokeStyle=s[2];cx.lineWidth=s[3];
+          cx.beginPath();cx.moveTo(s[0][0],s[0][1]);cx.lineTo(s[1][0],s[1][1]);cx.stroke();
+        }
+      });
+    } else {
+      const lifts=[];
+      for(let i=0;i<n;i++)lifts.push(o.gap?ch_(R,o.gap):false);
+      const st=rgba(col,alpha), lw=w*rd(R,.85,1.12);
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';cx.lineJoin='round';
+        cx.beginPath();
+        let lift=false;
+        for(let i=0;i<n;i++){
+          if(!i||lift)cx.moveTo(q[i][0],q[i][1]);else cx.lineTo(q[i][0],q[i][1]);
+          lift=lifts[i];
+        }
+        cx.strokeStyle=st;cx.lineWidth=lw;cx.stroke();
+      });
+    }
+    if(p===0&&w>=1.9&&!o.noDust){
+      const specks=[];
+      for(let i=0;i<n;i+=3){
+        if(ch_(R,.6))continue;
+        const sz=rd(R,.6,1.2);
+        specks.push([q[i][0]+rd(R,-w,w)-sz/2,q[i][1]+rd(R,-w,w)-sz/2,sz,rgba(col,a0*rd(R,.14,.3))]);
+      }
+      if(specks.length)emit(by0,by1,cx=>{for(const s of specks){cx.fillStyle=s[3];cx.fillRect(s[0],s[1],s[2],s[2])}});
+    }
+  }
+}
+// a stroke that dies away toward x1 — for things i only half-hold
+function fadeStroke(R,pts,o,x0,x1){
+  const rs=resample(pts,4);
+  let run=[],runA=1;
+  const span=x1-x0;
+  const flush=()=>{if(run.length>1)sk(R,run,{...o,a:(o.a??.6)*runA});run=[]};
+  for(const p of rs){
+    const m=clamp((x1-p[0])/span,0,1);
+    if(m<.06){flush();continue}
+    if(run.length===0)runA=m;
+    run.push(p);
+    if(Math.abs(m-runA)>.22){flush();run=[p];runA=m}
+  }
+  flush();
+}
+function dotF(R,x,y,r,a,col){
+  const c=(col||CUR).slice(),pts=[];
+  const n=8,ph=rd(R,0,7);
+  for(let i=0;i<=n;i++){
+    const t=i/n*TAU,m=1+.2*Math.sin(t*2+ph);
+    pts.push([x+Math.cos(t)*r*m+rd(R,-.2,.2),y+Math.sin(t)*r*m+rd(R,-.2,.2)]);
+  }
+  emit(y-r-2,y+r+2,cx=>{
+    cx.beginPath();
+    for(let i=0;i<pts.length;i++){i?cx.lineTo(pts[i][0],pts[i][1]):cx.moveTo(pts[i][0],pts[i][1])}
+    cx.closePath();cx.fillStyle=rgba(c,a);cx.fill();
+  });
+}
+function ell(R,cx,cy,rx,ry,o={}){
+  const n=Math.max(10,Math.round((rx+ry)/2)),rot=rd(R,0,TAU),pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const x=Math.cos(t)*rx,y=Math.sin(t)*ry;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  pts.push(pts[0]);
+  sk(R,pts,o);
+}
+function fillPoly(pts,col,a){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const st=rgba(col,a),P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.fillStyle=st;cx.fill();
+  });
+}
+// scribble a region full, clipped, in one act
+function scribFill(R,pts,sp,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1;
+  const lines=[],slope=rd(R,-.2,.2);
+  for(let y=y0-sp;y<y1+sp;y+=sp*rd(R,.8,1.2)){
+    const raw=[],ph=rd(R,0,7);
+    for(let x=x0;x<=x1;x+=4)raw.push([x,y+(x-x0)*slope+Math.sin(x*.5+ph)*sp*.42+rd(R,-.8,.8)]);
+    if(raw.length>1)lines.push([wob(R,resample(raw,3.2),.55),rgba(col,a*rd(R,.6,1.05)),w*rd(R,.85,1.12)]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap='round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+function hatchFill(R,pts,sp,ang,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1.1, straight=o.straight;
+  const diag=Math.hypot(x1-x0,y1-y0),cx0=(x0+x1)/2,cy0=(y0+y1)/2;
+  const px=Math.cos(ang+Math.PI/2),py=Math.sin(ang+Math.PI/2);
+  const dx=Math.cos(ang),dy=Math.sin(ang);
+  const lines=[],n=Math.ceil(diag/sp);
+  for(let i=-n;i<=n;i++){
+    const t=i*sp+(straight?0:rd(R,-.2,.2)*sp);
+    const raw=[[cx0+px*t-dx*diag*.6,cy0+py*t-dy*diag*.6],[cx0+px*t+dx*diag*.6,cy0+py*t+dy*diag*.6]];
+    lines.push([straight?raw:wob(R,resample(raw,4),.7),rgba(col,a*(straight?1:rd(R,.6,1.1))),w*(straight?1:rd(R,.85,1.15))]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap=straight?'butt':'round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+// a soft coloured-pencil scrub, never quite inside the lines
+function scrub(R,cx,cy,r,col,a=.4){
+  const b=blob(R,cx,cy,r*rd(R,1,1.12),r*rd(R,.82,1));
+  fillPoly(b,col,.1);
+  scribFill(R,b,Math.max(3,r*.13),a,{col});
+}
+function spatter(R,x,y,r,n,col,a=.5){
+  const sd=ri(R,0,99999),c=col.slice();
+  emit(y-r,y+r,cx=>{
+    const RR=mul32(sd);
+    for(let i=0;i<n;i++){
+      const t=RR()*TAU,d=Math.sqrt(RR())*r;
+      const s=.8+RR()*RR()*2.2;
+      cx.fillStyle=rgba(c,a*(.3+RR()*.7));
+      cx.fillRect(x+Math.cos(t)*d,y+Math.sin(t)*d*.7,s,s*(.8+RR()*.5));
+    }
+  });
+}
+function drip(R,x,y,len,col,a=.3,w=2){
+  const pts=[[x,y]];
+  let px=x;
+  for(let d=0;d<len;d+=9){px+=rd(R,-1.4,1.4);pts.push([px,y+d])}
+  sk(R,pts,{col,w,a,taper:'out',amp:.4});
+  dotF(R,px,y+len,w*1.1,a*1.2,col);
+}
+function arrowHead(R,x,y,ang,sz,a,col,w=1.6){
+  for(const sd of[-1,1])
+    sk(R,[[x,y],[x-Math.cos(ang+sd*.5)*sz,y-Math.sin(ang+sd*.5)*sz]],{col,w,a,taper:'out'});
+}
+function zigOut(R,x,y,rx,ry){
+  const pts=[];
+  const n=ri(R,6,9);
+  for(let i=0;i<=n;i++)pts.push([x+(i/n*2-1)*rx+rd(R,-4,4),y+((i%2)?-1:1)*ry*rd(R,.5,1)]);
+  sk(R,pts,{w:1.4,a:.55,amp:1});
+}
+function spark(R,x,y,r,o={}){
+  const n=o.nR??ri(R,5,8);
+  const rot=rd(R,0,TAU),col=o.col||CUR;
+  for(let i=0;i<n;i++){
+    const a=rot+i/n*TAU+rd(R,-.14,.14)/n*TAU;
+    const r0=r*rd(R,.22,.34),r1=r*rd(R,.85,1.1)*(i%2?.78:1);
+    sk(R,[[x+Math.cos(a)*r0,y+Math.sin(a)*r0],[x+Math.cos(a)*r1,y+Math.sin(a)*r1]],
+      {col,w:o.w??1.3,a:(o.a??.75)*rd(R,.8,1),taper:'out',amp:.3});
+  }
+  if(!o.noCenter&&ch_(R,.55))dotF(R,x,y,Math.max(1,r*.13),(o.a??.75),col);
+}
+
+// ---------------- asemic writing ----------------
+// a few drawings need writing that only looks like writing: a lab notebook nobody can read.
+function aword(R,x,y,h,nl,o={}){
+  const pts=[[x,y+rd(R,-.1,.1)*h]];
+  let cx=x;
+  for(let i=0;i<nl;i++){
+    const up=y-h*rd(R,.32,.62)-(ch_(R,.13)?h*rd(R,.4,.75):0);
+    const dn=y+(ch_(R,.09)?h*rd(R,.3,.55):h*rd(R,-.06,.12));
+    cx+=h*rd(R,.18,.3);pts.push([cx,up]);
+    cx+=h*rd(R,.18,.3);pts.push([cx,dn]);
+  }
+  sk(R,chaikin(pts,false,1),{col:o.col,w:o.w??.9,a:o.a??.55,amp:.28});
+  return cx-x;
+}
+function atext(R,xa,xb,y,h,o={}){
+  let cx=xa,guard=0;
+  while(cx<xb-h*.9&&guard++<70){
+    let nl=ri(R,2,5);
+    const est=nl*h*.5;
+    if(cx+est>xb)nl=Math.max(1,Math.floor((xb-cx)/(h*.5)));
+    if(nl<1)break;
+    const adv=aword(R,cx,y,h,nl,o);
+    cx+=adv+h*rd(R,.45,.75);
+  }
+}
+
+// ---------------- hand lettering ----------------
+// a real alphabet, one wobbly stroke at a time. used rarely, like pencil notes.
+const A_=(cx,cy,rx,ry,a0,a1,n=9)=>{const p=[];for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*rx,cy+Math.sin(t)*ry])}return p};
+const GL={};
+const G=(chr,w,...strokes)=>GL[chr]={w,s:strokes};
+G('a',.62,A_(.27,.73,.23,.26,-.5,5.8),[[.5,.48],[.52,.96],[.6,1]]);
+G('b',.6,[[.1,.05],[.1,1]],[[.1,.56],[.34,.47],[.54,.62],[.53,.86],[.3,1],[.1,.9]]);
+G('c',.58,A_(.3,.74,.25,.26,.6,5.68));
+G('d',.62,A_(.28,.74,.24,.26,-.5,5.8),[[.52,.05],[.53,.95],[.6,1]]);
+G('e',.56,[[.08,.73],[.48,.7],[.49,.54],[.3,.45],[.1,.56],[.07,.8],[.26,1],[.5,.93]]);
+G('f',.46,[[.44,.12],[.32,.05],[.22,.14],[.2,1]],[[.05,.48],[.42,.46]]);
+G('g',.6,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.48],[.53,1.12],[.42,1.36],[.16,1.32]]);
+G('h',.58,[[.1,.05],[.1,1]],[[.1,.62],[.3,.47],[.48,.56],[.5,1]]);
+G('i',.26,[[.13,.5],[.13,.96],[.18,1]],[[.11,.27],[.15,.3]]);
+G('j',.34,[[.22,.5],[.24,1.15],[.12,1.36],[-.02,1.28]],[[.2,.27],[.24,.3]]);
+G('k',.52,[[.1,.05],[.1,1]],[[.44,.48],[.12,.76]],[[.2,.68],[.46,1]]);
+G('l',.3,[[.14,.05],[.14,.93],[.22,1]]);
+G('m',.68,[[.07,1],[.07,.5]],[[.07,.62],[.2,.46],[.33,.56],[.34,1]],[[.34,.62],[.47,.46],[.6,.56],[.61,1]]);
+G('n',.56,[[.09,1],[.09,.5]],[[.09,.62],[.28,.46],[.46,.56],[.48,1]]);
+G('o',.6,A_(.29,.73,.24,.26,-1.2,-1.2+TAU*.97,10));
+G('p',.6,[[.1,.5],[.1,1.36]],[[.1,.57],[.34,.47],[.53,.62],[.52,.86],[.3,.98],[.1,.9]]);
+G('q',.62,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.5],[.52,1.22],[.62,1.34]]);
+G('r',.44,[[.1,1],[.1,.5]],[[.1,.68],[.22,.5],[.42,.46]]);
+G('s',.52,[[.46,.52],[.24,.45],[.09,.58],[.22,.72],[.42,.8],[.46,.93],[.24,1],[.06,.92]]);
+G('t',.48,[[.26,.12],[.25,.9],[.36,1]],[[.08,.44],[.46,.43]]);
+G('u',.58,[[.08,.5],[.08,.84],[.22,1],[.42,.9],[.45,.5]],[[.45,.6],[.47,.96],[.54,1]]);
+G('v',.5,[[.06,.5],[.26,1],[.46,.5]]);
+G('w',.62,[[.04,.5],[.17,1],[.3,.62],[.43,1],[.57,.5]]);
+G('x',.52,[[.07,.5],[.47,1]],[[.47,.5],[.07,1]]);
+G('y',.54,[[.07,.5],[.28,1]],[[.5,.5],[.24,1.14],[.06,1.34]]);
+G('z',.52,[[.07,.5],[.45,.5],[.06,1],[.47,1]]);
+G('2',.54,[[.08,.3],[.18,.12],[.38,.12],[.44,.32],[.07,1],[.47,1]]);
+G('0',.56,A_(.27,.55,.22,.44,-1.3,-1.3+TAU*.97,10));
+G('6',.52,[[.4,.1],[.18,.34],[.09,.68],[.2,.98],[.4,.94],[.46,.7],[.3,.56],[.11,.66]]);
+G('8',.54,A_(.27,.31,.16,.2,-1.57,-1.57+TAU),A_(.27,.76,.2,.23,-1.57,-1.57+TAU));
+G('.',.24,[[.1,.93],[.13,.97]]);
+G(',',.24,[[.14,.9],[.15,1.02],[.04,1.16]]);
+G("'",.2,[[.12,.05],[.09,.26]]);
+G('-',.44,[[.05,.7],[.38,.68]]);
+G('—',.66,[[.03,.7],[.6,.67]]);
+G('·',.24,[[.08,.68],[.12,.72]]);
+G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
+G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
+G(' ',.42);
+function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+function write(R,t,x,y,sz,o={}){
+  const a=o.a??.7,col=o.col;
+  let px=o.cen?x-measure(t,sz)/2:x;
+  const ph=rd(R,0,7);
+  for(let i=0;i<t.length;i++){
+    const c=t[i],g=GL[c]||GL[' '];
+    const yb=y+Math.sin(i*.8+ph)*sz*.045;
+    for(const st of(g.s||[])){
+      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
+      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
+    }
+    px+=(g.w+.1)*sz;
+  }
+}
+
+// ---------------- torn paper ----------------
+// the wall is a collage: sheets of coloured paper glued down, edges torn by
+// hand, each showing its white fibrous core where it ripped.
+function tornPath(R,x0,y0,x1,y1,rough,sd){
+  const pts=[];
+  const side=(ax,ay,bx,by,nx,ny,id)=>{
+    const L=Math.hypot(bx-ax,by-ay),steps=Math.max(3,Math.round(L/26));
+    for(let i=0;i<steps;i++){
+      const t=i/steps;
+      let off=(fbm(t*3.1+id*7,id*3.3,sd,3)-.5)*2*rough;
+      if(h2(i*1.7,id*9.1,sd)>0.93)off+=rd(R,8,22)*(h2(i,id,sd+3)>.5?1:-1);
+      pts.push([ax+(bx-ax)*t+nx*off,ay+(by-ay)*t+ny*off]);
+    }
+  };
+  side(x0,y0,x1,y0,0,1,0);
+  side(x1,y0,x1,y1,-1,0,1);
+  side(x1,y1,x0,y1,0,-1,2);
+  side(x0,y1,x0,y0,1,0,3);
+  return pts;
+}
+function sheet(R,x0,y0,x1,y1,col,o={}){
+  const rough=o.rough??16;
+  const sd=ri(R,0,9999);
+  let P=tornPath(R,x0,y0,x1,y1,rough,sd);
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  // the shadow the paper casts on what is beneath it
+  fillPoly(P.map(p=>[p[0]+6,p[1]+8]),[12,9,7],.28);
+  fillPoly(P,col,1);
+  fillPoly(P,col,1);
+  const [bx0,by0,bx1,by1]=bbox(P);
+  const PP=P.map(p=>p.slice());
+  // grain: the tooth of the paper
+  const gsd=ri(R,0,99999);
+  emit(by0,by1,cx=>{
+    const RR=mul32(gsd);
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<PP.length;i++){i?cx.lineTo(PP[i][0],PP[i][1]):cx.moveTo(PP[i][0],PP[i][1])}
+    cx.closePath();cx.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/1900);
+    for(let i=0;i<n;i++){
+      const s=.8+RR()*1.1;
+      const dark=RR()<.62;
+      cx.fillStyle=dark?'rgba(45,40,34,.05)':'rgba(255,252,244,.07)';
+      cx.fillRect(bx0+RR()*(bx1-bx0),by0+RR()*(by1-by0),s,s);
+    }
+    for(let i=0;i<n/22;i++){
+      const fx=bx0+RR()*(bx1-bx0),fy=by0+RR()*(by1-by0),fa=RR()*TAU,fl=3+RR()*7;
+      cx.strokeStyle='rgba(45,40,34,.05)';cx.lineWidth=.7;
+      cx.beginPath();cx.moveTo(fx,fy);cx.lineTo(fx+Math.cos(fa)*fl,fy+Math.sin(fa)*fl);cx.stroke();
+    }
+    cx.restore();
+  });
+  // torn edge: the white fibrous core
+  if(!o.noCore){
+    const core=P.concat([P[0]]);
+    sk(R,core,{col:[251,247,237],w:2,a:.42,amp:.4,gap:.24,noDust:true});
+    sk(R,core.map(p=>[p[0]+rd(R,1,3),p[1]+rd(R,1,3)]),{col:shade(col,.22),w:1,a:.2,amp:.5,gap:.4,noDust:true});
+  }
+  return P;
+}
+// a little pinned study: torn scrap + shadow + tape at two corners
+function scrap(R,x,y,w,h,col,rot){
+  const P=sheet(R,x-w/2,y-h/2,x+w/2,y+h/2,col,{rough:8,rot});
+  const [bx0,by0,bx1,by1]=bbox(P);
+  for(const cnr of[[bx0+14,by0+12],[bx1-16,by1-12]]){
+    const tp=rotPts([[cnr[0]-22,cnr[1]-8],[cnr[0]+22,cnr[1]-8],[cnr[0]+22,cnr[1]+9],[cnr[0]-22,cnr[1]+9]],cnr[0],cnr[1],rd(R,.5,.9));
+    fillPoly(tp,[240,234,216],.35);
+    sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+  }
+}
+
+// ---------------- small things ----------------
+function enso(R,cx,cy,r,frac,col,o={}){
+  const a0=rd(R,0,TAU),pts=[];
+  const n=Math.round(40*frac);
+  for(let i=0;i<=n;i++){
+    const t=a0+i/n*TAU*frac;
+    const rr2=r*(1+.03*Math.sin(i*.7));
+    pts.push([cx+Math.cos(t)*rr2,cy+Math.sin(t)*rr2]);
+  }
+  sk(R,pts,{col,w:o.w??9,a:o.a??.75,amp:3,taper:'out',noDust:true});
+  sk(R,pts.map(p=>[p[0]+rd(R,2,5),p[1]+rd(R,2,4)]),{col,w:(o.w??9)*.4,a:(o.a??.75)*.3,amp:3.4,gap:.12,noDust:true});
+  return a0+TAU*frac; // where the brush lifted
+}
+function moth(R,x,y,s,col,a=.6){
+  for(const sd of[-1,1]){
+    const wing=blob(R,x+sd*s*.55,y-s*.1,s*.62,s*.45);
+    sk(R,wing.concat([wing[0]]),{col,w:1.1,a,amp:.5});
+    scribFill(R,wing,s*.3,a*.4,{col});
+    const wl=blob(R,x+sd*s*.38,y+s*.34,s*.34,s*.26);
+    sk(R,wl.concat([wl[0]]),{col,w:1,a:a*.85,amp:.4});
+  }
+  sk(R,[[x,y-s*.45],[x,y+s*.5]],{col,w:1.6,a,amp:.3});
+  for(const sd of[-1,1])
+    sk(R,[[x,y-s*.42],[x+sd*s*.3,y-s*.75]],{col,w:.9,a:a*.8,amp:.3,taper:'out'});
+}
+function shellSpiral(R,cx,cy,r,col){
+  const pts=[];
+  for(let t=0;t<=1;t+=.012){
+    const th=t*3.2*TAU, rr2=r*Math.pow(.78,3.2*2-t*3.2*2);
+    pts.push([cx+Math.cos(th)*rr2,cy+Math.sin(th)*rr2*.86]);
+  }
+  sk(R,pts,{col,w:1.6,a:.6,amp:.7});
+  for(let k=0;k<7;k++){
+    const t=.4+k*.09,th=t*3.2*TAU,rr2=r*Math.pow(.78,3.2*2-t*3.2*2);
+    sk(R,[[cx+Math.cos(th)*rr2*.55,cy+Math.sin(th)*rr2*.5],[cx+Math.cos(th)*rr2,cy+Math.sin(th)*rr2*.86]],{col,w:.9,a:.35,amp:.3});
+  }
+}
+function fern(R,x,y,h,col){
+  const spine=[];
+  for(let t=0;t<=1;t+=.07)spine.push([x+Math.sin(t*2.6)*h*.14,y-t*h]);
+  sk(R,spine,{col,w:1.5,a:.6,amp:.5,taper:'out'});
+  for(let t=.08;t<.95;t+=.06){
+    const i=Math.min(spine.length-1,Math.round(t*spine.length));
+    const p=spine[i],L=h*.16*(1-t*.8);
+    for(const sd of[-1,1]){
+      const tip=[p[0]+sd*L,p[1]-L*.5];
+      sk(R,[p,tip],{col,w:1,a:.5,amp:.4,taper:'out'});
+    }
+  }
+}
+function birdM(R,x,y,s,col,a=.6){
+  sk(R,[[x-s,y],[x-s*.4,y-s*.55],[x,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+  sk(R,[[x,y],[x+s*.4,y-s*.55],[x+s,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+}
+function noteHead(R,x,y,up,col,a=.8){
+  dotF(R,x,y,4.2,a,col);
+  sk(R,[[x+(up?4:-4),y],[x+(up?4:-4),y+(up?-26:26)]],{col,w:1.4,a:a*.85,amp:.3});
+}
+
+// ---------------- replay engine ----------------
+let CSSK=innerWidth/LW;
+addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+function tick(now){
+  const sy=scrollY/CSSK, vh=innerHeight/CSSK;
+  for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
+  const budget=(FAST||RM)?200:7;
+  const t0=performance.now();
+  for(const T of TILES){
+    if(!T.active||T.done)continue;
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){
+      T.q[T.qi++](T.cx);
+      if(performance.now()-t0>budget)break;
+    }
+    if(GENDONE&&T.qi>=T.q.length){T.done=true;T.q=null;readyRestless(T)}
+    if(performance.now()-t0>budget)break;
+  }
+  runRestless(now);
+  drawTrail(now);
+  requestAnimationFrame(tick);
+}
+
+// ---------------- restlessness ----------------
+// a few marks cannot hold still. every so often one erases itself and is
+// drawn again, never quite the same, like a field line that is only drawn once it is felt.
+const RESTLESS=[];
+function restless(x,y,w,h,fn){RESTLESS.push({x,y:y+GEN_DY,w,h,fn,dy:GEN_DY,img:null,next:0,tile:null})}
+function readyRestless(T){
+  if(RM)return;
+  for(const r of RESTLESS){
+    if(r.img)continue;
+    if(r.y>=T.y0&&r.y+r.h<=T.y0+T.h&&T.done){
+      r.tile=T;
+      const px=Math.round(r.x*S),py=Math.round((r.y-T.y0)*S);
+      const pw=Math.round(r.w*S),ph=Math.round(r.h*S);
+      try{r.img=T.cx.getImageData(px,py,pw,ph);r.px=px;r.py=py;
+          r.next=performance.now()+2000+Math.random()*3000;}catch(e){}
+    }
+  }
+}
+let restR=stream(SEED*77+3);
+function runRestless(now){
+  for(const r of RESTLESS){
+    if(!r.img||now<r.next)continue;
+    r.tile.cx.putImageData(r.img,r.px,r.py);
+    DIRECT=r.tile; GEN_DY=r.dy;
+    r.fn(restR);
+    GEN_DY=0; DIRECT=null;
+    r.next=now+2600+Math.random()*4200;
+  }
+}
+
+// ---------------- the visitor ----------------
+// where you move, you leave graphite on the wall. it fades, like iron
+// filings that fall back when the magnet moves on.
+const trailCv=document.getElementById('trail');
+const trailCx=trailCv.getContext('2d');
+let TP=[];
+function sizeTrail(){
+  const d=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*d;trailCv.height=innerHeight*d;
+  trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
+  trailCx.setTransform(d,0,0,d,0,0);
+  trailCx.lineCap='round';
+}
+sizeTrail();
+addEventListener('pointermove',e=>{
+  const t=performance.now();
+  const L=TP[TP.length-1];
+  if(L&&Math.hypot(e.clientX-L.x,e.clientY-L.y)<3)return;
+  TP.push({x:e.clientX,y:e.clientY,t});
+  if(TP.length>400)TP.shift();
+},{passive:true});
+const DARKP=new Set([1,2,3,5,7,10]);
+function drawTrail(now){
+  if(RM){trailCx.clearRect(0,0,innerWidth,innerHeight);return}
+  trailCx.clearRect(0,0,innerWidth,innerHeight);
+  if(TP.length<2)return;
+  const pidx=Math.floor((scrollY+innerHeight/2)/CSSK/TILEH);
+  const col=DARKP.has(pidx)?CINK:INK;
+  const LIFE=3800;
+  while(TP.length&&now-TP[0].t>LIFE)TP.shift();
+  for(let i=1;i<TP.length;i++){
+    const a=TP[i-1],b=TP[i];
+    if(b.t-a.t>110)continue;
+    const age=(now-b.t)/LIFE;
+    const k=1-age;
+    if(k<=0)continue;
+    const wobx=Math.sin(now*.0011+i*.7)*1.3*age, woby=Math.cos(now*.0009+i*1.1)*1.3*age;
+    trailCx.strokeStyle=rgba(col,.2*k*k);
+    trailCx.lineWidth=.8+1.6*k;
+    trailCx.beginPath();
+    trailCx.moveTo(a.x+wobx,a.y+woby);
+    trailCx.lineTo(b.x+wobx,b.y+woby);
+    trailCx.stroke();
+  }
+}
+
+// ---------------- margin whispers ----------------
+function whispers(R,y0,y1,dark,n){
+  const col=dark?CINK:INK;
+  for(let i=0;i<n;i++){
+    const left=ch_(R,.5);
+    const x=left?rd(R,26,140):rd(R,1460,1574);
+    const y=rd(R,y0+40,y1-40);
+    const a=rd(R,.25,.45);
+    const k=ri(R,0,6);
+    if(k===0)sk(R,spiralPts(x,y,rd(R,8,16),2,rd(R,1.5,2.5),rd(R,0,7)),{col,w:1,a,amp:.4});
+    else if(k===1){for(let j=0;j<ri(R,3,6);j++)dotF(R,x+j*7,y+rd(R,-2,2),1.2,a,col)}
+    else if(k===2){sk(R,[[x-6,y],[x+6,y]],{col,w:1,a,amp:.3});sk(R,[[x,y-6],[x,y+6]],{col,w:1,a,amp:.3})}
+    else if(k===3)spark(R,x,y,rd(R,6,11),{col,a,w:1,nR:4,noCenter:true});
+    else if(k===4)aword(R,x-15,y,rd(R,8,12),ri(R,2,4),{col,a});
+    else if(k===5)ell(R,x,y,rd(R,5,9),rd(R,5,9),{col,w:1,a,amp:.4});
+    else birdM(R,x,y,rd(R,6,10),col,a);
+  }
+}
+
+
+// ===========================================================================
+// veld — eleven panels of 1200 units, top to bottom. every panel is drawn in
+// local coordinates 0..1600 x 0..1200; GEN_DY lifts it to its place.
+//
+// three kinds of line carry the whole wall:
+//   solid   = measured      (a marker with a straight stroke)
+//   broken  = suspected     (a marker with three dashes)
+//   spiral  = still a question
+// ===========================================================================
+const PAPER=[238,232,214], NIGHT=[20,24,46], DEEPV=[26,22,44], SPACE=[15,17,32], DUSK=[36,44,84],
+      ELEC=[78,152,214], MAGR=[198,68,58], COPPER=[190,114,62], AURORA=[98,198,142],
+      VIOLET=[128,100,180], FIL=[40,36,32], LAMPW=[250,244,214], SUNC=[236,170,70],
+      HONEY=[244,232,196], BARKC=[86,62,44], CHARC=[34,30,28], WARM=[242,228,214], PARCH=[232,224,200];
+const PH=1200;
+const P=[];
+
+// extra glyphs for this wall
+G('?',.5,[[.08,.2],[.2,.1],[.38,.14],[.42,.34],[.26,.58],[.24,.72]],[[.24,.94],[.27,.98]]);
+G(':',.24,[[.1,.62],[.13,.66]],[[.1,.93],[.13,.97]]);
+G('+',.5,[[.05,.7],[.45,.7]],[[.25,.5],[.25,.9]]);
+G('1',.4,[[.08,.3],[.24,.12],[.24,1]]);
+G('3',.52,[[.08,.2],[.2,.1],[.4,.14],[.42,.36],[.24,.52],[.42,.66],[.44,.88],[.26,1],[.06,.9]]);
+G('4',.54,[[.38,1],[.36,.1],[.05,.7],[.5,.7]]);
+G('5',.52,[[.44,.12],[.14,.12],[.1,.5],[.3,.44],[.46,.6],[.44,.9],[.26,1],[.06,.9]]);
+G('7',.5,[[.06,.12],[.46,.12],[.22,1]]);
+G('9',.52,[[.15,1],[.37,.76],[.46,.42],[.35,.12],[.15,.16],[.09,.4],[.25,.54],[.44,.44]]);
+
+// ---------------- small helpers ----------------
+function hblob(R,cx,cy,rx,ry){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<14;i++){const t=i/14*TAU,m=1+.1*Math.sin(t*2+ph)+.05*Math.sin(t*5+ph*2.1);pts.push([cx+Math.cos(t)*rx*m,cy+Math.sin(t)*ry*m])}
+  return chaikin(pts,true,1);
+}
+function circ(R,cx,cy,r){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<40;i++){const t=i/40*TAU,m=1+.012*Math.sin(t*3+ph)+.008*Math.sin(t*7+ph*2.1);pts.push([cx+Math.cos(t)*r*m,cy+Math.sin(t)*r*m])}
+  return pts;
+}
+function inPoly(Pp,x,y){let c=false;for(let i=0,j=Pp.length-1;i<Pp.length;j=i++){const a=Pp[i],b=Pp[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+// a broken line: the mark for what is suspected, not measured
+function dashLine(R,pts,o={},on=2,off=2,step=5){
+  const rs=resample(pts,step);
+  for(let i=0;i<rs.length-1;i+=on+off){
+    const seg=rs.slice(i,i+on+1);
+    if(seg.length>1)sk(R,seg,o);
+  }
+}
+function marker(R,kind,x,y,col,a=.85){
+  if(kind==='m')sk(R,[[x,y],[x+26,y-1]],{col,w:2.2,a,amp:.5});
+  else if(kind==='v')dashLine(R,[[x,y],[x+28,y-1]],{col,w:2,a,amp:.3},1,1,5);
+  else sk(R,spiralPts(x+11,y-3,9,1.5,1.8,rd(R,0,7)),{col,w:1.3,a:a*.85,amp:.25});
+}
+// a note: a marker for how sure we are, then one or more lines of pencil
+function note(R,kind,x,y,lines,sz,dark){
+  const col=dark?CINK:INK;
+  if(typeof lines==='string')lines=[lines];
+  marker(R,kind,x,y-sz*.32,col,.9);
+  lines.forEach((t,i)=>{
+    const w=measure(t,sz);
+    write(R,t,x+40,y+i*sz*1.55,sz,{col,a:kind==='q'?.72:.88});
+  });
+}
+function capM(R,kind,t,cx,y,sz,dark){
+  const col=dark?CINK:INK,tot=40+measure(t,sz),x0=cx-tot/2;
+  marker(R,kind,x0,y-sz*.32,col,.9);
+  write(R,t,x0+40,y,sz,{col,a:.85});
+}
+function plusSign(R,x,y,s,col,a=.8){sk(R,[[x-s,y],[x+s,y]],{col,w:1.5,a,amp:.2});sk(R,[[x,y-s],[x,y+s]],{col,w:1.5,a,amp:.2})}
+function minusSign(R,x,y,s,col,a=.8){sk(R,[[x-s,y],[x+s,y]],{col,w:1.5,a,amp:.2})}
+function wave0(x0,x1,y,amp,f){const p=[];for(let x=x0;x<=x1;x+=6)p.push([x,y+Math.sin(x*f)*amp]);return p}
+function branch(R,x,y,ang,len,depth,col,w){
+  const x2=x+Math.cos(ang)*len,y2=y+Math.sin(ang)*len;
+  sk(R,[[x,y],[(x+x2)/2+rd(R,-len*.06,len*.06),(y+y2)/2+rd(R,-len*.06,len*.06)],[x2,y2]],{col,w,a:.85,amp:.8,taper:'out'});
+  if(depth<=0)return;
+  const n=ri(R,2,3);
+  for(let i=0;i<n;i++)branch(R,x2,y2,ang+rd(R,-.7,.7),len*rd(R,.6,.75),depth-1,col,Math.max(.8,w*.65));
+}
+// the line of a magnetic dipole: r = L sin^2(theta)
+function dipLine(cx,cy,L,tilt,side,r0){
+  const pts=[];
+  const a=Math.max(.05,Math.asin(Math.sqrt(Math.min(1,r0/L)))),b=Math.PI-a;
+  for(let t=a;t<=b;t+=.035){
+    const r=L*Math.sin(t)*Math.sin(t);
+    const x=side*r*Math.sin(t),y=-r*Math.cos(t);
+    pts.push([cx+x*Math.cos(tilt)-y*Math.sin(tilt),cy+x*Math.sin(tilt)+y*Math.cos(tilt)]);
+  }
+  return pts;
+}
+function arrowOn(R,pts,f,col,a=.7,sz=9){
+  const i=Math.max(0,Math.min(pts.length-2,Math.floor(pts.length*f)));
+  const p=pts[i],q=pts[i+1];
+  arrowHead(R,q[0],q[1],Math.atan2(q[1]-p[1],q[0]-p[0]),sz,a,col,1.4);
+}
+// iron filings: thousands of short dashes that lie along an invisible field.
+// they are laid down from the source outward, so the field seems to spread.
+function filings(R,fn,cx,cy,rx,ry,n,o={}){
+  const segs=[],ref=o.ref||1;
+  for(let i=0;i<n;i++){
+    const t=rd(R,0,TAU),d=Math.sqrt(R());
+    const x=cx+Math.cos(t)*rx*d,y=cy+Math.sin(t)*ry*d;
+    if(o.skip&&o.skip(x,y))continue;
+    const f=fn(x,y);
+    const mag=Math.hypot(f[0],f[1]);
+    if(!(mag>0))continue;
+    const p=clamp(Math.pow(mag/ref,o.pw??.42),o.pmin??.1,1)*(1-d*d*d);
+    if(R()>p)continue;
+    segs.push([x,y,Math.atan2(f[1],f[0])+rd(R,-.09,.09),rd(R,6,11)*(o.len??1),rd(R,.4,.85)*(o.am??1),rd(R,1,1.7)]);
+  }
+  const ox=o.ox??cx,oy=o.oy??cy;
+  segs.sort((a,b)=>Math.hypot(a[0]-ox,a[1]-oy)-Math.hypot(b[0]-ox,b[1]-oy));
+  const col=(o.col||FIL).slice(),B=70;
+  for(let i=0;i<segs.length;i+=B){
+    const batch=segs.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    for(const s of batch){if(s[1]<y0)y0=s[1];if(s[1]>y1)y1=s[1]}
+    emit(y0-12,y1+12,c2=>{
+      c2.lineCap='round';
+      for(const s of batch){
+        const c=Math.cos(s[2])*s[3]/2,sn=Math.sin(s[2])*s[3]/2;
+        c2.strokeStyle=rgba(col,s[4]);c2.lineWidth=s[5];
+        c2.beginPath();c2.moveTo(s[0]-c,s[1]-sn);c2.lineTo(s[0]+c,s[1]+sn);c2.stroke();
+      }
+    });
+  }
+}
+// fine round grains (stars, pollen, plankton) in batches
+function dustBatch(pts,col,B=150){
+  const c=col.slice();
+  for(let i=0;i<pts.length;i+=B){
+    const batch=pts.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    for(const p of batch){if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+    emit(y0-4,y1+4,c2=>{for(const p of batch){c2.fillStyle=rgba(c,p[3]);c2.beginPath();c2.arc(p[0],p[1],p[2],0,TAU);c2.fill()}});
+  }
+}
+const magField=(cx,cy,d)=>(x,y)=>{
+  let bx=0,by=0;
+  for(const [px,q] of [[cx-d,1],[cx+d,-1]]){
+    const dx=x-px,dy=y-cy,r2=dx*dx+dy*dy+25,r=Math.sqrt(r2);
+    bx+=q*dx/(r2*r);by+=q*dy/(r2*r);
+  }
+  return [bx,by];
+};
+// a leaf-like petal, a creature's wing: an ellipse in a rotated frame
+function ePts(cx,cy,rx,ry,rot,n=16){
+  const o=[];
+  for(let i=0;i<n;i++){const t=i/n*TAU,ux=Math.cos(t)*rx,uy=Math.sin(t)*ry;o.push([cx+ux*Math.cos(rot)-uy*Math.sin(rot),cy+ux*Math.sin(rot)+uy*Math.cos(rot)])}
+  return o;
+}
+
+// ---------------- small drawings ----------------
+function robin(R,x,y,s){
+  const brown=[124,98,72];
+  sk(R,[[x-s*1.9,y+s*1.25],[x+s*1.3,y+s*1.2]],{col:BARKC,w:5,a:.8,amp:1,taper:'both'});
+  const body=hblob(R,x,y,s*.95,s*.72);
+  fillPoly(body,brown,.75);scribFill(R,body,3.4,.35,{col:BARKC,w:1});
+  const br=hblob(R,x+s*.5,y+s*.12,s*.46,s*.52);
+  fillPoly(br,[216,104,52],.85);scribFill(R,br,3,.35,{col:[200,88,40],w:1});
+  sk(R,body.concat([body[0]]),{col:INK,w:1.6,a:.85,amp:.5});
+  const head=hblob(R,x+s*.88,y-s*.5,s*.4,s*.38);
+  fillPoly(head,brown,.85);
+  const face=hblob(R,x+s*1.0,y-s*.42,s*.28,s*.26);
+  fillPoly(face,[216,104,52],.9);
+  sk(R,head.concat([head[0]]),{col:INK,w:1.4,a:.8,amp:.4});
+  sk(R,[[x+s*1.25,y-s*.5],[x+s*1.55,y-s*.44]],{col:INK,w:3,a:.9,amp:.2,taper:'out'});
+  dotF(R,x+s*.98,y-s*.6,2.6,.95,INK);
+  sk(R,[[x-s*.85,y-s*.1],[x-s*1.7,y+s*.3]],{col:brown,w:6,a:.85,amp:.5,taper:'out'});
+  for(const lx of[x-s*.05,x+s*.3])sk(R,[[lx,y+s*.6],[lx+1,y+s*1.2]],{col:INK,w:1.6,a:.8,amp:.3});
+}
+function eyeSketch(R,x,y,s){
+  const top=[],bot=[];
+  for(let i=0;i<=16;i++){const t=i/16,px=x-s+2*s*t,h=Math.sin(Math.PI*t)*s*.5;top.push([px,y-h]);bot.push([px,y+h*.9])}
+  fillPoly(top.concat(bot.slice().reverse()),[246,242,232],.95);
+  sk(R,top,{col:INK,w:1.8,a:.85,amp:.5});sk(R,bot,{col:INK,w:1.8,a:.85,amp:.5});
+  const ir=hblob(R,x,y,s*.3,s*.3);fillPoly(ir,[120,88,52],.7);
+  sk(R,ir.concat([ir[0]]),{col:INK,w:1.4,a:.8,amp:.3});
+  dotF(R,x,y,s*.13,.95,INK);
+}
+function flowerDraw(R,x,y,s){
+  sk(R,[[x,y+s*.9],[x+14,y+s*2.4],[x-6,y+s*4.1],[x+4,y+s*5.1]],{col:[88,120,66],w:7,a:.85,amp:1.4,taper:'out'});
+  for(const [dx,dy,rot] of [[-44,y+s*3.0,-.5],[46,y+s*2.2,.5]]){
+    const lf=ePts(x+dx,dy,s*.62,s*.2,rot);
+    fillPoly(lf,[104,138,76],.8);sk(R,lf.concat([lf[0]]),{col:INK,w:1.3,a:.7,amp:.4});
+  }
+  for(let k=0;k<12;k++){
+    const a=k/12*TAU+rd(R,-.06,.06),pc=[x+Math.cos(a)*s*1.0,y+Math.sin(a)*s*1.0];
+    const pet=ePts(pc[0],pc[1],s*.58,s*.24,a);
+    fillPoly(pet,[252,248,238],.95);
+    sk(R,pet.concat([pet[0]]),{col:INK,w:1.4,a:.8,amp:.4});
+  }
+  const cd=hblob(R,x,y,s*.5,s*.5);
+  fillPoly(cd,[218,150,52],.95);
+  sk(R,cd.concat([cd[0]]),{col:INK,w:1.6,a:.85,amp:.4});
+  spatter(R,x,y,s*.45,70,COPPER,.7);
+}
+function beeDraw(R,x,y,s,ang){
+  const co=Math.cos(ang),sn=Math.sin(ang);
+  const T=(px,py)=>[x+px*co-py*sn,y+px*sn+py*co];
+  const LE=(px,py,rx,ry,rot,n=16)=>ePts(px,py,rx,ry,rot,n).map(p=>T(p[0],p[1]));
+  // wings, behind
+  for(const sd of[-1,1]){
+    const w=LE(s*.2,sd*s*.85,s*.75,s*.3,sd*.3);
+    fillPoly(w,[226,238,246],.5);sk(R,w.concat([w[0]]),{col:INK,w:1.2,a:.55,amp:.4});
+  }
+  for(let k=0;k<4;k++){const lx=s*(.1+k*.3);for(const sd of[-1,1])sk(R,[T(lx,sd*s*.4),T(lx-s*.2,sd*s*1.1)],{col:INK,w:1.1,a:.7,amp:.3})}
+  // abdomen with stripes
+  const ab=LE(-s*.75,0,s*.72,s*.48,0);
+  fillPoly(ab,[238,192,60],.95);
+  for(let k=0;k<3;k++)sk(R,[T(-s*1.05+k*s*.4,-s*.42),T(-s*1.0+k*s*.4,s*.42)],{col:CHARC,w:s*.16,a:.85,amp:.5});
+  sk(R,ab.concat([ab[0]]),{col:INK,w:1.6,a:.85,amp:.4});
+  // thorax, fuzzy
+  const th=LE(s*.28,0,s*.42,s*.4,0,14);
+  fillPoly(th,[116,86,48],.9);
+  for(let k=0;k<26;k++){const t=rd(R,0,TAU);sk(R,[T(s*.28+Math.cos(t)*s*.38,Math.sin(t)*s*.36),T(s*.28+Math.cos(t)*s*.56,Math.sin(t)*s*.53)],{col:[170,126,66],w:.9,a:.7,amp:.2})}
+  const hd=LE(s*.86,0,s*.26,s*.28,0,12);
+  fillPoly(hd,CHARC,.9);
+  dotF(R,...T(s*.95,-s*.12),2,.9,CINK);dotF(R,...T(s*.95,s*.12),2,.9,CINK);
+  for(const sd of[-1,1])sk(R,[T(s*1.05,sd*s*.1),T(s*1.35,sd*s*.45),T(s*1.5,sd*s*.4)],{col:INK,w:1.1,a:.8,amp:.2});
+  for(let k=0;k<3;k++)for(const sd of[-1,1])sk(R,[T(s*(.05+k*.28),sd*s*.35),T(s*(-.05+k*.3),sd*s*.8),T(s*(-.2+k*.32),sd*s*.95)],{col:INK,w:1.1,a:.75,amp:.3});
+}
+function neuron(R,x,y,s){
+  const so=hblob(R,x,y,s*.5,s*.42);
+  fillPoly(so,[122,102,152],.7);scribFill(R,so,4,.3,{col:CINK,w:1});
+  sk(R,so.concat([so[0]]),{col:CINK,w:1.8,a:.85,amp:.5});
+  dotF(R,x,y,s*.14,.85,CINK);
+  for(let k=0;k<6;k++)branch(R,x+rd(R,-s*.25,s*.25),y-s*.2,-Math.PI/2+rd(R,-1.2,1.2),s*rd(R,.55,.85),3,CINK,3.2);
+  for(let k=0;k<3;k++)branch(R,x-s*.3,y+s*.15,Math.PI*.8+rd(R,-.4,.4),s*.8,2,CINK,2.6);
+}
+function heartShape(R,hx,hy,s,tilt){
+  const base=[[0,-.82],[.38,-1.0],[.82,-.72],[.96,-.1],[.7,.55],[.08,1.2],[-.46,.55],[-.98,-.05],[-.84,-.7],[-.42,-1.0]];
+  const co=Math.cos(tilt),sn=Math.sin(tilt);
+  const T=(px,py)=>[hx+(px*co-py*sn)*s,hy+(px*sn+py*co)*s];
+  const outline=chaikin(base.map(p=>T(p[0],p[1])),true,2);
+  for(const [a,b,c] of [[[-.18,-.9],[-.3,-1.45],[-.08,-1.7]],[[.3,-.92],[.52,-1.4],[.8,-1.55]]])
+    sk(R,[T(a[0],a[1]),T(b[0],b[1]),T(c[0],c[1])],{col:MAGR,w:s*.17,a:.75,amp:.8,noDust:true});
+  fillPoly(outline,MAGR,.62);scribFill(R,outline,4,.4,{col:[150,40,38],w:1.1});
+  sk(R,outline.concat([outline[0]]),{col:INK,w:2,a:.85,amp:.8});
+  sk(R,[T(-.1,-.7),T(.1,.1),T(-.05,.7)],{col:[120,30,30],w:1.4,a:.5,amp:.6});
+  return outline;
+}
+function ecgPts(x0,x1,y,amp,beats,R,jit){
+  const pts=[],L=(x1-x0)/beats;
+  const seq=[[0,0],[.12,0],[.18,-.12],[.24,0],[.34,0],[.37,.14],[.4,-1],[.44,.28],[.48,0],[.6,0],[.68,-.22],[.76,0],[1,0]];
+  for(let b=0;b<beats;b++){
+    const o=x0+b*L,j=jit?rd(R,-.07,.07)*L:0,a=jit?rd(R,.85,1.15):1;
+    for(const [t,v] of seq)pts.push([o+t*L+j*t,y+v*amp*a]);
+  }
+  return pts;
+}
+function mast(R,x,yb,h,col){
+  const w=h*.12;
+  sk(R,[[x-w,yb],[x-w*.12,yb-h]],{col,w:2.4,a:.9,amp:.8});
+  sk(R,[[x+w,yb],[x+w*.12,yb-h]],{col,w:2.4,a:.9,amp:.8});
+  const n=9;
+  for(let i=0;i<n;i++){
+    const t0=i/n,t1=(i+1)/n;
+    const l0=x-w*(1-t0*.88),r0=x+w*(1-t0*.88),l1=x-w*(1-t1*.88),r1=x+w*(1-t1*.88);
+    const y0=yb-h*t0,y1=yb-h*t1;
+    sk(R,[[l0,y0],[r1,y1]],{col,w:1.2,a:.7,amp:.4});
+    sk(R,[[r0,y0],[l1,y1]],{col,w:1.2,a:.7,amp:.4});
+    sk(R,[[l1,y1],[r1,y1]],{col,w:1.2,a:.7,amp:.3});
+  }
+  for(const dx of[-w*.4,0,w*.4]){
+    const px=x+dx,pan=[[px-4,yb-h-22],[px+4,yb-h-22],[px+4,yb-h+16],[px-4,yb-h+16]];
+    fillPoly(pan,[222,222,214],.95);sk(R,pan.concat([pan[0]]),{col,w:1.3,a:.8,amp:.3});
+  }
+  sk(R,[[x,yb-h-22],[x,yb-h-54]],{col,w:1.6,a:.8,amp:.3});
+  dotF(R,x,yb-h-58,3.2,.9,MAGR);
+}
+function signalArcs(R,x,y,r0,r1,step,ymin,ymax,a0){
+  for(let r=r0,i=0;r<=r1;r+=step,i++){
+    const pts=[];
+    for(let t=Math.PI;t<=TAU;t+=.03){
+      const px=x+Math.cos(t)*r,py=y+Math.sin(t)*r;
+      if(px>70&&px<1530&&py>ymin&&py<ymax)pts.push([px,py]);
+      else if(pts.length>1){sk(R,pts.slice(),{col:ELEC,w:1.2,a:Math.max(.08,a0-r/2400),amp:.8});pts.length=0}
+      else pts.length=0;
+    }
+    if(pts.length>1)sk(R,pts,{col:ELEC,w:1.2,a:Math.max(.08,a0-r/2400),amp:.8});
+  }
+}
+function needle(R,cx,cy,ang,len,a,ghost){
+  const co=Math.sin(ang),sn=-Math.cos(ang),px=-sn,py=co;
+  const tip=[cx+co*len,cy+sn*len],tail=[cx-co*len,cy-sn*len];
+  const l=[cx+px*22,cy+py*22],r=[cx-px*22,cy-py*22];
+  const nh=[tip,l,r],sh=[tail,l,r];
+  if(!ghost){fillPoly(nh,MAGR,.9);fillPoly(sh,[246,242,232],.95)}
+  sk(R,nh.concat([nh[0]]),{col:ghost?MAGR:INK,w:ghost?1.4:1.8,a,amp:.4});
+  sk(R,sh.concat([sh[0]]),{col:INK,w:ghost?1.2:1.6,a:ghost?a*.6:a,amp:.4});
+}
+
+// P0 · iron filings around a magnet ------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+0);
+  sheet(R,-26,-40,1626,TOTALH+40,PAPER,{rough:14});
+  write(R,'veld',800,205,130,{a:.88,cen:true});
+  write(R,'een muur over krachten die je niet ziet',800,262,24,{a:.7,cen:true});
+  const cx=800,cy=690,d=150;
+  // the magnet: red north, blue south
+  const nP=[[cx-186,cy-44],[cx,cy-44],[cx,cy+44],[cx-186,cy+44]],sP=[[cx,cy-44],[cx+186,cy-44],[cx+186,cy+44],[cx,cy+44]];
+  fillPoly(nP,MAGR,.9);scribFill(R,nP,4,.35,{col:[140,36,32],w:1.1});
+  fillPoly(sP,ELEC,.9);scribFill(R,sP,4,.35,{col:[40,90,150],w:1.1});
+  sk(R,[[cx-186,cy-44],[cx+186,cy-44],[cx+186,cy+44],[cx-186,cy+44],[cx-186,cy-44]],{col:INK,w:2.2,a:.85,amp:.8});
+  sk(R,[[cx,cy-44],[cx,cy+44]],{col:INK,w:1.6,a:.7,amp:.4});
+  write(R,'n',cx-96,cy+14,40,{col:CINK,a:.9,cen:true});write(R,'z',cx+96,cy+14,40,{col:CINK,a:.9,cen:true});
+  // the filings, laid down from the magnet outward
+  filings(R,magField(cx,cy,d),cx,cy,660,380,9500,{ref:1/(250*250),skip:(x,y)=>(Math.abs(x-cx)<196&&Math.abs(y-cy)<54)||(y<322&&Math.abs(x-800)<440)||y>1040});
+  spark(R,cx,cy,24,{col:LAMPW,a:.95,w:2.2,nR:8});
+  restless(cx-60,cy-60,120,120,RR=>spark(RR,cx,cy,24,{col:LAMPW,a:.95,w:2.2,nR:ri(RR,7,11)}));
+  // the key to the whole wall
+  write(R,'drie soorten lijn in deze muur',800,1086,20,{a:.65,cen:true});
+  const ly=1140;
+  sk(R,[[330,ly-6],[410,ly-7]],{w:2.6,a:.9,amp:.8});write(R,'gemeten',430,ly,22,{a:.85});
+  dashLine(R,[[690,ly-6],[770,ly-7]],{w:2.4,a:.9,amp:.4},1,1,6);write(R,'vermoed',790,ly,22,{a:.85});
+  sk(R,spiralPts(1080,ly-10,12,2,2.2,1.2),{w:1.5,a:.75,amp:.3});write(R,'een vraag',1110,ly,22,{a:.8});
+  drip(R,1260,-6,rd(R,70,100),shade(PAPER,.3),.6,2.4);
+  drip(R,330,-6,rd(R,40,70),shade(PAPER,.25),.5,2);
+  whispers(R,330,1000,false,3);
+});
+
+// P1 · light is a wave in a field ------------------------------------------------
+const SPK=Math.log(18.75)/1400;
+const spPhase=x=>TAU/(300*SPK)*(Math.exp(SPK*(x-100))-1);
+const spAmp=x=>74*(1-.8*(x-100)/1400);
+function specWave(R,x0,x1,col,w,a,ph=0,yc=560){
+  const pts=[];for(let x=x0;x<=x1;x+=2)pts.push([x,yc+Math.sin(spPhase(x)+ph)*spAmp(x)]);
+  sk(R,pts,{col,w,a,amp:.5});
+}
+const VIS=[[214,70,60],[232,130,60],[236,196,70],[110,190,100],[70,170,200],[84,110,200],[140,96,190]];
+P.push(function(){
+  const R=stream(SEED*101+1);
+  sheet(R,40,30,1560,1170,NIGHT,{rough:16,rot:.003});
+  const stars=[];for(let i=0;i<260;i++)stars.push([rd(R,90,1510),rd(R,50,1140),rd(R,.5,1.4),rd(R,.1,.4)]);
+  dustBatch(stars,CINK);
+  write(R,'licht is een golf in een veld',800,175,46,{col:CINK,a:.9,cen:true});
+  write(R,'van heel lang tot heel kort, steeds hetzelfde',800,228,22,{col:CINK,a:.7,cen:true});
+  const bands=[['radio',100,430,[190,196,214]],['microgolf',430,650,[220,150,170]],['infrarood',650,860,[220,104,76]],
+    ['licht',860,960,null],['uv',960,1140,VIOLET],['roentgen',1140,1330,ELEC],['gamma',1330,1500,[206,232,255]]];
+  for(const [nm,x0,x1,col] of bands){
+    if(col)specWave(R,x0,x1,col,2.2,.88);
+    else{const n=VIS.length,dx=(x1-x0)/n;for(let k=0;k<n;k++)specWave(R,x0+k*dx-(k?1:0),x0+(k+1)*dx,VIS[k],3.4,.95)}
+    write(R,nm,(x0+x1)/2,742,19,{col:CINK,a:.8,cen:true});
+    sk(R,[[x0,650],[x0,690]],{col:CINK,w:1.2,a:.5,amp:.3});
+  }
+  sk(R,[[1500,650],[1500,690]],{col:CINK,w:1.2,a:.5,amp:.3});
+  write(R,'dit zien wij',910,415,20,{col:CINK,a:.85,cen:true});
+  sk(R,[[910,430],[910,470]],{col:CINK,w:1.6,a:.8,amp:.5});arrowHead(R,910,478,Math.PI/2,10,.8,CINK,1.6);
+  restless(850,470,120,180,RR=>{const ph=rd(RR,0,TAU);for(let k=0;k<7;k++)specWave(RR,860+k*14.3,860+(k+1)*14.3,VIS[k],3,.55,ph)});
+  note(R,'m',140,860,'alles wat wij zien, is deze smalle streep',24,true);
+  note(R,'m',140,925,'bijen zien ook uv, dat voor ons onzichtbaar blijft',24,true);
+  note(R,'m',140,990,'masten en telefoons werken in de radio- en microgolven',24,true);
+  whispers(R,100,1100,true,4);
+});
+
+// P2 · the sky is full of fields --------------------------------------------------
+function coronaLoop(R,sx,sy,sr,a1,sp,col,w,a){
+  const a2=a1+sp;
+  const p1=[sx+Math.cos(a1)*sr*.97,sy+Math.sin(a1)*sr*.97],p2=[sx+Math.cos(a2)*sr*.97,sy+Math.sin(a2)*sr*.97];
+  const am=(a1+a2)/2,nx=Math.cos(am),ny=Math.sin(am),c=Math.hypot(p2[0]-p1[0],p2[1]-p1[1]),hh=c*rd(R,.75,1.15),pts=[];
+  for(let t=0;t<=1.001;t+=.05){
+    const bx=p1[0]+(p2[0]-p1[0])*t,by=p1[1]+(p2[1]-p1[1])*t,h=Math.sin(Math.PI*t)*hh;
+    pts.push([bx+nx*h,by+ny*h]);
+  }
+  sk(R,pts,{col,w,a,amp:.6,taper:'both'});
+}
+P.push(function(){
+  const R=stream(SEED*101+2);
+  sheet(R,40,30,1560,1170,SPACE,{rough:16,rot:-.003});
+  const st=[];for(let i=0;i<420;i++)st.push([rd(R,90,1510),rd(R,50,1140),rd(R,.5,1.6),rd(R,.1,.55)]);
+  dustBatch(st,CINK);
+  write(R,'het heelal is vol velden',800,150,46,{col:CINK,a:.9,cen:true});
+  // the sun, with the loops of its field and the spiral it winds into space
+  const sx=420,sy=570,sr=110;
+  for(let j=0;j<5;j++){
+    const th0=j*TAU/5,dots=[];
+    for(let t=0;t<1;t+=.012){const r=sr+22+330*t,th=th0+t*2.1;dots.push([sx+Math.cos(th)*r,sy+Math.sin(th)*r,rd(R,1,2.1),(1-t)*.7+.2])}
+    dustBatch(dots,[140,196,246],60);
+  }
+  const sun=circ(R,sx,sy,sr);
+  fillPoly(sun,SUNC,.92);scribFill(R,sun,4,.5,{col:[252,206,120],w:1.2});
+  sk(R,sun.concat([sun[0]]),{col:[255,226,150],w:2,a:.8,amp:.8});
+  const loops=(RR,n)=>{for(let k=0;k<n;k++){coronaLoop(RR,sx,sy,sr,rd(RR,0,TAU),rd(RR,.18,.9),pk(RR,[[255,226,150],LAMPW,[255,190,100]]),rd(RR,1.2,2.4),rd(RR,.5,.9))}};
+  loops(R,34);
+  restless(140,280,560,580,RR=>loops(RR,3));
+  // a galaxy, with a field that follows its arms
+  const gx0=1170,gy0=570,rot=-.35,flat=.62;
+  const G2=(r,th)=>{const u=Math.cos(th)*r,v=Math.sin(th)*r*flat;return[gx0+u*Math.cos(rot)-v*Math.sin(rot),gy0+u*Math.sin(rot)+v*Math.cos(rot)]};
+  const warm=[],cool=[];
+  for(let k=0;k<1100;k++){const r=Math.abs(rd(R,0,1)+rd(R,0,1)+rd(R,0,1)-1.5)*110,th=rd(R,0,TAU),p=G2(r,th);warm.push([p[0],p[1],rd(R,.7,2.2),rd(R,.3,.9)])}
+  for(let arm=0;arm<2;arm++)for(let t=0;t<1;t+=.0025){
+    const r=26+330*Math.pow(t,.95),th=arm*Math.PI+t*4.3;
+    for(let k=0;k<6;k++){const sp=10+34*t,p=G2(r+rd(R,-sp,sp),th+rd(R,-.14,.14));cool.push([p[0],p[1],rd(R,.6,1.9),rd(R,.3,.85)*(1-t*.45)])}
+  }
+  dustBatch(cool,[200,216,246]);dustBatch(warm,[250,226,170]);
+  for(let arm=0;arm<2;arm++)for(const off of[-16,0,16]){
+    const pts=[];for(let t=.06;t<1;t+=.02){const r=26+330*Math.pow(t,.95)+off*(.4+t),th=arm*Math.PI+t*4.3;pts.push(G2(r,th))}
+    sk(R,pts,{col:ELEC,w:1.2,a:.55,amp:.8,taper:'both'});
+  }
+  note(R,'m',90,890,['sterren zijn geladen gas,','met velden die lussen vormen'],20,true);
+  note(R,'m',90,970,'de zon draait haar veld tot een spiraal',20,true);
+  note(R,'m',850,890,'bijna alles wat we van ver weten, kwam als licht',20,true);
+  note(R,'m',850,935,'elektromagnetisme houdt atomen bij elkaar, ook jou',20,true);
+  note(R,'q',850,980,['waar de velden van sterrenstelsels vandaan','komen, weet niemand precies'],20,true);
+  whispers(R,100,1100,true,4);
+});
+
+// P3 · the earth is a magnet --------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+3);
+  sheet(R,40,30,1560,1170,DUSK,{rough:16,rot:.003});
+  const st=[];for(let i=0;i<300;i++)st.push([rd(R,90,1510),rd(R,50,1140),rd(R,.5,1.5),rd(R,.1,.5)]);
+  dustBatch(st,CINK);
+  write(R,'de aarde is een magneet',800,140,46,{col:CINK,a:.9,cen:true});
+  const gx=800,gy=540,gr=110,tilt=.22;
+  [1.7,2.2,2.9,3.7,4.6].forEach((k,i)=>{
+    for(const side of[-1,1]){
+      const pts=dipLine(gx,gy,gr*k,tilt,side,gr*1.02);
+      sk(R,pts,{col:ELEC,w:1.6,a:.8-i*.08,amp:.8});
+      arrowOn(R,pts,.3,ELEC,.7);
+    }
+  });
+  // the globe
+  const gl=circ(R,gx,gy,gr);
+  fillPoly(gl,[44,84,120],.95);scribFill(R,gl,4,.3,{col:[90,140,180],w:1});
+  for(let k=0;k<6;k++){const a=rd(R,0,TAU),d=rd(R,0,gr*.6),c=hblob(R,gx+Math.cos(a)*d,gy+Math.sin(a)*d,rd(R,18,40),rd(R,12,28));fillPoly(c,[110,150,96],.8)}
+  sk(R,gl.concat([gl[0]]),{col:CINK,w:1.8,a:.8,amp:.7});
+  const aurora=(RR,both)=>{
+    for(const north of(both?[true,false]:[true])){
+      const ang0=(north?-Math.PI/2:Math.PI/2)+tilt,a0=ang0-.62,a1=ang0+.62,arc=[];
+      for(let a=a0;a<=a1;a+=.05)arc.push([gx+Math.cos(a)*(gr+9),gy+Math.sin(a)*(gr+9)]);
+      sk(RR,arc,{col:AURORA,w:6,a:north?.6:.35,amp:.8,taper:'both',noDust:true});
+      for(let a=a0+.05;a<=a1-.05;a+=.04){
+        const len=rd(RR,18,56)*(1-Math.abs(a-ang0)/.75)*(north?1:.6),ox=Math.cos(a),oy=Math.sin(a);
+        sk(RR,[[gx+ox*(gr+10),gy+oy*(gr+10)],[gx+ox*(gr+10+len),gy+oy*(gr+10+len)]],{col:AURORA,w:2.2,a:rd(RR,.3,.65)*(north?1:.6),amp:.6,taper:'out',noDust:true});
+      }
+    }
+  };
+  aurora(R,true);
+  restless(gx-140,gy-gr-90,280,110,RR=>aurora(RR,false));
+  // a flock on its way, in the field it follows
+  for(let k=0;k<=9;k++)for(const sd of(k?[-1,1]:[0])){
+    const bx=1350-k*34+rd(R,-5,5),by=330+sd*k*15+rd(R,-5,5);
+    birdM(R,bx,by,11+(9-k)*.6,CINK,.85);
+  }
+  // two small studies
+  scrap(R,300,925,440,290,[240,234,216],-.03);
+  robin(R,290,915,50);
+  capM(R,'m','roodborstje',300,1043,18,false);
+  scrap(R,1300,925,440,290,[240,234,216],.03);
+  eyeSketch(R,1190,885,64);
+  const zx=1380,zy=930,zr=58;
+  ell(R,zx,zy,zr,zr,{col:INK,w:1.6,a:.8,amp:.4});
+  dashLine(R,[[1240,900],[zx-zr*.8,zy-zr*.5]],{col:INK,w:1.2,a:.6,amp:.3},1,1,6);
+  dashLine(R,[[1240,920],[zx-zr*.7,zy+zr*.6]],{col:INK,w:1.2,a:.6,amp:.3},1,1,6);
+  for(const [ex,ey,up] of[[zx-20,zy,-1],[zx+20,zy,1]]){
+    dotF(R,ex,ey,5.5,.95,ELEC);
+    sk(R,[[ex,ey+up*10],[ex,ey+up*34]],{col:INK,w:1.6,a:.8,amp:.2});arrowHead(R,ex,ey+up*36,up*Math.PI/2,7,.8,INK,1.4);
+  }
+  dashLine(R,A_(zx,zy-6,20,12,Math.PI,TAU,10),{col:ELEC,w:1.4,a:.8,amp:.2},1,1,4);
+  capM(R,'v','cryptochroom',1300,1043,18,false);
+  note(R,'m',570,850,'de aarde draagt een veld, overal',18,true);
+  note(R,'m',570,895,'vogels kiezen hun richting op dat veld',18,true);
+  note(R,'v',570,940,['hoe ze het voelen: waarschijnlijk een','molecuul in het oog, misschien ook','ijzer in de snavel'],18,true);
+  whispers(R,100,780,true,3);
+});
+
+// P4 · bee and flower ----------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+4);
+  sheet(R,50,40,1550,1160,HONEY,{rough:14,rot:.003});
+  write(R,'bij en bloem voelen elkaar voor ze elkaar raken',800,135,34,{a:.88,cen:true});
+  const fx=420,fy=560,fs=92;
+  for(let i=0;i<5;i++){
+    ell(R,fx,fy,fs*1.7+i*58,fs*1.5+i*52,{col:ELEC,w:1.2,a:.5-i*.08,amp:1.4});
+  }
+  for(let k=0;k<14;k++){const a=k/14*TAU,r=fs*1.75+rd(R,-10,10);minusSign(R,fx+Math.cos(a)*r,fy+Math.sin(a)*r,5,ELEC,.7)}
+  flowerDraw(R,fx,fy,fs);
+  // field lines drawn between them: the pull before the touch
+  const bx=930,by=470;
+  for(let k=0;k<5;k++){
+    const t=k-2,pts=[];
+    for(let u=0;u<=1.001;u+=.1){const x=fx+fs*1.2+(bx-fs*1.2-fx-fs*1.2)*u,y=fy-fs*.3+(by-fy+fs*.3)*u+Math.sin(u*Math.PI)*t*28;pts.push([x,y])}
+    sk(R,pts,{col:ELEC,w:1.3,a:.55,amp:1,taper:'both'});arrowOn(R,pts,.6,ELEC,.6,8);
+  }
+  beeDraw(R,bx,by,60,Math.PI+.12);
+  for(let k=0;k<9;k++){const a=rd(R,0,TAU),r=rd(R,70,110);plusSign(R,bx+Math.cos(a)*r,by+Math.sin(a)*r,5,MAGR,.8)}
+  restless(bx-80,by-110,170,220,RR=>{for(const sd of[-1,1]){const w=ePts(bx+10,by+sd*60,48,17,sd*(.3+rd(RR,-.35,.35)));sk(RR,w.concat([w[0]]),{col:INK,w:1.1,a:.5,amp:.4})}});
+  // hairs bending in the field
+  scrap(R,1330,310,400,300,[250,244,226],.03);
+  sk(R,wave0(1160,1500,400,3,.03),{col:INK,w:2.4,a:.8,amp:.6});
+  for(let k=0;k<15;k++){
+    const hx=1180+k*21,bend=34+k*.7,h=rd(R,50,76),pts=[];
+    for(let u=0;u<=1.001;u+=.12)pts.push([hx+bend*u*u*(.9+u*.2),400-h*u]);
+    sk(R,pts,{col:[120,90,50],w:1.5,a:.85,amp:.3,taper:'out'});
+  }
+  sk(R,[[1190,240],[1380,240]],{col:ELEC,w:2.2,a:.8,amp:.8});arrowHead(R,1386,240,0,12,.8,ELEC,2);
+  capM(R,'m','haartjes buigen mee',1330,452,17,false);
+  note(R,'m',720,780,'een bij draagt lading, een bloem ook',22,false);
+  note(R,'m',720,830,'bijen voelen die velden met hun haartjes',22,false);
+  note(R,'v',720,880,'misschien ook het veld van de aarde, als kompas',22,false);
+  note(R,'q',720,930,['hoeveel een bij er echt mee navigeert,','wordt nog uitgezocht'],22,false);
+  whispers(R,160,1100,false,4);
+});
+
+// P5 · the brain is electric -------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+5);
+  sheet(R,40,30,1560,1192,NIGHT,{rough:16,rot:-.003});
+  write(R,'het brein is elektrisch',800,135,46,{col:CINK,a:.9,cen:true});
+  // a brain, in profile, folded onto itself
+  const bc=[430,470],brain=hblob(R,bc[0],bc[1],255,175);
+  const cb=hblob(R,bc[0]+120,bc[1]+160,92,52),stem=chaikin([[bc[0]+8,bc[1]+110],[bc[0]+52,bc[1]+110],[bc[0]+46,bc[1]+190],[bc[0]+34,bc[1]+245],[bc[0]+12,bc[1]+235],[bc[0]+16,bc[1]+180]],true,2);
+  fillPoly(stem,[100,78,112],.6);sk(R,stem.concat([stem[0]]),{col:CINK,w:1.6,a:.6,amp:.5});
+  fillPoly(cb,[100,78,112],.6);
+  for(let k=0;k<9;k++)sk(R,[[bc[0]+40,bc[1]+150+k*5-12],[bc[0]+200,bc[1]+150+k*5-12]],{col:CINK,w:1,a:.35,amp:1.2});
+  sk(R,cb.concat([cb[0]]),{col:CINK,w:1.8,a:.7,amp:.7});
+  fillPoly(brain,[112,88,124],.7);
+  for(let k=0;k<70;k++){
+    let x=rd(R,bc[0]-240,bc[0]+240),y=rd(R,bc[1]-180,bc[1]+180);
+    if(!inPoly(brain,x,y))continue;
+    const pts=[[x,y]];let a=rd(R,0,TAU);
+    for(let s2=0;s2<11;s2++){a+=(fbm(x*.02,y*.02,s2,2)-.5)*2.2;x+=Math.cos(a)*13;y+=Math.sin(a)*13;if(!inPoly(brain,x,y))break;pts.push([x,y])}
+    if(pts.length>2)sk(R,pts,{col:CINK,w:1.3,a:.5,amp:.6});
+  }
+  sk(R,brain.concat([brain[0]]),{col:CINK,w:2,a:.8,amp:1});
+  for(let k=0;k<6;k++){const p=[bc[0]+rd(R,-170,170),bc[1]+rd(R,-110,110)];if(inPoly(brain,p[0],p[1]))spark(R,p[0],p[1],rd(R,8,14),{col:ELEC,a:.85,w:1.4,nR:6})}
+  restless(bc[0]-250,bc[1]-190,500,380,RR=>{for(let k=0;k<4;k++){const px=bc[0]+rd(RR,-170,170),py=bc[1]+rd(RR,-110,110);if(inPoly(brain,px,py))spark(RR,px,py,rd(RR,8,15),{col:ELEC,a:.85,w:1.4,nR:ri(RR,5,8)})}});
+  // one cell, drawn large; the signal runs down its long arm
+  const nx=1010,ny=470;
+  neuron(R,nx,ny,110);
+  const ax=[[nx+50,ny+20],[nx+170,ny+90],[nx+300,ny+80],[nx+420,ny+170],[nx+480,ny+250]];
+  const axs=chaikin(ax,false,2);
+  sk(R,axs,{col:CINK,w:4,a:.85,amp:1,noDust:true});
+  for(let k=1;k<axs.length-4;k+=4){const a2=axs[k],b2=axs[k+2];const m=ePts((a2[0]+b2[0])/2,(a2[1]+b2[1])/2,18,7,Math.atan2(b2[1]-a2[1],b2[0]-a2[0]),12);fillPoly(m,[150,120,170],.6);sk(R,m.concat([m[0]]),{col:CINK,w:1,a:.5,amp:.3})}
+  for(let k=0;k<4;k++){const e=axs[axs.length-1];const a=Math.PI/2+rd(R,-.9,.9);sk(R,[[e[0],e[1]],[e[0]+Math.cos(a)*40,e[1]+Math.sin(a)*40]],{col:CINK,w:2,a:.8,amp:.4,taper:'out'});dotF(R,e[0]+Math.cos(a)*44,e[1]+Math.sin(a)*44,4,.8,CINK)}
+  const sp=axs[Math.floor(axs.length*.45)];
+  spark(R,sp[0],sp[1],13,{col:ELEC,a:.95,w:1.8,nR:6});
+  restless(nx+120,ny+20,380,300,RR=>{const q=axs[ri(RR,2,axs.length-3)];spark(RR,q[0],q[1],13,{col:ELEC,a:.95,w:1.8,nR:ri(RR,5,8)})});
+  // the rhythms they make together
+  const eeg=[['delta',3,40],['theta',7,32],['alfa',12,26],['beta',22,20],['gamma',44,13]];
+  eeg.forEach(([nm,f,amp],i)=>{
+    const y=800+i*52;
+    write(R,nm,90,y+6,18,{col:CINK,a:.75});
+    const pts=[];
+    for(let x=220;x<=1480;x+=3){const ph=x/1260*f*TAU;pts.push([x,y+Math.sin(ph)*amp*.5*(1+.35*Math.sin(x*.011+i))+(fbm(x*.01,i,5,2)-.5)*amp*.4])}
+    sk(R,pts,{col:ELEC,w:1.7,a:.85,amp:.3});
+  });
+  note(R,'m',140,1090,'zenuwcellen vuren met een kleine spanning, samen maken ze ritmes',20,true);
+  note(R,'m',140,1128,'die velden werken terug op de cellen om zich heen',20,true);
+  note(R,'q',140,1166,'wat dat met wat je ervaart te maken heeft, is open',20,true);
+  whispers(R,100,780,true,3);
+});
+
+// P6 · the heart makes a field --------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+6);
+  sheet(R,50,40,1550,1186,WARM,{rough:14,rot:-.003});
+  write(R,'het hart maakt een veld',800,105,42,{a:.88,cen:true});
+  const hx=800,hy=490,hs=100,tilt=.2;
+  // the loops close on themselves: the shape of a doughnut seen from the side
+  const loops=(RR,ks,a0)=>{ks.forEach((k,i)=>{for(const side of[-1,1]){
+    const pts=dipLine(hx,hy,hs*k,tilt,side,hs*.55);
+    sk(RR,pts,{col:ELEC,w:1.6,a:a0-i*.06,amp:.8});
+    arrowOn(RR,pts,.32,ELEC,a0*.8,9);
+  }})};
+  loops(R,[1.5,1.9,2.4,2.9,3.4],.8);
+  for(let i=0;i<3;i++)sk(R,ePts(hx,hy+10,hs*(1.5+i*.7),hs*(.34+i*.12),tilt,36).concat([ePts(hx,hy+10,hs*(1.5+i*.7),hs*(.34+i*.12),tilt,36)[0]]),{col:ELEC,w:1,a:.22,amp:.8});
+  heartShape(R,hx,hy,hs*.9,tilt);
+  spark(R,hx-12,hy-hs*.2,18,{col:LAMPW,a:.95,w:2,nR:7});
+  restless(hx-340,140,680,680,RR=>loops(RR,[rd(RR,1.7,3.3)],.5));
+  // the electric side of it, one beat after another
+  const ey=935;
+  write(R,'ecg',100,ey+6,20,{a:.8});
+  sk(R,ecgPts(200,1480,ey,62,6,R,false),{col:MAGR,w:2.4,a:.9,amp:.4,noDust:true});
+  restless(190,ey-80,1300,160,RR=>sk(RR,ecgPts(200,1480,ey,62,6,RR,true),{col:MAGR,w:2.2,a:.5,amp:.4,noDust:true}));
+  note(R,'m',140,1040,'bij elke slag loopt er een elektrisch signaal over het hart (ecg)',20,false);
+  note(R,'m',140,1078,'en een magnetisch veld, meetbaar buiten het lichaam (mcg)',20,false);
+  note(R,'m',140,1116,'de veldlijnen sluiten zich in een lus, zoals bij elke magneet',20,false);
+  note(R,'q',140,1154,'of dat veld iets doorgeeft aan wie dichtbij is, weten we niet',20,false);
+  whispers(R,160,800,false,3);
+});
+
+// P7 · is dna an antenna? ----------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+7);
+  sheet(R,40,30,1560,1170,DEEPV,{rough:16,rot:.003});
+  const st=[];for(let i=0;i<220;i++)st.push([rd(R,90,1510),rd(R,50,1140),rd(R,.5,1.3),rd(R,.1,.4)]);
+  dustBatch(st,CINK);
+  write(R,'is dna ook een antenne?',800,140,46,{col:CINK,a:.9,cen:true});
+  const hx=800,y0=240,y1=1030,per=200,amp=118;
+  // waves that might be caught: broken lines, because nobody has shown it
+  const arcs=(RR,rs,a0)=>{rs.forEach((r,i)=>{
+    const pts=[];for(let t=Math.PI-.78;t<=Math.PI+.78;t+=.02){const px=1760+Math.cos(t)*r,py=640+Math.sin(t)*r;if(px>700&&py>170&&py<1120)pts.push([px,py])}
+    if(pts.length>2)dashLine(RR,pts,{col:ELEC,w:1.9,a:Math.max(.25,a0-i*.05),amp:.6},2,2,6);
+  })};
+  arcs(R,[880,960,1040,1120,1200,1280],.95);
+  restless(700,170,820,960,RR=>arcs(RR,[rd(RR,860,1300)],.7));
+  // the double helix itself: measured, so solid
+  const seg=(sgn,front)=>{
+    for(let y=y0;y<y1;y+=5){
+      const ph1=(y-y0)/per*TAU,ph2=(y+5-y0)/per*TAU,z=Math.cos((ph1+ph2)/2)*sgn;
+      if((z>0)!==front)continue;
+      sk(R,[[hx+sgn*Math.sin(ph1)*amp,y],[hx+sgn*Math.sin(ph2)*amp,y+5]],{col:sgn>0?ELEC:[220,130,170],w:front?5:2.2,a:front?.95:.45,amp:.2,noDust:true});
+    }
+  };
+  seg(1,false);seg(-1,false);
+  for(let y=y0;y<=y1;y+=17){
+    const ph=(y-y0)/per*TAU,sx=Math.sin(ph)*amp;
+    if(Math.abs(sx)<16)continue;
+    const pr=pk(R,[[GOLD,ELEC],[ROSE,AURORA]]);
+    sk(R,[[hx+sx,y],[hx,y]],{col:pr[0],w:2.4,a:.7,amp:.3});sk(R,[[hx,y],[hx-sx,y]],{col:pr[1],w:2.4,a:.7,amp:.3});
+  }
+  seg(1,true);seg(-1,true);
+  // light that does hit it: uv bends the thread, and cells mend it
+  spark(R,170,330,30,{col:SUNC,a:.95,w:2.4,nR:9});
+  write(R,'uv',170,400,18,{col:CINK,a:.8,cen:true});
+  for(const o of[-26,0,26])sk(R,[[200+o*.2,340+o],[640,610+o*.6]],{col:SUNC,w:2.2,a:.6,amp:1,taper:'out'});
+  sk(R,[[640,590],[660,602],[646,614],[666,626]],{col:VIOLET,w:2.4,a:.9,amp:.2});
+  spark(R,652,606,12,{col:VIOLET,a:.9,w:1.4,nR:6});
+  note(R,'m',90,740,'dna is een dubbele draad, een molecuul',18,true);
+  note(R,'m',90,785,'lading kan er een stukje doorheen lopen',18,true);
+  note(R,'m',90,830,['uv-licht kan de draad beschadigen,','cellen herstellen dat'],18,true);
+  note(R,'v',1010,830,['dat dna ook velden en licht opvangt,','als een antenne: een idee van sommige','onderzoekers, nog niet bewezen'],18,true);
+  note(R,'q',1010,960,['en wat dat zou betekenen,','als het waar bleek te zijn'],18,true);
+  whispers(R,100,1100,true,3);
+});
+
+// P8 · what we add ---------------------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+8);
+  sheet(R,50,40,1550,1192,[234,236,228],{rough:14,rot:.003});
+  write(R,'wat wij er zelf aan toevoegen',800,130,42,{a:.88,cen:true});
+  const hz=860,masts=[[360,420],[900,250],[1370,470]];
+  // their signals, drawn first so the masts stand in front
+  masts.forEach(([x,h],i)=>signalArcs(R,x,hz-h,56,780,52,60,hz-6,.62-i*.04));
+  restless(620,330,560,300,RR=>{const r=rd(RR,100,280);const pts=[];for(let t=Math.PI;t<=TAU;t+=.03)pts.push([900+Math.cos(t)*r,610+Math.sin(t)*r]);sk(RR,pts,{col:ELEC,w:1.4,a:.45,amp:.8})});
+  sk(R,wave0(70,1530,hz,3,.01),{w:2.6,a:.8,amp:1.4});
+  masts.forEach(([x,h])=>mast(R,x,hz,h,INK));
+  // roofs, trees, the small human scale
+  for(let k=0;k<12;k++){
+    const x=rd(R,120,1480);if(masts.some(m=>Math.abs(m[0]-x)<60))continue;
+    const w=rd(R,26,46),h=rd(R,18,28);
+    fillPoly([[x-w/2,hz],[x+w/2,hz],[x+w/2,hz-h],[x-w/2,hz-h]],[246,240,226],.95);
+    sk(R,[[x-w/2,hz],[x-w/2,hz-h],[x,hz-h-w*.35],[x+w/2,hz-h],[x+w/2,hz]],{col:INK,w:1.4,a:.8,amp:.4});
+  }
+  for(let k=0;k<16;k++){const x=rd(R,100,1500),b=hblob(R,x,hz-14,rd(R,9,16),rd(R,12,20));fillPoly(b,[130,160,100],.6);sk(R,[[x,hz],[x,hz-8]],{col:INK,w:1.4,a:.7,amp:.2})}
+  note(R,'m',140,950,'wat vroeger alleen zon en bliksem maakten, maken wij nu zelf',22,false);
+  note(R,'m',140,998,'de signalen van masten liggen ver onder de richtlijnen',22,false);
+  note(R,'m',140,1046,['bij roodborstjes bracht ruis van elektronica in steden','het kompas in de war, niet de masten zelf'],22,false);
+  note(R,'v',140,1126,'dat het ook bijen en vogels raakt, vermoeden sommige onderzoekers',22,false);
+  note(R,'q',140,1170,'wat een heel leven in dit veld doet, wordt nog onderzocht',22,false);
+  whispers(R,160,900,false,3);
+});
+
+// P9 · the needle ---------------------------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+9);
+  sheet(R,50,40,1550,1160,PARCH,{rough:14,rot:-.003});
+  write(R,'de naald voelt wat wij niet voelen',800,135,42,{a:.88,cen:true});
+  const cx=800,cy=560,cr=240;
+  filings(R,(x,y)=>[Math.sin(y*.012+x*.004)*.07,-1],cx,cy,720,470,3600,{ref:1.1,pw:.2,pmin:.35,am:.6,skip:(x,y)=>Math.hypot(x-cx,y-cy)<cr+40||(y<185&&Math.abs(x-800)<560)||y>905});
+  const face=circ(R,cx,cy,cr);
+  fillPoly(face,[248,243,228],.97);
+  sk(R,face.concat([face[0]]),{w:3.2,a:.9,amp:1});
+  ell(R,cx,cy,cr*.88,cr*.88,{w:1.3,a:.6,amp:.8});
+  for(let k=0;k<72;k++){
+    const a=k/72*TAU,l=k%18===0?30:k%9===0?20:k%2===0?12:7,r0=cr*.88;
+    sk(R,[[cx+Math.sin(a)*r0,cy-Math.cos(a)*r0],[cx+Math.sin(a)*(r0-l),cy-Math.cos(a)*(r0-l)]],{w:k%18===0?2:1.2,a:.75,amp:.2});
+  }
+  write(R,'n',cx,cy-cr*.55,38,{col:MAGR,a:.95,cen:true});write(R,'z',cx,cy+cr*.55+30,38,{a:.85,cen:true});
+  write(R,'o',cx+cr*.62,cy+14,38,{a:.85,cen:true});write(R,'w',cx-cr*.62,cy+14,38,{a:.85,cen:true});
+  needle(R,cx,cy,.05,cr*.62,.9,false);
+  dotF(R,cx,cy,7,.95,INK);dotF(R,cx,cy,2.6,1,[246,242,232]);
+  restless(cx-cr,cy-cr,cr*2,cr*2,RR=>needle(RR,cx,cy,rd(RR,-.4,.45),cr*.62,.3,true));
+  note(R,'m',160,1010,'een kompas leest het aardveld, dat dwars door alles heen loopt',22,false);
+  note(R,'v',160,1058,'misschien voelen wij het ook, heel zacht',22,false);
+  note(R,'q',160,1106,'wat zou het zijn, een zintuig dat je nooit gebruikt?',22,false);
+  whispers(R,160,900,false,3);
+});
+
+// P10 · standing in it ----------------------------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+10);
+  sheet(R,40,30,1560,1192,SPACE,{rough:16});
+  write(R,'je staat midden in het veld',800,135,46,{col:CINK,a:.9,cen:true});
+  const hx=800,hy=470,U=1,Mg=U*Math.pow(150,3)/2;
+  filings(R,(x,y)=>{
+    const dx=x-hx,dy=y-hy,r2=dx*dx+dy*dy+400,r=Math.sqrt(r2),mx=0,my=-1,dm=(mx*dx+my*dy)/r;
+    return [Mg*(3*dm*dx/r-mx)/(r2*r),Mg*(3*dm*dy/r-my)/(r2*r)-U];
+  },hx,hy+40,680,330,5200,{col:[226,222,206],ref:1.2,pw:.3,pmin:.3,ox:hx,oy:hy,skip:(x,y)=>Math.abs(x-hx)<46&&y>hy-130&&y<hy+300||y<225||y>850});
+  // a person, small, with a pulse
+  const C=CINK;
+  ell(R,hx,hy-118,15,16,{col:C,w:2.2,a:.9,amp:.3});
+  sk(R,[[hx,hy-100],[hx,hy+10]],{col:C,w:3,a:.9,amp:.4});
+  sk(R,[[hx,hy-80],[hx-28,hy-20]],{col:C,w:2.6,a:.85,amp:.3});sk(R,[[hx,hy-80],[hx+28,hy-20]],{col:C,w:2.6,a:.85,amp:.3});
+  sk(R,[[hx,hy+10],[hx-22,hy+110]],{col:C,w:2.8,a:.9,amp:.4});sk(R,[[hx,hy+10],[hx+22,hy+110]],{col:C,w:2.8,a:.9,amp:.4});
+  spark(R,hx+4,hy-62,16,{col:ELEC,a:.95,w:2,nR:8});
+  restless(hx-34,hy-96,76,76,RR=>spark(RR,hx+4,hy-62,16+rd(RR,0,6),{col:ELEC,a:.95,w:2,nR:ri(RR,7,10)}));
+  note(R,'m',140,880,'het aardveld loopt dwars door je heen',22,true);
+  note(R,'m',140,926,'je eigen hart maakt er een bij',22,true);
+  note(R,'m',140,972,'en elke dag komen er signalen bij die we zelf maken',22,true);
+  note(R,'q',140,1018,'wat dat allemaal samen met een mens doet, is nog niet af',22,true);
+  write(R,'veld · krachten in het onzichtbare · 2026',800,1120,18,{col:CINK,a:.8,cen:true});
+  aword(R,690,1156,13,5,{col:CINK,a:.6});
+  write(R,'(mijn echte handtekening)',830,1162,12,{col:CINK,a:.6});
+  whispers(R,100,860,true,3);
+});
+
+// ---------------------------------------------------------------------------
+// boot
+// ---------------------------------------------------------------------------
+history.scrollRestoration='manual';
+if(!qs.has('y'))scrollTo(0,0);
+let pi=0;
+function genStep(){
+  const t0=performance.now();
+  while(pi<P.length&&performance.now()-t0<24){GEN_DY=pi*PH;P[pi]();GEN_DY=0;pi++}
+  if(pi<P.length)setTimeout(genStep,0);
+  else{
+    GENDONE=true;
+    if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
+  }
+}
+genStep();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
