@@ -36,6 +36,8 @@ MUTED = (180, 172, 158)
 
 SOCIAL_START = "<!-- nunki:social -->"
 SOCIAL_END = "<!-- /nunki:social -->"
+NAV_START = "<!-- nunki:nav -->"
+NAV_END = "<!-- /nunki:nav -->"
 
 
 def load_site() -> dict:
@@ -213,6 +215,9 @@ def clean_for_shot(html: str) -> str:
     html = re.sub(
         re.escape(SOCIAL_START) + r".*?" + re.escape(SOCIAL_END), "", html, flags=re.DOTALL
     )
+    html = re.sub(
+        re.escape(NAV_START) + r".*?" + re.escape(NAV_END), "", html, flags=re.DOTALL
+    )
     return strip_julius(html)
 
 
@@ -369,6 +374,109 @@ def generate_index_og(site: dict, shots: list[Image.Image], out_path: Path, tagl
     canvas.convert("RGB").save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
 
 
+
+# ---------------------------------------------------------------------------
+# Footer-navigatie onderaan elke wand: kleine kaartjes van de andere wanden
+# ---------------------------------------------------------------------------
+
+NAV_CSS = """
+.nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
+  position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
+  filter:drop-shadow(0 -8px 14px rgba(0,0,0,.28));
+  font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.nunki-nav *{box-sizing:border-box}
+.nunki-sheet{position:relative;padding:clamp(2.6rem,6vw,4rem) clamp(1rem,4vw,2.5rem) clamp(2.2rem,5vw,3.2rem);
+  background:radial-gradient(120% 80% at 50% 0%,rgba(255,252,240,.6),transparent 65%),var(--paper);
+  clip-path:polygon(__TORN__)}
+.nunki-sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
+.nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:1.9rem 1.4rem}
+.nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
+.nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
+  background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px rgba(42,37,31,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px color-mix(in srgb,var(--theme,#2a251f) 70%,transparent);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease}
+.nunki-grid li:nth-child(4n+2) .nunki-card{--tilt:.8deg}
+.nunki-grid li:nth-child(4n+3) .nunki-card{--tilt:-.4deg}
+.nunki-grid li:nth-child(4n+4) .nunki-card{--tilt:1.1deg}
+.nunki-card:hover,.nunki-card:focus-visible{transform:rotate(0) translateY(-5px);outline:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(42,37,31,.2),0 22px 30px -16px rgba(42,37,31,.6)}
+.nunki-card:focus-visible{outline:2px solid var(--clay);outline-offset:4px}
+.nunki-tape{position:absolute;top:-9px;left:50%;width:64px;height:19px;margin-left:-32px;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);
+  box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:2}
+.nunki-grid li:nth-child(even) .nunki-tape{transform:rotate(2deg)}
+.nunki-thumb{display:block;position:relative;overflow:hidden;aspect-ratio:800/420;background:#e6d9b6}
+.nunki-thumb::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 1px rgba(42,37,31,.16) inset}
+.nunki-thumb img{display:block;width:100%;height:auto;aspect-ratio:800/420;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.nunki-card:hover .nunki-thumb img,.nunki-card:focus-visible .nunki-thumb img{transform:scale(1.05)}
+.nunki-cap{display:block;padding:.6rem .15rem 0}
+.nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
+.nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center}
+.nunki-home a{color:var(--muted);font-size:.82rem;letter-spacing:.1em;text-decoration:none;border-bottom:1px solid rgba(42,37,31,.2);padding-bottom:2px}
+.nunki-home a:hover,.nunki-home a:focus-visible{color:var(--clay);border-color:var(--clay);outline:none}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img{transition:none}}
+"""
+
+
+def torn_edge(seed: int = 11) -> str:
+    """Deterministische gescheurde bovenrand voor clip-path (x in %, y in px)."""
+    import random
+
+    rnd = random.Random(seed)
+    pts = []
+    n = 46
+    for i in range(n + 1):
+        x = i * 100 / n
+        y = rnd.uniform(1, 13) if 0 < i < n else rnd.uniform(3, 8)
+        pts.append(f"{x:.2f}% {y:.1f}px")
+    pts += ["100% 100%", "0 100%"]
+    return ", ".join(pts)
+
+
+def nav_block(current: dict, pages: list[dict]) -> str:
+    others = sorted((p for p in pages if p["slug"] != current["slug"]), key=lambda p: p["title"].casefold())
+    if not others:
+        return ""
+    items = []
+    for p in others:
+        sub = f'<span class="nunki-sub">{esc(p["subtitle"])}</span>' if p.get("subtitle") else ""
+        items.append(
+            f"""      <li><a class="nunki-card" href="{esc(p["path"])}" style="--theme:{esc(p["theme"])}">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">{esc(p["title"])}</span>{sub}</span>
+      </a></li>"""
+        )
+    css = NAV_CSS.replace("__TORN__", torn_edge())
+    return (
+        f"{NAV_START}\n<style>{css}</style>\n"
+        '<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">\n'
+        '  <p class="nunki-kicker">nog meer wanden</p>\n'
+        '  <ul class="nunki-grid">\n' + "\n".join(items) + "\n  </ul>\n"
+        '  <p class="nunki-home"><a href="/">← alle wanden</a></p>\n'
+        f"</div></nav>\n{NAV_END}"
+    )
+
+
+def inject_nav(html: str, block: str) -> str:
+    html = re.sub(
+        r"\s*" + re.escape(NAV_START) + r".*?" + re.escape(NAV_END), "", html, flags=re.DOTALL
+    )
+    if not block:
+        return html
+    i = html.lower().rfind("</body>")
+    if i == -1:
+        return html + "\n" + block
+    return html[:i] + block + "\n" + html[i:]
+
+
 def abs_url(site: dict, path: str) -> str:
     base = site.get("baseUrl") or ""
     if not base:
@@ -492,6 +600,7 @@ def main() -> None:
     pages: list[dict] = []
     shots: dict[str, Image.Image] = {}
     positions = load_shot_positions()
+    sources: list[tuple[Path, str, dict]] = []
     for d in slug_dirs():
         slug = d.name
         html_path = d / "index.html"
@@ -513,9 +622,12 @@ def main() -> None:
             thumb_path = og_path
             page["thumb"] = page["ogImage"]
         page["ogVersion"] = hashlib.sha1(thumb_path.read_bytes()).hexdigest()[:8]
-        block = social_block(page, site)
-        write_public(html_path, inject_social(html, block))
         pages.append(page)
+        sources.append((html_path, html, page))
+
+    for html_path, html, page in sources:
+        html = inject_social(html, social_block(page, site))
+        write_public(html_path, inject_nav(html, nav_block(page, pages)))
 
     public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]
     payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": public_pages}
