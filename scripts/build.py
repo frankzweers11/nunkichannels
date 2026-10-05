@@ -2,10 +2,14 @@
 """Scan httpdocs/*/index.html, write pages.json, OG images, and social meta in head."""
 from __future__ import annotations
 
+import hashlib
 import json
-import re
-import textwrap
 import os
+import re
+import shutil
+import subprocess
+import tempfile
+import textwrap
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -20,6 +24,10 @@ HTTPDOCS = ROOT / "httpdocs"
 SITE_JSON = HTTPDOCS / "site.json"
 PAGES_JSON = HTTPDOCS / "pages.json"
 OG_DIR = HTTPDOCS / "images" / "og"
+THUMB_DIR = HTTPDOCS / "images" / "thumbs"
+SHOTS_JSON = ROOT / "scripts" / "shots.json"
+CACHE_DIR = ROOT / ".cache" / "shots"
+SHOT_VERSION = "2"  # ophogen om alle screenshots opnieuw te maken
 SKIP_DIRS = {"images", "css", "js", "assets"}
 
 W, H = 1200, 630
@@ -131,7 +139,7 @@ def wrap_text(text: str, font: ImageFont.ImageFont, max_width: int, draw: ImageD
     return lines
 
 
-def generate_og(page: dict, out_path: Path) -> None:
+def generate_og_fallback(page: dict, out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     bg = hex_to_rgb(page["theme"])
     img = Image.new("RGB", (W, H), bg)
@@ -174,9 +182,191 @@ def generate_og(page: dict, out_path: Path) -> None:
         draw.text((margin_x, y), line, font=sub_font, fill=MUTED)
         y += 40
 
-    draw.text((margin_x, H - 56), "Nunki Channels", font=brand_font, fill=accent)
+    draw.text((margin_x, H - 56), "nunkichannels", font=brand_font, fill=accent)
 
     img.save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
+
+
+
+# ---------------------------------------------------------------------------
+# Screenshots van de wanden (headless Chrome) → social cards
+# ---------------------------------------------------------------------------
+
+def find_chrome() -> str | None:
+    candidates = [
+        os.environ.get("NUNKI_CHROME"),
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+        shutil.which("google-chrome"),
+        shutil.which("chromium"),
+        shutil.which("chromium-browser"),
+        shutil.which("chrome"),
+    ]
+    for c in candidates:
+        if c and Path(c).is_file():
+            return c
+    return None
+
+
+def clean_for_shot(html: str) -> str:
+    """HTML zonder social-meta en zonder externe badges (Julius), voor reproduceerbare shots."""
+    html = re.sub(
+        re.escape(SOCIAL_START) + r".*?" + re.escape(SOCIAL_END), "", html, flags=re.DOTALL
+    )
+    return strip_julius(html)
+
+
+def load_shot_positions() -> dict[str, int]:
+    if not SHOTS_JSON.is_file():
+        return {}
+    data = json.loads(SHOTS_JSON.read_text(encoding="utf-8"))
+    return {k: int(v) for k, v in data.items() if not k.startswith("_")}
+
+
+def scroll_injection(html: str, y: int) -> str:
+    """Zet de wand op positie y (zonder echt te scrollen) en activeer de tegels die in beeld komen."""
+    m = re.search(r"const LW=(\d+)", html)
+    lw = int(m.group(1)) if m else 1600
+    k = W / lw
+    inj = (
+        "<style>html,body{overflow:hidden!important;height:100%!important}"
+        f"#wall{{position:fixed!important;left:0;top:{-y * k:.2f}px}}</style>"
+        "<script>if(typeof TILES!=='undefined')TILES.forEach(t=>{"
+        f"if(t.y0>{y}-1300&&t.y0<{y}+{int(H / k) + 200})t.active=true}});</script>"
+    )
+    return html.replace("</body>", inj + "</body>", 1)
+
+
+def capture_page(slug: str, html: str, y: int = 0) -> Image.Image | None:
+    """Screenshot (1200x630) van de wand op scrollpositie y, na het intekenen. Gecachet op inhoud."""
+    clean = clean_for_shot(html)
+    key = hashlib.sha1(f"{SHOT_VERSION}|{y}|{clean}".encode("utf-8")).hexdigest()[:12]
+    cached = CACHE_DIR / f"{slug}-{key}.png"
+    if cached.is_file():
+        return Image.open(cached).convert("RGB")
+
+    chrome = find_chrome()
+    if not chrome:
+        print(f"  ! geen Chrome gevonden, fallback-kaart voor {slug} (zet NUNKI_CHROME)")
+        return None
+
+    with tempfile.TemporaryDirectory() as td:
+        src = Path(td) / "index.html"
+        out = Path(td) / "shot.png"
+        src.write_text(scroll_injection(clean, y) if y else clean, encoding="utf-8")
+        try:
+            subprocess.run(
+                [
+                    chrome,
+                    "--headless=new",
+                    "--disable-gpu",
+                    "--hide-scrollbars",
+                    "--force-device-scale-factor=1",
+                    f"--window-size={W},{H}",
+                    "--virtual-time-budget=20000",
+                    f"--screenshot={out}",
+                    src.as_uri() + "?fast",
+                ],
+                capture_output=True,
+                timeout=120,
+                check=False,
+            )
+        except (subprocess.TimeoutExpired, OSError) as e:
+            print(f"  ! screenshot van {slug} mislukt: {e}")
+            return None
+        if not out.is_file():
+            print(f"  ! screenshot van {slug} mislukt")
+            return None
+        img = Image.open(out).convert("RGB")
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        for old in CACHE_DIR.glob(f"{slug}-*.png"):
+            old.unlink()
+        img.save(cached, "PNG")
+        return img
+
+
+def cover(img: Image.Image, w: int, h: int) -> Image.Image:
+    scale = max(w / img.width, h / img.height)
+    resized = img.resize((max(w, round(img.width * scale)), max(h, round(img.height * scale))), Image.Resampling.LANCZOS)
+    left = (resized.width - w) // 2
+    top = (resized.height - h) // 2
+    return resized.crop((left, top, left + w, top + h))
+
+
+def luminance(img: Image.Image) -> float:
+    px = img.convert("L").resize((1, 1), Image.Resampling.BOX).getpixel((0, 0))
+    return float(px)
+
+
+def generate_og(page: dict, site: dict, shot: Image.Image | None, out_path: Path) -> None:
+    """Social card: screenshot van de wand, met een rustig label onderin."""
+    if shot is None:
+        generate_og_fallback(page, out_path)
+        return
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img = cover(shot, W, H).convert("RGBA")
+
+    band = 150
+    strip = img.crop((0, H - band, W, H))
+    light = luminance(strip) > 128
+    tone = (246, 241, 228) if not light else (42, 37, 31)
+    wash = (24, 20, 17) if not light else (246, 241, 228)
+
+    grad = Image.new("RGBA", (W, band), (*wash, 0))
+    gp = grad.load()
+    for y in range(band):
+        a = int(170 * (y / band) ** 1.6)
+        for x in range(W):
+            gp[x, y] = (*wash, a)
+    img.alpha_composite(grad, (0, H - band))
+
+    draw = ImageDraw.Draw(img)
+    brand = load_font(28, bold=True)
+    small = load_font(24)
+    draw.text((56, H - 62), site["name"], font=brand, fill=(*tone, 235))
+    tag = f"/{page['slug']}/"
+    tw = draw.textlength(tag, font=small)
+    draw.text((W - 56 - tw, H - 60), tag, font=small, fill=(*tone, 190))
+
+    img.convert("RGB").save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
+
+
+def generate_index_og(site: dict, shots: list[Image.Image], out_path: Path, tagline: str) -> None:
+    """Social card voor de homepage: collage van de wanden met een naamplaat."""
+    from PIL import ImageFilter
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    shots = shots[:6]
+    n = len(shots)
+    cols, rows = {1: (1, 1), 2: (2, 1), 3: (2, 2), 4: (2, 2), 5: (3, 2), 6: (3, 2)}[n]
+    gap = 8
+    paper = (238, 227, 197)
+    canvas = Image.new("RGB", (W, H), paper)
+    cw = (W - gap * (cols + 1)) // cols
+    ch = (H - gap * (rows + 1)) // rows
+    for i, shot in enumerate(shots):
+        r, c = divmod(i, cols)
+        tile = cover(shot, cw, ch)
+        canvas.paste(tile, (gap + c * (cw + gap), gap + r * (ch + gap)))
+
+    canvas = canvas.convert("RGBA")
+    pw, ph = 520, 88
+    px, py = (W - pw) // 2, (H - ph) // 2
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).rounded_rectangle([px, py + 8, px + pw, py + ph + 8], 10, fill=(24, 20, 17, 110))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(16))
+    canvas.alpha_composite(shadow)
+
+    plate = ImageDraw.Draw(canvas)
+    plate.rounded_rectangle([px, py, px + pw, py + ph], 8, fill=(246, 241, 228, 255))
+    plate.rounded_rectangle([px + 8, py + 8, px + pw - 8, py + ph - 8], 4, outline=(42, 37, 31, 40), width=1)
+
+    title_font = load_font(58, bold=True)
+    name = site["name"]
+    nw = plate.textlength(name, font=title_font)
+    plate.text((px + (pw - nw) / 2, py + 12), name, font=title_font, fill=(42, 37, 31, 255))
+
+    canvas.convert("RGB").save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
 
 
 def abs_url(site: dict, path: str) -> str:
@@ -230,6 +420,12 @@ def esc(s: str) -> str:
 
 
 def strip_julius(html: str) -> str:
+    html = re.sub(
+        r"\s*<iframe[^>]*data-julius-public-artifact-badge.*?</iframe>",
+        "",
+        html,
+        flags=re.DOTALL,
+    )
     html = re.sub(r"\s*<meta[^>]*data-julius-public-artifact-og[^>]*>", "", html)
     html = re.sub(
         r"\s*<script[^>]*data-julius-public-artifact-analytics[^>]*></script>",
@@ -260,21 +456,69 @@ def inject_social(html: str, block: str) -> str:
     return html
 
 
+def replace_block(html: str, name: str, content: str) -> str:
+    start, end = f"<!-- nunki:{name} -->", f"<!-- /nunki:{name} -->"
+    pattern = re.compile(re.escape(start) + r".*?" + re.escape(end), re.DOTALL)
+    if not pattern.search(html):
+        print(f"  ! marker {start} ontbreekt in index.html")
+        return html
+    return pattern.sub(lambda _m: f"{start}\n{content}\n{end}" if "\n" in content else f"{start}{content}{end}", html)
+
+
+def render_cards(pages: list[dict]) -> str:
+    items = []
+    ordered = sorted(pages, key=lambda p: p["title"].casefold())
+    for i, p in enumerate(ordered):
+        sub = f'<span class="sub">{esc(p["subtitle"])}</span>' if p.get("subtitle") else ""
+        items.append(
+            f'''      <li>
+        <a class="card" href="{esc(p["path"])}" style="--i:{i};--theme:{esc(p["theme"])}">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="{"eager" if i < 3 else "lazy"}" decoding="async"></span>
+          <span class="caption">
+            <span class="no">{i + 1:02d}</span>
+            <span class="name">{esc(p["title"])}</span>
+            <span class="go" aria-hidden="true">→</span>
+            {sub}
+          </span>
+        </a>
+      </li>'''
+        )
+    return "\n".join(items)
+
+
 def main() -> None:
     site = load_site()
     pages: list[dict] = []
+    shots: dict[str, Image.Image] = {}
+    positions = load_shot_positions()
     for d in slug_dirs():
         slug = d.name
         html_path = d / "index.html"
         html = html_path.read_text(encoding="utf-8")
         page = parse_page(slug, html)
         og_path = OG_DIR / f"{slug}.jpg"
-        generate_og(page, og_path)
+        shot = capture_page(slug, html, positions.get(slug, 0))
+        if shot is not None:
+            shots[slug] = shot
+        generate_og(page, site, shot, og_path)
+        # schone thumbnail (zonder label) voor de kaarten op de homepage
+        if shot is not None:
+            THUMB_DIR.mkdir(parents=True, exist_ok=True)
+            thumb_path = THUMB_DIR / f"{slug}.jpg"
+            cover(shot, 800, 420).save(thumb_path, "JPEG", quality=84, optimize=True, progressive=True)
+            os.chmod(thumb_path, 0o644)
+            page["thumb"] = f"/images/thumbs/{slug}.jpg"
+        else:
+            thumb_path = og_path
+            page["thumb"] = page["ogImage"]
+        page["ogVersion"] = hashlib.sha1(thumb_path.read_bytes()).hexdigest()[:8]
         block = social_block(page, site)
         write_public(html_path, inject_social(html, block))
         pages.append(page)
 
-    payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": pages}
+    public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]
+    payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": public_pages}
     write_public(
         PAGES_JSON,
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
@@ -282,14 +526,24 @@ def main() -> None:
 
     index_path = HTTPDOCS / "index.html"
     if index_path.is_file():
+        tagline = "Wanden — getekend, scrollend, levend."
         home = {
             "title": site["name"],
-            "subtitle": "Wanden — getekend, scrollend, levend.",
+            "subtitle": tagline,
             "path": "/",
             "ogImage": "/images/og/index.jpg",
         }
-        generate_og({**home, "slug": "index", "theme": "#13202b"}, OG_DIR / "index.jpg")
+        home_og = OG_DIR / "index.jpg"
+        ordered = sorted(pages, key=lambda p: p["title"].casefold())
+        home_shots = [shots[p["slug"]] for p in ordered if p["slug"] in shots]
+        if home_shots:
+            generate_index_og(site, home_shots, home_og, tagline)
+        else:
+            generate_og_fallback({**home, "slug": "index", "theme": "#13202b"}, home_og)
         html = index_path.read_text(encoding="utf-8")
+        html = replace_block(html, "cards", render_cards(pages))
+        n = len(pages)
+        html = replace_block(html, "count", f"{n} {'wand' if n == 1 else 'wanden'}")
         write_public(
             index_path,
             inject_social(html, social_block(home, site, is_home=True)),

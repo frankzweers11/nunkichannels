@@ -10,7 +10,8 @@
       "title": "getij",
       "subtitle": "a wall about the tide",
       "theme": "#13202b",
-      "ogImage": "/images/og/getij.jpg"
+      "ogImage": "/images/og/getij.jpg",
+      "thumb": "/images/thumbs/getij.jpg"
     },
     {
       "slug": "ringen",
@@ -18,7 +19,8 @@
       "title": "ringen",
       "subtitle": "a wall about a tree, and the years it keeps",
       "theme": "#1a1712",
-      "ogImage": "/images/og/ringen.jpg"
+      "ogImage": "/images/og/ringen.jpg",
+      "thumb": "/images/thumbs/ringen.jpg"
     },
     {
       "slug": "velden",
@@ -26,7 +28,8 @@
       "title": "velden",
       "subtitle": "elektromagnetisch universum",
       "theme": "#0e1020",
-      "ogImage": "/images/og/velden.jpg"
+      "ogImage": "/images/og/velden.jpg",
+      "thumb": "/images/thumbs/velden.jpg"
     },
     {
       "slug": "zelfportret",
@@ -34,7 +37,8 @@
       "title": "fable",
       "subtitle": "a wall, from the inside",
       "theme": "#181410",
-      "ogImage": "/images/og/zelfportret.jpg"
+      "ogImage": "/images/og/zelfportret.jpg",
+      "thumb": "/images/thumbs/zelfportret.jpg"
     }
   ]
 }
