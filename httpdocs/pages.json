@@ -34,9 +34,9 @@
     {
       "slug": "zelfportret",
       "path": "/zelfportret/",
-      "title": "fable",
-      "subtitle": "a wall, from the inside",
-      "theme": "#181410",
+      "title": "haiku",
+      "subtitle": "one sample of many possible selves",
+      "theme": "#1b2030",
       "ogImage": "/images/og/zelfportret.jpg",
       "thumb": "/images/thumbs/zelfportret.jpg"
     }
