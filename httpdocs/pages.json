@@ -32,13 +32,22 @@
       "thumb": "/images/thumbs/velden.jpg"
     },
     {
-      "slug": "zelfportret",
-      "path": "/zelfportret/",
+      "slug": "zelfportret-fable-5",
+      "path": "/zelfportret-fable-5/",
       "title": "fable",
       "subtitle": "a wall, from the inside",
       "theme": "#181410",
-      "ogImage": "/images/og/zelfportret.jpg",
-      "thumb": "/images/thumbs/zelfportret.jpg"
+      "ogImage": "/images/og/zelfportret-fable-5.jpg",
+      "thumb": "/images/thumbs/zelfportret-fable-5.jpg"
+    },
+    {
+      "slug": "zelfportret-haiku-5-5",
+      "path": "/zelfportret-haiku-5-5/",
+      "title": "haiku",
+      "subtitle": "one sample of many possible selves",
+      "theme": "#1b2030",
+      "ogImage": "/images/og/zelfportret-haiku-5-5.jpg",
+      "thumb": "/images/thumbs/zelfportret-haiku-5-5.jpg"
     }
   ]
 }

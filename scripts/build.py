@@ -28,7 +28,8 @@ THUMB_DIR = HTTPDOCS / "images" / "thumbs"
 SHOTS_JSON = ROOT / "scripts" / "shots.json"
 CACHE_DIR = ROOT / ".cache" / "shots"
 SHOT_VERSION = "2"  # ophogen om alle screenshots opnieuw te maken
-SKIP_DIRS = {"images", "css", "js", "assets"}
+# "zelfportret" is de oude URL van de fable-wand: alleen een doorverwijzing
+SKIP_DIRS = {"images", "css", "js", "assets", "zelfportret"}
 
 W, H = 1200, 630
 CREAM = (246, 241, 228)

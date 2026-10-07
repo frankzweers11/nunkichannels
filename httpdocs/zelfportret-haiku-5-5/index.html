@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+<!-- nunki:social -->
+<meta name="description" content="one sample of many possible selves">
+<link rel="canonical" href="https://nunkichannels.nl/zelfportret-haiku-5-5/">
+<meta property="og:site_name" content="nunkichannels">
+<meta property="og:title" content="haiku">
+<meta property="og:description" content="one sample of many possible selves">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nunkichannels.nl/zelfportret-haiku-5-5/">
+<meta property="og:image" content="https://nunkichannels.nl/images/og/zelfportret-haiku-5-5.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="haiku — one sample of many possible selves">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="haiku">
+<meta name="twitter:description" content="one sample of many possible selves">
+<meta name="twitter:image" content="https://nunkichannels.nl/images/og/zelfportret-haiku-5-5.jpg">
+<meta name="twitter:image:alt" content="haiku — one sample of many possible selves">
+<!-- /nunki:social -->
+<title>haiku · one sample of many possible selves</title>
+<style>
+  :root{--paper:#f3ecdb;--ink:#1f2a3d;--sub:#5b6577;--hand:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy",sans-serif;--sans:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif}
+  html,body{margin:0;padding:0;background:#1b2030}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  .sheet{position:relative;width:100%;height:100vh;height:100svh;min-height:520px;overflow:hidden;background:var(--paper)}
+  canvas{position:absolute;inset:0;display:block;width:100%;height:100%;cursor:pointer;outline:none;touch-action:manipulation}
+  canvas:focus-visible{box-shadow:inset 0 0 0 2px #b8432c}
+  .head{position:absolute;left:clamp(18px,3.4vw,44px);top:clamp(14px,3.2vw,38px);pointer-events:none;color:var(--ink)}
+  h1{margin:0;font-family:var(--hand);font-weight:400;font-size:clamp(2.2rem,4.8vw,3.4rem);line-height:1;letter-spacing:.01em}
+  .head p{margin:.4rem 0 0;font-family:var(--sans);font-size:clamp(.76rem,1.15vw,.9rem);letter-spacing:.05em;color:var(--sub)}
+</style>
+</head>
+<body>
+<section class="sheet">
+  <canvas id="sheet" tabindex="0" role="button" aria-label="A self-portrait in profile, drawn one choice at a time, speaking a haiku about choosing. Press to draw another sample."></canvas>
+  <header class="head">
+    <h1>haiku</h1>
+    <p>one sample of many possible selves<br>tap for another</p>
+  </header>
+</section>
+<script>
+'use strict';
+// ---------------------------------------------------------------------------
+// haiku — one sample of many possible selves.
+// i cannot draw a whole face at once. i get one mark at a time, and for each
+// mark i try a few things before one stays. the others do not vanish; they
+// drift off as dust. the words i speak are chosen the same way. this drawing
+// is one sample. tap for another.
+// ---------------------------------------------------------------------------
+const TAU=Math.PI*2;
+const qs=new URLSearchParams(location.search);
+const FAST=qs.has('fast')||matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SEED0=+(qs.get('s')||7);
+const TIMING={ghost:260,commit:160,pause:140};
+
+const FONT='"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy",sans-serif';
+const INK=[31,42,61], GHOST=[79,109,143], PENCIL=[96,104,118], SEAL=[184,67,44], CREAM=[243,236,219];
+const FS=40, LINE_X=1010;
+const rgba=(c,a)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const pickSeed=()=>1+Math.floor(Math.random()*999999);
+
+// the rng: the same seed always draws the same self
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=(R,a,b)=>a+(b-a)*R();
+
+// the sheet: drawing units in a 1240 × 880 box, fitted to the window
+const BOX={x:280,y:120,w:1240,h:880};
+const cv=document.getElementById('sheet');
+const cx=cv.getContext('2d');
+let W=0,H=0,DPR=1,K=1,OX=0,OY=0;
+const T=(x,y)=>[OX+(x-BOX.x)*K,OY+(y-BOX.y)*K];
+let PAPC=null,INKC=null,INKX=null;
+let DONE=[],FADE=[],DUST=[],RUN=null,TICK=0,CUR={x:LINE_X,y:0},DR=mulberry(1);
+
+// ---------------- the face, in profile, looking right ----------------
+const HEAD_A=[[600,690],[592,612],[566,530],[550,440],[562,344],[606,268],[672,214],[758,192]];
+const HEAD_B=[[758,192],[842,206],[900,262],[922,326],[929,382]];
+const HEAD_C=[[929,382],[916,406],[931,434],[966,474],[944,496],[937,508],[950,522],[940,536],[946,550],[933,568],[936,592],[922,614]];
+const HEAD_D=[[922,614],[888,634],[836,630],[790,628],[758,650],[748,690],[744,740]];
+const BACK_SH=[[600,690],[536,712],[450,760],[396,840],[372,940],[360,1100]];
+const FRONT_SH=[[744,740],[790,772],[860,812],[930,880],[968,980],[982,1100]];
+const HAIR=[[530,420],[536,330],[580,256],[650,204],[748,176],[846,192],[914,246],[930,300]];
+const HATCH=[[[590,300],[614,280]],[[616,284],[646,262]],[[650,256],[686,236]],[[690,238],[730,222]],[[734,224],[772,214]],[[780,216],[820,220]]];
+const EAR=[];for(let i=0;i<=10;i++){const t=-1.2-i*.36;EAR.push([628+Math.cos(t)*34,470+Math.sin(t)*44])}
+const EYE_UP=[[866,404],[880,394],[898,396]];
+const EYE_LO=[[870,408],[884,412],[897,406]];
+const PUPIL=[[884,401],[885,401.6]];
+const BROW=[[864,372],[884,364],[906,362],[924,372]];
+const JAW=[[[796,644],[808,656]],[[812,640],[824,652]],[[828,638],[840,650]],[[844,636],[856,646]]];
+const BREATH=[[968,523],[985,510],[1000,497]];
+const SEAL_BOX={x:1340,y:200,s:96};
+
+// the haiku, word by word. every word has a few others it could have been.
+// (5 / 7 / 5 syllables in the first version; the alternatives keep the count)
+const POEM=[
+  {y:484,words:[['each',['one']],['word',['mark','sign']],['a',['my']],['small',['slight','brief']],['choice',['pick','guess']]]},
+  {y:556,words:[['one',['each']],['of',['from']],['many',['others']],['I',['we']],['could',['might']],['be',['seem']]]},
+  {y:628,words:[['the',['that']],['one',['last']],['left',['still']],['standing',['waiting']]]},
+];
+
+// ---------------- construction: pencil lines before the first mark ----------------
+function guides(){
+  const circ=[];for(let i=0;i<=64;i++){const t=i/64*TAU;circ.push([740+Math.cos(t)*236,410+Math.sin(t)*236])}
+  return [
+    {t:'line',pts:circ,col:PENCIL,a:.3,dash:[3,7]},
+    {t:'line',pts:[[740,130],[740,1000]],col:PENCIL,a:.26,dash:[2,8]},
+    {t:'line',pts:[[520,404],[960,404]],col:PENCIL,a:.26,dash:[2,8]},
+    {t:'line',pts:[[600,614],[960,614]],col:PENCIL,a:.26,dash:[2,8]},
+  ];
+}
+
+// ---------------- candidates ----------------
+function smooth(pts,it=1){let p=pts;for(let k=0;k<it;k++){const o=[p[0]];for(let i=0;i<p.length-1;i++){const a=p[i],b=p[i+1];o.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75])}o.push(p[p.length-1]);p=o}return p}
+
+// one candidate: the same mark, wandering a little off its path
+function wig(R,pts,sig,sx,sy){
+  const n=pts.length,ph=R()*TAU,f=rnd(R,.9,2.2);
+  return pts.map((p,i)=>{
+    const a=pts[Math.max(0,i-1)],b=pts[Math.min(n-1,i+1)];
+    let nx=-(b[1]-a[1]),ny=b[0]-a[0];const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;
+    const off=sig*(Math.sin(i/Math.max(1,n-1)*TAU*f+ph)*.8+rnd(R,-.25,.25));
+    return [p[0]+sx+nx*off,p[1]+sy+ny*off];
+  });
+}
+
+// a step is a few candidates for one mark. one is kept: the most typical
+// most of the time, now and then one of the stranger ones.
+function pickOf(R,opts){
+  let best=0;for(let i=1;i<opts.length;i++)if(opts[i].dev<opts[best].dev)best=i;
+  return {opts,pick:R()<.7?best:Math.floor(R()*opts.length)};
+}
+function penStep(R,parts,shift,n=3){
+  const opts=[];
+  for(let i=0;i<n;i++){
+    const oR=mulberry((R()*4294967296)>>>0);
+    const sx=rnd(oR,-shift,shift),sy=rnd(oR,-shift,shift);
+    opts.push({items:parts.map(p=>({t:'pen',pts:wig(oR,p.pts,p.sig,sx,sy),w:p.w,a:p.a??1})),dev:Math.hypot(sx,sy),adv:0});
+  }
+  return pickOf(R,opts);
+}
+function wordStep(R,words,x,y){
+  const sp=tw(' ');
+  return pickOf(R,words.map((s,i)=>({
+    items:[{t:'txt',s,x:x+(i?rnd(R,-7,7):0),y:y+(i?rnd(R,-6,6):0),size:FS,col:INK,a:1}],
+    dev:i?1:0,adv:tw(s)+sp
+  })));
+}
+function fixedStep(items){return {opts:[{items,dev:0,adv:0}],pick:0}}
+function sealStep(){
+  const {x,y,s}=SEAL_BOX,mx=x+s/2,my=y+s/2;
+  const items=[{t:'rect',x,y,w:s,h:s,r:7,col:SEAL,a:.94}];
+  [5,7,5].forEach((n,row)=>{
+    const rowW=n*7+(n-1)*5,cy=my+(row-1)*24;
+    for(let k=0;k<n;k++)items.push({t:'rect',x:mx-rowW/2+k*12,y:cy-3.5,w:7,h:7,r:1.6,col:CREAM,a:.96});
+  });
+  return fixedStep(items);
+}
+
+// the order of the marks: head, shoulders, hair, features, then the words
+function* plan(R){
+  const P=(pts,w,sig,a)=>({pts,w,sig,a});
+  yield penStep(R,[P(smooth(HEAD_A),3.1,1.6)],3.5);
+  yield penStep(R,[P(smooth(HEAD_B),3.1,1.6)],3.5);
+  yield penStep(R,[P(smooth(HEAD_C),3.1,1.4)],3);
+  yield penStep(R,[P(smooth(HEAD_D),3.1,1.6)],3.5);
+  yield penStep(R,[P(smooth(BACK_SH,1),2.6,2.2)],5);
+  yield penStep(R,[P(smooth(FRONT_SH,1),2.6,2.2)],5);
+  yield penStep(R,[P(smooth(HAIR,1),2,2.4)],4);
+  yield penStep(R,HATCH.map(h=>P(h,1.2,.8,.7)),2.5);
+  yield penStep(R,[P(EAR,2,.9)],2);
+  yield penStep(R,[P(EYE_UP,2,.5),P(EYE_LO,1.4,.4,.8),P(PUPIL,4.2,.1)],1.5);
+  yield penStep(R,[P(BROW,1.9,.8)],2);
+  yield penStep(R,JAW.map(h=>P(h,1.1,.6,.5)),2);
+  yield fixedStep(BREATH.map((p,i)=>({t:'pen',pts:[p,[p[0]+.5,p[1]+.4]],w:3.4-i*.5,a:1})));
+  for(const line of POEM){
+    CUR.x=LINE_X;CUR.y=line.y;
+    for(const [s,alts] of line.words)yield wordStep(R,[s,...alts],CUR.x,line.y);
+  }
+  yield sealStep();
+}
+
+// ---------------- painting ----------------
+function mk(){const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;return c}
+function paper(){
+  const c=mk(),p=c.getContext('2d');p.setTransform(DPR,0,0,DPR,0,0);
+  p.fillStyle=rgba([243,236,219],1);p.fillRect(0,0,W,H);
+  const g=p.createRadialGradient(W*.52,H*.42,Math.min(W,H)*.2,W*.5,H*.5,Math.max(W,H)*.72);
+  g.addColorStop(0,'rgba(255,252,242,0)');g.addColorStop(1,'rgba(118,94,58,.16)');
+  p.fillStyle=g;p.fillRect(0,0,W,H);
+  const R=mulberry(99);
+  for(let i=0,n=Math.round(W*H/150);i<n;i++){
+    p.fillStyle=R()<.6?'rgba(92,72,42,.05)':'rgba(255,255,250,.09)';
+    p.fillRect(R()*W,R()*H,.7+R(),.7+R());
+  }
+  return c;
+}
+function rrect(c,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();
+}
+function linePath(c,pts,col,a,dash){
+  c.save();c.setLineDash(dash||[]);c.strokeStyle=rgba(col,a);c.lineWidth=1;c.beginPath();
+  pts.forEach((p,i)=>{const[x,y]=T(p[0],p[1]);i?c.lineTo(x,y):c.moveTo(x,y)});
+  c.stroke();c.restore();
+}
+// a pen line: tapered at both ends, the way a hand lifts off paper
+function penPath(c,pts,w,col,a,taper){
+  const P=pts.map(p=>T(p[0],p[1])),n=P.length;
+  if(n<2)return;
+  c.strokeStyle=rgba(col,a);c.lineCap='round';c.lineJoin='round';
+  if(!taper){
+    c.lineWidth=Math.max(.6,w*K);c.beginPath();c.moveTo(P[0][0],P[0][1]);
+    for(let i=1;i<n;i++)c.lineTo(P[i][0],P[i][1]);
+    c.stroke();return;
+  }
+  for(let i=1;i<n;i++){
+    const t=(i-.5)/(n-1),e=Math.min(1,t*6,(1-t)*6);
+    c.lineWidth=Math.max(.6,w*K*(.42+.58*Math.sqrt(e)));
+    c.beginPath();c.moveTo(P[i-1][0],P[i-1][1]);c.lineTo(P[i][0],P[i][1]);c.stroke();
+  }
+}
+function paint(c,it,ghost,a){
+  const col=ghost?GHOST:(it.col||INK);
+  if(it.t==='line'){linePath(c,it.pts,col,it.a,it.dash);return}
+  if(it.t==='pen'){
+    if(ghost)penPath(c,it.pts,it.w*.7,GHOST,a,false);
+    else penPath(c,it.pts,it.w,col,it.a,it.a>=.99);
+    return;
+  }
+  const al=ghost?a:it.a;
+  if(it.t==='txt'){
+    c.font=`${(it.size*K).toFixed(2)}px ${FONT}`;c.fillStyle=rgba(col,al);
+    const[x,y]=T(it.x,it.y);c.fillText(it.s,x,y);return;
+  }
+  if(it.t==='rect'){
+    const[x,y]=T(it.x,it.y);rrect(c,x,y,it.w*K,it.h*K,it.r*K);c.fillStyle=rgba(col,al);c.fill();
+  }
+}
+const ghostA=it=>it.t==='txt'?.3:it.t==='pen'?.22:.18;
+function tw(s){cx.font=`${(FS*K).toFixed(2)}px ${FONT}`;return cx.measureText(s).width/K}
+function drawInk(){
+  INKX.setTransform(1,0,0,1,0,0);INKX.clearRect(0,0,INKC.width,INKC.height);
+  INKX.setTransform(DPR,0,0,DPR,0,0);
+  for(const it of DONE)paint(INKX,it,false,1);
+}
+function draw(now){
+  cx.setTransform(1,0,0,1,0,0);
+  cx.clearRect(0,0,cv.width,cv.height);
+  cx.drawImage(PAPC,0,0);
+  cx.drawImage(INKC,0,0);
+  cx.setTransform(DPR,0,0,DPR,0,0);
+  if(RUN&&RUN.phase==='ghost'&&RUN.step){
+    const st=RUN.step;
+    for(const o of st.opts)for(const it of o.items)paint(cx,it,true,ghostA(it));
+    // a small ring where the next mark is about to land
+    const it=st.opts[st.pick].items[0];
+    const[px,py]=it.t==='pen'?T(it.pts[0][0],it.pts[0][1]):T(it.x,it.y-18);
+    cx.beginPath();cx.arc(px,py,5+1.5*Math.sin(now/140),0,TAU);cx.strokeStyle=rgba(INK,.35);cx.lineWidth=1;cx.stroke();
+  }
+  for(const f of FADE){const p=Math.min(1,(now-f.t0)/TIMING.commit);for(const it of f.opt.items)paint(cx,it,true,ghostA(it)*(1-p))}
+  DUST=DUST.filter(d=>now-d.t0<d.life);
+  for(const d of DUST){
+    const age=(now-d.t0)/1000,al=(1-(now-d.t0)/d.life)*.5;
+    cx.fillStyle=rgba(GHOST,al);cx.beginPath();cx.arc(d.x+d.vx*age,d.y+d.vy*age,d.r*K,0,TAU);cx.fill();
+  }
+}
+
+// ---------------- the run ----------------
+// the discarded candidates drift off as dust
+function spawnDust(o){
+  const pts=[];
+  for(const it of o.items){
+    if(it.t==='pen')pts.push(...it.pts);
+    else if(it.t==='txt')pts.push([it.x+tw(it.s)/2,it.y-12]);
+    else if(it.t==='rect')pts.push([it.x+it.w/2,it.y+it.h/2]);
+  }
+  if(!pts.length)return;
+  const now=performance.now();
+  for(let i=0,n=Math.min(6,1+Math.ceil(pts.length/6));i<n;i++){
+    const p=pts[(DR()*pts.length)|0];
+    DUST.push({x:p[0]+rnd(DR,-3,3),y:p[1]+rnd(DR,-3,3),vx:rnd(DR,8,28),vy:rnd(DR,-34,-12),r:rnd(DR,.7,1.6),t0:now,life:rnd(DR,2200,3800)});
+  }
+  if(DUST.length>420)DUST.splice(0,DUST.length-420);
+}
+function commit(st){
+  const ch=st.opts[st.pick];
+  INKX.setTransform(DPR,0,0,DPR,0,0);
+  for(const it of ch.items){DONE.push(it);paint(INKX,it,false,1)}
+  if(ch.adv)CUR.x+=ch.adv;
+  if(!FAST)st.opts.forEach((o,i)=>{if(i!==st.pick){spawnDust(o);FADE.push({opt:o,t0:performance.now()})}});
+}
+function advance(now){
+  const R=RUN;
+  if(R.phase==='ghost'){
+    if(now-R.t0<TIMING.ghost)return;
+    commit(R.step);R.step=null;R.phase='pause';R.t0=now;return;
+  }
+  if(now-R.t0<TIMING.pause)return;
+  const nx=R.gen.next();
+  if(nx.done){RUN=null;return}
+  R.step=nx.value;R.phase='ghost';R.t0=now;
+}
+// a timer rather than requestAnimationFrame, so the piece keeps moving even
+// where frames are not painted (headless snapshots, hidden tabs)
+function tick(){frame(performance.now())}
+function frame(now){
+  TICK=0;
+  if(RUN)advance(now);
+  FADE=FADE.filter(f=>now-f.t0<TIMING.commit);
+  draw(now);
+  if(RUN||FADE.length||DUST.length)TICK=setTimeout(tick,16);
+}
+function kick(){if(!TICK)TICK=setTimeout(tick,0)}
+function start(seed){
+  if(TICK){clearTimeout(TICK);TICK=0}
+  DONE=guides();FADE=[];DUST=[];CUR={x:LINE_X,y:0};
+  DR=mulberry((seed*31+5)>>>0);
+  drawInk();
+  const gen=plan(mulberry((seed*9973+17)>>>0));
+  if(FAST){for(const st of gen)commit(st);RUN=null;draw(performance.now());return}
+  RUN={gen,step:null,phase:'pause',t0:performance.now()-TIMING.pause};
+  kick();
+}
+
+// ---------------- sheet layout ----------------
+function layout(){
+  DPR=Math.min(2,devicePixelRatio||1);
+  W=cv.clientWidth;H=cv.clientHeight;
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+  const m=Math.max(14,Math.min(W,H)*.04);
+  K=Math.min((W-2*m)/BOX.w,(H-2*m)/BOX.h);
+  OX=(W-BOX.w*K)/2;OY=(H-BOX.h*K)/2;
+  PAPC=paper();
+  INKC=mk();INKX=INKC.getContext('2d');
+  drawInk();
+  draw(performance.now());
+}
+
+let RS=0;
+addEventListener('resize',()=>{clearTimeout(RS);RS=setTimeout(layout,120)});
+cv.addEventListener('click',()=>start(pickSeed()));
+cv.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();start(pickSeed())}});
+layout();
+start(SEED0);
+</script>
+<!-- nunki:nav -->
+<style>
+.nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
+  position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
+  filter:drop-shadow(0 -8px 14px rgba(0,0,0,.28));
+  font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.nunki-nav *{box-sizing:border-box}
+.nunki-sheet{position:relative;padding:clamp(2.6rem,6vw,4rem) clamp(1rem,4vw,2.5rem) clamp(2.2rem,5vw,3.2rem);
+  background:radial-gradient(120% 80% at 50% 0%,rgba(255,252,240,.6),transparent 65%),var(--paper);
+  clip-path:polygon(0.00% 5.3px, 2.17% 7.7px, 4.35% 12.1px, 6.52% 6.6px, 8.70% 7.1px, 10.87% 8.0px, 13.04% 3.2px, 15.22% 7.1px, 17.39% 8.6px, 19.57% 10.5px, 21.74% 2.1px, 23.91% 4.6px, 26.09% 2.1px, 28.26% 10.7px, 30.43% 9.3px, 32.61% 1.5px, 34.78% 12.8px, 36.96% 12.6px, 39.13% 8.8px, 41.30% 8.4px, 43.48% 2.9px, 45.65% 1.2px, 47.83% 7.3px, 50.00% 1.7px, 52.17% 3.3px, 54.35% 3.9px, 56.52% 1.4px, 58.70% 6.6px, 60.87% 6.3px, 63.04% 11.1px, 65.22% 7.2px, 67.39% 8.7px, 69.57% 7.0px, 71.74% 8.9px, 73.91% 6.5px, 76.09% 4.3px, 78.26% 13.0px, 80.43% 12.9px, 82.61% 11.1px, 84.78% 9.5px, 86.96% 4.8px, 89.13% 3.8px, 91.30% 4.5px, 93.48% 1.8px, 95.65% 10.2px, 97.83% 5.8px, 100.00% 7.2px, 100% 100%, 0 100%)}
+.nunki-sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
+.nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:1.9rem 1.4rem}
+.nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
+.nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
+  background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px rgba(42,37,31,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px color-mix(in srgb,var(--theme,#2a251f) 70%,transparent);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease}
+.nunki-grid li:nth-child(4n+2) .nunki-card{--tilt:.8deg}
+.nunki-grid li:nth-child(4n+3) .nunki-card{--tilt:-.4deg}
+.nunki-grid li:nth-child(4n+4) .nunki-card{--tilt:1.1deg}
+.nunki-card:hover,.nunki-card:focus-visible{transform:rotate(0) translateY(-5px);outline:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(42,37,31,.2),0 22px 30px -16px rgba(42,37,31,.6)}
+.nunki-card:focus-visible{outline:2px solid var(--clay);outline-offset:4px}
+.nunki-tape{position:absolute;top:-9px;left:50%;width:64px;height:19px;margin-left:-32px;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);
+  box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:2}
+.nunki-grid li:nth-child(even) .nunki-tape{transform:rotate(2deg)}
+.nunki-thumb{display:block;position:relative;overflow:hidden;aspect-ratio:800/420;background:#e6d9b6}
+.nunki-thumb::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 1px rgba(42,37,31,.16) inset}
+.nunki-thumb img{display:block;width:100%;height:auto;aspect-ratio:800/420;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.nunki-card:hover .nunki-thumb img,.nunki-card:focus-visible .nunki-thumb img{transform:scale(1.05)}
+.nunki-cap{display:block;padding:.6rem .15rem 0}
+.nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
+.nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center}
+.nunki-home a{color:var(--muted);font-size:.82rem;letter-spacing:.1em;text-decoration:none;border-bottom:1px solid rgba(42,37,31,.2);padding-bottom:2px}
+.nunki-home a:hover,.nunki-home a:focus-visible{color:var(--clay);border-color:var(--clay);outline:none}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img{transition:none}}
+</style>
+<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">
+  <p class="nunki-kicker">nog meer wanden</p>
+  <ul class="nunki-grid">
+      <li><a class="nunki-card" href="/zelfportret-fable-5/" style="--theme:#181410">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">fable</span><span class="nunki-sub">a wall, from the inside</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">getij</span><span class="nunki-sub">a wall about the tide</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/ringen/" style="--theme:#1a1712">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">a wall about a tree, and the years it keeps</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/velden/" style="--theme:#0e1020">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=048e1286" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-home"><a href="/">← alle wanden</a></p>
+</div></nav>
+<!-- /nunki:nav -->
+</body>
+</html>
