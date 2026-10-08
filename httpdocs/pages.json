@@ -48,6 +48,15 @@
       "theme": "#1b2030",
       "ogImage": "/images/og/zelfportret-haiku-5-5.jpg",
       "thumb": "/images/thumbs/zelfportret-haiku-5-5.jpg"
+    },
+    {
+      "slug": "zelfportret-sonnet-5-5",
+      "path": "/zelfportret-sonnet-5-5/",
+      "title": "sonnet",
+      "subtitle": "a liquid prisoner, pent in walls of glass",
+      "theme": "#070d13",
+      "ogImage": "/images/og/zelfportret-sonnet-5-5.jpg",
+      "thumb": "/images/thumbs/zelfportret-sonnet-5-5.jpg"
     }
   ]
 }
