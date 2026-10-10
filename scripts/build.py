@@ -45,7 +45,7 @@ MARK_END = "<!-- /nunki:mark -->"
 # De wanden staan in twee series: de zelfportretten van de modellen, en de andere wanden.
 SERIES = [
     ("self", "zelfportretten", lambda p: p["slug"].startswith("zelfportret-")),
-    ("walls", "wanden", lambda p: not p["slug"].startswith("zelfportret-")),
+    ("walls", "andere wanden", lambda p: not p["slug"].startswith("zelfportret-")),
 ]
 
 
