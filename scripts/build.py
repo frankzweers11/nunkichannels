@@ -450,16 +450,14 @@ NAV_CSS = """
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
 .nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
 .nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:0}
-.nunki-home-mark{display:inline-flex;align-items:center;height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;
-  color:var(--ink);text-decoration:none;background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
-  -webkit-tap-highlight-color:transparent;transition:background-color .3s ease,box-shadow .3s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
-.nunki-home-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
-.nunki-home-mark .nm-name{display:block;margin-left:7px;white-space:nowrap;font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;transform:translateY(1px)}
-.nunki-home-mark:hover,.nunki-home-mark:focus-visible{background:rgba(251,248,239,.97);outline:none;transform:translateY(-1px)}
-.nunki-home-mark:hover svg,.nunki-home-mark:focus-visible svg{transform:rotate(-8deg)}
-.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 8px 20px -12px rgba(0,0,0,.55)}
-@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark,.nunki-home-mark svg{transition:none}}
+.nunki-home-mark{position:relative;display:inline-block;box-sizing:border-box;padding:10px 28px 12px;border-radius:8px;
+  color:var(--ink);text-decoration:none;background:#f6f1e4;box-shadow:0 8px 24px rgba(24,20,17,.18);
+  -webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease}
+.nunki-home-mark::after{content:"";position:absolute;inset:8px;border:1px solid rgba(42,37,31,.4);border-radius:4px;pointer-events:none}
+.nunki-home-mark .nm-name{display:block;white-space:nowrap;font:700 1.35rem/1.1 "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.02em}
+.nunki-home-mark:hover,.nunki-home-mark:focus-visible{outline:none;transform:translateY(-2px);box-shadow:0 12px 28px rgba(24,20,17,.22)}
+.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 12px 28px rgba(24,20,17,.22)}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark{transition:none}}
 """
 
 
@@ -492,7 +490,7 @@ def nav_home_badge(site: dict) -> str:
     return (
         f'  <p class="nunki-home">'
         f'<a class="nunki-home-mark" href="/" title="{name}" aria-label="{name}, alle wanden">'
-        f"{LOGO_SVG}<span class=\"nm-name\">{name}</span></a></p>\n"
+        f'<span class="nm-name">{name}</span></a></p>\n'
     )
 
 
