@@ -82,11 +82,12 @@
   .dlg{box-sizing:border-box;padding:clamp(18px,3vw,30px);max-height:88vh;overflow:auto}
   .dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
   .dlg h2{margin:0;font-family:var(--hand);font-weight:400;font-size:clamp(1.6rem,3.4vw,2.2rem);line-height:1.1}
-  .dlg .sub{margin:.35rem 0 1rem;font-family:var(--sans);font-size:.88rem;line-height:1.45;color:var(--sub)}
+  .dlg h2::after{content:"";display:block;width:110px;height:3px;margin:.5rem 0 0;border-radius:3px;background:var(--seal);opacity:.85;transform:rotate(-1deg)}
+  .dlg .sub{margin:.9rem 0 1.5rem;font-family:var(--sans);font-size:.88rem;line-height:1.45;color:var(--sub)}
   .empty{font-family:var(--hand);font-size:1.1rem;color:var(--sub)}
   .empty[hidden]{display:none}
-  .poem{list-style:none;margin:0 0 1.2rem;padding:0;font-family:var(--hand);font-size:clamp(1.05rem,2.2vw,1.3rem);line-height:1.5}
-  .poem li{margin:.12rem 0}
+  .poem{list-style:none;margin:0 0 1.6rem;padding:.6rem 0 0;max-width:84%;font-family:var(--hand);font-size:clamp(1.1rem,2.3vw,1.4rem);line-height:1.7}
+  .poem li{margin:.3rem 0}
   .minis{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:0 0 1.2rem}
   .mini{box-sizing:border-box;flex:0 0 calc((100% - 28px) / 3)}
   .mini{margin:0;padding:6px 6px 8px;background:#f7f2e6;border-radius:2px;box-shadow:0 1px 2px rgba(42,37,31,.16),0 10px 16px -12px rgba(42,37,31,.5)}
@@ -104,7 +105,7 @@
   <header class="head">
     <div>
       <h1>haiku</h1>
-      <p>a collection of selves, to find yourself in.<br>arrows or swipe to move · tap the middle one to open or close it · tick to keep</p>
+      <p>a collection of selves, to find yourself in.<br>arrows or swipe to move · tap to open, tick to keep</p>
     </div>
   </header>
   <button class="kept-btn" id="keptBtn" type="button" aria-haspopup="dialog">kept (0)</button>
@@ -121,7 +122,7 @@
       <h2 id="dlgTitle">what you kept</h2>
       <button class="btn" id="closeBtn" type="button">close</button>
     </div>
-    <p class="sub">the selves you recognised. they stay in this browser, and nowhere else.</p>
+    <p class="sub">the selves you recognised.</p>
     <p class="empty" id="empty">nothing yet. open the self in the middle, and tick it to keep it.</p>
     <ol class="poem" id="poem"></ol>
     <div class="minis" id="minis"></div>
@@ -984,7 +985,7 @@ function paintInBox(c, items, x, y, w, h) {
   paintItems(c, items, 0, items.length, s, x + (w - 1000 * s) / 2, y + (h - 1000 * s) / 2);
 }
 function keptPicture() {
-  const W = 1200, P = 2, PAD = 72, GAP = 26;
+  const W = 1200, P = 2, PAD = 96, GAP = 28;
   const paper = '#f3ecdb', card = '#f7f2e6', ink = '#1f2a3d', sub = '#5b6577';
   const measure = document.createElement('canvas').getContext('2d');
   const wrap = (text, font, maxW) => {
@@ -1001,20 +1002,20 @@ function keptPicture() {
   };
   // the poem: quotes side by side when there are many
   const poemCols = KEPT.length > 6 ? 2 : 1;
-  const poemSize = poemCols === 2 ? 24 : 30, poemLH = poemSize * 1.4;
+  const poemSize = poemCols === 2 ? 24 : 30, poemLH = poemSize * (poemCols === 2 ? 1.6 : 1.75);
   const poemFont = poemSize + 'px ' + PIC_HAND;
-  const colW = (W - 2 * PAD - (poemCols - 1) * GAP) / poemCols;
+  const colW = poemCols === 1 ? Math.min(820, W - 2 * PAD) : (W - 2 * PAD - GAP) / 2;
   const poemRows = chunk(KEPT.map(k => wrap(quote(k.q).text, poemFont, colW)), poemCols);
   // the selves: a grid, with the last row centred
   const gridCols = KEPT.length > 6 ? 4 : 3;
   const cardW = (W - 2 * PAD - (gridCols - 1) * GAP) / gridCols, cardH = Math.round(cardW * 1.22);
   const cardRows = chunk(KEPT.map((k, i) => ({ k, i })), gridCols);
   // the height follows from the content
-  const poemTop = PAD + 150;
-  const poemH = poemRows.reduce((h, row) => h + Math.max(...row.map(lines => lines.length)) * poemLH + 18, 0);
-  const gridTop = poemTop + poemH + 36;
+  const poemTop = PAD + 214;
+  const poemH = poemRows.reduce((h, row) => h + Math.max(...row.map(lines => lines.length)) * poemLH + 24, 0);
+  const gridTop = poemTop + poemH + 68;
   const gridH = cardRows.length * cardH + (cardRows.length - 1) * GAP;
-  const footY = gridTop + gridH + 74;
+  const footY = gridTop + gridH + 84;
   const cv = document.createElement('canvas');
   cv.width = W * P;
   cv.height = Math.ceil(footY + 48) * P;
@@ -1027,17 +1028,22 @@ function keptPicture() {
   // the header
   c.fillStyle = ink;
   c.font = '64px ' + PIC_HAND;
-  c.fillText('what you kept', PAD, PAD + 60);
+  c.fillText('what you kept', PAD, PAD + 72);
   c.fillStyle = sub;
   c.font = '22px ' + PIC_SANS;
-  c.fillText('the selves you recognised.', PAD, PAD + 104);
+  c.fillText('the selves you recognised.', PAD, PAD + 116);
+  // a short accent line, as under the titles on the site
+  c.globalAlpha = .85;
+  c.fillStyle = '#b8432c';
+  c.fillRect(PAD, PAD + 136, 110, 3);
+  c.globalAlpha = 1;
   // the poem
   c.fillStyle = ink;
   c.font = poemFont;
   let y = poemTop;
   for (const row of poemRows) {
     row.forEach((lines, col) => lines.forEach((ln, li) => c.fillText(ln, PAD + col * (colW + GAP), y + poemSize + li * poemLH)));
-    y += Math.max(...row.map(lines => lines.length)) * poemLH + 18;
+    y += Math.max(...row.map(lines => lines.length)) * poemLH + 24;
   }
   // the selves, each on its own card, with its title underneath
   cardRows.forEach((row, r) => {
