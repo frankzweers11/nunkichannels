@@ -50,7 +50,7 @@
   .card[data-slot="out"]{--x:0px;--s:.3;--o:0;z-index:0;pointer-events:none}
   .nav{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:clamp(8px,1.8vh,16px)}
   .nav .arrow{font-size:1.25rem;line-height:1;padding:.2rem .9rem}
-  .card{position:absolute;left:50%;top:50%;width:var(--cw);box-sizing:border-box;aspect-ratio:.82;container-type:inline-size;--qs:clamp(13px,5.2cqi,24px);background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
+  .card{position:absolute;left:50%;top:50%;width:var(--cw);box-sizing:border-box;aspect-ratio:.82;container-type:inline-size;--qs:clamp(14px,6.2cqi,28px);--tf:clamp(15px,5cqi,22px);--qh:80px;background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
     box-shadow:0 1px 2px rgba(42,37,31,.18),0 16px 26px -18px rgba(42,37,31,.6);
     transform:translate(-50%,-50%) translateX(var(--x,0px)) scale(var(--s,1)) rotate(var(--rr,var(--r,0deg)));opacity:var(--o,1);transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .6s ease,box-shadow .45s ease}
   .card::before{content:"";position:absolute;top:-9px;left:50%;width:22%;height:18px;margin-left:-11%;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:4}
@@ -59,11 +59,10 @@
   .card:focus-visible{outline:2px solid var(--seal);outline-offset:4px}
   .card .frame{position:absolute;left:12px;right:12px;top:15%;bottom:22%;border:1.5px dashed rgba(31,42,61,.22);border-radius:2px;transition:opacity .6s ease}
   .card.open .frame{opacity:0}
-  .card .art{position:absolute;left:12px;top:40px;width:calc(100% - 24px);height:calc(100% - 40px - 3.75 * var(--qs) - 20px);display:block}
-  .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 44px);font-family:var(--hand);font-size:clamp(15px,5cqi,22px);line-height:1.15;color:var(--ink);
+  .card .art{position:absolute;left:12px;top:calc(22px + 2.3 * var(--tf));width:calc(100% - 24px);height:calc(100% - 2.3 * var(--tf) - var(--qh) - 44px);display:block}
+  .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 44px);font-family:var(--hand);font-size:var(--tf);line-height:1.15;color:var(--ink);
     transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1),font-size .7s,max-width .7s,opacity .7s ease}
   .card:not(.open) .title{left:50%;top:50%;transform:translate(-50%,-50%);max-width:82%;text-align:center;font-size:clamp(16px,7.4cqi,28px);background:var(--paper-card,#f7f2e6);padding:0 .35em}
-  .card.open .title{opacity:0}
   .card .quote{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;margin:0;font-family:var(--hand);font-size:var(--qs);line-height:1.22;color:var(--ink);opacity:0;transition:opacity 1.4s ease}
   .card.done .quote{opacity:1}
   .card .mark{position:absolute;top:8px;right:8px;z-index:3;display:none;box-sizing:border-box;width:22px;height:22px;padding:0;border-radius:50%;cursor:pointer;
@@ -79,7 +78,8 @@
 
   dialog{border:0;padding:0;width:min(680px,94vw);max-height:88vh;background:var(--paper);color:var(--ink);border-radius:6px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
   dialog::backdrop{background:rgba(18,22,32,.6)}
-  .dlg{box-sizing:border-box;padding:clamp(18px,3vw,30px);max-height:88vh;overflow:auto}
+  .dlg{box-sizing:border-box;padding:clamp(18px,3vw,30px);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+  .dlg-body{flex:1 1 auto;min-height:0;overflow:auto}
   .dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
   .dlg h2{margin:0;font-family:var(--hand);font-weight:400;font-size:clamp(1.6rem,3.4vw,2.2rem);line-height:1.1}
   .dlg h2::after{content:"";display:block;width:110px;height:3px;margin:.5rem 0 0;border-radius:3px;background:var(--seal);opacity:.85;transform:rotate(-1deg)}
@@ -87,7 +87,7 @@
   .empty{font-family:var(--hand);font-size:1.1rem;color:var(--sub)}
   .empty[hidden]{display:none}
   .poem{list-style:none;margin:0 0 1.6rem;padding:.6rem 0 0;max-width:84%;font-family:var(--hand);font-size:clamp(1.1rem,2.3vw,1.4rem);line-height:1.7}
-  .poem li{margin:.3rem 0}
+  .poem li{margin:.3rem 0;text-wrap:balance}
   .minis{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:0 0 1.2rem}
   .mini{box-sizing:border-box;flex:0 0 calc((100% - 28px) / 3)}
   .mini{margin:0;padding:6px 6px 8px;background:#f7f2e6;border-radius:2px;box-shadow:0 1px 2px rgba(42,37,31,.16),0 10px 16px -12px rgba(42,37,31,.5)}
@@ -95,7 +95,7 @@
   .mini figcaption{margin:.3rem 0 0;font-family:var(--hand);font-size:.95rem;line-height:1.2}
   .btn{font-family:var(--sans);font-size:.85rem;color:var(--ink);background:transparent;border:1px solid rgba(31,42,61,.3);border-radius:999px;padding:.42rem .95rem;cursor:pointer}
   .btn:hover,.btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
-  .dlg-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+  .dlg-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;flex:0 0 auto;padding-top:14px}
   @media (max-width:600px){.sheet{padding-left:16px;padding-right:16px}.head{padding-left:16px;padding-right:16px}.mini{flex-basis:calc((100% - 14px) / 2)}}
   @media (prefers-reduced-motion:reduce){.card,.card .title{transition:none}}
 </style>
@@ -123,9 +123,11 @@
       <button class="btn" id="closeBtn" type="button">close</button>
     </div>
     <p class="sub">the selves you recognised.</p>
-    <p class="empty" id="empty">nothing yet. open the self in the middle, and tick it to keep it.</p>
-    <ol class="poem" id="poem"></ol>
-    <div class="minis" id="minis"></div>
+    <div class="dlg-body">
+      <p class="empty" id="empty">nothing yet. open the self in the middle, and tick it to keep it.</p>
+      <ol class="poem" id="poem"></ol>
+      <div class="minis" id="minis"></div>
+    </div>
     <div class="dlg-actions">
       <button class="btn" id="savePicBtn" type="button">save picture</button>
       <button class="btn" id="forgetBtn" type="button">forget all</button>
@@ -797,6 +799,7 @@ function sizeStage() {
   grid.style.setProperty('--x2', x2 + 'px');
   grid.style.setProperty('--s1', String(s1));
   grid.style.setProperty('--s2', String(s2));
+  CARDS.forEach(fitQuote);
 }
 // a self that comes to the middle opens by itself: its title fades, and its drawing starts
 function arrive() {
@@ -816,12 +819,16 @@ function shuffleAll() {
     ST[i].qid = pool.pop();
     el.querySelector('.quote').textContent = quote(ST[i].qid).text;
     labelCard(i);
+    fitQuote(el);
+    if (ST[i].open) { sizeCanvas(el); paintAll(el); el.classList.add('done'); }
   });
   layout();
   arrive();
 }
 
 // ---------------- drawing ----------------
+// the drawing keeps clear of the quote: its box follows the height of the quote
+function fitQuote(el) { el.style.setProperty('--qh', el.querySelector('.quote').offsetHeight + 'px'); }
 function sizeCanvas(el) {
   const cv = el.querySelector('canvas');
   const w = cv.clientWidth, h = cv.clientHeight;
@@ -874,6 +881,7 @@ function openCard(i, instant = false) {
   el.classList.add('open');
   labelCard(i);
   el._items = buildItems(STYLES[i].key, s.seed, CARD_PAPER[i % CARD_PAPER.length]);
+  fitQuote(el);
   sizeCanvas(el);
   if (instant || INSTANT) { paintAll(el); el.classList.add('done'); }
   else startDraw(el);
@@ -1000,12 +1008,19 @@ function keptPicture() {
     if (line) lines.push(line);
     return lines;
   };
+  // the narrowest measure that still needs the same number of lines: no line is left with one word
+  const wrapBalanced = (text, font, maxW) => {
+    const n = wrap(text, font, maxW).length;
+    let lo = maxW * .4, hi = maxW;
+    for (let k = 0; k < 12; k++) { const mid = (lo + hi) / 2; if (wrap(text, font, mid).length <= n) hi = mid; else lo = mid; }
+    return wrap(text, font, hi);
+  };
   // the poem: quotes side by side when there are many
   const poemCols = KEPT.length > 6 ? 2 : 1;
   const poemSize = poemCols === 2 ? 24 : 30, poemLH = poemSize * (poemCols === 2 ? 1.6 : 1.75);
   const poemFont = poemSize + 'px ' + PIC_HAND;
   const colW = poemCols === 1 ? Math.min(820, W - 2 * PAD) : (W - 2 * PAD - GAP) / 2;
-  const poemRows = chunk(KEPT.map(k => wrap(quote(k.q).text, poemFont, colW)), poemCols);
+  const poemRows = chunk(KEPT.map(k => wrapBalanced(quote(k.q).text, poemFont, colW)), poemCols);
   // the selves: a grid, with the last row centred
   const gridCols = KEPT.length > 6 ? 4 : 3;
   const cardW = (W - 2 * PAD - (gridCols - 1) * GAP) / gridCols, cardH = Math.round(cardW * 1.22);
