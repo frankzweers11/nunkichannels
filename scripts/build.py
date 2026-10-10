@@ -160,20 +160,43 @@ INK = (42, 37, 31)
 CLAY = (172, 80, 54)
 LOGO_TAN = (214, 178, 108)
 
+LOGO_SVG = (
+    '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
+    '<path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" '
+    'stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>'
+)
+
+
+def _bezier_points(p0: tuple[float, float], p1: tuple[float, float], p2: tuple[float, float], p3: tuple[float, float], steps: int = 36) -> list[tuple[float, float]]:
+    out: list[tuple[float, float]] = []
+    for i in range(steps + 1):
+        t = i / steps
+        u = 1.0 - t
+        x = u**3 * p0[0] + 3 * u**2 * t * p1[0] + 3 * u * t**2 * p2[0] + t**3 * p3[0]
+        y = u**3 * p0[1] + 3 * u**2 * t * p1[1] + 3 * u * t**2 * p2[1] + t**3 * p3[1]
+        out.append((x, y))
+    return out
+
 
 def nunki_logo_rgba(size: int) -> Image.Image:
-    """Klein n-logo (zelfde vorm als LOGO_SVG)."""
+    """n-logo gerasterd uit hetzelfde SVG-pad als op de site (geen hoekige PIL-benadering)."""
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     s = size / 64.0
     w = max(2, round(7.5 * s))
-    r = max(2, round(4 * s))
-    cx, cy = int(48 * s), int(15 * s)
-    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=LOGO_TAN)
-    pts = [(18, 48), (18, 30), (32, 18), (46, 30), (46, 48)]
-    scaled = [(int(x * s), int(y * s)) for x, y in pts]
+
+    # M18 48 V30 c0-7 6-12 14-12 s12 5 12 12 v18
+    pts: list[tuple[float, float]] = [(18.0, 48.0), (18.0, 30.0)]
+    pts.extend(_bezier_points((18.0, 30.0), (18.0, 23.0), (24.0, 18.0), (32.0, 18.0))[1:])
+    pts.extend(_bezier_points((32.0, 18.0), (40.0, 18.0), (44.0, 23.0), (44.0, 30.0))[1:])
+    pts.append((44.0, 48.0))
+
+    scaled = [(x * s, y * s) for x, y in pts]
     for i in range(len(scaled) - 1):
         draw.line([scaled[i], scaled[i + 1]], fill=CLAY, width=w, joint="curve")
+
+    cx, cy, r = 48.0 * s, 15.0 * s, 4.0 * s
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=LOGO_TAN)
     return img
 
 
@@ -207,7 +230,8 @@ def composite_wand_badge(img: Image.Image, title: str, *, x: int = 24, y: int = 
     dr = ImageDraw.Draw(pill)
     dr.rounded_rectangle([0, 0, badge_w - 1, badge_h - 1], radius, fill=(246, 241, 228, 255))
     dr.rounded_rectangle([0, 0, badge_w - 1, badge_h - 1], radius, outline=(42, 37, 31, 14), width=1)
-    pill.alpha_composite(nunki_logo_rgba(icon), (pad_l, (badge_h - icon) // 2))
+    logo = nunki_logo_rgba(icon * 2).resize((icon, icon), Image.Resampling.LANCZOS)
+    pill.alpha_composite(logo, (pad_l, (badge_h - icon) // 2))
     tx = pad_l + icon + gap
     ty = (badge_h - font_size) // 2 - 2
     dr.text((tx, ty), label, font=script, fill=(*INK, 255))
@@ -430,12 +454,6 @@ def generate_index_og(site: dict, rows: list[list[Image.Image]], out_path: Path,
 # Footer-navigatie onderaan elke wand: kleine kaartjes van de andere wanden
 # ---------------------------------------------------------------------------
 
-LOGO_SVG = (
-    '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
-    '<path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" '
-    'stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>'
-)
-
 NAV_CSS = """
 .nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
   position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
@@ -458,6 +476,10 @@ NAV_CSS = """
 .nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
   justify-content:center;gap:1.9rem 1.4rem}
 .nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
+@media (min-width:720px){
+  .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+}
 .nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
   background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
   box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px rgba(42,37,31,.55);
@@ -480,15 +502,19 @@ NAV_CSS = """
 .nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
 .nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
-.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:0}
-.nunki-home-mark{position:relative;display:inline-block;box-sizing:border-box;padding:10px 28px 12px;border-radius:8px;
-  color:var(--ink);text-decoration:none;background:#f6f1e4;box-shadow:0 8px 24px rgba(24,20,17,.18);
-  -webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease}
-.nunki-home-mark::after{content:"";position:absolute;inset:8px;border:1px solid rgba(42,37,31,.4);border-radius:4px;pointer-events:none}
-.nunki-home-mark .nm-name{display:block;white-space:nowrap;font:700 1.35rem/1.1 "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.02em}
-.nunki-home-mark:hover,.nunki-home-mark:focus-visible{outline:none;transform:translateY(-2px);box-shadow:0 12px 28px rgba(24,20,17,.22)}
-.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 12px 28px rgba(24,20,17,.22)}
-@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark{transition:none}}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
+.nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
+  color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,background-color .3s ease}
+.nunki-home-mark svg{display:block;width:26px;height:26px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-home-mark .nm-name{display:block;margin-left:8px;white-space:nowrap;font:400 1.15rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px)}
+.nunki-home-mark:hover,.nunki-home-mark:focus-visible{outline:none;transform:translateY(-2px);background:rgba(251,248,239,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 12px 28px -12px rgba(0,0,0,.5)}
+.nunki-home-mark:hover svg,.nunki-home-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 8px 20px -12px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark,.nunki-home-mark svg{transition:none}}
 """
 
 
@@ -521,7 +547,7 @@ def nav_home_badge(site: dict) -> str:
     return (
         f'  <p class="nunki-home">'
         f'<a class="nunki-home-mark" href="/" title="{name}" aria-label="{name}, alle wanden">'
-        f'<span class="nm-name">{name}</span></a></p>\n'
+        f"{LOGO_SVG}<span class=\"nm-name\">{name}</span></a></p>\n"
     )
 
 
@@ -531,9 +557,11 @@ def nav_block(current: dict, pages: list[dict], site: dict) -> str:
         others = [p for p in items if p["slug"] != current["slug"]]
         if not others:
             continue
+        n = len(others)
+        count = " nunki-n-4" if n == 4 else ""
         groups.append(
             f'  <p class="nunki-group">{esc(label)}</p>\n'
-            f'  <ul class="nunki-grid nunki-{key}">\n' + "\n".join(nav_card(p) for p in others) + "\n  </ul>\n"
+            f'  <ul class="nunki-grid nunki-{key}{count}">\n' + "\n".join(nav_card(p) for p in others) + "\n  </ul>\n"
         )
     if not groups:
         return ""
