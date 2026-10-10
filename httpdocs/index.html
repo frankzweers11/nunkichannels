@@ -72,11 +72,17 @@
     z-index: 1;
     max-width: 1100px;
     margin: 0 auto;
-    padding: clamp(2.5rem, 8vw, 5.5rem) clamp(1.1rem, 4vw, 2.5rem) 3.5rem;
+    padding: 0 clamp(1.1rem, 4vw, 2.5rem) 3.5rem;
   }
 
   /* ---- kop ---- */
-  .masthead { text-align: center; margin-bottom: clamp(2.5rem, 7vw, 4.5rem); }
+  .masthead {
+    text-align: center;
+    margin: 0 calc(50% - 50vw) clamp(2.5rem, 7vw, 4.5rem);
+    width: 100vw;
+    max-width: 100vw;
+  }
+  .wordmark.woven { margin: 0; line-height: 0; }
   h1 {
     margin: 0;
     font-family: var(--hand);
@@ -86,6 +92,14 @@
     letter-spacing: 0.01em;
     text-transform: lowercase;
   }
+  /* the name, woven: once the hanging is drawn the letters move into it */
+  .wordmark canvas.hanging { display: block; margin: 0; width: 100% !important; max-width: 100%; height: auto !important; vertical-align: top; }
+  .wordmark.woven .wm-text {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  .wordmark.woven ~ .scribble { display: none; }
+  .wordmark.woven ~ .lead { margin-top: 0.6rem; }
   .scribble {
     display: block;
     width: min(260px, 60%);
@@ -111,6 +125,47 @@
     line-height: 1.55;
   }
 
+  .emblem {
+    display: block;
+    width: clamp(38px, 6vw, 50px);
+    height: auto;
+    margin: clamp(1rem, 2.5vw, 1.35rem) auto 0;
+    opacity: 0;
+    animation: rise 1s 0.1s ease forwards;
+  }
+
+  /* ---- series ---- */
+  .series { margin: 0 0 clamp(3.6rem, 9vw, 6rem); }
+  .series:last-child { margin-bottom: 0; }
+  .series-head { text-align: center; margin: 0 0 clamp(2rem, 5vw, 3rem); }
+  .series-head h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.8rem, 2.5vw, 1.3rem);
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    line-height: 1.1;
+    text-transform: lowercase;
+  }
+  .series-head h2::before,
+  .series-head h2::after {
+    content: "";
+    flex: 0 1 clamp(28px, 8vw, 80px);
+    height: 1px;
+    background: var(--line);
+  }
+  .series-head p {
+    margin: 0.75rem auto 0;
+    max-width: 30em;
+    color: var(--muted);
+    font-size: clamp(0.9rem, 2.2vw, 1rem);
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+  }
+
   /* ---- wanden ---- */
   .grid {
     list-style: none;
@@ -121,6 +176,8 @@
     gap: clamp(2rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.25rem);
   }
   .grid > li { display: flex; }
+  .grid-self { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 940px; margin: 0 auto; }
+  @media (max-width: 640px) { .grid-self { grid-template-columns: 1fr; } }
   .card {
     --tilt: -0.9deg;
     position: relative;
@@ -258,6 +315,7 @@
   }
 
   @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   @keyframes settle {
     from { opacity: 0; transform: translateY(18px) rotate(calc(var(--tilt) * 2)); }
     to   { opacity: 1; transform: rotate(var(--tilt)); }
@@ -266,6 +324,7 @@
   @media (prefers-reduced-motion: reduce) {
     .card { animation: none; opacity: 1; }
     .scribble path { animation: none; stroke-dashoffset: 0; }
+    .emblem { animation: none; opacity: 1; }
     .card, .thumb img, .go { transition: none; }
   }
   @media (hover: none) {
@@ -276,16 +335,22 @@
 <body>
 <div class="wrap">
   <header class="masthead">
-    <h1>nunkichannels</h1>
+    <h1 class="wordmark" id="wordmark"><span class="wm-text">nunkichannels</span></h1>
     <svg class="scribble" viewBox="0 0 240 16" preserveAspectRatio="none" aria-hidden="true">
       <path pathLength="1" d="M3 9 C 30 3, 52 13, 88 8 S 150 3, 182 9 S 222 11, 237 6"/>
     </svg>
     <p class="lead">Wanden — getekend, scrollend, levend.</p>
+    <svg class="emblem" viewBox="0 0 64 64" aria-hidden="true"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>
   </header>
 
   <main>
-    <ul class="grid">
-<!-- nunki:cards -->
+    <section class="series" aria-labelledby="s-self">
+      <header class="series-head">
+        <h2 id="s-self">zelfportretten</h2>
+        <p>vier claude-modellen, één vraag: maak je eigen zelfportret</p>
+      </header>
+      <ul class="grid grid-self">
+<!-- nunki:cards-self -->
       <li>
         <a class="card" href="/zelfportret-fable-5/" style="--i:0;--theme:#181410">
           <span class="tape" aria-hidden="true"></span>
@@ -294,77 +359,340 @@
             <span class="no">01</span>
             <span class="name">fable 5</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a wall, from the inside</span>
+            <span class="sub">drawn from the inside</span>
           </span>
         </a>
       </li>
       <li>
-        <a class="card" href="/getij/" style="--i:1;--theme:#13202b">
+        <a class="card" href="/zelfportret-haiku-5-5/" style="--i:1;--theme:#1b2030">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=0e357308" alt="" width="800" height="420" loading="eager" decoding="async"></span>
           <span class="caption">
             <span class="no">02</span>
-            <span class="name">getij</span>
-            <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a wall about the tide</span>
-          </span>
-        </a>
-      </li>
-      <li>
-        <a class="card" href="/zelfportret-haiku-5-5/" style="--i:2;--theme:#1b2030">
-          <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=a8ddd6ed" alt="" width="800" height="420" loading="eager" decoding="async"></span>
-          <span class="caption">
-            <span class="no">03</span>
             <span class="name">haiku 5.5</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a collection of selves to find yourself in</span>
+            <span class="sub">a collection of selves, to find yourself in</span>
           </span>
         </a>
       </li>
       <li>
-        <a class="card" href="/ringen/" style="--i:3;--theme:#1a1712">
+        <a class="card" href="/zelfportret-opus-5-5/" style="--i:2;--theme:#120e0b">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=fd72ba35" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="caption">
+            <span class="no">03</span>
+            <span class="name">opus 5.5</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub">a self-portrait in warp and weft</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/zelfportret-sonnet-5-5/" style="--i:3;--theme:#070d13">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=6965c746" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="caption">
+            <span class="no">04</span>
+            <span class="name">sonnet 5.5</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub">a liquid prisoner pent in walls of glass</span>
+          </span>
+        </a>
+      </li>
+<!-- /nunki:cards-self -->
+      </ul>
+    </section>
+    <section class="series" aria-labelledby="s-walls">
+      <header class="series-head">
+        <h2 id="s-walls">wanden</h2>
+        <p>het getij, de jaren van een boom, een magnetisch veld</p>
+      </header>
+      <ul class="grid grid-walls">
+<!-- nunki:cards-walls -->
+      <li>
+        <a class="card" href="/getij/" style="--i:4;--theme:#13202b">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">05</span>
+            <span class="name">getij</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub">een muur van water, van binnenuit</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/ringen/" style="--i:5;--theme:#1a1712">
           <span class="tape" aria-hidden="true"></span>
           <span class="thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
-            <span class="no">04</span>
+            <span class="no">06</span>
             <span class="name">ringen</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a wall about a tree, and the years it keeps</span>
+            <span class="sub">een muur over een boom en zijn jaren</span>
           </span>
         </a>
       </li>
       <li>
-        <a class="card" href="/zelfportret-sonnet-5-5/" style="--i:4;--theme:#070d13">
-          <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=b64e132c" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
-          <span class="caption">
-            <span class="no">05</span>
-            <span class="name">sonnet 5.5</span>
-            <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a liquid prisoner, pent in walls of glass</span>
-          </span>
-        </a>
-      </li>
-      <li>
-        <a class="card" href="/velden/" style="--i:5;--theme:#0e1020">
+        <a class="card" href="/velden/" style="--i:6;--theme:#0e1020">
           <span class="tape" aria-hidden="true"></span>
           <span class="thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
-            <span class="no">06</span>
+            <span class="no">07</span>
             <span class="name">velden</span>
             <span class="go" aria-hidden="true">→</span>
             <span class="sub">elektromagnetisch universum</span>
           </span>
         </a>
       </li>
-<!-- /nunki:cards -->
-    </ul>
+<!-- /nunki:cards-walls -->
+      </ul>
+    </section>
   </main>
 
   <footer>
-    <!-- nunki:count -->6 wanden<!-- /nunki:count --> · elke wand tekent zichzelf terwijl je kijkt
+    <!-- nunki:count -->4 zelfportretten · 3 wanden<!-- /nunki:count --> · elke wand tekent zichzelf terwijl je kijkt
   </footer>
 </div>
+<script>
+// ---------------------------------------------------------------------------
+// the name of the site, woven: a small silk hanging in damask. the letters
+// are warp, the ground is weft, and your pointer is the lamp, so the name
+// turns light or dark with where you hold it. by opus 5.5. canvas 2d only.
+// ---------------------------------------------------------------------------
+(function(){
+  'use strict';
+  const h1=document.getElementById('wordmark');
+  if(!h1||!document.createElement('canvas').getContext)return;
+  const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t, mod=(a,n)=>((a%n)+n)%n;
+  const ease=t=>1-Math.pow(1-t,3);
+  function hash(i,j,s){let h=(Math.imul(i|0,374761393)+Math.imul(j|0,668265263)+Math.imul(s|0,1442695041))|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return(h>>>0)/4294967296}
+  function mk(w,h){const c=document.createElement('canvas');c.width=Math.max(1,Math.round(w));c.height=Math.max(1,Math.round(h));return c}
+  const HAND='"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy",cursive';
+
+  const cv=mk(10,10);cv.className='hanging';cv.setAttribute('aria-hidden','true');
+  const cx=cv.getContext('2d');
+  let G=null,DPR=1,lamp={x:0,y:0,tx:0,ty:0,last:-1e9,ang:-2.3},reveal=RM?1:0,t0=0,dirty=true,visible=true,raf=0,lastT=0;
+
+  // tone curve, and the materials: ivory silk, clay silk, gold
+  const LUT=new Uint8ClampedArray(2048);
+  for(let k=0;k<2048;k++){const v=k/512;LUT[k]=Math.round(255*Math.pow(1-Math.exp(-v*1.6),1/1.6))}
+  const MATS=[{a:[.9,.83,.68],s:[1,.96,.88],k:.9},{a:[.66,.22,.12],s:[1,.62,.5],k:.7},{a:[.66,.46,.16],s:[1,.84,.5],k:1.5}];
+  const LC=[1,.96,.89],AMB=.5,KD=.42,KS=.5;
+
+  function bits(word){const b=[];for(const ch of word){const c=ch.charCodeAt(0);for(let k=6;k>=0;k--)b.push((c>>k)&1)}return b}
+
+  function build(){
+    DPR=Math.min(2,window.devicePixelRatio||1);
+    const avail=Math.min(window.innerWidth,1100);
+    const BW=Math.round(avail);
+    const pCss=clamp(BW/440,1.6,2.6),pD=Math.max(3,Math.floor(pCss*DPR)),p=pD/DPR;
+    const narrow=BW<600,E=Math.floor(BW/p),P=Math.floor(BW/(narrow?3.1:4.4)/p);
+    const CW=E*p,CH=P*p;
+    const mx=Math.round(clamp(BW*.04,14,34)),topM=0,rodH=0,fringe=Math.round(clamp(BW*.028,12,26)),bot=fringe+Math.round(clamp(BW*.025,10,22));
+    const row0=Math.min(5,Math.max(0,P-10)),visRows=P-row0,visCH=visRows*p;
+    const Wc=CW+2*mx,Hc=visCH+bot;
+    cv.width=Math.round(Wc*DPR);cv.height=Math.round(Hc*DPR);cv.style.width=Wc+'px';cv.style.height=Hc+'px';
+    G={E,P,p,pD,CW,CH:visCH,mx,topM,rodH,fringe,Wc,Hc,cx0:mx,cy0:topM,row0,visRows,visCH,patH:P*p};
+    G.hz=CW*.5;G.R2=Math.pow(CW*.9,2);
+    pattern();texture();statics();
+    lamp.x=lamp.tx=G.cx0-CW*.6;lamp.y=lamp.ty=G.cy0+visCH*.45;
+    dirty=true;
+  }
+
+  // the design: rules, beads, the name in the hand, and its clay underline
+  function pattern(){
+    const {E,P}=G,N=E*P,S=4;
+    const reg=new Uint8Array(N);          // 0 ground (weft satin), 1 letters (warp satin), 2 rule, 3 clay, 4 gold, 5 selvedge
+    const m=mk(E*S,P*S),c=m.getContext('2d',{willReadFrequently:true});
+    // the name, as large as the band allows
+    let fs=100;c.font=`400 ${fs}px ${HAND}`;
+    const tw=c.measureText('nunkichannels').width;
+    fs=fs*(E*S*(E*G.p<600?.88:.8))/tw;c.font=`400 ${fs}px ${HAND}`;
+    const mt=c.measureText('nunkichannels');
+    const asc=mt.actualBoundingBoxAscent||fs*.75,desc=mt.actualBoundingBoxDescent||fs*.2;
+    const boxH=asc+desc,maxH=P*S*.6;
+    if(boxH>maxH){fs*=maxH/boxH;c.font=`400 ${fs}px ${HAND}`}
+    const m2=c.measureText('nunkichannels'),a2=m2.actualBoundingBoxAscent||fs*.75,d2=m2.actualBoundingBoxDescent||fs*.2;
+    const base=P*S*.47+(a2-d2)/2;
+    c.fillStyle='#ff0000';c.textAlign='center';c.textBaseline='alphabetic';
+    c.fillText('nunkichannels',E*S/2,base);
+    // the clay scribble under it, the same curve as on paper
+    const sw=E*S*.3,sx=E*S/2-sw/2,sy=base+d2+P*S*.07;
+    c.strokeStyle='#0000ff';c.lineWidth=S*2.1;c.lineCap='round';c.beginPath();
+    const X=x=>sx+x/240*sw,Y=y=>sy+(y-8)/16*P*S*.09;
+    c.moveTo(X(3),Y(9));c.bezierCurveTo(X(30),Y(3),X(52),Y(13),X(88),Y(8));
+    c.bezierCurveTo(X(124),Y(3),X(150),Y(3),X(182),Y(9));c.bezierCurveTo(X(214),Y(15),X(222),Y(11),X(237),Y(6));
+    c.stroke();
+    const d=c.getImageData(0,0,E*S,P*S).data;
+    for(let j=0;j<P;j++)for(let i=0;i<E;i++){
+      const o=((j*S+(S>>1))*E*S+(i*S+(S>>1)))*4;
+      if(d[o+2]>110)reg[j*E+i]=3;else if(d[o]>110)reg[j*E+i]=1;
+    }
+    // rules near the edges, and a line of gold beads that spells the name in ascii
+    for(let i=4;i<E-4;i++){for(const j of [P-5,P-4])reg[j*E+i]=2}
+    const b=bits('nunki'),pitch=3,w=b.length*pitch-1,x0=Math.round(E/2-w/2),row=P-9;
+    b.forEach((bit,k)=>{if(!bit)return;for(let a=0;a<2;a++)for(let q=0;q<2;q++){const i=x0+k*pitch+a,j=row+q;if(i>4&&i<E-4&&j>5&&j<P-5)reg[j*E+i]=4}});
+    for(let j=0;j<P;j++)for(const i of [0,1,2,E-3,E-2,E-1])reg[j*E+i]=5;
+    // threads
+    const top=new Uint8Array(N),wm=new Uint8Array(N),mat=new Uint8Array(N),sh=new Uint8Array(N);
+    for(let j=0;j<P;j++)for(let i=0;i<E;i++){
+      const k=j*E+i,r=reg[k];let t;
+      if(r===1||r===2)t=mod(j-2*i,5)!==0?1:0;           // warp satin
+      else if(r===3||r===4)t=0;                         // clay and gold lie on top as weft
+      else if(r===5)t=(i+j)&1;
+      else t=mod(j-2*i,5)===0?1:0;                       // weft satin
+      top[k]=t;wm[k]=r===5||r===4?128:t?255:0;
+      mat[k]=r===3&&!t?1:r===4&&!t?2:r===5&&t?1:0;
+    }
+    for(let j=0;j<P;j++)for(let i=0;i<E;i++){
+      const k=j*E+i;if(reg[k]===5){sh[k]=200;continue}
+      let n=1;
+      if(top[k]){for(let a=j-1;a>=0&&top[a*E+i];a--)n++;for(let a=j+1;a<P&&top[a*E+i];a++)n++}
+      else{for(let a=i-1;a>=0&&!top[j*E+a];a--)n++;for(let a=i+1;a<E&&!top[j*E+a];a++)n++}
+      sh[k]=Math.round(255*clamp(.3+.24*(n-1),.3,1));
+    }
+    Object.assign(G,{reg,top,wm,mat,sh});
+    G.cells=mk(E,P);G.cc=G.cells.getContext('2d');G.img=G.cc.createImageData(E,P);
+  }
+
+  // the threads themselves, as a soft dark overlay, and how much each cell must be lifted to make up for it
+  function texture(){
+    const {E,P,pD:p,top:T,mat:M}=G,Wt=E*p,Ht=P*p;
+    const tc=mk(Wt,Ht),c=tc.getContext('2d'),im=c.createImageData(Wt,Ht),d=im.data;
+    const spr=(vert,ca,cb)=>{const a=new Float32Array(p*p);
+      for(let y=0;y<p;y++)for(let x=0;x<p;x++){
+        const ac=vert?x:y,al=vert?y:x,u=(ac+.5)/p*2-1;
+        let v=.02+.22*Math.pow(Math.abs(u),3.4);if(ac===0)v=Math.max(v,.2);
+        const ta=(al+.5)/p;if(ca){const e=1-ta*2.6;if(e>0)v+=.3*e*e}if(cb){const e=1-(1-ta)*2.6;if(e>0)v+=.3*e*e}
+        a[y*p+x]=clamp(v,0,.7)*255}
+      return a};
+    const S={},MEAN={};
+    for(const ca of [0,1])for(const cb of [0,1]){S['V'+ca+cb]=spr(true,ca,cb);S['H'+ca+cb]=spr(false,ca,cb)}
+    for(const k in S){let m=0;for(const v of S[k])m+=v;MEAN[k]=m/(S[k].length*255)}
+    const comp=new Float32Array(E*P);
+    for(let j=0;j<P;j++)for(let i=0;i<E;i++){
+      const k=j*E+i;let key;
+      if(T[k]){key='V'+(j>0&&T[k-E]?0:1)+(j<P-1&&T[k+E]?0:1)}
+      else{key='H'+(i>0&&!T[k-1]&&M[k-1]===M[k]?0:1)+(i<E-1&&!T[k+1]&&M[k+1]===M[k]?0:1)}
+      const s=S[key];comp[k]=1/(1-MEAN[key]*.9);
+      for(let y=0;y<p;y++){let o=((j*p+y)*Wt+i*p)*4,q=y*p;for(let x=0;x<p;x++,o+=4,q++){d[o]=74;d[o+1]=52;d[o+2]=28;d[o+3]=s[q]}}
+    }
+    c.putImageData(im,0,0);G.tex=tc;G.comp=comp;
+  }
+
+  // soft shadow under the cloth and the fringe (no rod or cord — flush top)
+  function statics(){
+    const {Wc,Hc,mx,topM,rodH,CW,CH,fringe,cy0,E,p}=G;
+    const sc=mk(Wc*DPR,Hc*DPR),c=sc.getContext('2d');c.scale(DPR,DPR);
+    // shadow of the cloth on the paper
+    c.save();c.shadowColor='rgba(70,52,30,.32)';c.shadowBlur=18;c.shadowOffsetY=8;c.shadowOffsetX=3;
+    c.fillStyle='rgba(120,100,70,.5)';c.fillRect(mx+4,cy0+4,CW-8,CH-6);c.restore();
+    c.clearRect(mx,cy0,CW,CH);
+    G.back=sc;
+    G.rod=null;
+    // fringe: the warp left loose below the last row, knotted in small bunches
+    const fc=mk(Wc*DPR,(fringe+4)*DPR),f=fc.getContext('2d');f.scale(DPR,DPR);
+    const group=Math.max(6,Math.round(E/40));
+    for(let i=0;i<E;i+=1){
+      const g0=Math.floor(i/group)*group,gc=g0+group/2,x=mx+(i+.5)*p,kx=mx+(gc+.5)*p,ky=fringe*.32;
+      const len=fringe*(.82+.18*hash(i,3,7)),sway=(hash(i,9,2)-.5)*1.4;
+      const red=i<3||i>=E-3;
+      f.strokeStyle=red?'rgba(160,70,48,.8)':`rgba(${200+hash(i,1,1)*30|0},${186+hash(i,1,1)*28|0},${156+hash(i,1,1)*24|0},.9)`;
+      f.lineWidth=Math.max(.6,p*.5);f.beginPath();f.moveTo(x,0);f.quadraticCurveTo(lerp(x,kx,.7),ky*.6,kx+(i-gc)*p*.18,ky);f.quadraticCurveTo(kx+(i-gc)*p*.3+sway,ky+len*.5,kx+(i-gc)*p*.5+sway*2,len);f.stroke();
+    }
+    for(let g0=0;g0<E;g0+=group){const kx=mx+(g0+group/2+.5)*p;f.fillStyle='rgba(176,150,112,.95)';f.beginPath();f.ellipse(kx,fringe*.33,p*1.3,p*.9,0,0,Math.PI*2);f.fill()}
+    G.fringeCv=fc;
+  }
+
+  // light every cell: silk threads shine across themselves, so warp catches a lamp at the side and weft one above or below
+  function light(row0,rows){
+    const {E,P,p,top:T,wm:WM,sh:SH,mat:MA,comp:CO,img,patH}=G,d=img.data;
+    const hz=G.hz,hz2=hz*hz,R2=G.R2,cxm=G.cx0+G.CW/2,cym=G.cy0+patH*.5,far=.35;
+    const dxs=new Float32Array(E),dys=new Float32Array(rows),fxs=new Float32Array(E),fys=new Float32Array(rows);
+    for(let i=0;i<E;i++){const x=G.cx0+(i+.5)*p;fxs[i]=lamp.x-x;dxs[i]=lamp.x-lerp(x,cxm,far)}
+    for(let j=0;j<rows;j++){const y=G.cy0+(row0+j+.5)*p;fys[j]=lamp.y-y;dys[j]=lamp.y-lerp(y,cym,far)}
+    for(let j=0;j<rows;j++){
+      const dy=dys[j],ry=fys[j];let k=(row0+j)*E,o=j*E*4;
+      for(let i=0;i<E;i++,k++,o+=4){
+        const dx=dxs[i],rx=fxs[i];
+        const d2=dx*dx+dy*dy+hz2,id=1/Math.sqrt(d2),f2=rx*rx+ry*ry+hz2;
+        const lx=dx*id,ly=dy*id,lz=hz*id,hzz=lz+1,ih=1/Math.sqrt(lx*lx+ly*ly+hzz*hzz),Hx=lx*ih,Hy=ly*ih;
+        let sw=1-Hy*Hy;sw*=sw;sw*=sw;sw*=sw;let sf=1-Hx*Hx;sf*=sf;sf*=sf;sf*=sf;
+        const w=WM[k]/255,I=1.5/(1+f2/R2),cm=CO[k];
+        const diff=((w*Math.sqrt(1-ly*ly)+(1-w)*Math.sqrt(1-lx*lx))*(.35+.65*lz)*KD*I+AMB)*cm;
+        const spec=(w*sw+(1-w)*sf)*SH[k]/255*KS*I*cm;
+        const m=MATS[MA[k]],sk=spec*m.k;
+        d[o]=LUT[Math.min(2047,((m.a[0]*diff+m.s[0]*sk)*LC[0]*512)|0)];
+        d[o+1]=LUT[Math.min(2047,((m.a[1]*diff+m.s[1]*sk)*LC[1]*512)|0)];
+        d[o+2]=LUT[Math.min(2047,((m.a[2]*diff+m.s[2]*sk)*LC[2]*512)|0)];
+        d[o+3]=255;
+      }
+    }
+    G.cc.putImageData(img,0,0,0,0,E,rows);
+  }
+
+  function draw(){
+    const {E,pD,mx,cy0,CW,CH,Wc,Hc,topM,rodH,fringe,row0,visRows}=G;
+    const rows=Math.max(0,Math.min(visRows,Math.round(visRows*ease(reveal))));
+    cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);
+    cx.setTransform(DPR,0,0,DPR,0,0);
+    // the shadow grows with the cloth
+    cx.save();cx.beginPath();cx.rect(0,0,Wc,cy0+rows*G.p+24);cx.clip();cx.drawImage(G.back,0,0,Wc,Hc);cx.restore();
+    if(rows>0){
+      light(row0,rows);
+      cx.setTransform(1,0,0,1,0,0);
+      const x0=Math.round(mx*DPR),y0=Math.round(cy0*DPR);
+      cx.imageSmoothingEnabled=false;
+      cx.drawImage(G.cells,0,row0,E,rows,x0,y0,E*pD,rows*pD);
+      cx.drawImage(G.tex,0,row0*pD,E*pD,rows*pD,x0,y0,E*pD,rows*pD);
+      cx.imageSmoothingEnabled=true;
+      cx.setTransform(DPR,0,0,DPR,0,0);
+      // the edge still rolling down
+      if(rows<visRows){const yb=cy0+rows*G.p,g=cx.createLinearGradient(0,yb-6,0,yb+3);g.addColorStop(0,'rgba(60,44,26,0)');g.addColorStop(1,'rgba(60,44,26,.35)');cx.fillStyle=g;cx.fillRect(mx,yb-6,CW,9)}
+    }
+    if(rows>=visRows){const a=clamp((reveal-1)*0+1,0,1);cx.globalAlpha=a;cx.drawImage(G.fringeCv,0,cy0+CH,Wc,fringe+4);cx.globalAlpha=1}
+    if(G.rod) cx.drawImage(G.rod,0,topM,Wc,rodH+6);
+  }
+
+  function frame(ts){
+    raf=0;
+    const dt=lastT?Math.min(.05,(ts-lastT)/1000):1/60;lastT=ts;
+    if(reveal<1){reveal=Math.min(1,reveal+dt/1.5);dirty=true}
+    const idle=ts-lamp.last>3000;
+    if(idle&&!RM){
+      // left alone, the lamp rests at the side and sways: the name stays light, a line of sheen drifts over it
+      lamp.ang+=dt*Math.PI*2/14;
+      lamp.tx=G.cx0-G.CW*(.6+.06*Math.sin(lamp.ang*.5));
+      lamp.ty=G.cy0+G.visCH*(.5+.75*Math.sin(lamp.ang));
+    }
+    const k=1-Math.exp(-dt*(idle?1.5:8));
+    const nx=lamp.x+(lamp.tx-lamp.x)*k,ny=lamp.y+(lamp.ty-lamp.y)*k;
+    if(Math.abs(nx-lamp.x)+Math.abs(ny-lamp.y)>.05)dirty=true;
+    lamp.x=nx;lamp.y=ny;
+    if(dirty&&visible){draw();dirty=false}
+    if(visible&&(!RM||reveal<1||!idle))raf=requestAnimationFrame(frame);
+  }
+  function kick(){if(!raf&&visible)raf=requestAnimationFrame(frame)}
+
+  addEventListener('pointermove',e=>{
+    const r=cv.getBoundingClientRect();
+    lamp.tx=e.clientX-r.left;lamp.ty=e.clientY-r.top;lamp.last=performance.now();kick();
+  },{passive:true});
+  let rt=0;
+  addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{build();kick()},150)});
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible){dirty=true;kick()}}).observe(cv);
+  }
+  try{
+    h1.appendChild(cv);
+    build();
+    draw();
+    h1.classList.add('woven');
+    kick();
+  }catch(err){cv.remove();h1.classList.remove('woven')}
+})();
+</script>
 </body>
 </html>

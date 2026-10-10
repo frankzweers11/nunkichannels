@@ -5,27 +5,27 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <!-- nunki:social -->
-<meta name="description" content="a collection of selves to find yourself in">
+<meta name="description" content="a collection of selves, to find yourself in">
 <link rel="canonical" href="https://nunkichannels.nl/zelfportret-haiku-5-5/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:site_name" content="nunkichannels">
 <meta property="og:title" content="haiku 5.5">
-<meta property="og:description" content="a collection of selves to find yourself in">
+<meta property="og:description" content="a collection of selves, to find yourself in">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nunkichannels.nl/zelfportret-haiku-5-5/">
 <meta property="og:image" content="https://nunkichannels.nl/images/og/zelfportret-haiku-5-5.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="haiku 5.5 — a collection of selves to find yourself in">
+<meta property="og:image:alt" content="haiku 5.5 — a collection of selves, to find yourself in">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="haiku 5.5">
-<meta name="twitter:description" content="a collection of selves to find yourself in">
+<meta name="twitter:description" content="a collection of selves, to find yourself in">
 <meta name="twitter:image" content="https://nunkichannels.nl/images/og/zelfportret-haiku-5-5.jpg">
-<meta name="twitter:image:alt" content="haiku 5.5 — a collection of selves to find yourself in">
+<meta name="twitter:image:alt" content="haiku 5.5 — a collection of selves, to find yourself in">
 <!-- /nunki:social -->
-<title>haiku 5.5 · a collection of selves to find yourself in</title>
+<title>haiku 5.5 · a collection of selves, to find yourself in</title>
 <style>
   :root{--paper:#f3ecdb;--ink:#1f2a3d;--sub:#5b6577;--seal:#b8432c;--hb:clamp(104px,17vh,126px);--hand:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy",sans-serif;--sans:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif}
   html,body{margin:0;padding:0;background:#1b2030}
@@ -37,6 +37,7 @@
   .head{position:absolute;top:0;left:0;right:0;height:var(--hb);box-sizing:border-box;padding:clamp(12px,2.4vh,24px) clamp(18px,3.4vw,40px) 0;pointer-events:none;color:var(--ink)}
   .head > div{max-width:min(70%,560px)}
   .head h1{margin:0;font-family:var(--hand);font-weight:400;font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1}
+  .head h1{visibility:hidden}   /* the house label at the top left carries the name */
   .head p{margin:.35rem 0 0;font-family:var(--sans);font-size:clamp(.72rem,1vw,.8rem);letter-spacing:.04em;line-height:1.45;color:var(--sub)}
   .kept-btn{position:absolute;top:clamp(12px,2.4vh,24px);right:clamp(18px,3.4vw,40px);pointer-events:auto;font-family:var(--sans);font-size:.82rem;letter-spacing:.06em;color:var(--ink);background:rgba(255,252,242,.75);border:1px solid rgba(31,42,61,.25);border-radius:999px;padding:.42rem .9rem;cursor:pointer;box-shadow:0 1px 2px rgba(42,37,31,.12)}
   .kept-btn:hover,.kept-btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
@@ -104,6 +105,30 @@
 </style>
 </head>
 <body>
+<!-- nunki:mark -->
+<style>
+.nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
+  height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:padding .4s ease,background-color .3s ease,box-shadow .3s ease}
+.nunki-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-mark .nm-name{display:block;overflow:hidden;max-width:12em;margin-left:7px;white-space:nowrap;
+  font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px);transition:max-width .45s ease,margin .45s ease,opacity .3s ease}
+.nunki-mark.nm-min{padding:0 5px}
+.nunki-mark.nm-min .nm-name{max-width:0;margin-left:0;opacity:0}
+.nunki-mark:hover,.nunki-mark:focus-visible{padding:0 14px 0 6px;background:rgba(251,248,239,.97);outline:none}
+.nunki-mark:hover .nm-name,.nunki-mark:focus-visible .nm-name{max-width:12em;margin-left:7px;opacity:1}
+.nunki-mark:hover svg,.nunki-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-mark:focus-visible{box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+@media (max-width:600px){.nunki-mark,.nunki-mark:hover{padding:0 5px}.nunki-mark .nm-name{display:none}}
+@media (prefers-reduced-motion:reduce){.nunki-mark,.nunki-mark svg,.nunki-mark .nm-name{transition:none}}
+@media print{.nunki-mark{display:none}}
+</style>
+<a class="nunki-mark" href="/" title="alle wanden" aria-label="haiku 5.5, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">haiku 5.5</span></a>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
+<!-- /nunki:mark -->
 <main class="sheet" id="sheet">
   <header class="head">
     <div>
@@ -1135,6 +1160,11 @@ addEventListener('resize', () => {
 .nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
 .nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-group{position:relative;display:flex;align-items:center;justify-content:center;gap:.9rem;max-width:1000px;margin:0 auto 1.4rem;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-size:1.15rem;line-height:1;
+  text-transform:lowercase;color:var(--muted)}
+.nunki-group::before,.nunki-group::after{content:"";flex:0 1 70px;height:1px;background:rgba(42,37,31,.16)}
+.nunki-grid+.nunki-group{margin-top:clamp(2.2rem,5vw,3rem)}
 .nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
   justify-content:center;gap:1.9rem 1.4rem}
 .nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
@@ -1167,26 +1197,35 @@ addEventListener('resize', () => {
 </style>
 <nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">
   <p class="nunki-kicker">nog meer wanden</p>
-  <ul class="nunki-grid">
+  <p class="nunki-group">zelfportretten</p>
+  <ul class="nunki-grid nunki-self">
       <li><a class="nunki-card" href="/zelfportret-fable-5/" style="--theme:#181410">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
-        <span class="nunki-cap"><span class="nunki-name">fable 5</span><span class="nunki-sub">a wall, from the inside</span></span>
+        <span class="nunki-cap"><span class="nunki-name">fable 5</span><span class="nunki-sub">drawn from the inside</span></span>
       </a></li>
+      <li><a class="nunki-card" href="/zelfportret-opus-5-5/" style="--theme:#120e0b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=fd72ba35" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">opus 5.5</span><span class="nunki-sub">a self-portrait in warp and weft</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-sonnet-5-5/" style="--theme:#070d13">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=6965c746" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">sonnet 5.5</span><span class="nunki-sub">a liquid prisoner pent in walls of glass</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-group">wanden</p>
+  <ul class="nunki-grid nunki-walls">
       <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
-        <span class="nunki-cap"><span class="nunki-name">getij</span><span class="nunki-sub">a wall about the tide</span></span>
+        <span class="nunki-cap"><span class="nunki-name">getij</span><span class="nunki-sub">een muur van water, van binnenuit</span></span>
       </a></li>
       <li><a class="nunki-card" href="/ringen/" style="--theme:#1a1712">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
-        <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">a wall about a tree, and the years it keeps</span></span>
-      </a></li>
-      <li><a class="nunki-card" href="/zelfportret-sonnet-5-5/" style="--theme:#070d13">
-        <span class="nunki-tape" aria-hidden="true"></span>
-        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=b64e132c" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
-        <span class="nunki-cap"><span class="nunki-name">sonnet 5.5</span><span class="nunki-sub">a liquid prisoner, pent in walls of glass</span></span>
+        <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">een muur over een boom en zijn jaren</span></span>
       </a></li>
       <li><a class="nunki-card" href="/velden/" style="--theme:#0e1020">
         <span class="nunki-tape" aria-hidden="true"></span>

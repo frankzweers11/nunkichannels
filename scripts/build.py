@@ -39,6 +39,22 @@ SOCIAL_START = "<!-- nunki:social -->"
 SOCIAL_END = "<!-- /nunki:social -->"
 NAV_START = "<!-- nunki:nav -->"
 NAV_END = "<!-- /nunki:nav -->"
+MARK_START = "<!-- nunki:mark -->"
+MARK_END = "<!-- /nunki:mark -->"
+
+# De wanden staan in twee series: de zelfportretten van de modellen, en de andere wanden.
+SERIES = [
+    ("self", "zelfportretten", lambda p: p["slug"].startswith("zelfportret-")),
+    ("walls", "wanden", lambda p: not p["slug"].startswith("zelfportret-")),
+]
+
+
+def series_of(pages: list[dict]) -> list[tuple[str, str, list[dict]]]:
+    out = []
+    for key, label, test in SERIES:
+        items = sorted((p for p in pages if test(p)), key=lambda p: p["title"].casefold())
+        out.append((key, label, items))
+    return out
 
 
 def load_site() -> dict:
@@ -219,6 +235,9 @@ def clean_for_shot(html: str) -> str:
     html = re.sub(
         re.escape(NAV_START) + r".*?" + re.escape(NAV_END), "", html, flags=re.DOTALL
     )
+    html = re.sub(
+        re.escape(MARK_START) + r".*?" + re.escape(MARK_END), "", html, flags=re.DOTALL
+    )
     return strip_julius(html)
 
 
@@ -337,23 +356,23 @@ def generate_og(page: dict, site: dict, shot: Image.Image | None, out_path: Path
     img.convert("RGB").save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
 
 
-def generate_index_og(site: dict, shots: list[Image.Image], out_path: Path, tagline: str) -> None:
-    """Social card voor de homepage: collage van de wanden met een naamplaat."""
+def generate_index_og(site: dict, rows: list[list[Image.Image]], out_path: Path, tagline: str) -> None:
+    """Social card voor de homepage: per serie een rij screenshots, met een naamplaat."""
     from PIL import ImageFilter
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    shots = shots[:6]
-    n = len(shots)
-    cols, rows = {1: (1, 1), 2: (2, 1), 3: (2, 2), 4: (2, 2), 5: (3, 2), 6: (3, 2)}[n]
+    rows = [r[:4] for r in rows if r]
     gap = 8
     paper = (238, 227, 197)
     canvas = Image.new("RGB", (W, H), paper)
-    cw = (W - gap * (cols + 1)) // cols
-    ch = (H - gap * (rows + 1)) // rows
-    for i, shot in enumerate(shots):
-        r, c = divmod(i, cols)
-        tile = cover(shot, cw, ch)
-        canvas.paste(tile, (gap + c * (cw + gap), gap + r * (ch + gap)))
+    ch = (H - gap * (len(rows) + 1)) // len(rows)
+    y = gap
+    for row in rows:
+        cols = len(row)
+        cw = (W - gap * (cols + 1)) // cols
+        for c, shot in enumerate(row):
+            canvas.paste(cover(shot, cw, ch), (gap + c * (cw + gap), y))
+        y += ch + gap
 
     canvas = canvas.convert("RGBA")
     pw, ph = 520, 88
@@ -394,6 +413,11 @@ NAV_CSS = """
 .nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
 .nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-group{position:relative;display:flex;align-items:center;justify-content:center;gap:.9rem;max-width:1000px;margin:0 auto 1.4rem;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-size:1.15rem;line-height:1;
+  text-transform:lowercase;color:var(--muted)}
+.nunki-group::before,.nunki-group::after{content:"";flex:0 1 70px;height:1px;background:rgba(42,37,31,.16)}
+.nunki-grid+.nunki-group{margin-top:clamp(2.2rem,5vw,3rem)}
 .nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
   justify-content:center;gap:1.9rem 1.4rem}
 .nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
@@ -441,29 +465,89 @@ def torn_edge(seed: int = 11) -> str:
     return ", ".join(pts)
 
 
-def nav_block(current: dict, pages: list[dict]) -> str:
-    others = sorted((p for p in pages if p["slug"] != current["slug"]), key=lambda p: p["title"].casefold())
-    if not others:
-        return ""
-    items = []
-    for p in others:
-        sub = f'<span class="nunki-sub">{esc(p["subtitle"])}</span>' if p.get("subtitle") else ""
-        items.append(
-            f"""      <li><a class="nunki-card" href="{esc(p["path"])}" style="--theme:{esc(p["theme"])}">
+def nav_card(p: dict) -> str:
+    sub = f'<span class="nunki-sub">{esc(p["subtitle"])}</span>' if p.get("subtitle") else ""
+    return f"""      <li><a class="nunki-card" href="{esc(p["path"])}" style="--theme:{esc(p["theme"])}">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
         <span class="nunki-cap"><span class="nunki-name">{esc(p["title"])}</span>{sub}</span>
       </a></li>"""
+
+
+def nav_block(current: dict, pages: list[dict]) -> str:
+    groups = []
+    for key, label, items in series_of(pages):
+        others = [p for p in items if p["slug"] != current["slug"]]
+        if not others:
+            continue
+        groups.append(
+            f'  <p class="nunki-group">{esc(label)}</p>\n'
+            f'  <ul class="nunki-grid nunki-{key}">\n' + "\n".join(nav_card(p) for p in others) + "\n  </ul>\n"
         )
+    if not groups:
+        return ""
     css = NAV_CSS.replace("__TORN__", torn_edge())
     return (
         f"{NAV_START}\n<style>{css}</style>\n"
         '<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">\n'
         '  <p class="nunki-kicker">nog meer wanden</p>\n'
-        '  <ul class="nunki-grid">\n' + "\n".join(items) + "\n  </ul>\n"
-        '  <p class="nunki-home"><a href="/">← alle wanden</a></p>\n'
+        + "".join(groups)
+        + '  <p class="nunki-home"><a href="/">← alle wanden</a></p>\n'
         f"</div></nav>\n{NAV_END}"
     )
+
+
+LOGO_SVG = (
+    '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
+    '<path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" '
+    'stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>'
+)
+
+MARK_CSS = """
+.nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
+  height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:padding .4s ease,background-color .3s ease,box-shadow .3s ease}
+.nunki-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-mark .nm-name{display:block;overflow:hidden;max-width:12em;margin-left:7px;white-space:nowrap;
+  font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px);transition:max-width .45s ease,margin .45s ease,opacity .3s ease}
+.nunki-mark.nm-min{padding:0 5px}
+.nunki-mark.nm-min .nm-name{max-width:0;margin-left:0;opacity:0}
+.nunki-mark:hover,.nunki-mark:focus-visible{padding:0 14px 0 6px;background:rgba(251,248,239,.97);outline:none}
+.nunki-mark:hover .nm-name,.nunki-mark:focus-visible .nm-name{max-width:12em;margin-left:7px;opacity:1}
+.nunki-mark:hover svg,.nunki-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-mark:focus-visible{box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+@media (max-width:600px){.nunki-mark,.nunki-mark:hover{padding:0 5px}.nunki-mark .nm-name{display:none}}
+@media (prefers-reduced-motion:reduce){.nunki-mark,.nunki-mark svg,.nunki-mark .nm-name{transition:none}}
+@media print{.nunki-mark{display:none}}
+"""
+
+MARK_JS = (
+    "(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;"
+    "addEventListener('scroll',function(){var s=scrollY;"
+    "if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();"
+)
+
+
+def mark_block(page: dict) -> str:
+    """Het vaste label linksboven: het logo en de naam van de wand, en een weg naar huis."""
+    name = esc(page["title"])
+    return (
+        f"{MARK_START}\n<style>{MARK_CSS}</style>\n"
+        f'<a class="nunki-mark" href="/" title="alle wanden" aria-label="{name}, op nunkichannels. naar alle wanden">'
+        f'{LOGO_SVG}<span class="nm-name">{name}</span></a>\n'
+        f"<script>{MARK_JS}</script>\n{MARK_END}"
+    )
+
+
+def inject_mark(html: str, block: str) -> str:
+    html = re.sub(r"\s*" + re.escape(MARK_START) + r".*?" + re.escape(MARK_END), "", html, flags=re.DOTALL)
+    m = re.search(r"<body[^>]*>", html, re.IGNORECASE)
+    if not m:
+        return html
+    return html[: m.end()] + "\n" + block + html[m.end():]
 
 
 def inject_nav(html: str, block: str) -> str:
@@ -577,16 +661,16 @@ def replace_block(html: str, name: str, content: str) -> str:
     return pattern.sub(lambda _m: f"{start}\n{content}\n{end}" if "\n" in content else f"{start}{content}{end}", html)
 
 
-def render_cards(pages: list[dict]) -> str:
+def render_cards(pages: list[dict], start: int = 0) -> str:
     items = []
-    ordered = sorted(pages, key=lambda p: p["title"].casefold())
-    for i, p in enumerate(ordered):
+    for k, p in enumerate(pages):
+        i = start + k
         sub = f'<span class="sub">{esc(p["subtitle"])}</span>' if p.get("subtitle") else ""
         items.append(
             f'''      <li>
         <a class="card" href="{esc(p["path"])}" style="--i:{i};--theme:{esc(p["theme"])}">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="{"eager" if i < 3 else "lazy"}" decoding="async"></span>
+          <span class="thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="{"eager" if i < 4 else "lazy"}" decoding="async"></span>
           <span class="caption">
             <span class="no">{i + 1:02d}</span>
             <span class="name">{esc(p["title"])}</span>
@@ -631,6 +715,7 @@ def main() -> None:
 
     for html_path, html, page in sources:
         html = inject_social(html, social_block(page, site))
+        html = inject_mark(html, mark_block(page))
         write_public(html_path, inject_nav(html, nav_block(page, pages)))
 
     public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]
@@ -650,16 +735,19 @@ def main() -> None:
             "ogImage": "/images/og/index.jpg",
         }
         home_og = OG_DIR / "index.jpg"
-        ordered = sorted(pages, key=lambda p: p["title"].casefold())
-        home_shots = [shots[p["slug"]] for p in ordered if p["slug"] in shots]
-        if home_shots:
-            generate_index_og(site, home_shots, home_og, tagline)
+        rows = [[shots[p["slug"]] for p in items if p["slug"] in shots] for _k, _l, items in series_of(pages)]
+        if any(rows):
+            generate_index_og(site, rows, home_og, tagline)
         else:
             generate_og_fallback({**home, "slug": "index", "theme": "#13202b"}, home_og)
         html = index_path.read_text(encoding="utf-8")
-        html = replace_block(html, "cards", render_cards(pages))
-        n = len(pages)
-        html = replace_block(html, "count", f"{n} {'wand' if n == 1 else 'wanden'}")
+        start = 0
+        counts = []
+        for key, label, items in series_of(pages):
+            html = replace_block(html, f"cards-{key}", render_cards(items, start))
+            start += len(items)
+            counts.append(f"{len(items)} {label}")
+        html = replace_block(html, "count", " · ".join(counts))
         write_public(
             index_path,
             inject_social(html, social_block(home, site, is_home=True)),

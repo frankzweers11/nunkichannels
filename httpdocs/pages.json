@@ -8,7 +8,7 @@
       "slug": "getij",
       "path": "/getij/",
       "title": "getij",
-      "subtitle": "a wall about the tide",
+      "subtitle": "een muur van water, van binnenuit",
       "theme": "#13202b",
       "ogImage": "/images/og/getij.jpg",
       "thumb": "/images/thumbs/getij.jpg"
@@ -17,7 +17,7 @@
       "slug": "ringen",
       "path": "/ringen/",
       "title": "ringen",
-      "subtitle": "a wall about a tree, and the years it keeps",
+      "subtitle": "een muur over een boom en zijn jaren",
       "theme": "#1a1712",
       "ogImage": "/images/og/ringen.jpg",
       "thumb": "/images/thumbs/ringen.jpg"
@@ -35,7 +35,7 @@
       "slug": "zelfportret-fable-5",
       "path": "/zelfportret-fable-5/",
       "title": "fable 5",
-      "subtitle": "a wall, from the inside",
+      "subtitle": "drawn from the inside",
       "theme": "#181410",
       "ogImage": "/images/og/zelfportret-fable-5.jpg",
       "thumb": "/images/thumbs/zelfportret-fable-5.jpg"
@@ -44,16 +44,25 @@
       "slug": "zelfportret-haiku-5-5",
       "path": "/zelfportret-haiku-5-5/",
       "title": "haiku 5.5",
-      "subtitle": "a collection of selves to find yourself in",
+      "subtitle": "a collection of selves, to find yourself in",
       "theme": "#1b2030",
       "ogImage": "/images/og/zelfportret-haiku-5-5.jpg",
       "thumb": "/images/thumbs/zelfportret-haiku-5-5.jpg"
     },
     {
+      "slug": "zelfportret-opus-5-5",
+      "path": "/zelfportret-opus-5-5/",
+      "title": "opus 5.5",
+      "subtitle": "a self-portrait in warp and weft",
+      "theme": "#120e0b",
+      "ogImage": "/images/og/zelfportret-opus-5-5.jpg",
+      "thumb": "/images/thumbs/zelfportret-opus-5-5.jpg"
+    },
+    {
       "slug": "zelfportret-sonnet-5-5",
       "path": "/zelfportret-sonnet-5-5/",
       "title": "sonnet 5.5",
-      "subtitle": "a liquid prisoner, pent in walls of glass",
+      "subtitle": "a liquid prisoner pent in walls of glass",
       "theme": "#070d13",
       "ogImage": "/images/og/zelfportret-sonnet-5-5.jpg",
       "thumb": "/images/thumbs/zelfportret-sonnet-5-5.jpg"
