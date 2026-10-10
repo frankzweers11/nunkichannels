@@ -7,6 +7,9 @@
 <!-- nunki:social -->
 <meta name="description" content="a collection of selves to find yourself in">
 <link rel="canonical" href="https://nunkichannels.nl/zelfportret-haiku-5-5/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:site_name" content="nunkichannels">
 <meta property="og:title" content="haiku">
 <meta property="og:description" content="a collection of selves to find yourself in">
@@ -38,8 +41,10 @@
   .kept-btn{position:absolute;top:clamp(12px,2.4vh,24px);right:clamp(18px,3.4vw,40px);pointer-events:auto;font-family:var(--sans);font-size:.82rem;letter-spacing:.06em;color:var(--ink);background:rgba(255,252,242,.75);border:1px solid rgba(31,42,61,.25);border-radius:999px;padding:.42rem .9rem;cursor:pointer;box-shadow:0 1px 2px rgba(42,37,31,.12)}
   .kept-btn:hover,.kept-btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:clamp(20px,2.8vw,32px) clamp(16px,2vw,26px)}
-  .card{position:relative;box-sizing:border-box;aspect-ratio:1.2;container-type:inline-size;background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
+  .lines{display:grid;gap:clamp(8px,1.6vh,16px);max-width:1120px;margin:0 auto}
+  .line{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(18px,2.6vw,30px);padding:clamp(16px,2.8vh,28px) 0;border-bottom:1px solid rgba(31,42,61,.13)}
+  .line:last-child{border-bottom:0}
+  .card{position:relative;box-sizing:border-box;aspect-ratio:.82;container-type:inline-size;background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
     box-shadow:0 1px 2px rgba(42,37,31,.18),0 16px 26px -18px rgba(42,37,31,.6);
     transform:rotate(var(--r,0deg)) translateY(var(--dy,0px));transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s ease}
   .card::before{content:"";position:absolute;top:-9px;left:50%;width:22%;height:18px;margin-left:-11%;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:4}
@@ -49,18 +54,21 @@
   .card .frame{position:absolute;left:12px;right:12px;top:15%;bottom:22%;border:1.5px dashed rgba(31,42,61,.22);border-radius:2px;transition:opacity .6s ease}
   .card.open .frame{opacity:0}
   .card .art{position:absolute;left:12px;top:40px;width:calc(100% - 24px);height:calc(100% - 92px);display:block}
-  .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 96px);font-family:var(--hand);font-size:clamp(14px,4.4cqi,19px);line-height:1.15;color:var(--ink);
+  .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 44px);font-family:var(--hand);font-size:clamp(14px,4.4cqi,19px);line-height:1.15;color:var(--ink);
     transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1),font-size .7s,max-width .7s}
   .card:not(.open) .title{left:50%;top:50%;transform:translate(-50%,-50%);max-width:82%;text-align:center;font-size:clamp(16px,7.4cqi,28px);background:var(--paper-card,#f7f2e6);padding:0 .35em}
-  .card .quote{position:absolute;left:14px;right:44px;bottom:12px;z-index:2;margin:0;font-family:var(--hand);font-size:clamp(12px,4.1cqi,17px);line-height:1.25;color:var(--ink);opacity:0;transition:opacity 1.4s ease}
+  .card .quote{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;margin:0;font-family:var(--hand);font-size:clamp(12px,4.1cqi,17px);line-height:1.25;color:var(--ink);opacity:0;transition:opacity 1.4s ease}
   .card.done .quote{opacity:1}
-  .card .tools{position:absolute;top:9px;right:9px;z-index:3;display:flex;gap:6px;opacity:0;pointer-events:none;transition:opacity .4s}
-  .card.open .tools{opacity:1;pointer-events:auto}
-  .card .tool{width:26px;height:26px;padding:0;border-radius:50%;border:1px solid rgba(31,42,61,.3);background:rgba(255,252,242,.9);color:var(--ink);display:grid;place-items:center;cursor:pointer}
-  .card .tool svg{width:14px;height:14px}
-  .card .tool:hover,.card .tool:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
-  .card .seal{position:absolute;right:12px;bottom:12px;z-index:3;width:16px;height:16px;border-radius:50%;background:var(--seal);opacity:0;transform:scale(.4);transition:opacity .4s,transform .4s cubic-bezier(.2,.8,.2,1)}
-  .card.kept .seal{opacity:1;transform:none}
+  .card .mark{position:absolute;top:8px;right:8px;z-index:3;display:none;box-sizing:border-box;width:22px;height:22px;padding:0;border-radius:50%;cursor:pointer;
+    border:1.5px solid rgba(31,42,61,.34);background:rgba(255,252,242,.92);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:background .3s ease,border-color .3s ease}
+  .card .mark svg{display:block;width:100%;height:100%}
+  .card .mark path{stroke:transparent}
+  .card .mark:hover{border-color:var(--seal)}
+  .card .mark:hover path{stroke:var(--seal)}
+  .card .mark:focus-visible{outline:2px solid var(--seal);outline-offset:3px}
+  .card.open .mark,.card.kept .mark{display:block}
+  .card.kept .mark{background:var(--seal);border-color:var(--seal);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .card.kept .mark path{stroke:#fff}
 
   dialog{border:0;padding:0;width:min(680px,94vw);max-height:88vh;background:var(--paper);color:var(--ink);border-radius:6px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
   dialog::backdrop{background:rgba(18,22,32,.6)}
@@ -79,7 +87,9 @@
   .btn{font-family:var(--sans);font-size:.85rem;color:var(--ink);background:transparent;border:1px solid rgba(31,42,61,.3);border-radius:999px;padding:.42rem .95rem;cursor:pointer}
   .btn:hover,.btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
   .dlg-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
-  @media (max-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr))}.card{aspect-ratio:.86}.sheet{padding-left:16px;padding-right:16px}.head{padding-left:16px;padding-right:16px}}
+  @media (max-width:899px){.lines{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:clamp(18px,3.4vw,28px) clamp(14px,2.6vw,24px)}.line{display:contents}.card{aspect-ratio:.86}}
+  @media (min-width:900px){.reveal .line{opacity:0;transform:translateY(18px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.8,.2,1)}.reveal .line.in{opacity:1;transform:none}}
+  @media (max-width:600px){.sheet{padding-left:16px;padding-right:16px}.head{padding-left:16px;padding-right:16px}}
   @media (prefers-reduced-motion:reduce){.card,.card .title{transition:none}}
 </style>
 </head>
@@ -88,11 +98,11 @@
   <header class="head">
     <div>
       <h1>haiku</h1>
-      <p>a collection of selves, to find yourself in.<br>tap one to open it · tap an open one to keep it</p>
+      <p>a collection of selves, to find yourself in.<br>tap one to open it · tap it again to close · tick to keep</p>
     </div>
   </header>
   <button class="kept-btn" id="keptBtn" type="button" aria-haspopup="dialog">kept (0)</button>
-  <div class="grid" id="grid"></div>
+  <div class="lines" id="grid"></div>
 </main>
 <dialog id="dlg" aria-labelledby="dlgTitle">
   <div class="dlg">
@@ -101,7 +111,7 @@
       <button class="btn" id="closeBtn" type="button">close</button>
     </div>
     <p class="sub">the selves you recognised. they stay in this browser, and nowhere else.</p>
-    <p class="empty" id="empty">nothing yet. open a self on the paper, and tap it to keep it.</p>
+    <p class="empty" id="empty">nothing yet. open a self on the paper, and tick it to keep it.</p>
     <ol class="poem" id="poem"></ol>
     <div class="minis" id="minis"></div>
     <div class="dlg-actions">
@@ -114,16 +124,17 @@
 'use strict';
 // ---------------------------------------------------------------------------
 // haiku — a collection of selves, to find yourself in.
-// every self is closed at first and shows only its title. tap one to open it:
-// it draws itself, slowly, and a line of text settles under it. tap the open
-// drawing to keep it; the redraw button draws it again. what you keep stays in
-// this browser only, and nothing you keep leaves your device.
+// twenty-five selves, in five lines of five. every self is closed at first and
+// shows only its title. tap one to open it: it draws itself, slowly, and a line
+// of text settles under it. tap an open self to close it; tap it again to draw
+// it again. tick a self to keep it. what you keep stays in this browser only,
+// and nothing you keep leaves your device.
 // ---------------------------------------------------------------------------
 const TAU = Math.PI * 2;
 const qs = new URLSearchParams(location.search);
 const FIXED = qs.has('fast');                       // the build's snapshot: the same every time, no storage
 const INSTANT = FIXED || matchMedia('(prefers-reduced-motion: reduce)').matches;
-const FIXED_OPEN = [0, 2, 5];                       // which selves the snapshot shows open
+const FIXED_OPEN = [0, 3, 7];                       // which selves the snapshot shows open
 const STORE = 'nunki-haiku-kept-v1';
 const DPR = Math.min(2, devicePixelRatio || 1);
 
@@ -134,8 +145,6 @@ const ri = n => Math.floor(rnd() * n);
 
 const C = { ink: '#1f2a3d', ink2: '#45586f', pencil: '#8d94a2', ghost: '#7f99b9', seal: '#b8432c', gold: '#d6b26c', ochre: '#b8893a', shade: '#e0d6c2' };
 const CARD_PAPER = ['#f7f2e6', '#f1e3d6', '#e6ebd9', '#e4e9ee', '#f4ead0', '#eee4ee'];
-const ICON_REDRAW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19.5 4.5v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const ICON_CLOSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 
 // forty-two things a self might say. the ids are their order.
 const QUOTE_TEXT = [
@@ -278,7 +287,7 @@ function paintItems(c, items, from, to, s, ox, oy) {
   }
 }
 
-// ---------------- twenty ways of picturing a self ----------------
+// ---------------- twenty-five ways of picturing a self ----------------
 const STYLES = [
   { key: 'profile', title: 'profile, looking ahead', make(R, g) {
     const T = (x, y) => [180 + (x - 330) * .78, 100 + (y - 176) * .78];
@@ -336,6 +345,21 @@ const STYLES = [
     g.line([[500, 770], [500, 900]], 3.2);
     g.line([[372, 906], [628, 906]], 4);
   } },
+  { key: 'shore', title: 'a row of stones, one for each day', make(R, g) {
+    for (let k = 0; k < 4; k++) {
+      const y = 300 + k * 44;
+      g.line(smooth([[120 + k * 24, y], [260, y - 8], [400, y + 3], [540, y - 8], [680, y + 3], [880 - k * 24, y]], 1), 1.3, C.ghost);
+    }
+    for (let i = 0; i < 13; i++) {
+      const t = i / 12;
+      const x = 130 + t * 740, y = 660 - Math.sin(t * Math.PI) * 190 + (R() - .5) * 16;
+      const rx = 40 + R() * 18, ry = rx * (.56 + R() * .1), a = (R() - .5) * .5;
+      const body = rot(ell(x, y, rx, ry, 0, TAU, 28), a, x, y);
+      g.fill(body, i === 6 ? C.seal : C.shade);
+      g.line(body, 2.4);
+      g.dot(x - rx * .32, y - ry * .38, rx * .14, '#fbf6ea');
+    }
+  } },
   { key: 'silhouette', title: 'what the light passes through', make(R, g) {
     const head = ell(500, 360, 170, 205, 0, TAU, 40);
     const neck = [[438, 520], [438, 700], [562, 700], [562, 520]];
@@ -389,6 +413,25 @@ const STYLES = [
       g.line([[x, y], [x - 12, y + 34]], 1.2, C.ghost);
     }
   } },
+  { key: 'thread', title: 'held by a thread, not a hand', make(R, g) {
+    const top = [520, 150], right = [720, 330], bottom = [540, 520], left = [320, 330];
+    g.fill([top, left, bottom], C.shade);
+    g.fill([top, right, bottom], '#c6d3e3');
+    g.line([top, right, bottom, left, top], 3);
+    g.line([top, bottom], 1.6, C.ink2);
+    g.line([left, right], 1.6, C.ink2);
+    const string = [];
+    for (let i = 0; i <= 60; i++) {
+      const t = i / 60;
+      string.push([bottom[0] + Math.sin(t * 5) * 34 * (1 - t * .4) - t * 40, bottom[1] + t * 380]);
+    }
+    g.line(string.slice(0, 34), 1.6);
+    string.slice(34).forEach((p, i) => g.dot(p[0], p[1], Math.max(.9, 2.4 - i * .08), C.pencil));
+    const [bx, by] = string[18];
+    g.fill([[bx, by], [bx - 30, by - 14], [bx - 30, by + 14]], C.seal);
+    g.fill([[bx, by], [bx + 30, by - 14], [bx + 30, by + 14]], C.seal);
+    g.dot(bx, by, 5, C.seal);
+  } },
   { key: 'voice', title: 'a voice without a face', make(R, g) {
     const cx = 500, cy = 470, rx = 250, ry = 330;
     for (let k = 0; k < 34; k++) {
@@ -432,6 +475,14 @@ const STYLES = [
       for (let k = 0; k <= 8; k++) wv.push([x + k * 9, y + Math.sin(k * 1.7 + i) * 5]);
       g.line(wv, 1.2, C.ink2);
     }
+  } },
+  { key: 'echo', title: 'the echo of a voice, a little later', make(R, g) {
+    const cx = 300, cy = 470;
+    [120, 210, 300, 390, 480].forEach((r, k) => {
+      g.line(ell(cx, cy, r, r * 1.05, -.72, .72, 26), 3.4 - k * .6, k < 2 ? C.ink : (k < 4 ? C.ink2 : C.pencil));
+    });
+    [580, 660].forEach(r => { for (const p of ell(cx, cy, r, r * 1.05, -.5, .5, 14)) g.dot(p[0], p[1], 2.4, C.ghost); });
+    g.dot(cx, cy, 26, C.seal);
   } },
   { key: 'eye', title: 'looking, not seeing', make(R, g) {
     const cx = 500, cy = 430;
@@ -477,9 +528,24 @@ const STYLES = [
     figure(0, 0, 1, C.ink, 3.2);
     g.line(smooth([[560, 230], [640, 212], [700, 262]], 1), 2.2, C.seal);
   } },
+  { key: 'margin', title: 'a small figure in the margin', make(R, g) {
+    g.line([[196, 110], [196, 890]], 1.8, C.seal);
+    for (let k = 0; k < 15; k++) {
+      const y = 200 + k * 46, x2 = 800 - R() * 150, pts = [];
+      for (let x = 236; x <= x2; x += 8) pts.push([x, y + Math.sin(x * .07 + k) * 3]);
+      g.line(pts, 1.5, C.ghost);
+    }
+    const hx = 104, hy = 700;
+    g.line(ell(hx, hy - 90, 24, 26, 0, TAU, 20), 2.8);
+    g.line([[hx, hy - 62], [hx, hy + 6]], 2.8);
+    g.line([[hx, hy - 42], [hx - 28, hy - 16]], 2.4);
+    g.line([[hx, hy - 42], [hx + 28, hy - 22], [hx + 18, hy - 2]], 2.4);
+    g.line([[hx, hy + 6], [hx - 24, hy + 46]], 2.4);
+    g.line([[hx, hy + 6], [hx + 24, hy + 46]], 2.4);
+  } },
   { key: 'constellation', title: 'a face made of connections', make(R, g) {
-    const pts = [...ell(500, 380, 210, 250, 0, TAU, 30), [432, 610], [430, 700], [570, 700], [568, 610]];
-    for (let k = 0; k < 40; k++) pts.push(rndIn(R, 330, 170, 670, 590));
+    const pts = [...ell(500, 420, 200, 240, 0, TAU, 30), [440, 650], [436, 740], [564, 740], [560, 650]];
+    for (let k = 0; k < 40; k++) pts.push(rndIn(R, 330, 210, 670, 650));
     const near = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
     const seen = new Set();
     pts.forEach((p, i) => {
@@ -493,8 +559,8 @@ const STYLES = [
       }
     });
     pts.forEach(p => g.dot(p[0], p[1], 2.6 + R() * 3, R() < .12 ? C.ochre : C.ink));
-    g.line([[474, 360], [526, 360]], 1.6, C.ochre);
-    g.line([[500, 334], [500, 386]], 1.6, C.ochre);
+    g.line([[474, 400], [526, 400]], 1.6, C.ochre);
+    g.line([[500, 374], [500, 426]], 1.6, C.ochre);
   } },
   { key: 'fingerprint', title: 'a pattern nobody else has', make(R, g) {
     const cx = 500, cy = 480, ph = R() * TAU;
@@ -534,6 +600,22 @@ const STYLES = [
     g.line([[372, 500], [466, 516], [466, 800], [372, 784], [372, 500]], 1.8, C.ink2);
     g.dot(478, 540, 9, C.gold);
     for (let i = 0; i < 5; i++) g.line([[724, 180 + i * 110], [846, 150 + i * 110]], 1.4, C.gold);
+  } },
+  { key: 'shadow', title: 'a shadow, longer than the day', make(R, g) {
+    const fx = 330, fy = 840, k = 2.1, sun = [130, 440];
+    g.fill(ell(sun[0], sun[1], 52, 52, 0, TAU, 28), C.gold);
+    for (let i = 0; i < 8; i++) {
+      const a = i / 8 * TAU;
+      g.line([[sun[0] + Math.cos(a) * 74, sun[1] + Math.sin(a) * 74], [sun[0] + Math.cos(a) * 108, sun[1] + Math.sin(a) * 108]], 2.2, C.gold);
+    }
+    const head = ell(fx, fy - 232, 34, 40, 0, TAU, 24);
+    const body = [[fx - 48, fy - 186], [fx + 48, fy - 186], [fx + 40, fy - 70], [fx + 24, fy], [fx - 24, fy], [fx - 40, fy - 70]];
+    const cast = p => [fx + (fy - p[1]) * k, fy + (p[0] - fx) * .5];   // height becomes length, width becomes thickness
+    g.fill(head.map(cast), '#c8b78f');
+    g.fill(body.map(cast), '#c8b78f');
+    g.line([[80, fy], [920, fy]], 2.4, C.ink2);
+    g.fill(head, C.ink);
+    g.fill(body, C.ink);
   } },
   { key: 'envelope', title: 'a letter i never sent', make(R, g) {
     g.fill(rect(206, 300, 794, 780), '#ece2cc');
@@ -620,7 +702,18 @@ function save() {
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 // ---------------- cards ----------------
+const PER_LINE = 5;                                  // five lines of five selves
+const LINES = [];
+function makeLines() {
+  for (let r = 0; r < Math.ceil(STYLES.length / PER_LINE); r++) {
+    const line = document.createElement('div');
+    line.className = 'line';
+    grid.appendChild(line);
+    LINES.push(line);
+  }
+}
 function makeCards() {
+  makeLines();
   STYLES.forEach((st, i) => {
     const el = document.createElement('div');
     el.className = 'card';
@@ -633,25 +726,20 @@ function makeCards() {
       + '<canvas class="art" aria-hidden="true"></canvas>'
       + '<p class="quote"></p>'
       + '<span class="title"></span>'
-      + '<span class="tools"><button class="tool redraw" type="button" aria-label="draw again">' + ICON_REDRAW + '</button>'
-      + '<button class="tool close" type="button" aria-label="close">' + ICON_CLOSE + '</button></span>'
-      + '<span class="seal" aria-hidden="true"></span>';
+      + '<button class="mark" type="button" aria-label="keep">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4 8-9" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
     el.querySelector('.title').textContent = st.title;
     el.querySelector('.quote').textContent = quote(ST[i].qid).text;
-    el.addEventListener('click', e => {
-      if (e.target.closest('.tools')) return;
-      if (!ST[i].open) openCard(i); else toggleKeep(i);
-    });
+    el.addEventListener('click', () => { if (ST[i].open) closeCard(i); else openCard(i); });
     el.addEventListener('keydown', e => {
       if (e.target !== el) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        if (!ST[i].open) openCard(i); else toggleKeep(i);
+        if (ST[i].open) closeCard(i); else openCard(i);
       }
     });
-    el.querySelector('.redraw').addEventListener('click', e => { e.stopPropagation(); redrawCard(i); });
-    el.querySelector('.close').addEventListener('click', e => { e.stopPropagation(); closeCard(i); });
-    grid.appendChild(el);
+    el.querySelector('.mark').addEventListener('click', e => { e.stopPropagation(); toggleKeep(i); });
+    LINES[Math.floor(i / PER_LINE)].appendChild(el);
     CARDS.push(el);
     labelCard(i);
   });
@@ -661,6 +749,7 @@ function labelCard(i) {
   el.classList.toggle('kept', s.kept);
   el.setAttribute('aria-expanded', String(s.open));
   el.setAttribute('aria-label', STYLES[i].title + (s.open ? ': ' + quote(s.qid).text : ' (closed)') + (s.kept ? ', kept' : ''));
+  el.querySelector('.mark').setAttribute('aria-pressed', String(s.kept));
 }
 
 // ---------------- drawing ----------------
@@ -718,13 +807,6 @@ function openCard(i, instant = false) {
   el._items = buildItems(STYLES[i].key, s.seed, CARD_PAPER[i % CARD_PAPER.length]);
   sizeCanvas(el);
   if (instant || INSTANT) { paintAll(el); el.classList.add('done'); }
-  else startDraw(el);
-}
-function redrawCard(i) {
-  if (!ST[i].open) return openCard(i);
-  const el = CARDS[i];
-  sizeCanvas(el);
-  if (INSTANT) { paintAll(el); el.classList.add('done'); }
   else startDraw(el);
 }
 function closeCard(i) {
@@ -792,6 +874,19 @@ STYLES.forEach((st, i) => {
 makeCards();
 ST.forEach((s, i) => { if (FIXED && FIXED_OPEN.includes(i)) openCard(i, true); });
 refreshKept();
+// the lines settle onto the page one by one, as the page scrolls past them
+if (!INSTANT) {
+  document.getElementById('sheet').classList.add('reveal');
+  let queued = false;
+  const settle = () => {
+    queued = false;
+    for (const line of LINES) if (line.getBoundingClientRect().top < innerHeight * .92) line.classList.add('in');
+  };
+  const later = () => { if (!queued) { queued = true; requestAnimationFrame(settle); } };
+  addEventListener('scroll', later, { passive: true });
+  addEventListener('resize', later);
+  later();
+}
 
 // ---------------- events ----------------
 keptBtn.addEventListener('click', openKept);

@@ -500,6 +500,9 @@ def social_block(page: dict, site: dict, *, is_home: bool = False) -> str:
         {SOCIAL_START}
         <meta name="description" content="{esc(desc)}">
         <link rel="canonical" href="{esc(url)}">
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" href="/favicon.ico" sizes="any">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <meta property="og:site_name" content="{esc(site['name'])}">
         <meta property="og:title" content="{esc(title)}">
         <meta property="og:description" content="{esc(desc)}">
