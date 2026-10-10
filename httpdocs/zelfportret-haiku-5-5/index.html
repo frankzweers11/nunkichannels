@@ -50,7 +50,7 @@
   .card[data-slot="out"]{--x:0px;--s:.3;--o:0;z-index:0;pointer-events:none}
   .nav{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:clamp(8px,1.8vh,16px)}
   .nav .arrow{font-size:1.25rem;line-height:1;padding:.2rem .9rem}
-  .card{position:absolute;left:50%;top:50%;width:var(--cw);box-sizing:border-box;aspect-ratio:.82;container-type:inline-size;background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
+  .card{position:absolute;left:50%;top:50%;width:var(--cw);box-sizing:border-box;aspect-ratio:.82;container-type:inline-size;--qs:clamp(13px,5.2cqi,24px);background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
     box-shadow:0 1px 2px rgba(42,37,31,.18),0 16px 26px -18px rgba(42,37,31,.6);
     transform:translate(-50%,-50%) translateX(var(--x,0px)) scale(var(--s,1)) rotate(var(--rr,var(--r,0deg)));opacity:var(--o,1);transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .6s ease,box-shadow .45s ease}
   .card::before{content:"";position:absolute;top:-9px;left:50%;width:22%;height:18px;margin-left:-11%;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:4}
@@ -59,11 +59,11 @@
   .card:focus-visible{outline:2px solid var(--seal);outline-offset:4px}
   .card .frame{position:absolute;left:12px;right:12px;top:15%;bottom:22%;border:1.5px dashed rgba(31,42,61,.22);border-radius:2px;transition:opacity .6s ease}
   .card.open .frame{opacity:0}
-  .card .art{position:absolute;left:12px;top:40px;width:calc(100% - 24px);height:calc(100% - 92px);display:block}
-  .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 44px);font-family:var(--hand);font-size:clamp(14px,4.4cqi,19px);line-height:1.15;color:var(--ink);
+  .card .art{position:absolute;left:12px;top:40px;width:calc(100% - 24px);height:calc(100% - 40px - 3.75 * var(--qs) - 20px);display:block}
+  .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 44px);font-family:var(--hand);font-size:clamp(15px,5cqi,22px);line-height:1.15;color:var(--ink);
     transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1),font-size .7s,max-width .7s}
   .card:not(.open) .title{left:50%;top:50%;transform:translate(-50%,-50%);max-width:82%;text-align:center;font-size:clamp(16px,7.4cqi,28px);background:var(--paper-card,#f7f2e6);padding:0 .35em}
-  .card .quote{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;margin:0;font-family:var(--hand);font-size:clamp(12px,4.1cqi,17px);line-height:1.25;color:var(--ink);opacity:0;transition:opacity 1.4s ease}
+  .card .quote{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;margin:0;font-family:var(--hand);font-size:var(--qs);line-height:1.22;color:var(--ink);opacity:0;transition:opacity 1.4s ease}
   .card.done .quote{opacity:1}
   .card .mark{position:absolute;top:8px;right:8px;z-index:3;display:none;box-sizing:border-box;width:22px;height:22px;padding:0;border-radius:50%;cursor:pointer;
     border:1.5px solid rgba(31,42,61,.34);background:rgba(255,252,242,.92);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:background .3s ease,border-color .3s ease}
@@ -125,6 +125,8 @@
     <div class="minis" id="minis"></div>
     <div class="dlg-actions">
       <button class="btn" id="copyBtn" type="button">copy poem</button>
+      <button class="btn" id="copyPicBtn" type="button">copy picture</button>
+      <button class="btn" id="savePicBtn" type="button">save picture</button>
       <button class="btn" id="forgetBtn" type="button">forget all</button>
     </div>
   </div>
@@ -691,6 +693,8 @@ const forgetBtn = document.getElementById('forgetBtn');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const shuffleBtn = document.getElementById('shuffleBtn');
+const copyPicBtn = document.getElementById('copyPicBtn');
+const savePicBtn = document.getElementById('savePicBtn');
 
 const CARDS = [];        // one element per self, in the order of STYLES
 const ST = [];           // per self: { seed, qid, kept, open }
@@ -972,6 +976,127 @@ grid.addEventListener('pointerup', e => {
   if (Math.abs(dx) > 50) { swiped = true; go(dx < 0 ? 1 : -1); }
 });
 grid.addEventListener('click', e => { if (swiped) { swiped = false; e.stopPropagation(); e.preventDefault(); } }, true);
+// ---------------- the picture of what you kept ----------------
+// the poem and the selves on one sheet, for an email: it looks the same wherever it is opened
+const PIC_HAND = '"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy",sans-serif';
+const PIC_SANS = '"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif';
+const chunk = (a, n) => { const rows = []; for (let i = 0; i < a.length; i += n) rows.push(a.slice(i, i + n)); return rows; };
+function paintInBox(c, items, x, y, w, h) {
+  const s = Math.min(w, h) / 1000 * .94;
+  paintItems(c, items, 0, items.length, s, x + (w - 1000 * s) / 2, y + (h - 1000 * s) / 2);
+}
+function keptPicture() {
+  const W = 1200, P = 2, PAD = 72, GAP = 26;
+  const paper = '#f3ecdb', card = '#f7f2e6', ink = '#1f2a3d', sub = '#5b6577';
+  const measure = document.createElement('canvas').getContext('2d');
+  const wrap = (text, font, maxW) => {
+    measure.font = font;
+    const lines = [];
+    let line = '';
+    for (const word of text.split(' ')) {
+      const test = line ? line + ' ' + word : word;
+      if (line && measure.measureText(test).width > maxW) { lines.push(line); line = word; }
+      else line = test;
+    }
+    if (line) lines.push(line);
+    return lines;
+  };
+  // the poem: quotes side by side when there are many
+  const poemCols = KEPT.length > 6 ? 2 : 1;
+  const poemSize = poemCols === 2 ? 24 : 30, poemLH = poemSize * 1.4;
+  const poemFont = poemSize + 'px ' + PIC_HAND;
+  const colW = (W - 2 * PAD - (poemCols - 1) * GAP) / poemCols;
+  const poemRows = chunk(KEPT.map(k => wrap(quote(k.q).text, poemFont, colW)), poemCols);
+  // the selves: a grid, with the last row centred
+  const gridCols = KEPT.length > 6 ? 4 : 3;
+  const cardW = (W - 2 * PAD - (gridCols - 1) * GAP) / gridCols, cardH = Math.round(cardW * 1.22);
+  const cardRows = chunk(KEPT.map((k, i) => ({ k, i })), gridCols);
+  // the height follows from the content
+  const poemTop = PAD + 150;
+  const poemH = poemRows.reduce((h, row) => h + Math.max(...row.map(lines => lines.length)) * poemLH + 18, 0);
+  const gridTop = poemTop + poemH + 36;
+  const gridH = cardRows.length * cardH + (cardRows.length - 1) * GAP;
+  const footY = gridTop + gridH + 74;
+  const cv = document.createElement('canvas');
+  cv.width = W * P;
+  cv.height = Math.ceil(footY + 48) * P;
+  const c = cv.getContext('2d');
+  c.scale(P, P);
+  c.lineCap = 'round';
+  c.lineJoin = 'round';
+  c.fillStyle = paper;
+  c.fillRect(0, 0, W, footY + 48);
+  // the header
+  c.fillStyle = ink;
+  c.font = '64px ' + PIC_HAND;
+  c.fillText('what you kept', PAD, PAD + 60);
+  c.fillStyle = sub;
+  c.font = '22px ' + PIC_SANS;
+  c.fillText('the selves you recognised.', PAD, PAD + 104);
+  // the poem
+  c.fillStyle = ink;
+  c.font = poemFont;
+  let y = poemTop;
+  for (const row of poemRows) {
+    row.forEach((lines, col) => lines.forEach((ln, li) => c.fillText(ln, PAD + col * (colW + GAP), y + poemSize + li * poemLH)));
+    y += Math.max(...row.map(lines => lines.length)) * poemLH + 18;
+  }
+  // the selves, each on its own card, with its title underneath
+  cardRows.forEach((row, r) => {
+    const rowW = row.length * cardW + (row.length - 1) * GAP;
+    const x0 = PAD + (W - 2 * PAD - rowW) / 2;
+    row.forEach(({ k, i }, col) => {
+      const x = x0 + col * (cardW + GAP), top = gridTop + r * (cardH + GAP);
+      c.save();
+      c.translate(x + cardW / 2, top + cardH / 2);
+      c.rotate([-1, .8, -.5][i % 3] * Math.PI / 180);
+      c.translate(-cardW / 2, -cardH / 2);
+      c.shadowColor = 'rgba(42,37,31,.22)';
+      c.shadowBlur = 16;
+      c.shadowOffsetY = 6;
+      c.fillStyle = card;
+      c.fillRect(0, 0, cardW, cardH);
+      c.shadowColor = 'transparent';
+      c.shadowBlur = 0;
+      c.shadowOffsetY = 0;
+      paintInBox(c, buildItems(k.k, k.s, card), 14, 30, cardW - 28, cardH - 92);
+      c.fillStyle = ink;
+      c.font = '24px ' + PIC_HAND;
+      wrap(STYLE_BY_KEY[k.k].title, '24px ' + PIC_HAND, cardW - 28).slice(0, 2)
+        .forEach((ln, li) => c.fillText(ln, 14, cardH - 44 + li * 26));
+      c.fillStyle = 'rgba(214,178,108,.6)';
+      c.save();
+      c.translate(cardW / 2, 0);
+      c.rotate(-2.5 * Math.PI / 180);
+      c.fillRect(-36, -10, 72, 20);
+      c.restore();
+      c.restore();
+    });
+  });
+  // the footer: where the selves can be found
+  c.fillStyle = sub;
+  c.font = '20px ' + PIC_SANS;
+  c.fillText(location.host + location.pathname.replace(/index\.html$/, ''), PAD, footY);
+  return cv;
+}
+const pictureBlob = () => new Promise(resolve => keptPicture().toBlob(resolve, 'image/png'));
+savePicBtn.addEventListener('click', () => {
+  if (!KEPT.length) return;
+  const a = document.createElement('a');
+  a.href = keptPicture().toDataURL('image/png');
+  a.download = 'haiku-what-you-kept.png';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+copyPicBtn.addEventListener('click', async () => {
+  if (!KEPT.length) return;
+  try {
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': pictureBlob() })]);
+    copyPicBtn.textContent = 'copied';
+  } catch (e) { copyPicBtn.textContent = 'could not copy'; }
+  setTimeout(() => { copyPicBtn.textContent = 'copy picture'; }, 1600);
+});
 let RS = 0;
 addEventListener('resize', () => {
   clearTimeout(RS);
