@@ -41,15 +41,21 @@
   .kept-btn{position:absolute;top:clamp(12px,2.4vh,24px);right:clamp(18px,3.4vw,40px);pointer-events:auto;font-family:var(--sans);font-size:.82rem;letter-spacing:.06em;color:var(--ink);background:rgba(255,252,242,.75);border:1px solid rgba(31,42,61,.25);border-radius:999px;padding:.42rem .9rem;cursor:pointer;box-shadow:0 1px 2px rgba(42,37,31,.12)}
   .kept-btn:hover,.kept-btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
 
-  .lines{display:grid;gap:clamp(8px,1.6vh,16px);max-width:1120px;margin:0 auto}
-  .line{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(18px,2.6vw,30px);padding:clamp(16px,2.8vh,28px) 0;border-bottom:1px solid rgba(31,42,61,.13)}
-  .line:last-child{border-bottom:0}
-  .card{position:relative;box-sizing:border-box;aspect-ratio:.82;container-type:inline-size;background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
+  .stage{--cw:min(360px,28vw,46vh);position:relative;height:calc(var(--cw) * 1.22 + 84px);max-width:1200px;margin:0 auto;overflow:hidden}
+  .card[data-slot="-2"]{--x:calc(var(--cw) * -1.42);--s:.46;--o:.55;z-index:1}
+  .card[data-slot="-1"]{--x:calc(var(--cw) * -.84);--s:.6;--o:.94;z-index:2}
+  .card[data-slot="0"]{--x:0px;--s:1;--o:1;--rr:0deg;z-index:3}
+  .card[data-slot="1"]{--x:calc(var(--cw) * .84);--s:.6;--o:.94;z-index:2}
+  .card[data-slot="2"]{--x:calc(var(--cw) * 1.42);--s:.46;--o:.55;z-index:1}
+  .card[data-slot="out"]{--x:0px;--s:.3;--o:0;z-index:0;pointer-events:none}
+  .nav{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:clamp(8px,1.8vh,16px)}
+  .nav .arrow{font-size:1.25rem;line-height:1;padding:.2rem .9rem}
+  .card{position:absolute;left:50%;top:50%;width:var(--cw);box-sizing:border-box;aspect-ratio:.82;container-type:inline-size;background:var(--paper-card,#f7f2e6);border-radius:3px;cursor:pointer;outline:none;
     box-shadow:0 1px 2px rgba(42,37,31,.18),0 16px 26px -18px rgba(42,37,31,.6);
-    transform:rotate(var(--r,0deg)) translateY(var(--dy,0px));transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s ease}
+    transform:translate(-50%,-50%) translateX(var(--x,0px)) scale(var(--s,1)) rotate(var(--rr,var(--r,0deg)));opacity:var(--o,1);transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .6s ease,box-shadow .45s ease}
   .card::before{content:"";position:absolute;top:-9px;left:50%;width:22%;height:18px;margin-left:-11%;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:4}
   .card:nth-child(even)::before{transform:rotate(2deg)}
-  .card:hover,.card:focus-visible{transform:rotate(0) translateY(-4px);box-shadow:0 2px 4px rgba(42,37,31,.2),0 26px 34px -18px rgba(42,37,31,.65)}
+  .card:hover,.card:focus-visible{box-shadow:0 2px 4px rgba(42,37,31,.2),0 26px 34px -18px rgba(42,37,31,.65)}
   .card:focus-visible{outline:2px solid var(--seal);outline-offset:4px}
   .card .frame{position:absolute;left:12px;right:12px;top:15%;bottom:22%;border:1.5px dashed rgba(31,42,61,.22);border-radius:2px;transition:opacity .6s ease}
   .card.open .frame{opacity:0}
@@ -62,11 +68,11 @@
   .card .mark{position:absolute;top:8px;right:8px;z-index:3;display:none;box-sizing:border-box;width:22px;height:22px;padding:0;border-radius:50%;cursor:pointer;
     border:1.5px solid rgba(31,42,61,.34);background:rgba(255,252,242,.92);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:background .3s ease,border-color .3s ease}
   .card .mark svg{display:block;width:100%;height:100%}
-  .card .mark path{stroke:transparent}
+  .card .mark path{stroke:rgba(31,42,61,.42)}
   .card .mark:hover{border-color:var(--seal)}
   .card .mark:hover path{stroke:var(--seal)}
   .card .mark:focus-visible{outline:2px solid var(--seal);outline-offset:3px}
-  .card.open .mark,.card.kept .mark{display:block}
+  .card[data-slot="0"] .mark,.card.open .mark,.card.kept .mark{display:block}
   .card.kept .mark{background:var(--seal);border-color:var(--seal);box-shadow:0 1px 2px rgba(0,0,0,.2)}
   .card.kept .mark path{stroke:#fff}
 
@@ -87,8 +93,8 @@
   .btn{font-family:var(--sans);font-size:.85rem;color:var(--ink);background:transparent;border:1px solid rgba(31,42,61,.3);border-radius:999px;padding:.42rem .95rem;cursor:pointer}
   .btn:hover,.btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
   .dlg-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
-  @media (max-width:899px){.lines{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:clamp(18px,3.4vw,28px) clamp(14px,2.6vw,24px)}.line{display:contents}.card{aspect-ratio:.86}}
-  @media (min-width:900px){.reveal .line{opacity:0;transform:translateY(18px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.8,.2,1)}.reveal .line.in{opacity:1;transform:none}}
+  @media (max-width:899px){.stage{--cw:min(280px,40vw)}.card[data-slot="-2"],.card[data-slot="2"]{--o:0}}
+  @media (max-width:599px){.stage{--cw:66vw}}
   @media (max-width:600px){.sheet{padding-left:16px;padding-right:16px}.head{padding-left:16px;padding-right:16px}}
   @media (prefers-reduced-motion:reduce){.card,.card .title{transition:none}}
 </style>
@@ -98,11 +104,16 @@
   <header class="head">
     <div>
       <h1>haiku</h1>
-      <p>a collection of selves, to find yourself in.<br>tap one to open it · tap it again to close · tick to keep</p>
+      <p>a collection of selves, to find yourself in.<br>arrows or swipe to move · tap the middle one to open it · tick to keep</p>
     </div>
   </header>
   <button class="kept-btn" id="keptBtn" type="button" aria-haspopup="dialog">kept (0)</button>
-  <div class="lines" id="grid"></div>
+  <div class="stage" id="grid"></div>
+  <nav class="nav" aria-label="browse the selves">
+    <button class="btn arrow" id="prevBtn" type="button" aria-label="previous self">‹</button>
+    <button class="btn" id="shuffleBtn" type="button">shuffle</button>
+    <button class="btn arrow" id="nextBtn" type="button" aria-label="next self">›</button>
+  </nav>
 </main>
 <dialog id="dlg" aria-labelledby="dlgTitle">
   <div class="dlg">
@@ -111,7 +122,7 @@
       <button class="btn" id="closeBtn" type="button">close</button>
     </div>
     <p class="sub">the selves you recognised. they stay in this browser, and nowhere else.</p>
-    <p class="empty" id="empty">nothing yet. open a self on the paper, and tick it to keep it.</p>
+    <p class="empty" id="empty">nothing yet. open the self in the middle, and tick it to keep it.</p>
     <ol class="poem" id="poem"></ol>
     <div class="minis" id="minis"></div>
     <div class="dlg-actions">
@@ -124,17 +135,17 @@
 'use strict';
 // ---------------------------------------------------------------------------
 // haiku — a collection of selves, to find yourself in.
-// twenty-five selves, in five lines of five. every self is closed at first and
-// shows only its title. tap one to open it: it draws itself, slowly, and a line
-// of text settles under it. tap an open self to close it; tap it again to draw
-// it again. tick a self to keep it. what you keep stays in this browser only,
-// and nothing you keep leaves your device.
+// twenty-five selves, one in the middle at a time, two on each side. move with
+// the arrows, the keys or a swipe. the self in the middle is closed at first and
+// shows only its title; tap it to open it: it draws itself, slowly, and a line of
+// text settles under it. tap it again to close it. tick a self to keep it. what
+// you keep stays in this browser only, and nothing you keep leaves your device.
 // ---------------------------------------------------------------------------
 const TAU = Math.PI * 2;
 const qs = new URLSearchParams(location.search);
 const FIXED = qs.has('fast');                       // the build's snapshot: the same every time, no storage
 const INSTANT = FIXED || matchMedia('(prefers-reduced-motion: reduce)').matches;
-const FIXED_OPEN = [0, 3, 7];                       // which selves the snapshot shows open
+const FIXED_OPEN = [0];                       // which selves the snapshot shows open
 const STORE = 'nunki-haiku-kept-v1';
 const DPR = Math.min(2, devicePixelRatio || 1);
 
@@ -679,6 +690,9 @@ const empty = document.getElementById('empty');
 const closeBtn = document.getElementById('closeBtn');
 const copyBtn = document.getElementById('copyBtn');
 const forgetBtn = document.getElementById('forgetBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
 
 const CARDS = [];        // one element per self, in the order of STYLES
 const ST = [];           // per self: { seed, qid, kept, open }
@@ -702,25 +716,18 @@ function save() {
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 // ---------------- cards ----------------
-const PER_LINE = 5;                                  // five lines of five selves
-const LINES = [];
-function makeLines() {
-  for (let r = 0; r < Math.ceil(STYLES.length / PER_LINE); r++) {
-    const line = document.createElement('div');
-    line.className = 'line';
-    grid.appendChild(line);
-    LINES.push(line);
-  }
-}
+// the stage: one self in the middle, open or closed, and two on each side that show only their titles.
+// the stage wraps round, so the first and the last self sit next to each other.
+const N = STYLES.length;
+const ORDER = STYLES.map((_, i) => i);   // the order the selves come round in
+let CUR = 0;                             // the place in ORDER that is in the middle
 function makeCards() {
-  makeLines();
   STYLES.forEach((st, i) => {
     const el = document.createElement('div');
     el.className = 'card';
     el.tabIndex = 0;
     el.setAttribute('role', 'button');
     el.style.setProperty('--r', [-1.1, .8, -.5, 1, -.9, .6][i % 6] + 'deg');
-    el.style.setProperty('--dy', [0, 8, -4, 6, -2, 10][i % 6] + 'px');
     el.style.setProperty('--paper-card', CARD_PAPER[i % CARD_PAPER.length]);
     el.innerHTML = '<span class="frame" aria-hidden="true"></span>'
       + '<canvas class="art" aria-hidden="true"></canvas>'
@@ -730,26 +737,57 @@ function makeCards() {
       + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4 8-9" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
     el.querySelector('.title').textContent = st.title;
     el.querySelector('.quote').textContent = quote(ST[i].qid).text;
-    el.addEventListener('click', () => { if (ST[i].open) closeCard(i); else openCard(i); });
+    el.addEventListener('click', () => {
+      if (el.dataset.slot === '0') toggleOpen(i);
+      else if (el.dataset.slot !== 'out') moveTo(i);
+    });
     el.addEventListener('keydown', e => {
       if (e.target !== el) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        if (ST[i].open) closeCard(i); else openCard(i);
+        if (el.dataset.slot === '0') toggleOpen(i); else moveTo(i);
       }
     });
     el.querySelector('.mark').addEventListener('click', e => { e.stopPropagation(); toggleKeep(i); });
-    LINES[Math.floor(i / PER_LINE)].appendChild(el);
+    grid.appendChild(el);
     CARDS.push(el);
     labelCard(i);
   });
 }
+function toggleOpen(i) { if (ST[i].open) closeCard(i); else openCard(i); }
 function labelCard(i) {
   const el = CARDS[i], s = ST[i];
   el.classList.toggle('kept', s.kept);
   el.setAttribute('aria-expanded', String(s.open));
   el.setAttribute('aria-label', STYLES[i].title + (s.open ? ': ' + quote(s.qid).text : ' (closed)') + (s.kept ? ', kept' : ''));
   el.querySelector('.mark').setAttribute('aria-pressed', String(s.kept));
+}
+// every self gets a slot: 0 is in the middle, -2 to 2 are on the stage, the rest wait out of view
+function layout() {
+  ORDER.forEach((i, pos) => {
+    let d = ((pos - CUR) % N + N) % N;
+    if (d > N / 2) d -= N;
+    const slot = Math.abs(d) <= 2 ? String(d) : 'out';
+    CARDS[i].dataset.slot = slot;
+    CARDS[i].tabIndex = slot === 'out' ? -1 : 0;
+  });
+  CARDS.forEach((el, i) => { if (ST[i].open && el.dataset.slot !== '0') closeCard(i); });
+}
+function moveTo(i) { CUR = ORDER.indexOf(i); layout(); CARDS[i].focus({ preventScroll: true }); }
+function go(step) { CUR = (CUR + step + N) % N; layout(); CARDS[ORDER[CUR]].focus({ preventScroll: true }); }
+function shuffleAll() {
+  shuffle(ORDER);
+  CUR = 0;
+  // a new order, and new quotes for the selves that are not kept
+  const pool = shuffle(QUOTES.map(q => q.id).filter(id => !KEPT.some(x => x.q === id)));
+  CARDS.forEach((el, i) => {
+    if (ST[i].kept) return;
+    ST[i].qid = pool.pop();
+    el.querySelector('.quote').textContent = quote(ST[i].qid).text;
+    labelCard(i);
+  });
+  layout();
+  CARDS[ORDER[CUR]].focus({ preventScroll: true });
 }
 
 // ---------------- drawing ----------------
@@ -798,7 +836,7 @@ function tick() {
   if (ANIM.length) TICK = setTimeout(tick, 16);
 }
 
-// ---------------- open, redraw, close, keep ----------------
+// ---------------- open, close, keep ----------------
 function openCard(i, instant = false) {
   const el = CARDS[i], s = ST[i];
   s.open = true;
@@ -872,22 +910,10 @@ STYLES.forEach((st, i) => {
     : { seed: FIXED ? 100 + i * 7 : 1 + ri(999998), qid: freeQ.pop(), kept: false, open: false });
 });
 makeCards();
+CUR = FIXED ? 0 : ri(N);                 // each visit starts at another self
+layout();
 ST.forEach((s, i) => { if (FIXED && FIXED_OPEN.includes(i)) openCard(i, true); });
 refreshKept();
-// the lines settle onto the page one by one, as the page scrolls past them
-if (!INSTANT) {
-  document.getElementById('sheet').classList.add('reveal');
-  let queued = false;
-  const settle = () => {
-    queued = false;
-    for (const line of LINES) if (line.getBoundingClientRect().top < innerHeight * .92) line.classList.add('in');
-  };
-  const later = () => { if (!queued) { queued = true; requestAnimationFrame(settle); } };
-  addEventListener('scroll', later, { passive: true });
-  addEventListener('resize', later);
-  later();
-}
-
 // ---------------- events ----------------
 keptBtn.addEventListener('click', openKept);
 closeBtn.addEventListener('click', () => dlg.close());
@@ -905,6 +931,24 @@ forgetBtn.addEventListener('click', () => {
   refreshKept();
   openKept();
 });
+prevBtn.addEventListener('click', () => go(-1));
+nextBtn.addEventListener('click', () => go(1));
+shuffleBtn.addEventListener('click', shuffleAll);
+addEventListener('keydown', e => {
+  if (dlg.open) return;
+  if (e.key === 'ArrowLeft') go(-1);
+  else if (e.key === 'ArrowRight') go(1);
+});
+// a sideways swipe of more than 50px moves the stage; the click that ends a swipe is ignored
+let downX = null, swiped = false;
+grid.addEventListener('pointerdown', e => { downX = e.clientX; swiped = false; });
+grid.addEventListener('pointerup', e => {
+  if (downX === null) return;
+  const dx = e.clientX - downX;
+  downX = null;
+  if (Math.abs(dx) > 50) { swiped = true; go(dx < 0 ? 1 : -1); }
+});
+grid.addEventListener('click', e => { if (swiped) { swiped = false; e.stopPropagation(); e.preventDefault(); } }, true);
 let RS = 0;
 addEventListener('resize', () => {
   clearTimeout(RS);
