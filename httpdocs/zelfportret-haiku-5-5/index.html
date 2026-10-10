@@ -1020,6 +1020,71 @@ grid.addEventListener('click', e => { if (swiped) { swiped = false; e.stopPropag
 const PIC_HAND = '"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy",sans-serif';
 const PIC_SANS = '"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif';
 const chunk = (a, n) => { const rows = []; for (let i = 0; i < a.length; i += n) rows.push(a.slice(i, i + n)); return rows; };
+function roundRectPath(c, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+}
+function drawNunkiLogo(c, ox, oy, size) {
+  const s = size / 64;
+  c.save();
+  c.translate(ox, oy);
+  c.scale(s, s);
+  c.fillStyle = '#d6b26c';
+  c.beginPath();
+  c.arc(48, 15, 4, 0, Math.PI * 2);
+  c.fill();
+  c.strokeStyle = '#ac5036';
+  c.lineWidth = 7.5;
+  c.lineCap = 'round';
+  c.lineJoin = 'round';
+  c.beginPath();
+  c.moveTo(18, 48);
+  c.lineTo(18, 30);
+  c.bezierCurveTo(18, 23, 24, 18, 32, 18);
+  c.bezierCurveTo(40, 18, 44, 23, 44, 30);
+  c.lineTo(44, 48);
+  c.stroke();
+  c.restore();
+}
+function drawNunkiMarkBadge(c, bx, by, title, scale = 1) {
+  const ink = '#2a251f';
+  const icon = Math.round(24 * scale);
+  const padL = Math.round(6 * scale), padR = Math.round(14 * scale), gap = Math.round(7 * scale);
+  const fontSize = Math.round(17 * scale);
+  const badgeH = Math.round(34 * scale);
+  const label = String(title || 'haiku 5.5').trim().toLowerCase();
+  c.save();
+  c.font = '400 ' + fontSize + 'px ' + PIC_HAND;
+  const tw = c.measureText(label).width;
+  const badgeW = padL + icon + gap + tw + padR;
+  const r = badgeH / 2;
+  c.save();
+  c.shadowColor = 'rgba(0,0,0,0.35)';
+  c.shadowBlur = 12;
+  c.shadowOffsetY = 6;
+  c.fillStyle = 'rgba(24,20,17,0.12)';
+  roundRectPath(c, bx, by + 5, badgeW, badgeH, r);
+  c.fill();
+  c.restore();
+  c.fillStyle = 'rgba(246,241,228,0.97)';
+  roundRectPath(c, bx, by, badgeW, badgeH, r);
+  c.fill();
+  c.strokeStyle = 'rgba(42,37,31,0.07)';
+  c.lineWidth = 1;
+  c.stroke();
+  drawNunkiLogo(c, bx + padL, by + (badgeH - icon) / 2, icon);
+  c.fillStyle = ink;
+  c.font = '400 ' + fontSize + 'px ' + PIC_HAND;
+  c.textBaseline = 'middle';
+  c.fillText(label, bx + padL + icon + gap, by + badgeH / 2 + 1);
+  c.restore();
+}
 function paintInBox(c, items, x, y, w, h) {
   const s = Math.min(w, h) / 1000 * .94;
   paintItems(c, items, 0, items.length, s, x + (w - 1000 * s) / 2, y + (h - 1000 * s) / 2);
@@ -1062,16 +1127,18 @@ function keptPicture() {
   const poemH = poemRows.reduce((h, row) => h + Math.max(...row.map(lines => lines.length)) * poemLH + 24, 0);
   const gridTop = poemTop + poemH + 68;
   const gridH = cardRows.length * cardH + (cardRows.length - 1) * GAP;
-  const footY = gridTop + gridH + 84;
+  const FOOT_BADGE_SCALE = 1.32;
+  const footBadgeH = Math.round(34 * FOOT_BADGE_SCALE);
+  const footBadgeTop = gridTop + gridH + 72;
   const cv = document.createElement('canvas');
   cv.width = W * P;
-  cv.height = Math.ceil(footY + 48) * P;
+  cv.height = Math.ceil(footBadgeTop + footBadgeH + 44) * P;
   const c = cv.getContext('2d');
   c.scale(P, P);
   c.lineCap = 'round';
   c.lineJoin = 'round';
   c.fillStyle = paper;
-  c.fillRect(0, 0, W, footY + 48);
+  c.fillRect(0, 0, W, footBadgeTop + footBadgeH + 44);
   // the header
   c.fillStyle = ink;
   c.font = '64px ' + PIC_HAND;
@@ -1124,10 +1191,8 @@ function keptPicture() {
       c.restore();
     });
   });
-  // the footer: where the selves can be found
-  c.fillStyle = sub;
-  c.font = '20px ' + PIC_SANS;
-  c.fillText(location.host + location.pathname.replace(/index\.html$/, ''), PAD, footY);
+  const markEl = document.querySelector('.nunki-mark .nm-name');
+  drawNunkiMarkBadge(c, PAD, footBadgeTop, markEl ? markEl.textContent : 'haiku 5.5', FOOT_BADGE_SCALE);
   return cv;
 }
 savePicBtn.addEventListener('click', () => {
