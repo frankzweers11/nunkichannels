@@ -14,6 +14,15 @@
       "thumb": "/images/thumbs/getij.jpg"
     },
     {
+      "slug": "patronen",
+      "path": "/patronen/",
+      "title": "patronen",
+      "subtitle": "een muur over getal en vorm",
+      "theme": "#16131d",
+      "ogImage": "/images/og/patronen.jpg",
+      "thumb": "/images/thumbs/patronen.jpg"
+    },
+    {
       "slug": "ringen",
       "path": "/ringen/",
       "title": "ringen",

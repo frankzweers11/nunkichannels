@@ -1,0 +1,2607 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- nunki:social -->
+<meta name="description" content="een muur over getal en vorm">
+<link rel="canonical" href="https://nunkichannels.nl/patronen/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:site_name" content="nunkichannels">
+<meta property="og:title" content="patronen">
+<meta property="og:description" content="een muur over getal en vorm">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nunkichannels.nl/patronen/">
+<meta property="og:image" content="https://nunkichannels.nl/images/og/patronen.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="patronen — een muur over getal en vorm">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="patronen">
+<meta name="twitter:description" content="een muur over getal en vorm">
+<meta name="twitter:image" content="https://nunkichannels.nl/images/og/patronen.jpg">
+<meta name="twitter:image:alt" content="patronen — een muur over getal en vorm">
+<!-- /nunki:social -->
+<title>patronen · een muur over getal en vorm</title>
+<style>
+  html,body{margin:0;padding:0;background:#16131d}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  #wall{position:relative;width:100vw}
+  #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #wall canvas.live{pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+  #wall canvas.live.on{opacity:1}
+  #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+  #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
+</style>
+</head>
+<body>
+<!-- nunki:mark -->
+<style>
+.nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
+  height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:padding .4s ease,background-color .3s ease,box-shadow .3s ease}
+.nunki-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-mark .nm-name{display:block;overflow:hidden;max-width:12em;margin-left:7px;white-space:nowrap;
+  font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px);transition:max-width .45s ease,margin .45s ease,opacity .3s ease}
+.nunki-mark.nm-min{padding:0 5px}
+.nunki-mark.nm-min .nm-name{max-width:0;margin-left:0;opacity:0}
+.nunki-mark:hover,.nunki-mark:focus-visible{padding:0 14px 0 6px;background:rgba(251,248,239,.97);outline:none}
+.nunki-mark:hover .nm-name,.nunki-mark:focus-visible .nm-name{max-width:12em;margin-left:7px;opacity:1}
+.nunki-mark:hover svg,.nunki-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-mark:focus-visible{box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+@media (max-width:600px){.nunki-mark,.nunki-mark:hover{padding:0 5px}.nunki-mark .nm-name{display:none}}
+@media (prefers-reduced-motion:reduce){.nunki-mark,.nunki-mark svg,.nunki-mark .nm-name{transition:none}}
+@media print{.nunki-mark{display:none}}
+</style>
+<a class="nunki-mark" href="/" title="alle wanden" aria-label="patronen, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">patronen</span></a>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
+<!-- /nunki:mark -->
+<div id="wall"></div>
+<canvas id="trail"></canvas>
+<script>
+'use strict';
+// ---------------------------------------------------------------------------
+// patronen — a wall about number and form.
+// thirteen sheets that count from one to ten. it starts with a point and a
+// compass, and every figure grows out of the one before: two circles make an
+// eye, the eye makes a triangle, and so on, through the pentagram in an apple,
+// a sunflower that counts in fibonacci, the rose venus draws in eight years,
+// snowflakes, the five solids, the star of the week, the octave on a string,
+// the nine that keeps coming back, and at ten the tree of life in the flower,
+// after frank's own study of the thirteen flowers. ten is one again.
+// every mark is laid down by a hand while you watch: the constructions are
+// made with compass and straightedge, but by a hand that wanders. where you
+// move, your line is repeated in the symmetry of the figure you are near.
+// the engine (tiles, queued strokes, torn paper, pencil lettering) follows
+// the technique of the fable wall that inspired it, like ringen, getij and velden.
+// ?fast draws at full speed (the build's stills), ?still draws everything at
+// once without any animation (for checking renders), ?hud shows frame timing.
+// ---------------------------------------------------------------------------
+const TAU = Math.PI*2;
+const qs = new URLSearchParams(location.search);
+const SEED = +(qs.get('s')||7);
+const FAST = qs.has('fast');
+const STILL = qs.has('still');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------- rng ----------------
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function stream(n){const f=mul32((n*2654435761)>>>0);for(let i=0;i<9;i++)f();return f}
+const rd=(R,a,b)=>a+R()*(b-a);
+const ri=(R,a,b)=>Math.floor(rd(R,a,b+1));
+const ch_=(R,p)=>R()<p;
+const pk=(R,arr)=>arr[(R()*arr.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// ---------------- noise ----------------
+function h2(x,y,s){const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)}
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+  const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  return h2(xi,yi,s)*(1-u)*(1-v)+h2(xi+1,yi,s)*u*(1-v)+h2(xi,yi+1,s)*(1-u)*v+h2(xi+1,yi+1,s)*u*v}
+function fbm(x,y,s,o){let a=.5,f=1,t=0,n=0;for(let i=0;i<o;i++){t+=vn(x*f,y*f,s+i*17)*a;n+=a;a*=.5;f*=2.03}return t/n}
+
+// ---------------- colour ----------------
+const INK=[42,37,31], CINK=[238,231,210];
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const shade=(c,k)=>[c[0]*(1-k),c[1]*(1-k),c[2]*(1-k)];
+const tint=(c,k)=>[c[0]+(255-c[0])*k,c[1]+(255-c[1])*k,c[2]+(255-c[2])*k];
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+let CUR=INK;
+// the ground and the papers laid on it
+const GROUND=[22,19,29], CREAM=[244,238,222], PARCH=[230,212,176], BLUEP=[34,70,122], KRAFT=[178,142,100],
+      SLATE=[40,46,44], GRIDP=[241,242,236], STAVE=[242,236,222], LAPISD=[24,34,74], ROSEP=[246,233,226],
+      TRACE=[250,250,246];
+// pencils, inks and chalks
+const GRAPH=[66,64,70], GOLD=[214,178,108], GOLDL=[244,216,146], VERM=[192,70,46], LAPIS=[50,82,158],
+      VERD=[64,132,116], ROSE=[206,106,128], VIOL=[124,94,170], OCHRE=[184,136,56], SANG=[170,78,52],
+      SEPIA=[96,64,40], HONEY=[228,170,58], SKY=[124,172,222], LEAF=[92,138,66], CHALK=[238,236,228],
+      PALE=[226,236,246], BALL=[38,62,150], REDPEN=[200,40,44], STEEL=[150,156,166], BRASS=[198,160,90];
+const RAINBOW=[[214,60,56],[232,120,50],[226,176,40],[96,170,84],[64,150,196],[80,100,200],[140,84,190]];
+function ramp(st,t){
+  if(t<=st[0][0])return st[0][1];
+  for(let i=1;i<st.length;i++)if(t<=st[i][0]){const a=st[i-1],b=st[i];return mix(a[1],b[1],(t-a[0])/((b[0]-a[0])||1))}
+  return st[st.length-1][1];
+}
+const rainbowAt=t=>ramp(RAINBOW.map((c,i)=>[i/6,c]),clamp(t,0,1));
+// ---------------- the wall ----------------
+const LW=1600, TILEH=1200, PH=1200, NP=13, TOTALH=NP*PH;
+const NT=Math.ceil(TOTALH/TILEH);
+let S=Math.min(1.35, Math.max(1, window.devicePixelRatio||1));
+if(navigator.deviceMemory && navigator.deviceMemory<8) S=1.1;
+const wallEl=document.getElementById('wall');
+wallEl.style.height=(TOTALH/LW*100)+'vw';
+const TILES=[];
+for(let i=0;i<NT;i++){
+  const y0=i*TILEH, h=Math.min(TILEH+2, TOTALH-y0);
+  const cv=document.createElement('canvas');
+  cv.width=Math.round(LW*S); cv.height=Math.round(h*S);
+  cv.style.top=(y0/LW*100)+'vw';
+  cv.style.height=(h/LW*100)+'vw';
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.lineCap='round'; cx.lineJoin='round';
+  TILES.push({cv,cx,y0,h,q:[],qi:0,done:false,active:i===0});
+}
+let GENDONE=false;
+// route one drawing act to every tile it touches; whole passages of the wall
+// can be shifted down as one piece by GEN_DY
+let DIRECT=null, GEN_DY=0;
+let COMP=null; // when set (e.g. 'lighter'), every mark queued meanwhile is drawn with that blend: light on dark glows
+function emit(y0,y1,fn){
+  if(COMP){const f0=fn,cm=COMP;fn=c=>{c.save();c.globalCompositeOperation=cm;f0(c);c.restore()}}
+  if(DIRECT){
+    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
+    else fn(DIRECT.cx);
+    return;
+  }
+  const dy=GEN_DY;
+  const f=dy?cx=>{cx.save();cx.translate(0,dy);fn(cx);cx.restore()}:fn;
+  const a=clamp(Math.floor((y0+dy-60)/TILEH),0,NT-1), b=clamp(Math.floor((y1+dy+60)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++) TILES[i].q.push(f);
+}
+// ---------------- geometry ----------------
+function resample(pts,step){
+  if(pts.length<2)return pts.slice();
+  const out=[[pts[0][0],pts[0][1]]];let need=step;
+  for(let i=1;i<pts.length;i++){
+    let x0=pts[i-1][0],y0=pts[i-1][1];
+    const x1=pts[i][0],y1=pts[i][1];
+    let d=Math.hypot(x1-x0,y1-y0);
+    while(d>=need&&d>0){const t=need/d;x0+=(x1-x0)*t;y0+=(y1-y0)*t;out.push([x0,y0]);d=Math.hypot(x1-x0,y1-y0);need=step}
+    need-=d;
+  }
+  const last=pts[pts.length-1],le=out[out.length-1];
+  if(Math.hypot(last[0]-le[0],last[1]-le[1])>step*.2||out.length<2)out.push([last[0],last[1]]);
+  return out;
+}
+function chaikin(pts,closed,it){
+  while(it-->0){
+    const out=[],n=pts.length;
+    if(n<3)return pts;
+    if(!closed)out.push(pts[0]);
+    const end=closed?n:n-1;
+    for(let i=0;i<end;i++){
+      const a=pts[i],b=pts[(i+1)%n];
+      out.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);
+    }
+    if(!closed)out.push(pts[n-1]);
+    pts=out;
+  }
+  return pts;
+}
+function bbox(pts){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+  return[x0,y0,x1,y1]}
+function blob(R,cx,cy,rx,ry){
+  const rot=rd(R,0,TAU),ph=rd(R,0,7),n=14,pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const m=1+.16*Math.sin(t*2+ph)+.09*Math.sin(t*5+ph*2.1);
+    const x=Math.cos(t)*rx*m,y=Math.sin(t)*ry*m;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  return chaikin(pts,true,1);
+}
+function rotPts(pts,cx,cy,rot){
+  const co=Math.cos(rot),sn=Math.sin(rot);
+  return pts.map(p=>[cx+(p[0]-cx)*co-(p[1]-cy)*sn, cy+(p[0]-cx)*sn+(p[1]-cy)*co]);
+}
+function spiralPts(cx,cy,rOut,rIn,turns,ph,dir=1){
+  const n=Math.max(24,Math.round(turns*30)),pts=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n,th=ph+dir*t*turns*TAU,r=rOut+(rIn-rOut)*t;
+    pts.push([cx+Math.cos(th)*r,cy+Math.sin(th)*r]);
+  }
+  return pts;
+}
+// ---------------- the hand ----------------
+// every mark wanders off its intended path a little. pressed marks get a
+// second pass, the way a pen goes back over a line it means.
+function wob(R,rs,amp){
+  const n=rs.length,q=[];
+  const P1=rd(R,0,7),P2=rd(R,0,7),P3=rd(R,0,7);
+  const F1=rd(R,1.6,3.2),F2=rd(R,5,9);
+  for(let i=0;i<n;i++){
+    const t=i/(n-1);
+    const A=rs[Math.max(0,i-1)],B=rs[Math.min(n-1,i+1)];
+    let nx=-(B[1]-A[1]),ny=B[0]-A[0];
+    const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;
+    const off=amp*(.62*Math.sin(t*F1*2+P1)+.28*Math.sin(t*F2+P2)+.10*Math.sin(t*17+P3));
+    q.push([rs[i][0]+nx*off+rd(R,-.3,.3),rs[i][1]+ny*off+rd(R,-.3,.3)]);
+  }
+  return q;
+}
+function sk(R,pts,o={}){
+  const w=o.w??1.3, a0=o.a??.7;
+  const rs=resample(pts,Math.max(2.4,w*1.5));
+  const n=rs.length;
+  if(n<2)return;
+  const col=(o.col||CUR).slice();
+  const passes=o.passes??1;
+  const [bx0,by0,bx1,by1]=bbox(rs);
+  for(let p=0;p<passes;p++){
+    const amp=(o.amp??(w*.38+.55))*(p?1.5:1);
+    const alpha=a0*(p?.35:1);
+    const q=wob(R,rs,amp);
+    if(o.taper){
+      const segs=[];
+      for(let i=1;i<n;i++){
+        const t=i/(n-1);
+        let e;
+        if(o.taper==='out')e=.3+.7*(1-t);
+        else if(o.taper==='in')e=.3+.7*t;
+        else e=.35+.65*Math.min(1,Math.min(t,1-t)/.25);
+        segs.push([q[i-1],q[i],rgba(col,alpha*rd(R,.8,1)),Math.max(.5,w*e*rd(R,.85,1.15))]);
+      }
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';
+        for(const s of segs){
+          cx.strokeStyle=s[2];cx.lineWidth=s[3];
+          cx.beginPath();cx.moveTo(s[0][0],s[0][1]);cx.lineTo(s[1][0],s[1][1]);cx.stroke();
+        }
+      });
+    } else {
+      const lifts=[];
+      for(let i=0;i<n;i++)lifts.push(o.gap?ch_(R,o.gap):false);
+      const st=rgba(col,alpha), lw=w*rd(R,.85,1.12);
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';cx.lineJoin='round';
+        cx.beginPath();
+        let lift=false;
+        for(let i=0;i<n;i++){
+          if(!i||lift)cx.moveTo(q[i][0],q[i][1]);else cx.lineTo(q[i][0],q[i][1]);
+          lift=lifts[i];
+        }
+        cx.strokeStyle=st;cx.lineWidth=lw;cx.stroke();
+      });
+    }
+    if(p===0&&w>=1.9&&!o.noDust){
+      const specks=[];
+      for(let i=0;i<n;i+=3){
+        if(ch_(R,.6))continue;
+        const sz=rd(R,.6,1.2);
+        specks.push([q[i][0]+rd(R,-w,w)-sz/2,q[i][1]+rd(R,-w,w)-sz/2,sz,rgba(col,a0*rd(R,.14,.3))]);
+      }
+      if(specks.length)emit(by0,by1,cx=>{for(const s of specks){cx.fillStyle=s[3];cx.fillRect(s[0],s[1],s[2],s[2])}});
+    }
+  }
+}
+// a stroke that dies away toward x1 — for things i only half-hold
+function fadeStroke(R,pts,o,x0,x1){
+  const rs=resample(pts,4);
+  let run=[],runA=1;
+  const span=x1-x0;
+  const flush=()=>{if(run.length>1)sk(R,run,{...o,a:(o.a??.6)*runA});run=[]};
+  for(const p of rs){
+    const m=clamp((x1-p[0])/span,0,1);
+    if(m<.06){flush();continue}
+    if(run.length===0)runA=m;
+    run.push(p);
+    if(Math.abs(m-runA)>.22){flush();run=[p];runA=m}
+  }
+  flush();
+}
+function dotF(R,x,y,r,a,col){
+  const c=(col||CUR).slice(),pts=[];
+  const n=8,ph=rd(R,0,7);
+  for(let i=0;i<=n;i++){
+    const t=i/n*TAU,m=1+.2*Math.sin(t*2+ph);
+    pts.push([x+Math.cos(t)*r*m+rd(R,-.2,.2),y+Math.sin(t)*r*m+rd(R,-.2,.2)]);
+  }
+  emit(y-r-2,y+r+2,cx=>{
+    cx.beginPath();
+    for(let i=0;i<pts.length;i++){i?cx.lineTo(pts[i][0],pts[i][1]):cx.moveTo(pts[i][0],pts[i][1])}
+    cx.closePath();cx.fillStyle=rgba(c,a);cx.fill();
+  });
+}
+function ell(R,cx,cy,rx,ry,o={}){
+  const n=Math.max(10,Math.round((rx+ry)/2)),rot=rd(R,0,TAU),pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const x=Math.cos(t)*rx,y=Math.sin(t)*ry;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  pts.push(pts[0]);
+  sk(R,pts,o);
+}
+function fillPoly(pts,col,a){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const st=rgba(col,a),P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.fillStyle=st;cx.fill();
+  });
+}
+// scribble a region full, clipped, in one act
+function scribFill(R,pts,sp,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1;
+  const lines=[],slope=rd(R,-.2,.2);
+  for(let y=y0-sp;y<y1+sp;y+=sp*rd(R,.8,1.2)){
+    const raw=[],ph=rd(R,0,7);
+    for(let x=x0;x<=x1;x+=4)raw.push([x,y+(x-x0)*slope+Math.sin(x*.5+ph)*sp*.42+rd(R,-.8,.8)]);
+    if(raw.length>1)lines.push([wob(R,resample(raw,3.2),.55),rgba(col,a*rd(R,.6,1.05)),w*rd(R,.85,1.12)]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap='round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+function hatchFill(R,pts,sp,ang,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1.1, straight=o.straight;
+  const diag=Math.hypot(x1-x0,y1-y0),cx0=(x0+x1)/2,cy0=(y0+y1)/2;
+  const px=Math.cos(ang+Math.PI/2),py=Math.sin(ang+Math.PI/2);
+  const dx=Math.cos(ang),dy=Math.sin(ang);
+  const lines=[],n=Math.ceil(diag/sp);
+  for(let i=-n;i<=n;i++){
+    const t=i*sp+(straight?0:rd(R,-.2,.2)*sp);
+    const raw=[[cx0+px*t-dx*diag*.6,cy0+py*t-dy*diag*.6],[cx0+px*t+dx*diag*.6,cy0+py*t+dy*diag*.6]];
+    lines.push([straight?raw:wob(R,resample(raw,4),.7),rgba(col,a*(straight?1:rd(R,.6,1.1))),w*(straight?1:rd(R,.85,1.15))]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap=straight?'butt':'round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+// a soft coloured-pencil scrub, never quite inside the lines
+function scrub(R,cx,cy,r,col,a=.4){
+  const b=blob(R,cx,cy,r*rd(R,1,1.12),r*rd(R,.82,1));
+  fillPoly(b,col,.1);
+  scribFill(R,b,Math.max(3,r*.13),a,{col});
+}
+function spatter(R,x,y,r,n,col,a=.5){
+  const sd=ri(R,0,99999),c=col.slice();
+  emit(y-r,y+r,cx=>{
+    const RR=mul32(sd);
+    for(let i=0;i<n;i++){
+      const t=RR()*TAU,d=Math.sqrt(RR())*r;
+      const s=.8+RR()*RR()*2.2;
+      cx.fillStyle=rgba(c,a*(.3+RR()*.7));
+      cx.fillRect(x+Math.cos(t)*d,y+Math.sin(t)*d*.7,s,s*(.8+RR()*.5));
+    }
+  });
+}
+function drip(R,x,y,len,col,a=.3,w=2){
+  const pts=[[x,y]];
+  let px=x;
+  for(let d=0;d<len;d+=9){px+=rd(R,-1.4,1.4);pts.push([px,y+d])}
+  sk(R,pts,{col,w,a,taper:'out',amp:.4});
+  dotF(R,px,y+len,w*1.1,a*1.2,col);
+}
+function arrowHead(R,x,y,ang,sz,a,col,w=1.6){
+  for(const sd of[-1,1])
+    sk(R,[[x,y],[x-Math.cos(ang+sd*.5)*sz,y-Math.sin(ang+sd*.5)*sz]],{col,w,a,taper:'out'});
+}
+function zigOut(R,x,y,rx,ry){
+  const pts=[];
+  const n=ri(R,6,9);
+  for(let i=0;i<=n;i++)pts.push([x+(i/n*2-1)*rx+rd(R,-4,4),y+((i%2)?-1:1)*ry*rd(R,.5,1)]);
+  sk(R,pts,{w:1.4,a:.55,amp:1});
+}
+function spark(R,x,y,r,o={}){
+  const n=o.nR??ri(R,5,8);
+  const rot=rd(R,0,TAU),col=o.col||CUR;
+  for(let i=0;i<n;i++){
+    const a=rot+i/n*TAU+rd(R,-.14,.14)/n*TAU;
+    const r0=r*rd(R,.22,.34),r1=r*rd(R,.85,1.1)*(i%2?.78:1);
+    sk(R,[[x+Math.cos(a)*r0,y+Math.sin(a)*r0],[x+Math.cos(a)*r1,y+Math.sin(a)*r1]],
+      {col,w:o.w??1.3,a:(o.a??.75)*rd(R,.8,1),taper:'out',amp:.3});
+  }
+  if(!o.noCenter&&ch_(R,.55))dotF(R,x,y,Math.max(1,r*.13),(o.a??.75),col);
+}
+// ---------------- asemic writing ----------------
+// a few drawings need writing that only looks like writing: a field journal nobody can read.
+function aword(R,x,y,h,nl,o={}){
+  const pts=[[x,y+rd(R,-.1,.1)*h]];
+  let cx=x;
+  for(let i=0;i<nl;i++){
+    const up=y-h*rd(R,.32,.62)-(ch_(R,.13)?h*rd(R,.4,.75):0);
+    const dn=y+(ch_(R,.09)?h*rd(R,.3,.55):h*rd(R,-.06,.12));
+    cx+=h*rd(R,.18,.3);pts.push([cx,up]);
+    cx+=h*rd(R,.18,.3);pts.push([cx,dn]);
+  }
+  sk(R,chaikin(pts,false,1),{col:o.col,w:o.w??.9,a:o.a??.55,amp:.28});
+  return cx-x;
+}
+function atext(R,xa,xb,y,h,o={}){
+  let cx=xa,guard=0;
+  while(cx<xb-h*.9&&guard++<70){
+    let nl=ri(R,2,5);
+    const est=nl*h*.5;
+    if(cx+est>xb)nl=Math.max(1,Math.floor((xb-cx)/(h*.5)));
+    if(nl<1)break;
+    const adv=aword(R,cx,y,h,nl,o);
+    cx+=adv+h*rd(R,.45,.75);
+  }
+}
+
+// ---------------- hand lettering ----------------
+// a real alphabet, one wobbly stroke at a time. used rarely, like pencil notes.
+const A_=(cx,cy,rx,ry,a0,a1,n=9)=>{const p=[];for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*rx,cy+Math.sin(t)*ry])}return p};
+const GL={};
+const G=(chr,w,...strokes)=>GL[chr]={w,s:strokes};
+G('a',.62,A_(.27,.73,.23,.26,-.5,5.8),[[.5,.48],[.52,.96],[.6,1]]);
+G('b',.6,[[.1,.05],[.1,1]],[[.1,.56],[.34,.47],[.54,.62],[.53,.86],[.3,1],[.1,.9]]);
+G('c',.58,A_(.3,.74,.25,.26,.6,5.68));
+G('d',.62,A_(.28,.74,.24,.26,-.5,5.8),[[.52,.05],[.53,.95],[.6,1]]);
+G('e',.56,[[.08,.73],[.48,.7],[.49,.54],[.3,.45],[.1,.56],[.07,.8],[.26,1],[.5,.93]]);
+G('f',.46,[[.44,.12],[.32,.05],[.22,.14],[.2,1]],[[.05,.48],[.42,.46]]);
+G('g',.6,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.48],[.53,1.12],[.42,1.36],[.16,1.32]]);
+G('h',.58,[[.1,.05],[.1,1]],[[.1,.62],[.3,.47],[.48,.56],[.5,1]]);
+G('i',.26,[[.13,.5],[.13,.96],[.18,1]],[[.11,.27],[.15,.3]]);
+G('j',.34,[[.22,.5],[.24,1.15],[.12,1.36],[-.02,1.28]],[[.2,.27],[.24,.3]]);
+G('k',.52,[[.1,.05],[.1,1]],[[.44,.48],[.12,.76]],[[.2,.68],[.46,1]]);
+G('l',.3,[[.14,.05],[.14,.93],[.22,1]]);
+G('m',.68,[[.07,1],[.07,.5]],[[.07,.62],[.2,.46],[.33,.56],[.34,1]],[[.34,.62],[.47,.46],[.6,.56],[.61,1]]);
+G('n',.56,[[.09,1],[.09,.5]],[[.09,.62],[.28,.46],[.46,.56],[.48,1]]);
+G('o',.6,A_(.29,.73,.24,.26,-1.2,-1.2+TAU*.97,10));
+G('p',.6,[[.1,.5],[.1,1.36]],[[.1,.57],[.34,.47],[.53,.62],[.52,.86],[.3,.98],[.1,.9]]);
+G('q',.62,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.5],[.52,1.22],[.62,1.34]]);
+G('r',.44,[[.1,1],[.1,.5]],[[.1,.68],[.22,.5],[.42,.46]]);
+G('s',.52,[[.46,.52],[.24,.45],[.09,.58],[.22,.72],[.42,.8],[.46,.93],[.24,1],[.06,.92]]);
+G('t',.48,[[.26,.12],[.25,.9],[.36,1]],[[.08,.44],[.46,.43]]);
+G('u',.58,[[.08,.5],[.08,.84],[.22,1],[.42,.9],[.45,.5]],[[.45,.6],[.47,.96],[.54,1]]);
+G('v',.5,[[.06,.5],[.26,1],[.46,.5]]);
+G('w',.62,[[.04,.5],[.17,1],[.3,.62],[.43,1],[.57,.5]]);
+G('x',.52,[[.07,.5],[.47,1]],[[.47,.5],[.07,1]]);
+G('y',.54,[[.07,.5],[.28,1]],[[.5,.5],[.24,1.14],[.06,1.34]]);
+G('z',.52,[[.07,.5],[.45,.5],[.06,1],[.47,1]]);
+G('2',.54,[[.08,.3],[.18,.12],[.38,.12],[.44,.32],[.07,1],[.47,1]]);
+G('0',.56,A_(.27,.55,.22,.44,-1.3,-1.3+TAU*.97,10));
+G('6',.52,[[.4,.1],[.18,.34],[.09,.68],[.2,.98],[.4,.94],[.46,.7],[.3,.56],[.11,.66]]);
+G('8',.54,A_(.27,.31,.16,.2,-1.57,-1.57+TAU),A_(.27,.76,.2,.23,-1.57,-1.57+TAU));
+G('.',.24,[[.1,.93],[.13,.97]]);
+G(',',.24,[[.14,.9],[.15,1.02],[.04,1.16]]);
+G("'",.2,[[.12,.05],[.09,.26]]);
+G('-',.44,[[.05,.7],[.38,.68]]);
+G('—',.66,[[.03,.7],[.6,.67]]);
+G('·',.24,[[.08,.68],[.12,.72]]);
+G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
+G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
+G(' ',.42);
+function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+function write(R,t,x,y,sz,o={}){
+  const a=o.a??.7,col=o.col;
+  let px=o.cen?x-measure(t,sz)/2:x;
+  const ph=rd(R,0,7);
+  for(let i=0;i<t.length;i++){
+    const c=t[i],g=GL[c]||GL[' '];
+    const yb=y+Math.sin(i*.8+ph)*sz*.045;
+    for(const st of(g.s||[])){
+      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
+      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
+    }
+    px+=(g.w+.1)*sz;
+  }
+}
+// ---------------- torn paper ----------------
+// the wall is a collage: sheets of coloured paper glued down, edges torn by
+// hand, each showing its white fibrous core where it ripped.
+function tornPath(R,x0,y0,x1,y1,rough,sd){
+  const pts=[];
+  const side=(ax,ay,bx,by,nx,ny,id)=>{
+    const L=Math.hypot(bx-ax,by-ay),steps=Math.max(3,Math.round(L/26));
+    for(let i=0;i<steps;i++){
+      const t=i/steps;
+      let off=(fbm(t*3.1+id*7,id*3.3,sd,3)-.5)*2*rough;
+      if(h2(i*1.7,id*9.1,sd)>0.93)off+=rd(R,8,22)*(h2(i,id,sd+3)>.5?1:-1);
+      pts.push([ax+(bx-ax)*t+nx*off,ay+(by-ay)*t+ny*off]);
+    }
+  };
+  side(x0,y0,x1,y0,0,1,0);
+  side(x1,y0,x1,y1,-1,0,1);
+  side(x1,y1,x0,y1,0,-1,2);
+  side(x0,y1,x0,y0,1,0,3);
+  return pts;
+}
+function sheet(R,x0,y0,x1,y1,col,o={}){
+  const rough=o.rough??16;
+  const sd=ri(R,0,9999);
+  let P=tornPath(R,x0,y0,x1,y1,rough,sd);
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  // the shadow the paper casts on what is beneath it
+  fillPoly(P.map(p=>[p[0]+6,p[1]+8]),[12,9,7],.28);
+  fillPoly(P,col,1);
+  fillPoly(P,col,1);
+  const [bx0,by0,bx1,by1]=bbox(P);
+  const PP=P.map(p=>p.slice());
+  // grain: the tooth of the paper
+  const gsd=ri(R,0,99999);
+  emit(by0,by1,cx=>{
+    const RR=mul32(gsd);
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<PP.length;i++){i?cx.lineTo(PP[i][0],PP[i][1]):cx.moveTo(PP[i][0],PP[i][1])}
+    cx.closePath();cx.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/1900);
+    for(let i=0;i<n;i++){
+      const s=.8+RR()*1.1;
+      const dark=RR()<.62;
+      cx.fillStyle=dark?'rgba(45,40,34,.05)':'rgba(255,252,244,.07)';
+      cx.fillRect(bx0+RR()*(bx1-bx0),by0+RR()*(by1-by0),s,s);
+    }
+    for(let i=0;i<n/22;i++){
+      const fx=bx0+RR()*(bx1-bx0),fy=by0+RR()*(by1-by0),fa=RR()*TAU,fl=3+RR()*7;
+      cx.strokeStyle='rgba(45,40,34,.05)';cx.lineWidth=.7;
+      cx.beginPath();cx.moveTo(fx,fy);cx.lineTo(fx+Math.cos(fa)*fl,fy+Math.sin(fa)*fl);cx.stroke();
+    }
+    cx.restore();
+  });
+  // torn edge: the white fibrous core
+  if(!o.noCore){
+    const core=P.concat([P[0]]);
+    sk(R,core,{col:[251,247,237],w:2,a:.42,amp:.4,gap:.24,noDust:true});
+    sk(R,core.map(p=>[p[0]+rd(R,1,3),p[1]+rd(R,1,3)]),{col:shade(col,.22),w:1,a:.2,amp:.5,gap:.4,noDust:true});
+  }
+  return P;
+}
+// a little pinned study: torn scrap + shadow + tape at two corners
+function scrap(R,x,y,w,h,col,rot){
+  const P=sheet(R,x-w/2,y-h/2,x+w/2,y+h/2,col,{rough:8,rot});
+  const [bx0,by0,bx1,by1]=bbox(P);
+  for(const cnr of[[bx0+14,by0+12],[bx1-16,by1-12]]){
+    const tp=rotPts([[cnr[0]-22,cnr[1]-8],[cnr[0]+22,cnr[1]-8],[cnr[0]+22,cnr[1]+9],[cnr[0]-22,cnr[1]+9]],cnr[0],cnr[1],rd(R,.5,.9));
+    fillPoly(tp,[240,234,216],.35);
+    sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+  }
+}
+// ---------------- small things ----------------
+function enso(R,cx,cy,r,frac,col,o={}){
+  const a0=rd(R,0,TAU),pts=[];
+  const n=Math.round(40*frac);
+  for(let i=0;i<=n;i++){
+    const t=a0+i/n*TAU*frac;
+    const rr2=r*(1+.03*Math.sin(i*.7));
+    pts.push([cx+Math.cos(t)*rr2,cy+Math.sin(t)*rr2]);
+  }
+  sk(R,pts,{col,w:o.w??9,a:o.a??.75,amp:3,taper:'out',noDust:true});
+  sk(R,pts.map(p=>[p[0]+rd(R,2,5),p[1]+rd(R,2,4)]),{col,w:(o.w??9)*.4,a:(o.a??.75)*.3,amp:3.4,gap:.12,noDust:true});
+  return a0+TAU*frac; // where the brush lifted
+}
+function birdM(R,x,y,s,col,a=.6){
+  sk(R,[[x-s,y],[x-s*.4,y-s*.55],[x,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+  sk(R,[[x,y],[x+s*.4,y-s*.55],[x+s,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+}
+
+// ---------------- replay engine ----------------
+let CSSK=innerWidth/LW;
+addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+// living things: small canvases laid over the wall, switched on once the sheet
+// beneath them is drawn, and only moving while they are in view
+const LIVE=[];
+// a pause in the drawing of one sheet, so a construction can be watched
+function pause(ms,y=600){if(DIRECT)return;const i=clamp(Math.floor((y+GEN_DY)/TILEH),0,NT-1);TILES[i].q.push({pause:ms})}
+function live(x,y,w,h,o){
+  const L={x,y:y+GEN_DY,w,h,...o,cv:null,cx:null,on:false};
+  LIVE.push(L);
+  return L;
+}
+function makeLive(L){
+  const cv=document.createElement('canvas'),sc=L.sc??S;
+  cv.className='live';
+  cv.width=Math.round(L.w*sc);cv.height=Math.round(L.h*sc);
+  cv.style.left=(L.x/LW*100)+'%';cv.style.width=(L.w/LW*100)+'%';
+  cv.style.top=(L.y/LW*100)+'vw';cv.style.height=(L.h/LW*100)+'vw';
+  cv.style.zIndex=2;
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.setTransform(sc,0,0,sc,-L.x*sc,-L.y*sc);
+  cx.lineCap='round';cx.lineJoin='round';
+  L.cv=cv;L.cx=cx;L.sc=sc;L.on=true;
+  if(L.init)L.init(cx,L);
+}
+function liveReady(L){
+  const a=clamp(Math.floor(L.y/TILEH),0,NT-1),b=clamp(Math.floor((L.y+L.h)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++)if(!TILES[i].done)return false;
+  return true;
+}
+let HUD=null,hudN=0,hudT=0,hudBusy=0,hudMax=0;
+if(qs.has('hud')){HUD=document.createElement('div');HUD.id='hud';document.body.appendChild(HUD)}
+function tick(now){
+  const tb=performance.now();
+  const sy=scrollY/CSSK, vh=innerHeight/CSSK;
+  for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
+  const budget=(FAST||RM)?200:7;
+  const t0=performance.now();
+  for(const T of TILES){
+    if(!T.active||T.done)continue;
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){
+      const it=T.q[T.qi];
+      if(typeof it!=='function'){
+        // a breath in the drawing: the hand waits before the next figure
+        if(FAST||RM){T.qi++;continue}
+        if(!T.wait)T.wait=now+it.pause;
+        if(now<T.wait)break;
+        T.wait=0;T.qi++;continue;
+      }
+      T.qi++;it(T.cx);
+      if(performance.now()-t0>budget)break;
+    }
+    if(GENDONE&&T.qi>=T.q.length){T.done=true;T.q=null;readyRestless(T)}
+    if(performance.now()-t0>budget)break;
+  }
+  runRestless(now);
+  for(const L of LIVE){
+    if(!L.on){
+      if(GENDONE&&liveReady(L)){makeLive(L);requestAnimationFrame(()=>L.cv.classList.add('on'))}
+      continue;
+    }
+    if(L.frame&&(!RM||!L.drawn)&&L.y+L.h>sy-60&&L.y<sy+vh+60){L.frame(L.cx,now,L);L.drawn=true}
+  }
+  drawTrail(now);
+  if(HUD){
+    const busy=performance.now()-tb;hudBusy+=busy;hudMax=Math.max(hudMax,busy);hudN++;
+    if(now-hudT>1000){HUD.textContent=`${(hudN*1000/(now-hudT)).toFixed(0)} fps\n${(hudBusy/hudN).toFixed(1)} ms busy\n${hudMax.toFixed(1)} ms max`;hudN=0;hudBusy=0;hudMax=0;hudT=now}
+  }
+  requestAnimationFrame(tick);
+}
+// for stills: draw every sheet at once, no animation at all
+function drawAllNow(){
+  for(const T of TILES){
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){const it=T.q[T.qi++];if(typeof it==='function')it(T.cx)}
+    T.done=true;T.q=null;
+  }
+  for(const L of LIVE){makeLive(L);L.cv.classList.add('on');L.cv.style.transition='none';if(L.frame)L.frame(L.cx,performance.now(),L)}
+}
+// ---------------- restlessness ----------------
+// a few marks cannot hold still. every so often one erases itself and is
+// drawn again, never quite the same, the way a geometer goes over a figure once more.
+const RESTLESS=[];
+function restless(x,y,w,h,fn){RESTLESS.push({x,y:y+GEN_DY,w,h,fn,dy:GEN_DY,img:null,next:0,tile:null})}
+function readyRestless(T){
+  if(RM)return;
+  for(const r of RESTLESS){
+    if(r.img)continue;
+    if(r.y>=T.y0&&r.y+r.h<=T.y0+T.h&&T.done){
+      r.tile=T;
+      const px=Math.round(r.x*S),py=Math.round((r.y-T.y0)*S);
+      const pw=Math.round(r.w*S),ph=Math.round(r.h*S);
+      try{r.img=T.cx.getImageData(px,py,pw,ph);r.px=px;r.py=py;
+          r.next=performance.now()+2000+Math.random()*3000;}catch(e){}
+    }
+  }
+}
+let restR=stream(SEED*77+3);
+function runRestless(now){
+  for(const r of RESTLESS){
+    if(!r.img||now<r.next)continue;
+    const cx=r.tile.cx;
+    cx.putImageData(r.img,r.px,r.py);
+    cx.save();
+    cx.setTransform(S,0,0,S,0,-r.tile.y0*S);
+    cx.beginPath();cx.rect(r.x,r.y,r.w,r.h);cx.clip();
+    DIRECT=r.tile; GEN_DY=r.dy;
+    r.fn(restR);
+    GEN_DY=0; DIRECT=null;
+    cx.restore();
+    r.next=now+2600+Math.random()*4200;
+  }
+}
+function hblob(R,cx,cy,rx,ry){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<14;i++){const t=i/14*TAU,m=1+.1*Math.sin(t*2+ph)+.05*Math.sin(t*5+ph*2.1);pts.push([cx+Math.cos(t)*rx*m,cy+Math.sin(t)*ry*m])}
+  return chaikin(pts,true,1);
+}
+function circ(R,cx,cy,r){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<40;i++){const t=i/40*TAU,m=1+.012*Math.sin(t*3+ph)+.008*Math.sin(t*7+ph*2.1);pts.push([cx+Math.cos(t)*r*m,cy+Math.sin(t)*r*m])}
+  return pts;
+}
+function ePts(cx,cy,rx,ry,rot,n=16){
+  const o=[];
+  for(let i=0;i<n;i++){const t=i/n*TAU,ux=Math.cos(t)*rx,uy=Math.sin(t)*ry;o.push([cx+ux*Math.cos(rot)-uy*Math.sin(rot),cy+ux*Math.sin(rot)+uy*Math.cos(rot)])}
+  return o;
+}
+function offsetPath(pts,d){
+  return pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny)||1;return[p[0]+nx/l*d,p[1]+ny/l*d]});
+}
+// the same line drawn several times, a little apart, each strand its own colour
+function strands(R,pts,colFn,n,spread,o){
+  for(let s=0;s<n;s++){
+    const u=n>1?s/(n-1):.5,col=colFn(u);
+    sk(R,n>1?offsetPath(pts,(u-.5)*spread):pts,{...o,col,noDust:true});
+  }
+}
+// a soft light; it may run over into the next scene, so it is only clipped far outside its own
+function glow(R,x,y,r,col,a,sx=1){
+  const t=Math.max(y-r,-70),bt=Math.min(y+r,1270);
+  if(bt<=t)return;
+  emit(t,bt,c2=>{
+    c2.save();c2.beginPath();c2.rect(x-r*sx,t,2*r*sx,bt-t);c2.clip();
+    c2.translate(x,y);c2.scale(sx,1);
+    const g=c2.createRadialGradient(0,0,0,0,0,r);
+    g.addColorStop(0,rgba(col,a));g.addColorStop(.4,rgba(col,a*.35));g.addColorStop(1,rgba(col,0));
+    c2.fillStyle=g;c2.fillRect(-r,-r,2*r,2*r);c2.restore();
+  });
+}
+function say(R,txt,left,dark,y=1100,sz=26){
+  const w=measure(txt,sz),x=left?112:1488-w;
+  write(R,txt,x,y,sz,{col:dark?CINK:INK,a:.9});
+}
+function inPoly(Pp,x,y){let c=false;for(let i=0,j=Pp.length-1;i<Pp.length;j=i++){const a=Pp[i],b=Pp[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+function dipLine(cx,cy,L,tilt,side,r0){
+  const pts=[];
+  const a=Math.max(.05,Math.asin(Math.sqrt(Math.min(1,r0/L)))),b=Math.PI-a;
+  for(let t=a;t<=b;t+=.035){
+    const r=L*Math.sin(t)*Math.sin(t);
+    const x=side*r*Math.sin(t),y=-r*Math.cos(t);
+    pts.push([cx+x*Math.cos(tilt)-y*Math.sin(tilt),cy+x*Math.sin(tilt)+y*Math.cos(tilt)]);
+  }
+  return pts;
+}
+function dustBatch(pts,col,B=150){
+  const c=col.slice();
+  for(let i=0;i<pts.length;i+=B){
+    const batch=pts.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    for(const p of batch){if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+    emit(y0-4,y1+4,c2=>{for(const p of batch){c2.fillStyle=rgba(c,p[3]);c2.beginPath();c2.arc(p[0],p[1],p[2],0,TAU);c2.fill()}});
+  }
+}
+// a line whose colour changes along its length
+function gradLine(R,pts,colFn,o,segs=9){
+  const n=pts.length;
+  for(let i=0;i<segs;i++){
+    const a=Math.floor((n-1)*i/segs),b=Math.min(n-1,Math.floor((n-1)*(i+1)/segs)+2);
+    if(b-a<1)continue;
+    sk(R,pts.slice(a,b+1),{...o,col:colFn((i+.5)/segs),noDust:true,taper:undefined});
+  }
+}
+
+// ---------------- the visitor ----------------
+// where you move, you leave graphite on the wall, as on the other walls. but
+// here a line made near a figure is repeated in that figure's own symmetry:
+// three times around the triangle, five around the pentagram, six around the
+// snowflake. the lines stay where you drew them, on the wall, and fade.
+const trailCv=document.getElementById('trail');
+const trailCx=trailCv.getContext('2d');
+let TP=[],TRD=1,trailDirty=false;
+// symmetry centres, in wall coordinates: n rotations, mir = mirrored too,
+// ax = angle of the mirror, r = how far the figure reaches, dark = light lines
+const SYM=[];
+function sym(x,y,n,o={}){SYM.push({x,y:y+GEN_DY,n,mir:o.mir??true,ax:o.ax??0,r:o.r??380,dark:!!o.dark,phi:!!o.phi})}
+// stretches of wall where the paper is dark, for the plain trail colour
+const DARKY=[];
+function darkBand(y0,y1){DARKY.push([y0+GEN_DY,y1+GEN_DY])}
+const isDarkAt=y=>DARKY.some(b=>y>=b[0]&&y<=b[1]);
+function sizeTrail(){
+  TRD=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*TRD;trailCv.height=innerHeight*TRD;
+  trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
+  trailCx.lineCap='round';trailCx.lineJoin='round';
+}
+sizeTrail();
+function symAt(x,y){
+  let best=-1,bd=1e9;
+  for(let i=0;i<SYM.length;i++){const s=SYM[i],d=Math.hypot(x-s.x,y-s.y);if(d<s.r&&d<bd){bd=d;best=i}}
+  return best;
+}
+addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch')return;
+  const t=performance.now(),x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK;
+  const L=TP[TP.length-1];
+  if(L&&Math.hypot(x-L.x,y-L.y)*CSSK<3)return;
+  TP.push({x,y,t,s:symAt(x,y)});
+  if(TP.length>420)TP.shift();
+},{passive:true});
+const GA=TAU*(1-1/((1+Math.sqrt(5))/2)); // the golden angle, about 137.5 degrees
+function drawTrail(now){
+  const LIFE=4600;
+  while(TP.length&&now-TP[0].t>LIFE)TP.shift();
+  if(RM||TP.length<2){if(trailDirty){trailCx.setTransform(1,0,0,1,0,0);trailCx.clearRect(0,0,trailCv.width,trailCv.height);trailDirty=false}return}
+  trailCx.setTransform(1,0,0,1,0,0);
+  trailCx.clearRect(0,0,trailCv.width,trailCv.height);
+  trailDirty=true;
+  // gather the segments into a few paths: per symmetry centre, per age
+  const NB=6,groups=new Map();
+  for(let i=1;i<TP.length;i++){
+    const a=TP[i-1],b=TP[i];
+    if(b.t-a.t>110||a.s!==b.s)continue;
+    const k=1-(now-b.t)/LIFE;
+    if(k<=0)continue;
+    const bk=Math.min(NB-1,Math.floor(k*NB)),key=b.s*NB+bk+NB;
+    let g=groups.get(key);
+    if(!g){g={s:b.s,bk,p:new Path2D(),y:b.y};groups.set(key,g)}
+    const age=1-k,wx=Math.sin(now*.0011+i*.7)*1.3*age,wy=Math.cos(now*.0009+i*1.1)*1.3*age;
+    g.p.moveTo(a.x+wx,a.y+wy);g.p.lineTo(b.x+wx,b.y+wy);
+  }
+  const base=TRD*CSSK,oy=-scrollY*TRD;
+  for(const g of groups.values()){
+    const k=(g.bk+.5)/NB,S0=g.s>=0?SYM[g.s]:null;
+    const dark=S0?S0.dark:isDarkAt(g.y);
+    trailCx.strokeStyle=rgba(dark?CINK:INK,(dark?.3:.24)*k*k);
+    trailCx.lineWidth=(.8+1.7*k)/CSSK;
+    if(!S0){trailCx.setTransform(base,0,0,base,0,oy);trailCx.stroke(g.p);continue}
+    const n=S0.phi?13:S0.n;
+    for(let r=0;r<n;r++){
+      for(let m=0;m<(S0.mir&&!S0.phi?2:1);m++){
+        trailCx.setTransform(base,0,0,base,0,oy);
+        trailCx.translate(S0.x,S0.y);
+        if(S0.phi){const sc=1+r*.05;trailCx.rotate(r*GA);trailCx.scale(sc,sc)}
+        else trailCx.rotate(r*TAU/n);
+        if(m){trailCx.rotate(S0.ax);trailCx.scale(1,-1);trailCx.rotate(-S0.ax)}
+        trailCx.translate(-S0.x,-S0.y);
+        trailCx.stroke(g.p);
+      }
+    }
+  }
+}
+
+// ---------------- more letters ----------------
+// the pencil alphabet learns the rest of the numbers, and a few signs of reckoning
+G('1',.4,[[.07,.3],[.23,.1],[.23,1]]);
+G('3',.52,[[.08,.2],[.22,.1],[.38,.12],[.44,.28],[.36,.46],[.22,.52],[.38,.58],[.47,.76],[.4,.94],[.22,1],[.05,.9]]);
+G('4',.54,[[.37,1],[.37,.1],[.05,.72],[.5,.72]]);
+G('5',.52,[[.44,.1],[.13,.1],[.1,.47],[.28,.43],[.44,.54],[.47,.76],[.36,.95],[.18,1],[.05,.9]]);
+G('7',.5,[[.05,.1],[.46,.1],[.18,1]]);
+G('9',.52,A_(.25,.33,.2,.22,-.2,-.2+TAU*.98,10),[[.45,.36],[.43,.72],[.3,1]]);
+G('é',.56,...GL['e'].s,[[.22,.36],[.36,.2]]);
+G('ë',.56,...GL['e'].s,[[.15,.3],[.18,.33]],[[.36,.3],[.39,.33]]);
+G('=',.5,[[.06,.6],[.44,.6]],[[.06,.8],[.44,.8]]);
+G('+',.5,[[.06,.7],[.44,.7]],[[.25,.5],[.25,.9]]);
+G('×',.44,[[.08,.55],[.36,.85]],[[.36,.55],[.08,.85]]);
+G(':',.24,[[.11,.52],[.13,.55]],[[.11,.92],[.13,.95]]);
+G('→',.7,[[.04,.7],[.62,.7]],[[.48,.58],[.64,.7],[.48,.82]]);
+G('/',.4,[[.34,.08],[.06,1.04]]);
+G('√',.62,[[.02,.66],[.12,.6],[.24,1],[.4,.1],[.62,.1]]);
+G('φ',.62,A_(.31,.64,.24,.26,0,TAU,12),[[.31,.18],[.31,1.28]]);
+G('π',.6,[[.05,.52],[.55,.5]],[[.18,.52],[.16,1]],[[.42,.5],[.44,.92],[.52,1]]);
+G('°',.26,A_(.13,.2,.08,.09,0,TAU,8));
+G('?',.5,[[.08,.2],[.2,.1],[.38,.14],[.42,.34],[.26,.58],[.24,.72]],[[.24,.94],[.27,.98]]);
+G('!',.24,[[.12,.1],[.12,.72]],[[.12,.94],[.13,.97]]);
+G('≈',.54,[[.05,.62],[.15,.56],[.27,.62],[.39,.68],[.49,.62]],[[.05,.82],[.15,.76],[.27,.82],[.39,.88],[.49,.82]]);
+G('|',.24,[[.12,.05],[.12,1.1]]);
+G('…',.6,[[.08,.93],[.1,.97]],[[.28,.93],[.3,.97]],[[.48,.93],[.5,.97]]);
+
+// ---------------- vectors ----------------
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const norm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return[a[0]/l,a[1]/l,a[2]/l]};
+const sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+const PHI=(1+Math.sqrt(5))/2;
+
+// ---------------- compass and straightedge ----------------
+// a circle the way a compass makes it: true and thin, starting wherever the
+// pencil leg was set down, and running on a little past where it began
+function cPts(cx,cy,r,a0,a1,step=5){
+  const n=Math.max(10,Math.ceil(Math.abs(a1-a0)*r/step)),p=[];
+  for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*r,cy+Math.sin(t)*r])}
+  return p;
+}
+function compass(R,cx,cy,r,o={}){
+  const a0=o.a0??rd(R,0,TAU),sw=(o.sweep??TAU)+(o.over??rd(R,.05,.14));
+  sk(R,cPts(cx,cy,r,a0,a0+sw),{col:o.col??GRAPH,w:o.w??.9,a:o.a??.42,amp:o.amp??Math.min(.55,.22+r*.0009),noDust:true,passes:o.passes,taper:o.taper});
+}
+// a construction line: straight, faint, overshooting its points a little
+function cline(R,x0,y0,x1,y1,o={}){
+  const e=o.ext??16,L=Math.hypot(x1-x0,y1-y0)||1,ux=(x1-x0)/L,uy=(y1-y0)/L;
+  sk(R,[[x0-ux*e,y0-uy*e],[x1+ux*e,y1+uy*e]],{col:o.col??GRAPH,w:o.w??.85,a:o.a??.36,amp:o.amp??.3,noDust:true,gap:o.gap});
+}
+function iline(R,x0,y0,x1,y1,o={}){sk(R,[[x0,y0],[x1,y1]],{col:o.col??INK,w:o.w??2,a:o.a??.85,amp:o.amp??.4,passes:o.passes,noDust:true,taper:o.taper})}
+function poly(R,pts,o={}){sk(R,pts.concat([pts[0]]),{col:o.col??INK,w:o.w??2,a:o.a??.85,amp:o.amp??.4,noDust:true,passes:o.passes})}
+// the little hole the compass needle leaves behind
+function needle(R,x,y,col=INK,a=.7){dotF(R,x,y,1.4,a,col);ell(R,x,y,3.4,3.4,{col,w:.7,a:a*.4,amp:.12,noDust:true})}
+function discF(x,y,r,col,a){fillPoly(cPts(x,y,r,0,TAU,2.5),col,a)}
+function ngon(cx,cy,r,n,rot=-Math.PI/2){const p=[];for(let i=0;i<n;i++){const t=rot+i/n*TAU;p.push([cx+Math.cos(t)*r,cy+Math.sin(t)*r])}return p}
+function starOrder(n,k){const o=[];let i=0;for(let s=0;s<=n;s++){o.push(i%n);i+=k}return o}
+function lerp2(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}
+// fill between an outer and an inner outline: a frame, a ring, a band
+function ringFill(P,Q,col,a){
+  const [x0,y0,x1,y1]=bbox(P),st=rgba(col,a),A=P.map(p=>p.slice()),B=Q.map(p=>p.slice());
+  emit(y0,y1,c=>{
+    c.beginPath();A.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    B.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    c.fillStyle=st;c.fill('evenodd');
+  });
+}
+// a label, centred, in pencil
+function note(R,t,x,y,sz,col,a=.75){write(R,t,x,y,sz,{col,a,cen:true})}
+function sentence(R,t,y,col,sz=27){write(R,t,800,y,sz,{col,a:.9,cen:true})}
+
+// ---------------- numbers as pebbles ----------------
+// the pythagoreans laid their numbers out in pebbles, and saw shapes in them
+function pebblePos(n){
+  const P=[];
+  if(n===1)P.push([0,0]);
+  else if(n===2)P.push([-.5,0],[.5,0]);
+  else if(n===3)ngon(0,.12,.62,3).forEach(p=>P.push(p));
+  else if(n===4)P.push([-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5]);
+  else if(n===5)ngon(0,.08,.8,5).forEach(p=>P.push(p));
+  else if(n===6){for(let r=0;r<3;r++)for(let i=0;i<=r;i++)P.push([i-r/2,r*.87-.87])}
+  else if(n===7){P.push([0,0]);ngon(0,0,1,6,0).forEach(p=>P.push(p))}
+  else if(n===8)ngon(0,0,1.15,8,-Math.PI/2+Math.PI/8).forEach(p=>P.push(p));
+  else if(n===9){for(let r=0;r<3;r++)for(let c=0;c<3;c++)P.push([c-1,r-1])}
+  else if(n===10){for(let r=0;r<4;r++)for(let i=0;i<=r;i++)P.push([i-r/2,r*.87-1.3])}
+  return P;
+}
+function pebbles(R,cx,cy,n,s,col,a=.9){
+  for(const p of pebblePos(n)){
+    const b=hblob(R,cx+p[0]*s,cy+p[1]*s,s*.3,s*.28);
+    fillPoly(b,col,a);
+    sk(R,b.concat([b[0]]),{col:shade(col,.35),w:.9,a:a*.55,amp:.2,noDust:true});
+  }
+}
+const WORDS=['','één','twee','drie','vier','vijf','zes','zeven','acht','negen','tien'];
+// the head of each sheet: the number in pebbles, and its name under it
+function chapter(R,n,x,y,col,pc,o={}){
+  pebbles(R,x,y,n,o.s??22,pc||col);
+  write(R,WORDS[n],x,y+(o.dy??(n>=6?70:58)),o.sz??32,{col,a:.86,cen:true});
+}
+
+// ---------------- the wall itself ----------------
+// the ground is dark, and under all the sheets runs a lattice of circles,
+// each through the centres of its neighbours: the flower of life, without end.
+// it is not there at the top, where there is only one point yet.
+function latticeA(x,y){
+  let a=.065;
+  a*=sm((y-430)/560);
+  a*=sm((Math.hypot(x-800,y-720)-300)/280);
+  a*=.18+.82*sm((Math.hypot(x-800,y-(6*PH+620))-560)/220);
+  return a;
+}
+function groundPaint(R){
+  for(let y=-20;y<TOTALH+20;y+=300){
+    const ya=y,yb=Math.min(TOTALH+20,y+300),gsd=ri(R,0,99999);
+    emit(ya,yb,c=>{
+      c.fillStyle=rgba(GROUND,1);c.fillRect(-10,ya-1,LW+20,yb-ya+2);
+      const RR=mul32(gsd),n=Math.round(LW*(yb-ya)/1500);
+      for(let i=0;i<n;i++){const s=.8+RR()*1.2;c.fillStyle=RR()<.5?'rgba(255,246,230,.035)':'rgba(0,0,0,.1)';c.fillRect(RR()*LW,ya+RR()*(yb-ya),s,s)}
+    });
+  }
+  const L=124,hy=L*Math.sqrt(3)/2;
+  for(let j=-1;j*hy<TOTALH+L;j++){
+    const y=j*hy,row=[];
+    for(let i=-1;i*L<LW+L;i++){const x=i*L+(j&1?L/2:0),a=latticeA(x,y);if(a>.004)row.push([x,y,a])}
+    if(!row.length)continue;
+    emit(y-L,y+L,c=>{c.lineWidth=.8;for(const [x,yy,a] of row){c.strokeStyle=rgba(GOLD,a);c.beginPath();c.arc(x,yy,L,0,TAU);c.stroke()}});
+  }
+}
+// a round sheet, torn
+function disc(R,cx,cy,r,col,o={}){
+  const sd=ri(R,0,9999),P=[],n=Math.max(40,Math.round(TAU*r/20));
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    let off=(fbm(Math.cos(t)*2+3,Math.sin(t)*2,sd,3)-.5)*2*(o.rough??9);
+    if(h2(i*1.7,9.1,sd)>.94)off+=rd(R,5,14)*(h2(i,3,sd)>.5?1:-1);
+    P.push([cx+Math.cos(t)*(r+off),cy+Math.sin(t)*(r+off)]);
+  }
+  fillPoly(P.map(p=>[p[0]+7,p[1]+9]),[8,6,10],.34);
+  fillPoly(P,col,1);fillPoly(P,col,1);
+  const gsd=ri(R,0,99999);
+  emit(cy-r-12,cy+r+12,c=>{
+    const RR=mul32(gsd),N=Math.round(r*r*3/1900);
+    for(let i=0;i<N;i++){const t=RR()*TAU,d=Math.sqrt(RR())*r*.97,s=.8+RR()*1.1;c.fillStyle=RR()<.6?'rgba(0,0,0,.08)':'rgba(255,250,240,.05)';c.fillRect(cx+Math.cos(t)*d,cy+Math.sin(t)*d,s,s)}
+  });
+  sk(R,P.concat([P[0]]),{col:[251,247,237],w:2,a:.34,amp:.4,gap:.24,noDust:true});
+  return P;
+}
+// tracing paper laid over a drawing: you see through it, a little milky
+function tracing(R,x0,y0,x1,y1,rot=0){
+  let P=tornPath(R,x0,y0,x1,y1,4,ri(R,0,9999));
+  if(rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,rot);
+  fillPoly(P.map(p=>[p[0]+3,p[1]+5]),[30,24,18],.07);
+  fillPoly(P,TRACE,.42);
+  sk(R,P.concat([P[0]]),{col:[255,255,255],w:1.2,a:.55,amp:.3,noDust:true});
+  return P;
+}
+// straight lines across a sheet, clipped to it: the squares of a school notebook, the staves of music paper
+function rule(P,lines,col,a,w=1){
+  const [x0,y0,x1,y1]=bbox(P),PP=P.map(p=>p.slice()),st=rgba(col,a);
+  emit(y0,y1,c=>{
+    c.save();c.beginPath();PP.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.clip();
+    c.strokeStyle=st;c.lineWidth=w;c.beginPath();
+    for(const l of lines){c.moveTo(l[0],l[1]);c.lineTo(l[2],l[3])}
+    c.stroke();c.restore();
+  });
+}
+// a strip of tape over a corner
+function tape(R,x,y,ang,len=46){
+  const tp=rotPts([[x-len/2,y-9],[x+len/2,y-9],[x+len/2,y+9],[x-len/2,y+9]],x,y,ang);
+  fillPoly(tp,[240,234,216],.38);
+  sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+}
+
+// a small note taped across the gap between two sheets: how this figure came
+// out of the one before. drawn last, at the top of a sheet, so it lies over both.
+function bridge(R,x,txt,fn,o={}){
+  const w=o.w??Math.max(252,measure(txt,13)+48),h=o.h??112,rot=o.rot??rd(R,-.045,.045);
+  sheet(R,x-w/2,-h/2,x+w/2,h/2,o.col??[249,246,236],{rough:5,rot});
+  tape(R,x-w/2+18,-h/2+5,rd(R,.5,.8),40);tape(R,x+w/2-20,h/2-5,rd(R,.5,.8),40);
+  fn(x,-12);
+  write(R,txt,x,h/2-16,13,{col:INK,a:.75,cen:true});
+}
+
+// ---------------- the seven old planets ----------------
+// 0 saturn, 1 jupiter, 2 mars, 3 sun, 4 venus, 5 mercury, 6 moon: the chaldean order, slowest first
+function planet(R,k,x,y,s,col,a=.9){
+  const o={col,w:Math.max(1.5,s*.085),a,amp:.3,noDust:true};
+  const C=(cx,cy,r)=>sk(R,cPts(cx,cy,r,0,TAU+.25,3),o);
+  const L=pts=>sk(R,pts.map(p=>[x+p[0]*s,y+p[1]*s]),o);
+  if(k===3){C(x,y,s*.4);dotF(R,x,y,s*.08,a,col)}
+  else if(k===6){
+    const r=s*.42,out=cPts(x,y,r,1.009,5.274,3),inn=cPts(x+.38*r,y,.86*r,4.891,1.392,3);
+    fillPoly(out.concat(inn),col,a*.25);
+    sk(R,out.concat(inn).concat([out[0]]),o);
+  }
+  else if(k===4){C(x,y-s*.16,s*.28);L([[0,.12],[0,.62]]);L([[-.18,.4],[.18,.4]])}
+  else if(k===2){C(x-s*.08,y+s*.08,s*.28);L([[.12,-.12],[.42,-.42]]);L([[.18,-.42],[.42,-.42],[.42,-.18]])}
+  else if(k===5){C(x,y-s*.04,s*.23);L([[0,.19],[0,.62]]);L([[-.15,.42],[.15,.42]]);sk(R,cPts(x,y-s*.45,s*.17,0,Math.PI,3),o)}
+  else if(k===1){L([[-.32,-.28],[-.14,-.42],[.02,-.3],[-.06,-.06],[-.34,.18],[.36,.18]]);L([[.18,-.4],[.18,.52]])}
+  else{L([[-.12,-.52],[-.12,.3]]);L([[-.32,-.34],[.08,-.34]]);L([[-.12,0],[.08,-.14],[.26,-.04],[.24,.22],[.08,.42],[.22,.56]])}
+}
+
+// ---------------- the five solids ----------------
+function solidData(k){
+  if(k===0)return{V:[[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]],F:[[0,1,2],[0,3,1],[0,2,3],[1,3,2]]};
+  if(k===1){
+    const V=[];for(const x of[-1,1])for(const y of[-1,1])for(const z of[-1,1])V.push([x,y,z]);
+    return{V,F:[[0,1,3,2],[4,6,7,5],[0,4,5,1],[2,3,7,6],[0,2,6,4],[1,5,7,3]]};
+  }
+  if(k===2)return{V:[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],F:[[0,2,4],[2,1,4],[1,3,4],[3,0,4],[2,0,5],[1,2,5],[3,1,5],[0,3,5]]};
+  if(k===3){
+    const V=[[-1,PHI,0],[1,PHI,0],[-1,-PHI,0],[1,-PHI,0],[0,-1,PHI],[0,1,PHI],[0,-1,-PHI],[0,1,-PHI],[PHI,0,-1],[PHI,0,1],[-PHI,0,-1],[-PHI,0,1]];
+    const F=[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];
+    return{V,F};
+  }
+  // the dodecahedron is the icosahedron turned inside out: its corners are the other's face centres
+  const I=solidData(3);
+  const V=I.F.map(f=>{const c=[0,0,0];for(const i of f)for(let d=0;d<3;d++)c[d]+=I.V[i][d]/3;return c});
+  const F=I.V.map((v,vi)=>{
+    const fs=[];I.F.forEach((f,fi)=>{if(f.includes(vi))fs.push(fi)});
+    const n=norm(v),u=norm(cross(n,Math.abs(n[0])<.9?[1,0,0]:[0,1,0])),w=cross(n,u);
+    fs.sort((a,b)=>Math.atan2(dot(V[a],w),dot(V[a],u))-Math.atan2(dot(V[b],w),dot(V[b],u)));
+    return fs;
+  });
+  return{V,F};
+}
+const SOLIDS=[0,1,2,3,4].map(solidData);
+// turn and flatten a solid: the corners on paper, with their depth kept
+function project(k,cx,cy,s,yaw,pitch,roll=0){
+  const D=SOLIDS[k],cy_=Math.cos(yaw),sy_=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),cr=Math.cos(roll),sr=Math.sin(roll);
+  let rmax=0;for(const v of D.V)rmax=Math.max(rmax,Math.hypot(v[0],v[1],v[2]));
+  const P=D.V.map(v=>{
+    let [x,y,z]=v.map(t=>t/rmax);
+    [x,z]=[x*cy_+z*sy_,-x*sy_+z*cy_];
+    [y,z]=[y*cp-z*sp,y*sp+z*cp];
+    [x,y]=[x*cr-y*sr,x*sr+y*cr];
+    return[cx+x*s,cy+y*s,z];
+  });
+  return{D,P};
+}
+// a solid as leonardo drew them for pacioli: open frames, the light coming in
+// through every face, the far side seen through the near
+function solidVacuus(R,k,cx,cy,s,yaw,pitch,o={}){
+  const {D,P}=project(k,cx,cy,s,yaw,pitch,o.roll??0);
+  const ink=o.ink??SEPIA,wood=o.wood??[206,170,112],lite=norm([-.5,-.7,.6]);
+  const faces=D.F.map(f=>{
+    const c=[0,0,0];for(const i of f){c[0]+=P[i][0];c[1]+=P[i][1];c[2]+=P[i][2]}
+    c[0]/=f.length;c[1]/=f.length;c[2]/=f.length;
+    // the face normal points away from the middle of the solid
+    const nrm=norm([c[0]-cx,c[1]-cy,c[2]*s]);
+    return{f,c,nrm};
+  }).sort((a,b)=>a.c[2]-b.c[2]);
+  const inset=o.inset??(k===3?.62:k===4?.7:.72);
+  for(const F of faces){
+    const front=F.nrm[2]>0;
+    const outer=F.f.map(i=>[P[i][0],P[i][1]]),inner=outer.map(p=>[F.c[0]+(p[0]-F.c[0])*inset,F.c[1]+(p[1]-F.c[1])*inset]);
+    const lit=clamp(.5+.5*dot([F.nrm[0],F.nrm[1],F.nrm[2]],lite),0,1);
+    const col=front?mix(shade(wood,.32),tint(wood,.25),lit):shade(wood,.5);
+    ringFill(outer,inner,col,front?.96:.9);
+    if(!front)hatchFill(R,outer,4.2,.9,.22,{col:ink,w:.8});
+    else if(lit<.45)hatchFill(R,outer,5,-.6,.2*(1-lit),{col:ink,w:.8});
+    poly(R,outer,{col:ink,w:front?1.5:1,a:front?.85:.5,amp:.3});
+    poly(R,inner,{col:ink,w:front?1.1:.8,a:front?.7:.4,amp:.25});
+  }
+}
+// a solid as a wire: near edges pressed, far edges faint
+function solidWire(R,k,cx,cy,s,yaw,pitch,o={}){
+  const {D,P}=project(k,cx,cy,s,yaw,pitch,o.roll??0);
+  const E=new Map();
+  D.F.forEach(f=>{
+    const c=[0,0,0];for(const i of f){c[0]+=P[i][0];c[1]+=P[i][1];c[2]+=P[i][2]}
+    const front=(c[2]/f.length)>0||norm([c[0]/f.length-cx,c[1]/f.length-cy,c[2]/f.length*s])[2]>0;
+    for(let j=0;j<f.length;j++){const a=f[j],b=f[(j+1)%f.length],key=a<b?a+'_'+b:b+'_'+a;E.set(key,(E.get(key)||false)||front)}
+  });
+  const col=o.col??INK;
+  for(const [key,fr] of E){
+    const [a,b]=key.split('_').map(Number);
+    if(fr)iline(R,P[a][0],P[a][1],P[b][0],P[b][1],{col,w:o.w??1.8,a:o.a??.85,amp:.3});
+    else sk(R,[[P[a][0],P[a][1]],[P[b][0],P[b][1]]],{col,w:(o.w??1.8)*.55,a:(o.a??.85)*.4,amp:.3,noDust:true,gap:.3});
+  }
+  if(o.dots)for(const p of P)dotF(R,p[0],p[1],(o.w??1.8)*1.3,o.a??.85,col);
+}
+
+// ---------------- sound ----------------
+// only ever after a tap or a click, and quiet
+let AC=null;
+function audio(){
+  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}
+  if(AC&&AC.state==='suspended')AC.resume();
+  return AC;
+}
+function tone(f,t0,dur,vol,type='triangle'){
+  const ac=audio();if(!ac)return;
+  const t=ac.currentTime+t0,o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
+  o.type=type;o.frequency.value=f;lp.type='lowpass';lp.frequency.value=2600;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0006,t+dur);
+  o.connect(lp);lp.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.05);
+}
+function pluck(f,t0=0,vol=.11){tone(f,t0,2.8,vol,'triangle');tone(f*2,t0,1.5,vol*.22,'sine');tone(f*3,t0,.9,vol*.1,'sine')}
+// places on the wall that answer a tap
+const HITS=[];
+function hit(x0,y0,x1,y1,fn){HITS.push({x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,fn})}
+const hitAt=(x,y)=>HITS.find(h=>x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1);
+addEventListener('click',e=>{const x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK,h=hitAt(x,y);if(h)h.fn(x,y)});
+addEventListener('pointermove',e=>{const h=hitAt(e.clientX/CSSK,(e.clientY+scrollY)/CSSK);document.body.style.cursor=h?'pointer':''},{passive:true});
+
+// ---------------- margin whispers ----------------
+// small figures in the margins, the way a geometer doodles while thinking
+function whispers(R,y0,y1,dark,n){
+  const col=dark?CINK:INK;
+  for(let i=0;i<n;i++){
+    const left=ch_(R,.5),x=left?rd(R,32,128):rd(R,1472,1568),y=rd(R,y0+40,y1-40),a=rd(R,.25,.45),k=ri(R,0,7),s=rd(R,7,13);
+    if(k===0)poly(R,ngon(x,y,s,3,rd(R,0,TAU)),{col,w:1,a});
+    else if(k===1)poly(R,ngon(x,y,s,6,rd(R,0,TAU)),{col,w:1,a});
+    else if(k===2){const p=ngon(x,y,s,5,rd(R,0,TAU));sk(R,starOrder(5,2).map(j=>p[j]),{col,w:1,a,amp:.3,noDust:true})}
+    else if(k===3){compass(R,x-s*.35,y,s*.7,{col,a,w:1});compass(R,x+s*.35,y,s*.7,{col,a,w:1})}
+    else if(k===4){for(let j=0;j<ri(R,3,5);j++)dotF(R,x+j*7-10,y+rd(R,-2,2),1.2,a,col)}
+    else if(k===5)sk(R,spiralPts(x,y,s*1.2,1,rd(R,1.5,2.5),rd(R,0,7)),{col,w:1,a,amp:.4});
+    else if(k===6)write(R,pk(R,['1','2','3','5','8','13','21','φ','9','7','34']),x,y+5,rd(R,12,16),{col,a,cen:true});
+    else{compass(R,x,y,s,{col,a,w:1});needle(R,x,y,col,a)}
+  }
+}
+
+
+// ===========================================================================
+// patronen — thirteen sheets, top to bottom. every sheet is drawn in local
+// coordinates 0..1600 x 0..1200; GEN_DY lifts it to its place.
+// the numbers one to ten each have a sheet; between five and six there are
+// two more, for fibonacci and for venus, and after six one for the solids.
+// ===========================================================================
+const P=[];
+
+// the compass itself: a hinge, two legs, a needle in the point and a lead on the circle
+function compassTool(R,hx,hy,nx,ny,px,py,o={}){
+  const metal=o.metal??STEEL,edge=o.edge??CINK,brass=o.brass??BRASS,a=o.a??.92;
+  const leg=(x1,y1,w0,w1,stop)=>{
+    const L=Math.hypot(x1-hx,y1-hy),ux=(x1-hx)/L,uy=(y1-hy)/L,vx=-uy,vy=ux;
+    const ex=x1-ux*stop,ey=y1-uy*stop;
+    const q=[[hx+vx*w0,hy+vy*w0],[ex+vx*w1,ey+vy*w1],[ex-vx*w1,ey-vy*w1],[hx-vx*w0,hy-vy*w0]];
+    fillPoly(q,shade(metal,.25),a);
+    fillPoly([[hx+vx*w0*.15,hy+vy*w0*.15],[ex+vx*w1*.15,ey+vy*w1*.15],[ex+vx*w1,ey+vy*w1],[hx+vx*w0,hy+vy*w0]],tint(metal,.35),a*.8);
+    sk(R,q.concat([q[0]]),{col:edge,w:1.3,a:.6,amp:.3,noDust:true});
+    return{ex,ey,ux,uy,vx,vy};
+  };
+  const A=leg(nx,ny,9,4,30),B=leg(px,py,9,5,64);
+  // the needle
+  iline(R,A.ex,A.ey,nx,ny,{col:tint(metal,.4),w:1.8,a,amp:.1});
+  // the lead holder and the lead
+  const hq=[[B.ex+B.vx*7,B.ey+B.vy*7],[B.ex+B.ux*26+B.vx*6,B.ey+B.uy*26+B.vy*6],[B.ex+B.ux*26-B.vx*6,B.ey+B.uy*26-B.vy*6],[B.ex-B.vx*7,B.ey-B.vy*7]];
+  fillPoly(hq,brass,a);sk(R,hq.concat([hq[0]]),{col:edge,w:1.1,a:.55,amp:.2,noDust:true});
+  const lx=B.ex+B.ux*26,ly=B.ey+B.uy*26;
+  const cone=[[lx+B.vx*4,ly+B.vy*4],[px,py],[lx-B.vx*4,ly-B.vy*4]];
+  fillPoly(cone,[64,62,66],a);sk(R,cone,{col:edge,w:.9,a:.45,amp:.15,noDust:true});
+  // the hinge and the handle, knurled
+  const bx=(nx+px)/2,by=(ny+py)/2,hl=Math.hypot(hx-bx,hy-by),hux=(hx-bx)/hl,huy=(hy-by)/hl;
+  const hv=[-huy,hux];
+  const hd=[[hx+hv[0]*6,hy+hv[1]*6],[hx+hux*46+hv[0]*6,hy+huy*46+hv[1]*6],[hx+hux*46-hv[0]*6,hy+huy*46-hv[1]*6],[hx-hv[0]*6,hy-hv[1]*6]];
+  fillPoly(hd,brass,a);
+  for(let t=10;t<44;t+=4)sk(R,[[hx+hux*t+hv[0]*6,hy+huy*t+hv[1]*6],[hx+hux*t-hv[0]*6,hy+huy*t-hv[1]*6]],{col:shade(brass,.45),w:.9,a:.6,amp:.1,noDust:true});
+  sk(R,hd.concat([hd[0]]),{col:edge,w:1.1,a:.55,amp:.2,noDust:true});
+  const hg=hblob(R,hx,hy,15,15);fillPoly(hg,brass,a);
+  sk(R,hg.concat([hg[0]]),{col:edge,w:1.3,a:.6,amp:.2,noDust:true});
+  dotF(R,hx,hy,3.5,.9,shade(brass,.55));
+}
+
+// P0 · één: the point ---------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+0),RW=stream(SEED*101+90);
+  groundPaint(RW);
+  darkBand(-200,1220);
+  write(R,'patronen',800,215,130,{col:CINK,a:.9,cen:true});
+  write(R,'een muur over getal en vorm',800,284,26,{col:CINK,a:.72,cen:true});
+  chapter(R,1,800,372,CINK,GOLD,{dy:52});
+  const cx=800,cy=730,r=226;
+  // first there is only the point
+  COMP='lighter';glow(R,cx,cy,120,GOLD,.28);COMP=null;
+  needle(R,cx,cy,GOLDL,.95);
+  pause(800,cy);
+  // then the pencil leg goes round once
+  const a0=.5,pts=cPts(cx,cy,r,a0,a0+TAU+.1,4),N=30;
+  for(let i=0;i<N;i++){
+    const s=pts.slice(Math.floor(i*(pts.length-1)/N),Math.floor((i+1)*(pts.length-1)/N)+1);
+    sk(R,s,{col:GOLD,w:2.6,a:.88,amp:.25,noDust:true});
+    pause(28,cy);
+  }
+  sk(R,cPts(cx,cy,r+1.2,a0+.3,a0+TAU-.2,4),{col:GOLDL,w:1,a:.35,amp:.5,noDust:true,gap:.04});
+  pause(400,cy);
+  // and the radius steps round the circle: exactly six times
+  for(let k=0;k<6;k++){
+    const t=a0+k*TAU/6,x=cx+Math.cos(t)*r,y=cy+Math.sin(t)*r;
+    sk(R,cPts(x,y,r,t+Math.PI+TAU/6-.13,t+Math.PI+TAU/6+.13,4),{col:CINK,w:1,a:.42,amp:.2,noDust:true});
+    sk(R,cPts(x,y,r,t+Math.PI-TAU/6-.13,t+Math.PI-TAU/6+.13,4),{col:CINK,w:1,a:.42,amp:.2,noDust:true});
+    dotF(R,x,y,2.2,.8,GOLDL);
+    pause(160,cy);
+  }
+  for(let k=0;k<6;k++){const t=a0+k*TAU/6;sk(R,cPts(cx+Math.cos(t)*r,cy+Math.sin(t)*r,r,0,TAU,6),{col:GOLD,w:1,a:.13,amp:.3,noDust:true,gap:.16})}
+  {const st=[];for(let i=0;i<160;i++){const x=rd(R,20,1580),y=rd(R,330,1180);if(Math.hypot(x-cx,y-cy)<r*2.1)continue;st.push([x,y,rd(R,.5,1.4),rd(R,.08,.4)])}dustBatch(st,CINK)}
+  cline(R,cx,cy,cx+Math.cos(a0)*r,cy+Math.sin(a0)*r,{col:CINK,a:.3,ext:4});
+  write(R,'r',cx+Math.cos(a0)*r*.52+8,cy+Math.sin(a0)*r*.52-6,20,{col:CINK,a:.6});
+  // the instrument rests where it finished
+  const px=cx+Math.cos(a0)*r,py=cy+Math.sin(a0)*r,mx=(cx+px)/2,my=(cy+py)/2,L=300,h=Math.sqrt(L*L-(r/2)*(r/2));
+  const ux=(px-cx)/r,uy=(py-cy)/r;
+  compassTool(R,mx+uy*h,my-ux*h,cx,cy,px,py);
+  COMP='lighter';spark(R,cx,cy,13,{col:GOLDL,a:.95,w:1.8,nR:8,noCenter:true});COMP=null;
+  restless(cx-30,cy-30,60,60,RR=>{COMP='lighter';spark(RR,cx,cy,13,{col:GOLDL,a:.95,w:1.8,nR:ri(RR,7,10),noCenter:true});COMP=null});
+  note(R,'zes keer past de straal erin',cx-430,cy+150,19,CINK,.62);
+  sk(R,[[cx-330,cy+120],[cx-262,cy+70],[cx-226,cy+52]],{col:CINK,w:1,a:.4,amp:.6,taper:'out'});
+  sentence(R,'alles begint met een punt',1050,CINK,30);
+  note(R,'een punt is wat geen delen heeft · euclides',800,1098,18,CINK,.58);
+  sym(cx,cy,12,{r:430,dark:true});
+  whispers(R,500,1150,true,3);
+});
+
+// a lens: where two circles of the same size overlap, each through the other's centre
+function lensPts(a,b,r){
+  const ab=Math.atan2(b[1]-a[1],b[0]-a[0]),ba=ab+Math.PI;
+  return cPts(a[0],a[1],r,ab-Math.PI/3,ab+Math.PI/3,4).concat(cPts(b[0],b[1],r,ba-Math.PI/3,ba+Math.PI/3,4));
+}
+
+// P1 · twee: the vesica ------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+1);
+  sheet(R,64,46,1536,1158,CREAM,{rough:13,rot:-.004});
+  chapter(R,2,800,104,INK,GRAPH);
+  const r=228,cy=610,A=[686,cy],B=[914,cy],h=r*Math.sqrt(3)/2;
+  // a line through the first point and a second one
+  cline(R,A[0]-r-70,cy,B[0]+r+70,cy,{a:.42});
+  needle(R,A[0],A[1]);needle(R,B[0],B[1]);
+  pause(400);
+  compass(R,A[0],A[1],r,{a:.5,w:1.05,a0:-.4});pause(500);
+  compass(R,B[0],B[1],r,{a:.5,w:1.05,a0:Math.PI+.4});pause(400);
+  // where they cross, a second line, standing up
+  cline(R,800,cy-h-80,800,cy+h+80,{a:.42});
+  dotF(R,800,cy-h,2.4,.8,INK);dotF(R,800,cy+h,2.4,.8,INK);
+  pause(300);
+  // the eye between them
+  const ves=lensPts(A,B,r);
+  fillPoly(ves,GOLD,.2);
+  scribFill(R,ves,5,.32,{col:OCHRE,w:1});
+  compass(R,A[0],A[1],r,{col:INK,w:1.7,a:.75,a0:1.2});
+  compass(R,B[0],B[1],r,{col:INK,w:1.7,a:.75,a0:4.1});
+  poly(R,ves,{col:VERM,w:2.4,a:.85});
+  // one across, the square root of three up
+  write(R,'1',800-6,cy+28,22,{a:.8});
+  write(R,'√3',812,cy-h*.45,22,{a:.8});
+  sk(R,[[A[0]+8,cy+40],[B[0]-8,cy+40]],{w:1,a:.45,amp:.3});
+  arrowHead(R,A[0]+8,cy+40,Math.PI,7,.5,INK,1);arrowHead(R,B[0]-8,cy+40,0,7,.5,INK,1);
+  sym(800,cy,2,{r:430});
+  // the eye
+  {
+    const x=300,y=330,w=230,H=104,d=((w/2)**2-(H/2)**2)/H,rho=d+H/2;
+    const top=cPts(x,y+d,rho,-Math.PI/2-Math.asin((w/2)/rho),-Math.PI/2+Math.asin((w/2)/rho),3);
+    const bot=cPts(x,y-d,rho,Math.PI/2-Math.asin((w/2)/rho),Math.PI/2+Math.asin((w/2)/rho),3);
+    const eye=top.concat(bot);
+    fillPoly(eye,[250,248,240],.9);
+    const ir=hblob(R,x,y,42,42);
+    fillPoly(ir,LAPIS,.55);
+    for(let k=0;k<26;k++){const t=k/26*TAU+rd(R,-.08,.08);sk(R,[[x+Math.cos(t)*14,y+Math.sin(t)*14],[x+Math.cos(t)*40,y+Math.sin(t)*40]],{col:shade(LAPIS,.3),w:1,a:.5,amp:.3,noDust:true})}
+    discF(x,y,15,[30,26,28],.92);discF(x-11,y-12,4.5,[255,255,255],.9);
+    sk(R,ir.concat([ir[0]]),{w:1.3,a:.7,amp:.3});
+    poly(R,eye,{w:1.9,a:.85});
+    for(let k=0;k<9;k++){const p=top[Math.round(4+k*(top.length-9)/8)];sk(R,[p,[p[0]+(p[0]-x)*.12,p[1]-16]],{w:1.1,a:.6,amp:.3,taper:'out'})}
+    note(R,'het oog',x,y+110,20,INK);
+    sym(x,y,2,{r:150});
+  }
+  // the fish
+  {
+    const x=1300,y=330,pts1=[],pts2=[];
+    for(let t=0;t<=1.0001;t+=.04){const u=-140+t*270;pts1.push([x+u,y-64*Math.sin(Math.PI*Math.min(t,.78)/.86)+Math.max(0,t-.66)*140]);pts2.push([x+u,y+64*Math.sin(Math.PI*Math.min(t,.78)/.86)-Math.max(0,t-.66)*140])}
+    const body=pts1.concat(pts2.slice().reverse());
+    fillPoly(body,SKY,.18);scribFill(R,body,5,.25,{col:LAPIS,w:1});
+    sk(R,pts1,{w:2,a:.85,amp:.4});sk(R,pts2,{w:2,a:.85,amp:.4});
+    dotF(R,x-82,y-8,4,.85,INK);
+    note(R,'de vis',x,y+110,20,INK);
+  }
+  // a cell that becomes two
+  {
+    const x=320,y=930,sep=160,rr=66,pts=[];
+    // two drops of the same water, pulling apart: the edge is where their pull is equal
+    const f=(px,py)=>Math.exp(-((px-x+sep/2)**2+(py-y)**2)/(rr*rr))+Math.exp(-((px-x-sep/2)**2+(py-y)**2)/(rr*rr));
+    for(let t=0;t<TAU;t+=.05){
+      let lo=0,hi=260;
+      for(let it=0;it<26;it++){const m=(lo+hi)/2;if(f(x+Math.cos(t)*m,y+Math.sin(t)*m)>.42)lo=m;else hi=m}
+      pts.push([x+Math.cos(t)*lo,y+Math.sin(t)*lo]);
+    }
+    const mem=chaikin(pts,true,1);
+    fillPoly(mem,[226,236,206],.75);
+    scribFill(R,mem,6,.22,{col:LEAF,w:1});
+    poly(R,mem,{col:shade(LEAF,.45),w:1.8,a:.8});
+    for(const sd of[-1,1]){const n=hblob(R,x+sd*sep/2+sd*8,y-4,24,21);fillPoly(n,VIOL,.45);sk(R,n.concat([n[0]]),{col:shade(VIOL,.4),w:1.2,a:.7,amp:.3});dotF(R,x+sd*sep/2+sd*12,y-8,4,.7,shade(VIOL,.4))}
+    for(let k=0;k<22;k++)dotF(R,x+rd(R,-150,150),y+rd(R,-48,48),rd(R,1.2,2.4),.45,LEAF);
+    note(R,'een cel wordt twee',x,y+120,20,INK);
+  }
+  // plus and minus
+  {
+    const x=1290,y=930;
+    compass(R,x,y,74,{col:INK,w:1.8,a:.75});
+    for(const [sd,col] of[[-1,VERM],[1,LAPIS]]){
+      const py=y+sd*74;
+      const b=hblob(R,x,py,17,17);fillPoly(b,[250,246,236],1);sk(R,b.concat([b[0]]),{col,w:1.7,a:.9,amp:.3});
+      sk(R,[[x-8,py],[x+8,py]],{col,w:2,a:.9,amp:.2});
+      if(sd<0)sk(R,[[x,py-8],[x,py+8]],{col,w:2,a:.9,amp:.2});
+    }
+    for(const sd of[-1,1])for(const w of[104,134]){const pts=[];for(let t=0;t<=1.0001;t+=.05)pts.push([x+sd*w*Math.sin(Math.PI*t),y-74+148*t]);sk(R,pts,{col:GRAPH,w:1,a:.32,amp:.5,noDust:true})}
+    note(R,'plus en min',x,y+120,20,INK);
+  }
+  sentence(R,'twee cirkels, elk door het hart van de ander',1104,INK);
+  whispers(R,140,1120,false,4);
+});
+
+// P2 · drie: the triangle -----------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+2);
+  const SH=sheet(R,58,40,1542,1162,BLUEP,{rough:14,rot:.003});
+  darkBand(40,1160);
+  const lines=[];for(let x=80;x<1540;x+=40)lines.push([x,20,x,1190]);for(let y=60;y<1170;y+=40)lines.push([30,y,1570,y]);
+  rule(SH,lines,PALE,.075,1);
+  chapter(R,3,800,104,PALE,PALE);
+  const d=360,A=[620,700],B=[980,700],C=[800,700-d*Math.sqrt(3)/2],G=[800,700-d*Math.sqrt(3)/6];
+  cline(R,A[0],A[1],B[0],B[1],{col:PALE,a:.55,ext:70});
+  needle(R,A[0],A[1],PALE);needle(R,B[0],B[1],PALE);
+  pause(400);
+  compass(R,A[0],A[1],d,{col:PALE,a:.45,w:1.05,a0:-1.4});pause(500);
+  compass(R,B[0],B[1],d,{col:PALE,a:.45,w:1.05,a0:Math.PI+1.4});pause(400);
+  dotF(R,C[0],C[1],3,.9,PALE);
+  pause(300);
+  const tri=[A,C,B];
+  fillPoly(tri,PALE,.08);
+  iline(R,A[0],A[1],C[0],C[1],{col:CHALK,w:2.8,a:.92});pause(150);
+  iline(R,C[0],C[1],B[0],B[1],{col:CHALK,w:2.8,a:.92});pause(150);
+  iline(R,B[0],B[1],A[0],A[1],{col:CHALK,w:2.8,a:.92});
+  // the circle inside and the circle around: one twice the other
+  compass(R,G[0],G[1],d/(2*Math.sqrt(3)),{col:PALE,a:.42,w:1});
+  compass(R,G[0],G[1],d/Math.sqrt(3),{col:PALE,a:.3,w:1});
+  for(const p of tri)cline(R,p[0],p[1],G[0]+(G[0]-p[0])*.5,G[1]+(G[1]-p[1])*.5,{col:PALE,a:.22,ext:0});
+  needle(R,G[0],G[1],PALE);
+  for(const [p,ang] of[[A,-Math.PI/6],[B,Math.PI+Math.PI/6],[C,Math.PI/2]]){
+    write(R,'60°',p[0]+Math.cos(ang)*58-16,p[1]+Math.sin(ang)*58+8,16,{col:PALE,a:.7});
+  }
+  write(R,'de eerste vorm',800,792,18,{col:PALE,a:.7,cen:true});
+  write(R,'die een ruimte omsluit',800,818,18,{col:PALE,a:.7,cen:true});
+  write(R,'euclides, boek één, stelling één',800,1044,17,{col:PALE,a:.55,cen:true});
+  sym(G[0],G[1],3,{r:430,dark:true});
+  // fire: the first of the solids, four triangles
+  solidWire(R,0,262,300,92,.62,-.42,{col:PALE,w:1.7,dots:true});
+  note(R,'vier driehoeken: vuur',262,440,18,PALE,.72);
+  sym(262,300,3,{r:140,dark:true});
+  // a stool on three legs
+  {
+    const x=1340,y=260,rx=92,ry=27;
+    const seat=[];for(let t=0;t<TAU;t+=.12)seat.push([x+Math.cos(t)*rx,y+Math.sin(t)*ry]);
+    fillPoly(seat,PALE,.1);
+    for(const [t,back] of[[Math.PI*1.5,true],[Math.PI*.18,false],[Math.PI*.82,false]]){
+      const px=x+Math.cos(t)*rx*.72,py=y+Math.sin(t)*ry*.72,fx=x+Math.cos(t)*rx*1.08,fy=y+150+Math.sin(t)*ry*1.4;
+      sk(R,[[px,py],[fx,fy]],{col:PALE,w:back?1.6:2.4,a:back?.45:.85,amp:.4});
+    }
+    poly(R,seat,{col:CHALK,w:2,a:.9});
+    sk(R,seat.slice(0,27).map(p=>[p[0],p[1]+9]),{col:PALE,w:1.2,a:.5,amp:.3});
+    sk(R,[[x-120,y+188],[x+130,y+184]],{col:PALE,w:1,a:.35,amp:.6,gap:.06});
+    note(R,'staat altijd stil',x,y+232,18,PALE,.72);
+  }
+  // three circles, three eyes: the triquetra
+  {
+    const x=250,y=920,r=74,cs=ngon(x,y+8,r/Math.sqrt(3),3);
+    for(const c of cs)compass(R,c[0],c[1],r,{col:PALE,a:.25,w:.9});
+    for(let i=0;i<3;i++){const L=lensPts(cs[i],cs[(i+1)%3],r);fillPoly(L,PALE,.07);poly(R,L,{col:CHALK,w:2.2,a:.88})}
+    compass(R,x,y+8,r*.62,{col:PALE,a:.6,w:1.5});
+    note(R,'drie in één',x,y+130,18,PALE,.72);
+    sym(x,y+8,3,{r:130,dark:true});
+  }
+  // the triangle numbers, in pebbles: one, three, six, ten
+  {
+    const x0=1190,y=960,s=17;
+    [1,3,6,10].forEach((n,j)=>{
+      const rows=[1,2,3,4].slice(0,j+1),cx=x0+[0,60,140,250][j];
+      rows.forEach((m,ri_)=>{for(let i=0;i<m;i++)dotF(R,cx+(i-(m-1)/2)*s,y-(rows.length-1-ri_)*s*.87-0,4.6,.9,CHALK)});
+      write(R,String(n),cx,y+44,18,{col:PALE,a:.8,cen:true});
+    });
+    note(R,'tel ze op: 1 + 2 + 3 + 4 = 10',1330,y+86,17,PALE,.62);
+  }
+  sentence(R,'met drie poten wiebelt niets',1112,CHALK);
+  whispers(R,140,1120,true,4);
+});
+
+// P3 · vier: the square --------------------------------------------------------
+// john michell's old figure: draw a square around the earth, set the moon on
+// top of it, and the circle through the moon's centre is as long as the square
+P.push(function(){
+  const R=stream(SEED*101+3);
+  sheet(R,60,44,1540,1160,PARCH,{rough:15,rot:-.003});
+  chapter(R,4,800,104,SEPIA,SANG);
+  const E=[800,712],Re=226,Rm=Re*3/11,M=[800,E[1]-Re-Rm],Rb=Re+Rm;
+  const sq=[[E[0]-Re,E[1]-Re],[E[0]+Re,E[1]-Re],[E[0]+Re,E[1]+Re],[E[0]-Re,E[1]+Re]];
+  for(let i=0;i<4;i++){const a=sq[i],b=sq[(i+1)%4];cline(R,a[0],a[1],b[0],b[1],{col:SEPIA,a:.32,ext:40})}
+  needle(R,E[0],E[1],SEPIA);
+  pause(300);
+  compass(R,E[0],E[1],Re,{col:SEPIA,a:.45,w:1});
+  pause(300);
+  // the earth, washed blue and green
+  const earth=cPts(E[0],E[1],Re-2,0,TAU,6);
+  fillPoly(earth,[120,160,170],.32);
+  scribFill(R,earth,6,.22,{col:LAPIS,w:1.1});
+  for(let k=0;k<5;k++){const b=blob(R,E[0]+rd(R,-130,130),E[1]+rd(R,-120,120),rd(R,30,70),rd(R,20,50));if(b.every(p=>Math.hypot(p[0]-E[0],p[1]-E[1])<Re-8)){fillPoly(b,[110,140,80],.2);scribFill(R,b,4,.22,{col:LEAF,w:1})}}
+  compass(R,E[0],E[1],Re,{col:SEPIA,w:1.9,a:.85});
+  poly(R,sq,{col:SEPIA,w:2.2,a:.88});
+  pause(300);
+  // the moon, resting on it
+  const moon=cPts(M[0],M[1],Rm-1.5,0,TAU,4);
+  fillPoly(moon,[214,210,196],.85);
+  for(let k=0;k<6;k++)dotF(R,M[0]+rd(R,-34,34),M[1]+rd(R,-30,30),rd(R,3,8),.25,[120,116,108]);
+  compass(R,M[0],M[1],Rm,{col:SEPIA,w:1.6,a:.85});
+  needle(R,M[0],M[1],SEPIA,.6);
+  pause(300);
+  // the circle through the moon's middle, in red chalk
+  sk(R,cPts(E[0],E[1],Rb,-Math.PI/2,TAU*.75+.02,5),{col:SANG,w:2,a:.82,amp:.4,gap:.07,noDust:true});
+  // radii and their lengths, in miles as the old books give them
+  const ang=-.62;
+  cline(R,E[0],E[1],E[0]+Math.cos(ang)*Rb,E[1]+Math.sin(ang)*Rb,{col:SANG,a:.55,ext:0});
+  write(R,'5040',E[0]+Math.cos(ang)*Rb*.62+10,E[1]+Math.sin(ang)*Rb*.62-8,20,{col:SANG,a:.85});
+  cline(R,E[0],E[1],E[0]+Re,E[1],{col:SEPIA,a:.6,ext:0});
+  write(R,'3960 mijl',E[0]+Re*.52,E[1]+28,19,{col:SEPIA,a:.85,cen:true});
+  cline(R,M[0],M[1],M[0]+Rm,M[1],{col:SEPIA,a:.6,ext:0});
+  write(R,'1080 mijl',M[0]+Rm+14,M[1]+8,17,{col:SEPIA,a:.85});
+  write(R,'aarde',E[0]-58,E[1]+6,22,{col:SEPIA,a:.75});
+  write(R,'maan',M[0]-Rm-62,M[1]+6,18,{col:SEPIA,a:.75});
+  note(R,'3960 + 1080 = 5040 = 1 × 2 × 3 × 4 × 5 × 6 × 7',800,1022,19,SEPIA,.78);
+  note(R,'en de cirkel is bijna precies zo lang als het vierkant',800,1054,18,SANG,.75);
+  sym(E[0],E[1],4,{r:420});
+  // the four elements on a cross
+  {
+    const x=280,y=340,s=96;
+    compass(R,x,y,s*.86,{col:SEPIA,a:.5,w:1.2});
+    iline(R,x-s,y,x+s,y,{col:SEPIA,w:1.4,a:.6});iline(R,x,y-s,x,y+s,{col:SEPIA,w:1.4,a:.6});
+    const el=[[0,-1,1,false,'vuur'],[1,0,1,true,'lucht'],[0,1,-1,false,'water'],[-1,0,-1,true,'aarde']];
+    for(const [dx,dy,up,bar,nm] of el){
+      const cx=x+dx*s*1.32,cy=y+dy*s*1.32,t=ngon(cx,cy,19,3,up>0?-Math.PI/2:Math.PI/2);
+      poly(R,t,{col:SANG,w:1.8,a:.9});
+      if(bar)iline(R,cx-14,cy+(up>0?4:-4),cx+14,cy+(up>0?4:-4),{col:SANG,w:1.5,a:.9});
+      write(R,nm,cx,cy+(dy>0?46:dy<0?-30:44),15,{col:SEPIA,a:.75,cen:true});
+    }
+    sym(x,y,4,{r:150});
+  }
+  // salt grows in little cubes
+  {
+    const x=1310,y=330;
+    const cube=(cx,cy,s,a)=>{
+      const k=.5,dx=s*.62,dy=s*.36;
+      const top=[[cx,cy-s*.5-dy],[cx+dx,cy-s*.5],[cx,cy-s*.5+dy],[cx-dx,cy-s*.5]];
+      const lf=[[cx-dx,cy-s*.5],[cx,cy-s*.5+dy],[cx,cy+s*.5+dy],[cx-dx,cy+s*.5]];
+      const rt=[[cx,cy-s*.5+dy],[cx+dx,cy-s*.5],[cx+dx,cy+s*.5],[cx,cy+s*.5+dy]];
+      fillPoly(top,[246,242,232],a);fillPoly(lf,[214,206,190],a);fillPoly(rt,[180,170,152],a);
+      hatchFill(R,rt,4,1.1,.25,{col:SEPIA,w:.8});
+      for(const f of[top,lf,rt])poly(R,f,{col:SEPIA,w:1.3,a:.75,amp:.25});
+    };
+    cube(x-40,y+40,92,.95);cube(x+58,y+70,52,.95);cube(x+18,y-56,40,.95);cube(x-96,y+96,30,.95);
+    note(R,'zout groeit in kubussen',x,y+170,18,SEPIA);
+  }
+  // the year as a cross: four quarters of the moon, four seasons
+  {
+    const x=300,y=920,s=92;
+    compass(R,x,y,s,{col:SEPIA,a:.6,w:1.3});
+    const ph=[[0,-1,'lente',0],[1,0,'zomer',1],[0,1,'herfst',2],[-1,0,'winter',3]];
+    for(const [dx,dy,nm,k] of ph){
+      const cx=x+dx*s,cy=y+dy*s,m=cPts(cx,cy,15,0,TAU,2);
+      fillPoly(m,[250,246,236],1);
+      if(k===0)fillPoly(m,[70,62,56],.85);
+      else if(k===1)fillPoly(cPts(cx,cy,15,Math.PI/2,Math.PI*1.5,2),[70,62,56],.85);
+      else if(k===3)fillPoly(cPts(cx,cy,15,-Math.PI/2,Math.PI/2,2),[70,62,56],.85);
+      poly(R,m,{col:SEPIA,w:1.2,a:.8,amp:.2});
+      write(R,nm,cx+dx*58,cy+dy*44+(dy?6:6),15,{col:SEPIA,a:.75,cen:true});
+    }
+    iline(R,x-s*.55,y,x+s*.55,y,{col:SANG,w:1,a:.5});iline(R,x,y-s*.55,x,y+s*.55,{col:SANG,w:1,a:.5});
+  }
+  // and a person, who fits in both
+  {
+    const x=1300,y=932,H=190,sqs=[[x-H/2,y-H/2],[x+H/2,y-H/2],[x+H/2,y+H/2],[x-H/2,y+H/2]],nav=[x,y+H/2-H*.6];
+    poly(R,sqs,{col:SEPIA,w:1.4,a:.7});
+    compass(R,nav[0],nav[1],H*.6,{col:SEPIA,w:1.3,a:.65});
+    const hd=[x,y-H/2+15],sh=[x,y-H/2+36],hip=[x,y+6];
+    ell(R,hd[0],hd[1],12,14,{col:SANG,w:1.6,a:.85,amp:.2});
+    sk(R,[sh,hip],{col:SANG,w:1.8,a:.85,amp:.3});
+    sk(R,[[x-H/2,sh[1]+6],sh,[x+H/2,sh[1]+6]],{col:SANG,w:1.6,a:.85,amp:.3});
+    const ra=-.42;
+    for(const sd of[-1,1]){
+      sk(R,[sh,[nav[0]+sd*Math.cos(ra)*H*.6,nav[1]+Math.sin(ra)*H*.6]],{col:SANG,w:1.2,a:.5,amp:.3});
+      sk(R,[hip,[x+sd*18,y+H/2]],{col:SANG,w:1.6,a:.85,amp:.3});
+      sk(R,[hip,[nav[0]+sd*Math.sin(.5)*H*.6,nav[1]+Math.cos(.5)*H*.6]],{col:SANG,w:1.1,a:.45,amp:.3});
+    }
+    note(R,'de mens past in allebei',x,y+H/2+44,18,SEPIA);
+    sym(x,y,4,{r:150});
+  }
+  sentence(R,'de hemel is rond, de aarde is vierkant',1112,SEPIA);
+  whispers(R,140,1120,false,4);
+});
+
+// P4 · vijf: the pentagram and the golden cut ----------------------------------
+P.push(function(){
+  const R=stream(SEED*101+4);
+  sheet(R,62,42,1538,1160,ROSEP,{rough:13,rot:.004});
+  chapter(R,5,800,104,INK,ROSE);
+  const C=[560,650],r0=276;
+  compass(R,C[0],C[1],r0,{a:.38,w:1});
+  needle(R,C[0],C[1]);
+  pause(300);
+  for(let lvl=0;lvl<4;lvl++){
+    const rr=r0/Math.pow(PHI,2*lvl),rot=-Math.PI/2+lvl*Math.PI/5,pent=ngon(C[0],C[1],rr,5,rot);
+    poly(R,pent,{col:INK,w:Math.max(.9,2.1-lvl*.4),a:.85-lvl*.14});
+    const star=starOrder(5,2).map(i=>pent[i]);
+    if(lvl<3){
+      fillPoly(star,ROSE,.07);
+      sk(R,star,{col:lvl%2?VERM:ROSE,w:2.6-lvl*.55,a:.88-lvl*.16,amp:.35,noDust:true});
+    }
+    pause(250);
+  }
+  // one line of the star, and how it is cut: each piece is to the next as the whole is to the larger
+  {
+    const pent=ngon(C[0],C[1],r0,5),a=pent[0],b=pent[2];
+    const p1=lerp2(a,b,1/(PHI*PHI)),p2=lerp2(a,b,1/PHI);
+    const L=Math.hypot(b[0]-a[0],b[1]-a[1]),nx=-(b[1]-a[1])/L,ny=(b[0]-a[0])/L;
+    for(const p of[a,p1,p2,b])sk(R,[[p[0]-nx*9,p[1]-ny*9],[p[0]+nx*9,p[1]+ny*9]],{w:1.6,a:.85,amp:.2});
+    const off=30;
+    const lab=(t0,t1,txt)=>{const m=lerp2(a,b,(t0+t1)/2);write(R,txt,m[0]+nx*off-8,m[1]+ny*off+8,20,{col:VERM,a:.9})};
+    lab(0,1/(PHI*PHI),'φ');lab(1/(PHI*PHI),1/PHI,'1');lab(1/PHI,1,'φ');
+  }
+  note(R,'φ = 1,618…',C[0],C[1]+r0+62,22,VERM,.85);
+  note(R,'het grote stuk staat tot het kleine als het geheel tot het grote',C[0],C[1]+r0+96,16,INK,.6);
+  sym(C[0],C[1],5,{r:380});
+  // an apple, cut straight across
+  {
+    const x=1180,y=560,Ra=196;
+    const skin=[];for(let t=0;t<TAU;t+=.04)skin.push([x+Math.cos(t)*Ra*(1+.028*Math.cos(5*t+.4)+.012*Math.sin(2*t)),y+Math.sin(t)*Ra*(1+.028*Math.cos(5*t+.4)+.012*Math.sin(2*t))*.97]);
+    fillPoly(skin.map(p=>[p[0]+5,p[1]+7]),[60,30,30],.18);
+    fillPoly(skin,[188,48,40],.95);
+    for(let k=0;k<70;k++){const t=rd(R,2.3,4.6),r1=Ra*rd(R,.9,.95);sk(R,[[x+Math.cos(t)*r1,y+Math.sin(t)*r1*.97],[x+Math.cos(t)*Ra*.965,y+Math.sin(t)*Ra*.965*.97]],{col:pk(R,[[232,186,70],[200,170,60],[236,120,60]]),w:rd(R,1.5,3),a:rd(R,.3,.6),amp:.3,noDust:true})}
+    const flesh=skin.map(p=>[x+(p[0]-x)*.925,y+(p[1]-y)*.925]);
+    fillPoly(flesh,[250,240,212],1);
+    spatter(R,x,y,Ra*.8,500,[226,206,150],.35);
+    // the faint ring of the vessels
+    for(let k=0;k<10;k++){const t=-Math.PI/2+k*TAU/10+(k%2?.1:0),rr=Ra*.6;dotF(R,x+Math.cos(t)*rr,y+Math.sin(t)*rr,3.2,.6,[150,160,90])}
+    sk(R,cPts(x,y,Ra*.6,0,TAU,6),{col:[180,170,110],w:1,a:.35,amp:.6,gap:.08,noDust:true});
+    // the core: a star of five rooms, a pip in each
+    const core=[];
+    for(let k=0;k<10;k++){const t=-Math.PI/2+k*TAU/10,rr=k%2?Ra*.17:Ra*.43;core.push([x+Math.cos(t)*rr,y+Math.sin(t)*rr])}
+    const cs=chaikin(core,true,2);
+    fillPoly(cs,[226,222,170],.9);
+    poly(R,cs,{col:[150,140,80],w:1.6,a:.8});
+    for(let k=0;k<5;k++){
+      const t=-Math.PI/2+k*TAU/5,px=x+Math.cos(t)*Ra*.28,py=y+Math.sin(t)*Ra*.28;
+      const pip=[];for(let u=0;u<TAU;u+=.3){const rr=9+5*Math.cos(u);pip.push([px+Math.cos(t)*Math.cos(u)*rr*1.6-Math.sin(t)*Math.sin(u)*rr*.7,py+Math.sin(t)*Math.cos(u)*rr*1.6+Math.cos(t)*Math.sin(u)*rr*.7])}
+      fillPoly(pip,[96,54,30],.95);sk(R,pip.concat([pip[0]]),{col:[60,34,20],w:1,a:.8,amp:.2});
+      dotF(R,px-Math.cos(t)*4,py-Math.sin(t)*4,2,.7,[220,180,140]);
+    }
+    poly(R,skin,{col:shade([188,48,40],.4),w:2,a:.85});
+    note(R,'snijd hem dwars door',x,y+Ra+52,20,INK);
+    sym(x,y,5,{r:240});
+  }
+  // apple blossom: five petals
+  {
+    const x=290,y=300,s=46;
+    for(let k=0;k<5;k++){const t=-Math.PI/2+k*TAU/5,pet=ePts(x+Math.cos(t)*s*.95,y+Math.sin(t)*s*.95,s*.78,s*.6,t,14);
+      fillPoly(pet,[252,236,238],.95);scribFill(R,pet,4,.25,{col:ROSE,w:1});poly(R,pet,{col:shade(ROSE,.35),w:1.3,a:.75,amp:.3})}
+    for(let k=0;k<16;k++){const t=k/16*TAU;sk(R,[[x,y],[x+Math.cos(t)*s*.42,y+Math.sin(t)*s*.42]],{col:[180,160,60],w:.9,a:.7,amp:.2,noDust:true});dotF(R,x+Math.cos(t)*s*.44,y+Math.sin(t)*s*.44,2.2,.9,HONEY)}
+    dotF(R,x,y,6,.9,[150,170,80]);
+    note(R,'appelbloesem',x,y+s*2.2,18,INK);
+    sym(x,y,5,{r:120});
+  }
+  // a starfish
+  {
+    const x=1330,y=250,s=70,pts=[];
+    for(let k=0;k<=100;k++){const t=k/100*TAU-Math.PI/2,m=.42+.58*Math.pow(Math.abs(Math.cos(t*2.5)),1.6);pts.push([x+Math.cos(t)*s*m,y+Math.sin(t)*s*m])}
+    fillPoly(pts,[226,150,80],.9);
+    spatter(R,x,y,s*.75,180,[250,230,190],.6);
+    poly(R,pts,{col:shade([226,150,80],.5),w:1.6,a:.8});
+    for(let k=0;k<5;k++){const t=-Math.PI/2+k*TAU/5;sk(R,[[x,y],[x+Math.cos(t)*s*.86,y+Math.sin(t)*s*.86]],{col:shade([226,150,80],.45),w:1,a:.45,amp:.4,gap:.15})}
+    note(R,'zeester',x,y+s*1.5,18,INK);
+    sym(x,y,5,{r:120});
+  }
+  // a sand dollar: a shell with a flower of five
+  {
+    const x=1300,y=962,s=74,shell=hblob(R,x,y,s,s*.97);
+    fillPoly(shell,[236,224,196],.95);
+    spatter(R,x,y,s*.9,260,[200,182,150],.5);
+    for(let k=0;k<5;k++){
+      const t=-Math.PI/2+k*TAU/5;
+      for(const sd of[-1,1]){const pts=[];for(let u=0;u<=1.0001;u+=.1){const w=Math.sin(Math.PI*u)*s*.16*sd;pts.push([x+Math.cos(t)*u*s*.66-Math.sin(t)*w,y+Math.sin(t)*u*s*.66+Math.cos(t)*w])}
+        for(const p of pts.slice(1,-1))dotF(R,p[0],p[1],1.8,.7,[150,120,90]);sk(R,pts,{col:[170,140,110],w:1,a:.5,amp:.2,noDust:true})}
+    }
+    poly(R,shell,{col:[150,120,90],w:1.6,a:.8});
+    dotF(R,x,y,3,.7,[150,120,90]);
+    note(R,'zanddollar',x,y+s*1.5,18,INK);
+    sym(x,y,5,{r:120});
+  }
+  sentence(R,'in elke appel zit een ster',1112,INK);
+  whispers(R,140,1120,false,4);
+});
+
+// P5 · fibonacci: the sum of the two before -------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+5);
+  sheet(R,58,40,1542,1160,CREAM,{rough:13,rot:-.003});
+  // the row of numbers, each one the two before it added up
+  const FIB=[1,1,2,3,5,8,13,21,34,55,89,144],fx=[];
+  let tw=0;const gap=34,szs=FIB.map(()=>30);
+  FIB.forEach((n,i)=>{fx.push(tw+measure(String(n),szs[i])/2);tw+=measure(String(n),szs[i])+gap});
+  const x0=800-(tw-gap)/2;
+  FIB.forEach((n,i)=>{write(R,String(n),x0+fx[i],122,szs[i],{a:.85,cen:true,col:i>=8?VERM:INK});pause(60,300)});
+  for(let i=2;i<FIB.length;i++){
+    const a=x0+fx[i-2],b=x0+fx[i],m=(a+b)/2,pts=[];
+    for(let t=0;t<=1.0001;t+=.1)pts.push([a+(b-a)*t,140+Math.sin(Math.PI*t)*(16+i*1.2)]);
+    sk(R,pts,{col:VERM,w:1,a:.38,amp:.3,noDust:true,taper:'both'});
+  }
+  // the squares, each as wide as the two before, and the arc through them
+  {
+    const dirs=[3,0,1,2],sq=[[0,0,1,3]];let bx0=0,by0=0,bx1=1,by1=1;
+    for(let i=1;i<9;i++){
+      const s=FIB[i],d=[0,1,2,3][(i-1)%4];let x,y;
+      if(d===0){x=bx1;y=by0}else if(d===1){x=bx0;y=by1}else if(d===2){x=bx0-s;y=by0}else{x=bx0;y=by0-s}
+      sq.push([x,y,s,d]);bx0=Math.min(bx0,x);by0=Math.min(by0,y);bx1=Math.max(bx1,x+s);by1=Math.max(by1,y+s);
+    }
+    // turn the whole figure a quarter, so it lies down
+    const k=9,X0=880,Y0=318;
+    const T=(x,y)=>[X0+(-y-(-by1))*k,Y0+(x-bx0)*k];
+    const TR=tracing(R,X0-34,Y0-30,X0+55*k+30,Y0+34*k+30,.006);
+    sq.forEach(([x,y,s,d],i)=>{
+      const c=[T(x,y),T(x+s,y),T(x+s,y+s),T(x,y+s)];
+      fillPoly(c,[GOLD,ROSE,SKY,LEAF][i%4],.1);
+      poly(R,c,{col:INK,w:1.1,a:.7,amp:.2});
+      if(s>=3){const m=T(x+s/2,y+s/2);write(R,String(s),m[0],m[1]+s*k*.07,Math.min(34,8+s*k*.11),{a:.6,cen:true})}
+      pause(110,500);
+    });
+    const arcPts=[];
+    sq.forEach(([x,y,s,d])=>{
+      const cx=[x,x,x+s,x+s][d],cy=[y+s,y,y,y+s][d],a0=[-Math.PI/2,0,Math.PI/2,Math.PI][d];
+      for(let j=0;j<=12;j++){const t=a0+j/12*Math.PI/2;arcPts.push(T(cx+Math.cos(t)*s,cy+Math.sin(t)*s))}
+    });
+    sk(R,arcPts,{col:VERM,w:2.4,a:.9,amp:.3,noDust:true});
+    note(R,'elk vierkant zo breed als de twee ervoor',X0+27*k,Y0+34*k+62,17,INK,.62);
+  }
+  // a sunflower: every seed a golden angle further round than the one before
+  {
+    const cx=440,cy=640,Rd=222,N=760,c=Rd/Math.sqrt(N),GAv=TAU*(1-1/PHI);
+    // the rays first, the petals in two rings
+    for(let ring=0;ring<2;ring++){
+      const n=ring?34:21;
+      for(let i=0;i<n;i++){
+        const t=i/n*TAU+ring*.09+rd(R,-.03,.03),L=rd(R,92,118)-ring*10,w=rd(R,22,30);
+        const base=[cx+Math.cos(t)*(Rd-12),cy+Math.sin(t)*(Rd-12)];
+        const pet=[];for(let u=0;u<=1.0001;u+=.1){const ww=w*Math.sin(Math.PI*Math.pow(u,.8))*.5;pet.push([base[0]+Math.cos(t)*L*u-Math.sin(t)*ww,base[1]+Math.sin(t)*L*u+Math.cos(t)*ww])}
+        for(let u=1;u>=0;u-=.1){const ww=w*Math.sin(Math.PI*Math.pow(u,.8))*.5;pet.push([base[0]+Math.cos(t)*L*u+Math.sin(t)*ww,base[1]+Math.sin(t)*L*u-Math.cos(t)*ww])}
+        const col=ring?[240,190,40]:[214,150,30];
+        fillPoly(pet,col,.92);
+        sk(R,[base,[base[0]+Math.cos(t)*L*.85,base[1]+Math.sin(t)*L*.85]],{col:shade(col,.25),w:1,a:.5,amp:.4,noDust:true});
+        poly(R,pet,{col:shade(col,.45),w:1.1,a:.7,amp:.3});
+      }
+    }
+    discF(cx,cy,Rd+4,[46,30,18],.97);
+    // then the seeds, from the middle out, the way the flower makes them
+    const seeds=[];
+    for(let k=1;k<=N;k++){
+      const r=c*Math.sqrt(k),t=k*GAv,x=cx+Math.cos(t)*r,y=cy+Math.sin(t)*r,sz=c*.66*(.62+.38*Math.min(1,k/90));
+      const u=k/N;let col=u<.09?mix([196,190,86],[150,128,60],u/.09):mix([132,92,50],[96,62,34],Math.pow(u,.8));
+      // three of the thirty-four spirals in red, three of the fifty-five in blue
+      if(k>70&&[0,11,22].includes(k%34))col=[204,72,52];
+      if(k>70&&[5,23,41].includes(k%55))col=[70,104,186];
+      seeds.push([x,y,sz,t,rgba(col,.96),rgba(shade(col,.55),.85)]);
+    }
+    for(let i=0;i<seeds.length;i+=80){
+      const B=seeds.slice(i,i+80);let ya=1e9,yb=-1e9;for(const s of B){ya=Math.min(ya,s[1]-8);yb=Math.max(yb,s[1]+8)}
+      emit(ya,yb,c2=>{for(const [x,y,sz,t,f,e] of B){c2.save();c2.translate(x,y);c2.rotate(t);c2.beginPath();c2.ellipse(0,0,sz,sz*.7,0,0,TAU);c2.fillStyle=f;c2.fill();c2.strokeStyle=e;c2.lineWidth=.6;c2.stroke();c2.restore()}});
+      pause(70,640);
+    }
+    // two of the spirals the seeds fall into, one each way
+    {
+      const parts=[['34',VERM],[' spiralen de ene kant op, ',INK],['55',LAPIS],[' de andere',INK]],sz=18;
+      let tw=0;for(const p of parts)tw+=measure(p[0],sz)+.1*sz;
+      let xx=cx-tw/2;for(const [t,col] of parts){write(R,t,xx,cy+Rd+148,sz,{col,a:col===INK?.65:.9});xx+=measure(t,sz)+.1*sz}
+    }
+    sym(cx,cy,13,{phi:true,r:330});
+    COMP=null;
+  }
+  // a nautilus, sawn through: chamber after chamber, each the same shape, only larger
+  {
+    const cx=1170,cy=826,b=Math.log(3)/TAU,a=8.6,th1=TAU*2.6,rr=t=>a*Math.exp(b*t);
+    const sp=t=>[cx+Math.cos(t+2.2)*rr(t),cy+Math.sin(t+2.2)*rr(t)*.94];
+    const outer=[];for(let t=0;t<=th1;t+=.05)outer.push(sp(t));
+    const inner=[];for(let t=th1-TAU;t>=0;t-=.05)inner.push(sp(t));
+    const last=[];for(let t=th1-TAU;t<=th1;t+=.04)last.push(sp(t));
+    fillPoly(last.map(p=>[p[0]+5,p[1]+7]),[60,40,24],.16);
+    fillPoly(last,[246,236,216],.97);
+    for(let t=TAU*.9;t<th1-.5;t+=.84){const ch=[];for(let u=t;u<=t+.42;u+=.06)ch.push(sp(u));for(let u=t+.42;u>=t;u-=.06)ch.push(sp(u-TAU));fillPoly(ch,[236,214,196],.5)}
+    // the last whorl is striped like a tiger outside
+    for(let t=th1-TAU*.9;t<th1;t+=.16){const p=sp(t),q=sp(t-TAU);sk(R,[p,lerp2(p,q,.22)],{col:[170,96,52],w:rd(R,3,6),a:rd(R,.35,.6),amp:1.2,noDust:true,taper:'in'})}
+    // the walls between the chambers
+    for(let t=TAU*.9;t<th1-.5;t+=.42){
+      const p=sp(t),q=sp(t-TAU),m=lerp2(p,q,.5),dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy)||1,bow=L*.18;
+      const mid=[m[0]+(-dy/L)*bow,m[1]+(dx/L)*bow];
+      sk(R,chaikin([p,mid,q],false,2),{col:[150,116,84],w:1.3,a:.75,amp:.2,noDust:true});
+    }
+    sk(R,outer,{col:SEPIA,w:2,a:.85,amp:.3,noDust:true});
+    sk(R,inner.slice().reverse(),{col:SEPIA,w:1.2,a:.6,amp:.3,noDust:true});
+    sk(R,[sp(th1),sp(th1-TAU)],{col:SEPIA,w:1.8,a:.8,amp:.3,noDust:true});
+    note(R,'groeien zonder je vorm te verliezen',cx,cy+180,19,INK,.75);
+  }
+  // the quotients creep up on the golden number
+  note(R,'8 : 5 = 1,6  ·  13 : 8 = 1,625  ·  21 : 13 = 1,615  ·  34 : 21 = 1,619  ·  55 : 34 = 1,6176  →  φ',800,1060,16,INK,.62);
+  sentence(R,'elk getal is de som van de twee ervoor',1112,INK);
+  whispers(R,180,1120,false,3);
+});
+
+// P6 · venus: the rose of eight years ----------------------------------------------
+// seen from the earth, venus goes round the sun thirteen times in eight years,
+// and passes between us and the sun five times. the five loops make a rose.
+const VEN=(()=>{
+  const Te=365.256,Tv=224.701,N=2600,pts=[];
+  for(let i=0;i<=N;i++){
+    const t=i/N*8*Te,ae=Math.PI/2+TAU*t/Te,av=Math.PI/2+TAU*t/Tv;
+    pts.push([.7233*Math.cos(av)-Math.cos(ae),.7233*Math.sin(av)-Math.sin(ae)]);
+  }
+  return pts;
+})();
+P.push(function(){
+  const R=stream(SEED*101+6),RS=stream(SEED*101+66);
+  darkBand(-20,1220);
+  const cx=800,cy=600,AU=240,V=VEN.map(p=>[cx+p[0]*AU,cy+p[1]*AU]);
+  // the night: stars, and a ring of degrees like an old astrolabe
+  const st=[];for(let i=0;i<420;i++){const x=rd(RS,20,1580),y=rd(RS,-20,1220);if(Math.hypot(x-cx,y-cy)<440&&ch_(RS,.7))continue;st.push([x,y,rd(RS,.5,1.6),rd(RS,.12,.6)])}
+  dustBatch(st,CINK);
+  const RR0=458;
+  sk(R,cPts(cx,cy,RR0,0,TAU+.02,6),{col:GOLD,w:1.2,a:.45,amp:.3,noDust:true});
+  sk(R,cPts(cx,cy,RR0+16,0,TAU+.02,6),{col:GOLD,w:.9,a:.3,amp:.3,noDust:true});
+  for(let d=0;d<360;d+=5){const t=d/180*Math.PI,l=d%30===0?16:d%10===0?10:5;sk(R,[[cx+Math.cos(t)*RR0,cy+Math.sin(t)*RR0],[cx+Math.cos(t)*(RR0+l),cy+Math.sin(t)*(RR0+l)]],{col:GOLD,w:d%30?.8:1.2,a:d%30?.35:.55,amp:.1,noDust:true})}
+  // the sun's own yearly circle round us, faint
+  sk(R,cPts(cx,cy,AU,0,TAU,6),{col:GOLD,w:1,a:.32,amp:.3,noDust:true,gap:.12});
+  write(R,'de zon',cx+AU*.72+10,cy-AU*.72-10,18,{col:GOLDL,a:.6});
+  // the rose, laid down year after year
+  COMP='lighter';
+  const n=V.length,chunks=32;
+  for(let c=0;c<chunks;c++){
+    const seg=V.slice(Math.floor(c*n/chunks),Math.floor((c+1)*n/chunks)+1),u=c/chunks;
+    const col=mix(mix(ROSE,GOLDL,.35+.35*Math.sin(u*TAU*2.5)),[255,255,255],.1);
+    strands(R,seg,s=>mix(col,[255,236,220],s*.4),3,4,{w:1.5,a:.42,amp:.25});
+    pause(90,cy);
+  }
+  COMP=null;
+  // the five meetings, between us and the sun, and the star they make in turn
+  const syn=TAU/(TAU/224.701-TAU/365.256),Te=365.256;
+  const inn=[],out=[];
+  for(let k=0;k<5;k++){
+    const ti=k*syn,ts=ti+syn/2,idx=t=>Math.round(t/(8*Te)*(n-1))%n;
+    inn.push(V[idx(ti)]);out.push(V[idx(ts)]);
+  }
+  for(let k=0;k<5;k++){const a=out[k],b=out[(k+1)%5];cline(R,a[0],a[1],b[0],b[1],{col:GOLDL,a:.3,ext:0,w:1})}
+  COMP='lighter';
+  for(const p of inn)spark(R,p[0],p[1],9,{col:GOLDL,a:.9,w:1.4,nR:6});
+  for(const p of out)spark(R,p[0],p[1],7,{col:ROSE,a:.7,w:1.2,nR:5});
+  glow(R,cx,cy,40,SKY,.25);
+  COMP=null;
+  // the earth, in the middle of it all, as it is for us
+  discF(cx,cy,8,[96,150,190],.95);
+  sk(R,cPts(cx,cy,12,0,TAU+.2,2),{col:PALE,w:1,a:.6,amp:.1,noDust:true});
+  write(R,'aarde',cx+16,cy+30,15,{col:PALE,a:.6});
+  // the moving planet, on a glass of its own
+  const glowSprite=(()=>{const g=document.createElement('canvas');g.width=g.height=64;const c=g.getContext('2d');const rg=c.createRadialGradient(32,32,0,32,32,32);rg.addColorStop(0,'rgba(255,246,226,1)');rg.addColorStop(.25,'rgba(255,214,190,.55)');rg.addColorStop(1,'rgba(255,190,170,0)');c.fillStyle=rg;c.fillRect(0,0,64,64);return g})();
+  const lx=cx-440,ly=cy-440,lw=880,lh=880;
+  live(lx,ly,lw,lh,{sc:1,start:0,
+    frame(c,now,L){
+      if(!L.start)L.start=now;
+      c.clearRect(lx,ly+L.dy,lw,lh);
+      const u=((now-L.start)/80000)%1,i0=Math.floor(u*(n-1)),TR=150;
+      c.lineCap='round';
+      for(let j=TR;j>0;j-=3){const a=V[(i0-j+n)%n],b=V[(i0-j+3+n)%n],k=1-j/TR;c.strokeStyle=`rgba(255,226,206,${.5*k*k})`;c.lineWidth=1+2*k;c.beginPath();c.moveTo(a[0],a[1]+L.dy);c.lineTo(b[0],b[1]+L.dy);c.stroke()}
+      const p=V[i0];c.drawImage(glowSprite,p[0]-22,p[1]+L.dy-22,44,44);
+      c.fillStyle='rgba(255,252,240,1)';c.beginPath();c.arc(p[0],p[1]+L.dy,3,0,TAU);c.fill();
+    },dy:GEN_DY});
+  write(R,'vijf · acht · dertien',800,100,30,{col:CINK,a:.85,cen:true});
+  ['in acht jaar gaat venus','dertien keer om de zon','en staat ze vijf keer','precies tussen ons en de zon'].forEach((t,i)=>note(R,t,250,930+i*27,17,CINK,.55));
+  ['zo ziet het eruit','als je vanaf de aarde kijkt'].forEach((t,i)=>note(R,t,1350,960+i*27,17,CINK,.5));
+  sentence(R,'in acht jaar tekent venus een roos',1124,CINK,28);
+  note(R,'vijf, acht en dertien: weer fibonacci',800,1162,17,GOLDL,.6);
+  sym(cx,cy,5,{r:520,dark:true});
+  whispers(R,200,1100,true,3);
+});
+
+// circles of one size on a lattice, each through the centres of its neighbours
+function lattice(cx,cy,r,maxd){
+  const out=[],e1=[0,-r],e2=[r*Math.sqrt(3)/2,-r/2];
+  for(let i=-4;i<=4;i++)for(let j=-4;j<=4;j++){
+    const x=cx+i*e1[0]+j*e2[0],y=cy+i*e1[1]+j*e2[1],d=Math.hypot(x-cx,y-cy);
+    if(d<=maxd+.5)out.push([x,y,d]);
+  }
+  return out.sort((a,b)=>a[2]-b[2]);
+}
+// a circle drawn only where it lies inside a larger one
+function arcInside(R,x,y,r,cx,cy,rmax,o){
+  let run=[];
+  const flush=()=>{if(run.length>2)sk(R,run,o);run=[]};
+  for(let t=0;t<=TAU+.001;t+=.04){const p=[x+Math.cos(t)*r,y+Math.sin(t)*r];if(Math.hypot(p[0]-cx,p[1]-cy)<=rmax+.5)run.push(p);else flush()}
+  flush();
+}
+function snowflake(R,x,y,rad,col,a=.92){
+  // one arm is invented, then repeated six times and mirrored: every flake is new, every flake has six
+  const br=[];
+  const nb=ri(R,3,5);
+  for(let i=0;i<nb;i++)br.push([rd(R,.22,.86),rd(R,.12,.38)*(1-i*.12),ch_(R,.4)]);
+  const plate=ch_(R,.6)?rd(R,.12,.24):0;
+  for(let k=0;k<6;k++){
+    const t=-Math.PI/2+k*TAU/6,ux=Math.cos(t),uy=Math.sin(t);
+    iline(R,x,y,x+ux*rad,y+uy*rad,{col,w:Math.max(1.2,rad*.03),a,amp:.2});
+    for(const [f,l,tw] of br){
+      const px=x+ux*rad*f,py=y+uy*rad*f;
+      for(const sd of[-1,1]){
+        const bt=t+sd*Math.PI/3,L=rad*l;
+        iline(R,px,py,px+Math.cos(bt)*L,py+Math.sin(bt)*L,{col,w:Math.max(1,rad*.022),a:a*.9,amp:.15});
+        if(tw){const qx=px+Math.cos(bt)*L*.55,qy=py+Math.sin(bt)*L*.55;iline(R,qx,qy,qx+ux*L*.35,qy+uy*L*.35,{col,w:1,a:a*.8,amp:.1})}
+      }
+    }
+  }
+  if(plate){const h=ngon(x,y,rad*plate,6,-Math.PI/2);fillPoly(h,col,.18);poly(R,h,{col,w:1.2,a,amp:.15})}
+  dotF(R,x,y,Math.max(1.5,rad*.03),a,col);
+}
+function bee(R,x,y,s,ang){
+  const co=Math.cos(ang),sn=Math.sin(ang),T=(px,py)=>[x+px*co-py*sn,y+px*sn+py*co];
+  for(const sd of[-1,1]){const w=ePts(s*.15,sd*s*.62,s*.55,s*.24,sd*.35,14).map(p=>T(p[0],p[1]));fillPoly(w,[236,242,246],.6);poly(R,w,{col:INK,w:1,a:.55,amp:.2})}
+  const ab=ePts(-s*.5,0,s*.55,s*.36,0,16).map(p=>T(p[0],p[1]));
+  fillPoly(ab,[236,186,56],.95);
+  for(let k=0;k<3;k++)sk(R,[T(-s*.78+k*s*.3,-s*.32),T(-s*.74+k*s*.3,s*.32)],{col:[40,32,26],w:s*.12,a:.85,amp:.3,noDust:true});
+  poly(R,ab,{col:INK,w:1.2,a:.8,amp:.2});
+  const th=ePts(s*.18,0,s*.3,s*.28,0,12).map(p=>T(p[0],p[1]));fillPoly(th,[110,80,46],.92);
+  const hd=ePts(s*.56,0,s*.18,s*.2,0,10).map(p=>T(p[0],p[1]));fillPoly(hd,[40,32,26],.92);
+  for(const sd of[-1,1])sk(R,[T(s*.68,sd*s*.08),T(s*.92,sd*s*.3)],{col:INK,w:1,a:.75,amp:.1,noDust:true});
+}
+
+// P7 · zes: the hexagon ------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+7);
+  sheet(R,60,42,1540,1158,KRAFT,{rough:15,rot:.003});
+  chapter(R,6,800,96,INK,CHALK);
+  note(R,'1 + 2 + 3 = 1 × 2 × 3',800,214,17,INK,.6);
+  const cx=800,cy=568,r=94,L3=lattice(cx,cy,r,3*r);
+  needle(R,cx,cy,CHALK);
+  pause(300);
+  // the seed: one circle, and six round it
+  const seed=L3.filter(p=>p[2]<r+1);
+  for(const p of seed){compass(R,p[0],p[1],r,{col:CHALK,w:1.8,a:.9,a0:Math.atan2(p[1]-cy,p[0]-cx)});pause(180,cy)}
+  pause(300);
+  // the flower: twelve more, and the ones that only half fit
+  for(const p of L3.filter(p=>p[2]>r+1&&p[2]<2*r+1)){compass(R,p[0],p[1],r,{col:CHALK,w:1.3,a:.75});pause(70,cy)}
+  for(const p of L3.filter(p=>p[2]>2*r+1))arcInside(R,p[0],p[1],r,cx,cy,3*r,{col:CHALK,w:1.2,a:.66,amp:.25,noDust:true});
+  compass(R,cx,cy,3*r,{col:CHALK,w:2.2,a:.92});
+  compass(R,cx,cy,3*r+11,{col:CHALK,w:1.4,a:.7});
+  pause(300);
+  // two triangles: fire upwards, water downwards
+  const up=ngon(cx,cy,2*r,3,-Math.PI/2),dn=ngon(cx,cy,2*r,3,Math.PI/2);
+  poly(R,up,{col:VERM,w:2.2,a:.62});poly(R,dn,{col:LAPIS,w:2.2,a:.62});
+  note(R,'zo boven, zo beneden',cx,cy+3*r+52,19,INK,.75);
+  note(R,'de bloem van het leven',cx,cy+3*r+80,16,INK,.55);
+  sym(cx,cy,6,{r:440});
+  // honeycomb
+  {
+    const hx=300,hy=372,s=23,cells=[];
+    for(let c=-6;c<=6;c++)for(let w=-5;w<=5;w++){
+      const x=hx+c*1.5*s,y=hy+w*Math.sqrt(3)*s+(c&1?Math.sqrt(3)*s/2:0);
+      if(((x-hx)/165)**2+((y-hy)/122)**2<1+(fbm(x*.02,y*.02,3,2)-.5)*.7)cells.push([x,y]);
+    }
+    for(const [x,y] of cells){
+      const h=ngon(x,y,s-1.5,6,0),kind=R();
+      fillPoly(h,kind<.18?[246,226,172]:kind<.42?[240,212,146]:[226,160,48],kind<.18?.7:.88);
+      if(kind>=.18&&kind<.42)poly(R,ngon(x,y,s*.62,6,0),{col:[200,150,70],w:1,a:.5,amp:.15});
+      else if(kind>=.42)discF(x-s*.2,y-s*.25,s*.22,[255,236,170],.45);
+      poly(R,h,{col:[246,226,170],w:2,a:.9,amp:.15});
+    }
+    bee(R,hx+150,hy-130,30,.5);bee(R,hx-170,hy+92,24,-2.4);
+    note(R,'de bij bouwt in zessen',hx,hy+176,18,INK);
+    sym(hx,hy,6,{r:180});
+  }
+  // snowflakes, no two alike
+  {
+    for(const [x,y,rad] of[[1330,318,96],[1176,500,56],[1440,530,50]]){snowflake(R,x,y,rad,CHALK);sym(x,y,6,{r:rad+40})}
+    note(R,'nooit twee dezelfde',1330,640,18,INK);
+  }
+  // a snake biting its own tail: kekulé saw it in a dream, and found the ring of benzene
+  {
+    const x=320,y=872,hr=56;
+    const hx=ngon(x,y,hr,6,-Math.PI/2);
+    poly(R,hx,{col:INK,w:2,a:.85});
+    for(let k=0;k<6;k+=2){const a=hx[k],b=hx[(k+1)%6],m=lerp2(lerp2(a,b,.5),[x,y],.16),d=[(b[0]-a[0])*.32,(b[1]-a[1])*.32];iline(R,m[0]-d[0],m[1]-d[1],m[0]+d[0],m[1]+d[1],{col:INK,w:1.6,a:.8})}
+    const a0=-Math.PI/2+.38,a1=a0+TAU-.5,ro=116,ri_=94,body=[];
+    for(let t=a0;t<=a1;t+=.05){const w=t<a0+.9?(t-a0)/.9:1;body.push([x+Math.cos(t)*(105+11*w),y+Math.sin(t)*(105+11*w)])}
+    for(let t=a1;t>=a0;t-=.05){const w=t<a0+.9?(t-a0)/.9:1;body.push([x+Math.cos(t)*(105-11*w),y+Math.sin(t)*(105-11*w)])}
+    fillPoly(body,[118,146,74],.9);
+    for(let t=a0+.2;t<a1;t+=.12)sk(R,[[x+Math.cos(t)*97,y+Math.sin(t)*97],[x+Math.cos(t+.06)*114,y+Math.sin(t+.06)*114]],{col:[70,96,44],w:1,a:.5,amp:.2,noDust:true});
+    poly(R,body,{col:[56,74,36],w:1.5,a:.85,amp:.25});
+    const hp=[x+Math.cos(a1+.12)*105,y+Math.sin(a1+.12)*105],head=ePts(hp[0],hp[1],22,15,a1+.12+Math.PI/2,14);
+    fillPoly(head,[118,146,74],.95);poly(R,head,{col:[56,74,36],w:1.5,a:.85,amp:.2});
+    dotF(R,hp[0]+Math.cos(a1)*-4,hp[1]+Math.sin(a1)*-4-4,2.6,.9,[30,26,20]);
+    note(R,'kekulé zag in een droom een slang',x,y+158,16,INK,.7);
+    note(R,'die in zijn eigen staart beet',x,y+182,16,INK,.7);
+    sym(x,y,6,{r:150});
+  }
+  // saturn, seen from above its north pole, wears a hexagon
+  {
+    const x=1290,y=868;
+    for(let rr=100;rr<=140;rr+=4)sk(R,cPts(x,y,rr,0,TAU+.1,6),{col:rr>122&&rr<130?[90,70,48]:[236,222,190],w:rr>122&&rr<130?2.4:2.6,a:rr>122&&rr<130?.5:.55+.3*Math.sin(rr*.7),amp:.15,noDust:true});
+    discF(x,y,76,[222,196,140],.97);
+    for(let rr=72;rr>14;rr-=9)sk(R,cPts(x,y,rr,0,TAU+.1,4),{col:rr%2?[200,170,110]:[236,214,160],w:3,a:.45,amp:.4,noDust:true});
+    const hx=ngon(x,y,42,6,-Math.PI/2+.2);
+    fillPoly(hx,[170,140,96],.45);poly(R,hx,{col:[120,92,60],w:2,a:.8,amp:.2});
+    discF(x,y,7,[110,86,60],.8);
+    compass(R,x,y,76,{col:INK,w:1.4,a:.65});
+    note(R,'saturnus draagt een zeshoek',x,y+176,16,INK,.72);
+    sym(x,y,6,{r:170});
+  }
+  sentence(R,'geen sneeuwvlok is gelijk, en toch telt elke tot zes',1112,INK,26);
+  whispers(R,140,1120,false,3);
+});
+
+// P8 · the five solids ---------------------------------------------------------
+// thirteen circles, every centre joined to every other: in those lines a cube
+// shows itself. and there are five solids with equal faces, and no more.
+function solidLive(c,k,cx,cy,s,yaw,pitch,wood,ink){
+  const {D,P}=project(k,cx,cy,s,yaw,pitch,0),lite=norm([-.5,-.7,.6]);
+  const faces=D.F.map(f=>{const m=[0,0,0];for(const i of f){m[0]+=P[i][0];m[1]+=P[i][1];m[2]+=P[i][2]}m[0]/=f.length;m[1]/=f.length;m[2]/=f.length;return{f,m,n:norm([m[0]-cx,m[1]-cy,m[2]*s])}}).sort((a,b)=>a.m[2]-b.m[2]);
+  const inset=k===3?.6:k===4?.68:.7;
+  c.lineJoin='round';
+  for(const F of faces){
+    const front=F.n[2]>0,O=F.f.map(i=>[P[i][0],P[i][1]]),I=O.map(p=>[F.m[0]+(p[0]-F.m[0])*inset,F.m[1]+(p[1]-F.m[1])*inset]);
+    const lit=clamp(.5+.5*dot(F.n,lite),0,1),col=front?mix(shade(wood,.34),tint(wood,.28),lit):shade(wood,.55);
+    c.beginPath();O.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    I.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    c.fillStyle=rgba(col,front?.97:.9);c.fill('evenodd');
+    c.strokeStyle=rgba(ink,front?.85:.45);c.lineWidth=front?1.5:1;c.stroke();
+  }
+}
+P.push(function(){
+  const R=stream(SEED*101+8);
+  darkBand(-20,720);
+  const cx=800,cy=388,rr=43;
+  disc(R,cx,cy,318,LAPISD,{rough:8});
+  // the fruit: thirteen circles that only touch
+  const C=[[cx,cy]];
+  for(const d of[2*rr,4*rr])for(let k=0;k<6;k++){const t=-Math.PI/2+k*TAU/6;C.push([cx+Math.cos(t)*d,cy+Math.sin(t)*d])}
+  for(const p of C){compass(R,p[0],p[1],rr,{col:GOLD,w:1.7,a:.9});pause(90,cy)}
+  pause(300);
+  // every centre joined to every other one: seventy-eight lines
+  for(let i=0;i<C.length;i++)for(let j=i+1;j<C.length;j++){iline(R,C[i][0],C[i][1],C[j][0],C[j][1],{col:GOLDL,w:.9,a:.42,amp:.15});if((i*13+j)%9===0)pause(30,cy)}
+  pause(300);
+  // and a cube appears in them, seen on its corner
+  const out=C.slice(7);
+  COMP='lighter';
+  for(let k=0;k<6;k++){const a=out[k],b=out[(k+1)%6];iline(R,a[0],a[1],b[0],b[1],{col:GOLDL,w:2.4,a:.7,amp:.2})}
+  for(const k of[1,3,5])iline(R,cx,cy,out[k][0],out[k][1],{col:GOLDL,w:2.4,a:.7,amp:.2});
+  glow(R,cx,cy,120,GOLD,.12);
+  COMP=null;
+  for(const p of C)needle(R,p[0],p[1],GOLDL,.8);
+  ['dertien cirkels,','elk middelpunt','met elk ander verbonden:','78 lijnen'].forEach((t,i)=>note(R,t,250,330+i*28,18,CINK,.66));
+  ['kijk goed:','er zit een kubus in'].forEach((t,i)=>note(R,t,1350,370+i*28,18,CINK,.66));
+  sym(cx,cy,6,{r:340,dark:true});
+  // the five, as leonardo drew them for pacioli: frames you can look through
+  const names=[['tetraëder','vuur'],['kubus','aarde'],['octaëder','lucht'],['icosaëder','water'],['dodecaëder','ether']];
+  const wood=[206,168,110];
+  for(let k=0;k<5;k++){
+    const x=200+k*300,y=892,sc=rd(R,-.04,.04);
+    const SP=sheet(R,x-124,y-150,x+124,y+138,PARCH,{rough:7,rot:sc});
+    tape(R,x-92,y-140,rd(R,.5,.8));tape(R,x+96,y-138,rd(R,-.8,-.5));
+    const s=k===0?86:k===1?78:82,yaw=[.95,.5,.3,.2,.4][k],pitch=[-.62,-.45,-.35,-.3,-.38][k];
+    // the solid lies on a glass of its own, and turns slowly while you look at it
+    live(x-112,y-130,224,218,{k,sx:x,sy:y-22,s,yaw,pitch,sp:.12+k*.025,last:0,dy:GEN_DY,
+      frame(c,now,L){
+        if(now-L.last<33)return;L.last=now;
+        c.clearRect(L.x,L.y,L.w,L.h);
+        const t=now/1000;
+        solidLive(c,L.k,L.sx,L.sy+L.dy,L.s,L.yaw+t*L.sp,L.pitch+Math.sin(t*L.sp*1.7)*.25,wood,SEPIA);
+      }});
+    write(R,names[k][0],x,y+92,20,{col:SEPIA,a:.85,cen:true});
+    write(R,names[k][1],x,y+118,16,{col:SANG,a:.75,cen:true});
+  }
+  sentence(R,'vijf vormen, en meer zijn er niet',1100,CINK,28);
+  note(R,'leonardo tekende ze zo voor het boek van pacioli, 1509',800,1140,16,CINK,.5);
+  whispers(R,100,700,true,3);
+});
+
+// chalk on black paper, the way steiner drew on his boards: a soft dusty
+// line under a grainy one, lifting where the board is rough
+function chalk(R,pts,col,w=2.4,a=.8,o={}){
+  sk(R,pts,{col,w:w*3.2,a:a*.06,amp:.6,noDust:true});
+  sk(R,pts,{col,w,a,amp:o.amp??.5,gap:o.gap??.06,noDust:true,passes:2,taper:o.taper});
+}
+function chalkCircle(R,cx,cy,r,col,w,a){const a0=rd(R,0,TAU);chalk(R,cPts(cx,cy,r,a0,a0+TAU+.12,6),col,w,a)}
+const CH={white:[236,234,226],yellow:[242,222,122],pink:[238,152,172],blue:[134,182,232],green:[146,204,146],orange:[242,172,92],violet:[184,152,224],red:[228,98,88],grey:[170,170,184]};
+
+// P9 · zeven: the star of the week ------------------------------------------------
+// the seven old planets in the order of their speed, slowest first. go round
+// them by every third, and you walk through the days of the week.
+P.push(function(){
+  const R=stream(SEED*101+9);
+  const SH=sheet(R,62,44,1538,1158,[34,37,38],{rough:14,rot:-.003});
+  darkBand(44,1158);
+  // old chalk, wiped away but not gone
+  for(let k=0;k<9;k++){const b=blob(R,rd(R,200,1400),rd(R,180,1050),rd(R,90,220),rd(R,40,90));fillPoly(b,[200,200,196],.016);scribFill(R,b,7,.03,{col:[220,220,214],w:2})}
+  chapter(R,7,800,98,CH.white,CH.white);
+  const cx=800,cy=600,r=262;
+  const PL=[[0,'zaterdag',CH.grey],[1,'donderdag',CH.blue],[2,'dinsdag',CH.red],[3,'zondag',CH.yellow],[4,'vrijdag',CH.green],[5,'woensdag',CH.orange],[6,'maandag',CH.white]];
+  const node=k=>{const t=-Math.PI/2+k*TAU/7;return[cx+Math.cos(t)*r,cy+Math.sin(t)*r,t]};
+  chalkCircle(R,cx,cy,r,CH.white,1.6,.5);
+  pause(300);
+  for(const [k,day,col] of PL){
+    const [x,y,t]=node(k);
+    planet(R,k,cx+Math.cos(t)*(r+62),cy+Math.sin(t)*(r+62),50,col,.92);
+    write(R,day,cx+Math.cos(t)*(r+132),cy+Math.sin(t)*(r+132)+7,20,{col:CH.white,a:.7,cen:true});
+    dotF(R,x,y,5,.9,col);
+    pause(160,cy);
+  }
+  // sunday, monday, tuesday... every third planet round the ring
+  let k=3;
+  for(let d=0;d<7;d++){
+    const nk=(k+3)%7,[x0,y0]=node(k),[x1,y1]=node(nk),col=PL[k][2];
+    chalk(R,[[x0,y0],[x1,y1]],col,2.6,.82);
+    const m=lerp2([x0,y0],[x1,y1],.56);arrowHead(R,m[0],m[1],Math.atan2(y1-y0,x1-x0),12,.8,col,2);
+    write(R,String(d+1),lerp2([x0,y0],[x1,y1],.12)[0]-6,lerp2([x0,y0],[x1,y1],.12)[1]+6,16,{col,a:.8});
+    k=nk;pause(260,cy);
+  }
+  sym(cx,cy,7,{r:450,dark:true});
+  // the seven colours
+  {
+    const x=300,y=360,cols=[CH.red,CH.orange,CH.yellow,CH.green,CH.blue,[110,120,214],CH.violet];
+    cols.forEach((c,i)=>chalk(R,cPts(x,y,126-i*10,Math.PI*1.04,Math.PI*1.96,5),c,7,.75,{gap:.03}));
+    note(R,'zeven kleuren',x,y+56,18,CH.white,.72);
+  }
+  // the seven tones
+  {
+    const x0=1196,y0=300,w=300;
+    for(let i=0;i<5;i++)chalk(R,[[x0,y0+i*14],[x0+w,y0+i*14]],CH.white,1.1,.45,{gap:.02});
+    const nm=['do','re','mi','fa','sol','la','si'];
+    for(let i=0;i<7;i++){
+      const nx=x0+28+i*40,ny=y0+70-i*7;
+      const hd=ePts(nx,ny,8.5,6.2,-.35,12);fillPoly(hd,CH.yellow,.85);
+      chalk(R,[[nx+7,ny-2],[nx+7,ny-40]],CH.yellow,1.6,.8);
+      if(ny>y0+56)chalk(R,[[nx-13,ny],[nx+13,ny]],CH.white,1.1,.6);
+      write(R,nm[i],nx,y0+112,15,{col:CH.white,a:.7,cen:true});
+    }
+    note(R,'zeven tonen',x0+w/2,y0+150,18,CH.white,.72);
+  }
+  // seven centres, from the root to the crown
+  {
+    const x=300,y=900;
+    chalk(R,cPts(x,y-122,22,0,TAU+.2,4),CH.white,2,.7);
+    for(const sd of[-1,1]){
+      chalk(R,chaikin([[x+sd*8,y-98],[x+sd*12,y-88],[x+sd*52,y-76],[x+sd*60,y-50],[x+sd*50,y+10],[x+sd*44,y+40]],false,2),CH.white,2,.6);
+      chalk(R,chaikin([[x+sd*58,y-60],[x+sd*80,y-10],[x+sd*92,y+38],[x+sd*70,y+52],[x+sd*30,y+50]],false,2),CH.white,1.8,.5);
+    }
+    chalk(R,chaikin([[x-140,y+78],[x-90,y+44],[x,y+40],[x+90,y+44],[x+140,y+78],[x+70,y+98],[x,y+92],[x-70,y+98],[x-140,y+78]],false,2),CH.white,2,.6);
+    const cc=[CH.red,CH.orange,CH.yellow,CH.green,CH.blue,[110,120,214],CH.violet];
+    cc.forEach((c,i)=>{const py=y+52-i*28-(i===6?30:0);COMP='lighter';glow(R,x,py,20,c,.35);COMP=null;dotF(R,x,py,6,.9,c)});
+    note(R,'zeven centra',x,y+140,18,CH.white,.72);
+  }
+  // and the seven that cannot be made: compass and ruler never close the heptagon
+  {
+    const x=1300,y=890,rr=96;
+    chalkCircle(R,x,y,rr,CH.white,1.2,.4);
+    const step=2*rr*Math.sin(Math.PI/7)*1.022;
+    let t=-Math.PI/2,p=[x+Math.cos(t)*rr,y+Math.sin(t)*rr];
+    for(let i=0;i<7;i++){
+      const dt=2*Math.asin(step/(2*rr)),q=[x+Math.cos(t+dt)*rr,y+Math.sin(t+dt)*rr];
+      chalk(R,[p,q],CH.pink,2.2,.8);
+      sk(R,cPts(p[0],p[1],step,t+dt/2+Math.PI/2-.12,t+dt/2+Math.PI/2+.12,4),{col:CH.white,w:1,a:.35,amp:.2,noDust:true});
+      t+=dt;p=q;
+    }
+    write(R,'?',x+22,y-rr-12,24,{col:CH.pink,a:.85});
+    note(R,'met passer en liniaal',x,y+140,17,CH.white,.7);
+    note(R,'sluit de zevenhoek nooit',x,y+164,17,CH.white,.7);
+  }
+  sentence(R,'de week is een ster',1112,CH.white,30);
+  whispers(R,140,1120,true,3);
+});
+
+// P10 · acht: the octave ------------------------------------------------------------
+const CHL=[[1,2,1],[1,3,-1],[2,3,1],[1,4,1],[2,5,-1],[3,4,1],[1,5,-1],[2,4,-1],[3,5,1],[4,5,-1]];
+const CHL_F=[220,262,294,330,392,440,523,587,659,784];
+function chladniF(m,u,v){const [a,b,s]=m;return Math.cos(a*Math.PI*u)*Math.cos(b*Math.PI*v)+s*Math.cos(b*Math.PI*u)*Math.cos(a*Math.PI*v)}
+function chladniG(m,u,v){
+  const [a,b,s]=m,P_=Math.PI;
+  return[-a*P_*Math.sin(a*P_*u)*Math.cos(b*P_*v)-s*b*P_*Math.sin(b*P_*u)*Math.cos(a*P_*v),
+         -b*P_*Math.cos(a*P_*u)*Math.sin(b*P_*v)-s*a*P_*Math.cos(b*P_*u)*Math.sin(a*P_*v)];
+}
+// sand finds the places on the plate that do not move
+function settle(m,u,v,RR){
+  for(let i=0;i<8;i++){
+    const f=chladniF(m,u,v),g=chladniG(m,u,v),gg=g[0]*g[0]+g[1]*g[1]+1e-6;
+    u-=f*g[0]/gg;v-=f*g[1]/gg;
+    u=clamp(u,.012,.988);v=clamp(v,.012,.988);
+  }
+  if(Math.abs(chladniF(m,u,v))>.05)return settle(m,RR(),RR(),RR);
+  return[u+(RR()-.5)*.008,v+(RR()-.5)*.008];
+}
+P.push(function(){
+  const R=stream(SEED*101+10);
+  const SH=sheet(R,60,42,1540,1160,STAVE,{rough:13,rot:.003});
+  // music paper: staves all the way down
+  const lines=[];for(let y0=210;y0<1120;y0+=96)for(let i=0;i<5;i++)lines.push([40,y0+i*9,1560,y0+i*9]);
+  rule(SH,lines,[150,160,180],.16,1);
+  chapter(R,8,800,96,INK,VIOL);
+  // the monochord: one box, three strings, a bridge under each at a different place
+  const bx0=230,bx1=1370,by0=244,by1=356,nut0=262,nut1=1338,SY=[270,300,330],FR=[1/2,2/3,3/4];
+  {
+    const box=[[bx0,by0],[bx1,by0],[bx1,by1],[bx0,by1]];
+    fillPoly(box.map(p=>[p[0]+6,p[1]+8]),[40,30,20],.18);
+    fillPoly(box,[196,150,96],.95);
+    for(let k=0;k<14;k++){const y=by0+6+k*7.8;sk(R,[[bx0+4,y],[bx1-4,y+rd(R,-3,3)]],{col:[150,104,60],w:rd(R,.8,1.6),a:.35,amp:1.4,gap:.05,noDust:true})}
+    poly(R,box,{col:SEPIA,w:1.8,a:.85});
+    for(const x of[nut0,nut1]){const q=[[x-4,by0+12],[x+4,by0+12],[x+4,by1-12],[x-4,by1-12]];fillPoly(q,[236,226,200],.95);poly(R,q,{col:SEPIA,w:1,a:.7,amp:.1})}
+    FR.forEach((f,i)=>{
+      const x=nut0+(nut1-nut0)*f,y=SY[i];
+      const br=[[x-9,y+11],[x,y-1],[x+9,y+11]];fillPoly(br,[236,226,200],1);poly(R,br,{col:SEPIA,w:1.1,a:.8,amp:.1});
+    });
+    const lab=[['1 : 2','octaaf'],['2 : 3','kwint'],['3 : 4','kwart']];
+    lab.forEach(([a,b],i)=>{write(R,a,bx1+16,SY[i]+7,17,{col:VIOL,a:.9});write(R,b,bx1+70,SY[i]+7,15,{col:INK,a:.7})});
+    note(R,'pluk een snaar',800,by1+40,16,INK,.55);
+  }
+  // the strings themselves lie on glass, so they can sing when you pluck them
+  const ML=live(nut0-6,SY[0]-30,nut1-nut0+12,SY[2]-SY[0]+60,{pl:[0,0,0],dirty:true,dy:GEN_DY,
+    frame(c,now,L){
+      const active=L.pl.some(t=>t&&now-t<2200);
+      if(!active&&!L.dirty)return;
+      L.dirty=active;
+      c.clearRect(L.x,L.y,L.w,L.h);
+      c.lineCap='round';
+      SY.forEach((y0,i)=>{
+        const y=y0+L.dy,bx=nut0+(nut1-nut0)*FR[i],t=L.pl[i]?(now-L.pl[i])/1000:9,A=t<2.2?11*Math.exp(-t*2.2):0;
+        c.strokeStyle='rgba(70,64,60,.9)';c.lineWidth=1.6-i*.2;
+        c.beginPath();
+        for(let x=nut0;x<=bx;x+=6){const s=Math.sin(Math.PI*(x-nut0)/(bx-nut0));c[x===nut0?'moveTo':'lineTo'](x,y+A*s*Math.cos(t*TAU*9+i))}
+        c.lineTo(bx,y);c.stroke();
+        c.beginPath();c.moveTo(bx,y);c.lineTo(nut1,y);c.stroke();
+      });
+    }});
+  SY.forEach((y,i)=>hit(nut0,y-13,nut1,y+13,()=>{
+    ML.pl[i]=performance.now();ML.dirty=true;
+    const f0=196,r=[2,3/2,4/3][i];
+    pluck(f0,0,.1);pluck(f0*r,.42,.1);pluck(f0,.95,.07);pluck(f0*r,.95,.07);
+  }));
+  // a string can also sing in halves, thirds and quarters, all at once
+  {
+    const x0=250,x1=730,names=['heel','in helften','in derden','in kwarten'];
+    for(let n=1;n<=4;n++){
+      const y=468+(n-1)*72,A=20;
+      for(const sd of[1,-1]){const pts=[];for(let x=x0;x<=x1;x+=4)pts.push([x,y+sd*A*Math.sin(n*Math.PI*(x-x0)/(x1-x0))]);sk(R,pts,{col:sd>0?LAPIS:VIOL,w:1.6,a:.75,amp:.2,noDust:true})}
+      for(let j=0;j<=n;j++)dotF(R,x0+(x1-x0)*j/n,y,3.2,.9,INK);
+      write(R,String(n),x0-30,y+7,18,{a:.75});
+      write(R,names[n-1],x1+22,y+6,16,{a:.65});
+    }
+  }
+  // a cell divides: one, two, four, eight, and on
+  {
+    const groups=[[1,[[0,0]]],[2,[[-.5,0],[.5,0]]],[4,[[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5]]],[8,[[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5],[0,-.95],[0,.95],[-.95,0],[.95,0]]]];
+    groups.forEach(([n,pos],gi)=>{
+      const gx=1000+gi*118,gy=556,cr=gi===0?30:gi===1?22:gi===2?18:14,sp=gi===0?0:gi===1?44:36;
+      discF(gx,gy,48,[250,228,226],.5);
+      sk(R,cPts(gx,gy,48,0,TAU+.2,4),{col:ROSE,w:1.3,a:.55,amp:.3,noDust:true});
+      for(const [px,py] of pos){const b=hblob(R,gx+px*sp,gy+py*sp,cr,cr);fillPoly(b,[246,206,210],.85);sk(R,b.concat([b[0]]),{col:shade(ROSE,.3),w:1.1,a:.75,amp:.2});dotF(R,gx+px*sp,gy+py*sp,2.2,.6,VIOL)}
+      write(R,String(n),gx,gy+80,20,{a:.8,cen:true});
+      if(gi<3)arrowHead(R,gx+66,gy,0,8,.5,INK,1.2);
+    });
+    note(R,'16 · 32 · 64 · 128 · 256 · …',1177,680,16,INK,.6);
+  }
+  // sand on a plate of brass: play it, and the sand runs to where it is still
+  const PX=230,PY=724,PS=300;
+  {
+    const plate=[[PX,PY],[PX+PS,PY],[PX+PS,PY+PS],[PX,PY+PS]];
+    fillPoly(plate.map(p=>[p[0]+7,p[1]+9]),[30,24,18],.25);
+    fillPoly(plate,[72,74,78],.97);
+    emit(PY,PY+PS,c=>{const g=c.createRadialGradient(PX+PS*.35,PY+PS*.3,10,PX+PS/2,PY+PS/2,PS*.75);g.addColorStop(0,'rgba(255,255,255,.12)');g.addColorStop(1,'rgba(0,0,0,.15)');c.fillStyle=g;c.fillRect(PX,PY,PS,PS)});
+    poly(R,plate,{col:[30,30,34],w:1.6,a:.85,amp:.15});
+    discF(PX+PS/2,PY+PS/2,9,[150,150,156],.95);discF(PX+PS/2,PY+PS/2,3.5,[50,50,54],.95);
+    note(R,'geluid wordt vorm',PX+PS/2,PY+PS+40,18,INK,.75);
+    note(R,'(tik op de plaat)',PX+PS/2,PY+PS+64,14,INK,.5);
+  }
+  const NG=2400;
+  const CL=live(PX-2,PY-2,PS+4,PS+4,{mode:5,t0:0,from:null,to:null,auto:0,dy:GEN_DY,dirty:true,
+    init(c,L){
+      const RR=mul32(4242);L.RR=RR;
+      L.to=[];for(let i=0;i<NG;i++)L.to.push(settle(CHL[L.mode],RR(),RR(),RR));
+      L.from=L.to.map(p=>p.slice());L.t0=-1e9;L.cols=[];for(let i=0;i<8;i++)L.cols.push(`rgba(${226+(RR()*24|0)},${214+(RR()*20|0)},${188+(RR()*24|0)},${.72+RR()*.28})`);
+    },
+    next(L,now){
+      L.mode=(L.mode+1)%CHL.length;
+      const cur=L.to.map((p,i)=>{const k=clamp((now-L.t0)/1600,0,1);return k>=1?p:[L.from[i][0]+(p[0]-L.from[i][0])*k,L.from[i][1]+(p[1]-L.from[i][1])*k]});
+      L.from=cur;L.to=cur.map(p=>settle(CHL[L.mode],clamp(p[0]+(L.RR()-.5)*.1,.02,.98),clamp(p[1]+(L.RR()-.5)*.1,.02,.98),L.RR));
+      L.t0=now;L.dirty=true;
+    },
+    frame(c,now,L){
+      if(!L.auto)L.auto=now+9000;
+      if(now>L.auto&&!RM){L.next(L,now);L.auto=now+11000}
+      const k=clamp((now-L.t0)/1600,0,1);
+      if(k>=1&&!L.dirty)return;
+      L.dirty=k<1;
+      c.clearRect(L.x,L.y,L.w,L.h);
+      const e=k*k*(3-2*k),jig=(1-k)*.012;
+      // eight colours of sand, each laid down in one go
+      for(let bk=0;bk<8;bk++){
+        c.fillStyle=L.cols[bk];c.beginPath();
+        for(let i=bk;i<NG;i+=8){
+          const a=L.from[i],b=L.to[i];
+          const u=a[0]+(b[0]-a[0])*e+(jig?Math.sin(now*.03+i)*jig:0),v=a[1]+(b[1]-a[1])*e+(jig?Math.cos(now*.027+i*1.3)*jig:0);
+          c.rect(PX+u*PS-.8,PY+L.dy+v*PS-.8,1.7,1.7);
+        }
+        c.fill();
+      }
+    }});
+  hit(PX,PY,PX+PS,PY+PS,()=>{const now=performance.now();CL.next(CL,now);CL.auto=now+14000;const f=CHL_F[CL.mode];tone(f,0,2.2,.08,'sine');tone(f*2,0,1.2,.02,'sine')});
+  sym(PX+PS/2,PY+PS/2,4,{r:210});
+  // the eye of horus, made of halves of halves
+  {
+    const x=1150,y=866,s=1.25,T=(px,py)=>[x+px*s,y+py*s];
+    const part=(pts,col,w=2.4)=>sk(R,pts.map(p=>T(p[0],p[1])),{col,w,a:.88,amp:.3,noDust:true});
+    // the white toward the nose: a half
+    const lidT=[[-100,0],[-60,-26],[0,-34],[56,-22],[88,0]],lidB=[[88,0],[50,16],[0,22],[-60,14],[-100,0]];
+    fillPoly(lidT.concat(lidB).map(p=>T(p[0],p[1])),[252,250,244],.9);
+    part(lidT,INK);part(lidB,INK);
+    // the pupil: a quarter
+    const pu=cPts(0,-6,22,0,TAU,3).map(p=>T(p[0],p[1]));fillPoly(pu,[30,28,36],.95);
+    // the brow: an eighth
+    part([[-104,-48],[-50,-66],[20,-70],[90,-54]],INK,6);
+    // toward the ear: a sixteenth
+    part([[88,0],[136,-2]],INK,4);
+    // the curl: a thirty-second
+    part([[-10,22],[-6,60],[16,84],[40,82],[46,66],[32,58]],INK,3);
+    // the tear: a sixty-fourth
+    part([[-50,16],[-58,52],[-62,92]],INK,3);
+    const lab=(txt,px,py)=>write(R,txt,x+px*s,y+py*s,16,{col:REDPEN,a:.9,cen:true});
+    lab('1/2',-136,-6);lab('1/4',50,2);lab('1/8',8,-84);lab('1/16',168,4);lab('1/32',74,96);lab('1/64',-92,110);
+    note(R,'1/2 + 1/4 + 1/8 + 1/16 + 1/32 + 1/64 = 63/64',x,y+182,16,INK,.72);
+    note(R,'het laatste stukje ontbreekt altijd',x,y+208,16,INK,.6);
+  }
+  sentence(R,'halveer een snaar en hij zingt hetzelfde lied, hoger',1132,INK,26);
+  whispers(R,140,1120,false,3);
+});
+
+// P11 · negen: three, six, nine ------------------------------------------------------
+// a page from a school exercise book. keep doubling a number and add up its
+// digits until one is left: 1 2 4 8 7 5, and again, and the 3, 6 and 9 are
+// never touched. multiply anything by nine, and the digits add up to nine.
+P.push(function(){
+  const R=stream(SEED*101+11);
+  const SH=sheet(R,64,42,1540,1160,GRIDP,{rough:10,rot:-.004});
+  const g=[];for(let x=64;x<1560;x+=24)g.push([x,20,x,1190]);for(let y=42;y<1170;y+=24)g.push([40,y,1570,y]);
+  rule(SH,g,[120,160,210],.16,1);
+  rule(SH,[[196,20,196,1190],[200,20,200,1190]],REDPEN,.35,1.2);
+  for(const y of[240,600,960]){discF(128,y,13,GROUND,1);sk(R,cPts(128,y,13,0,TAU+.2,2),{col:[180,180,170],w:1,a:.5,amp:.1,noDust:true})}
+  // a coffee cup was put down here once
+  {const ring=cPts(1390,190,62,.4,TAU-.2,4);sk(R,ring,{col:[150,104,60],w:5,a:.13,amp:1.2,noDust:true,gap:.04});sk(R,ring.map(p=>[p[0]+1.5,p[1]+1]),{col:[120,80,40],w:1.2,a:.18,amp:1,noDust:true})}
+  chapter(R,9,800,96,BALL,BALL);
+  const cx=560,cy=590,r=246;
+  const pos=n=>{const t=-Math.PI/2+(n%9)*TAU/9;return[cx+Math.cos(t)*r,cy+Math.sin(t)*r]};
+  compass(R,cx,cy,r,{col:GRAPH,a:.5,w:1.1});
+  needle(R,cx,cy,GRAPH);
+  for(let n=1;n<=9;n++){const t=-Math.PI/2+(n%9)*TAU/9;write(R,String(n),cx+Math.cos(t)*(r+40),cy+Math.sin(t)*(r+40)+11,30,{col:n%3?BALL:REDPEN,a:.9,cen:true});dotF(R,...pos(n),4,.9,n%3?BALL:REDPEN)}
+  pause(400,cy);
+  // doubling: 1 2 4 8 16 32 ... and each sum of digits
+  const cyc=[1,2,4,8,7,5];
+  for(let i=0;i<6;i++){
+    const a=pos(cyc[i]),b=pos(cyc[(i+1)%6]);
+    iline(R,a[0],a[1],b[0],b[1],{col:BALL,w:2,a:.85,amp:.5});
+    const m=lerp2(a,b,.55);arrowHead(R,m[0],m[1],Math.atan2(b[1]-a[1],b[0]-a[0]),12,.85,BALL,1.8);
+    pause(220,cy);
+  }
+  pause(300,cy);
+  for(const [p,q] of[[3,6],[6,9],[9,3]]){const a=pos(p),b=pos(q);iline(R,a[0],a[1],b[0],b[1],{col:REDPEN,w:2.6,a:.85,amp:.5});pause(200,cy)}
+  sym(cx,cy,9,{mir:false,r:400});
+  {
+    const nums=['1','2','4','8','16','32','64','128','256','512'],sums=['1','2','4','8','7','5','1','2','4','8'];
+    let x=250;
+    nums.forEach((t,i)=>{const w=Math.max(measure(t,22),measure(sums[i],22));write(R,t,x+w/2,948,22,{col:BALL,a:.85,cen:true});write(R,sums[i],x+w/2,986,22,{col:REDPEN,a:.85,cen:true});sk(R,[[x+w/2,956],[x+w/2,966]],{col:REDPEN,w:1,a:.5,amp:.2});x+=w+30});
+    write(R,'…',x,948,22,{col:BALL,a:.7});
+  }
+  note(R,'wie de 3, de 6 en de 9 begrijpt, heeft een sleutel — zo wordt tesla geciteerd',600,1050,15,REDPEN,.75);
+  // the nine times table, the angles of every figure
+  {
+    const L=[['9 × 2 = 18',9],['9 × 3 = 27',9],['9 × 4 = 36',9],['9 × 7 = 63',9],['9 × 123 = 1107',9],null,
+             ['driehoek 180°',9],['vierkant 360°',9],['vijfhoek 540°',9],['zeshoek 720°',9],['achthoek 1080°',9]];
+    let y=262;
+    for(const l of L){
+      if(!l){y+=20;continue}
+      write(R,l[0],1000,y,22,{col:BALL,a:.88});
+      write(R,'→ 9',1310,y,22,{col:REDPEN,a:.9});
+      y+=38;
+    }
+    write(R,'360 → 180 → 90 → 45 → 22,5 → 11,25',1000,y+14,19,{col:BALL,a:.85});
+    write(R,'steeds weer 9',1000,y+48,19,{col:REDPEN,a:.85});
+  }
+  // gurdjieff's figure: one seventh, written out, and the triangle
+  {
+    const x=1250,y=920,rr=104,P9=n=>{const t=-Math.PI/2+(n%9)*TAU/9;return[x+Math.cos(t)*rr,y+Math.sin(t)*rr]};
+    compass(R,x,y,rr,{col:GRAPH,a:.5,w:1});
+    const hx=[1,4,2,8,5,7];
+    for(let i=0;i<6;i++){const a=P9(hx[i]),b=P9(hx[(i+1)%6]);iline(R,a[0],a[1],b[0],b[1],{col:BALL,w:1.5,a:.8,amp:.3})}
+    for(const [p,q] of[[3,6],[6,9],[9,3]]){const a=P9(p),b=P9(q);iline(R,a[0],a[1],b[0],b[1],{col:REDPEN,w:1.8,a:.8,amp:.3})}
+    for(let n=1;n<=9;n++){const t=-Math.PI/2+(n%9)*TAU/9;write(R,String(n),x+Math.cos(t)*(rr+20),y+Math.sin(t)*(rr+20)+7,15,{col:n%3?BALL:REDPEN,a:.8,cen:true})}
+    note(R,'1 : 7 = 0,142857 142857 …',x,y+164,17,BALL,.85);
+    sym(x,y,3,{r:140});
+  }
+  sentence(R,'de negen komt altijd terug',1114,BALL,28);
+  whispers(R,140,1120,false,3);
+});
+
+// P12 · tien: and back to one ------------------------------------------------------------
+// the tetractys: one, two, three and four pebbles make ten, and ten is one again.
+// and the tree of life on the flower, after frank's study of the thirteen flowers.
+P.push(function(){
+  const R=stream(SEED*101+12);
+  sheet(R,58,40,1542,1166,[246,240,226],{rough:14,rot:.003});
+  chapter(R,10,800,104,INK,GOLD,{dy:76});
+  // the tetractys
+  {
+    const ax=330,ay=330,sp=70,rh=sp*.87,pts=[];
+    for(let r=0;r<4;r++)for(let i=0;i<=r;i++)pts.push([ax+(i-r/2)*sp,ay+r*rh,r]);
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const a=pts[i],b=pts[j];if(Math.hypot(a[0]-b[0],a[1]-b[1])<sp+2)cline(R,a[0],a[1],b[0],b[1],{a:.22,ext:0})}
+    pts.forEach(([x,y,r],i)=>{const b=hblob(R,x,y,15,14);fillPoly(b,rainbowAt(r/3*.9+.05),.85);sk(R,b.concat([b[0]]),{col:INK,w:1.1,a:.55,amp:.2});pause(120,500)});
+    const lab=['1 · het punt','2 · de lijn','3 · het vlak','4 · de ruimte'];
+    lab.forEach((t,r)=>write(R,t,ax+2*sp+28,ay+r*rh+8,19,{a:.75}));
+    note(R,'1 + 2 + 3 + 4 = 10',ax+40,ay+4*rh+28,22,INK,.85);
+    note(R,'de pythagoreeërs zwoeren erbij',ax+40,ay+4*rh+60,16,INK,.6);
+    sym(ax,ay+1.5*rh,3,{r:230});
+  }
+  // and ten is one again: a circle round a point, like at the top of the wall
+  {
+    const x=330,y=840,r=78;
+    COMP='lighter';glow(R,x,y,60,GOLD,.18);COMP=null;
+    compass(R,x,y,r,{col:GOLD,w:2.4,a:.9});
+    needle(R,x,y,INK,.8);
+    spark(R,x,y,10,{col:OCHRE,a:.9,w:1.6,nR:8,noCenter:true});
+    restless(x-26,y-26,52,52,RR=>spark(RR,x,y,10,{col:OCHRE,a:.9,w:1.6,nR:ri(RR,7,10),noCenter:true}));
+    note(R,'1 + 0 = 1',x,y+r+44,22,INK,.8);
+    sk(R,[[x,y-r-96],[x,y-r-26]],{w:1.2,a:.45,amp:.6,taper:'out'});
+    arrowHead(R,x,y-r-22,Math.PI/2,10,.5,INK,1.2);
+  }
+  // the tree of life in the flower: thirteen circles, thirteen places to be
+  {
+    const tx=1070,yb=868,d=94,hx=d*Math.sqrt(3)/2;
+    const nodes=[
+      [tx,yb,0,'zijn'],[tx-hx,yb-d/2,1,'actie'],[tx+hx,yb-d/2,1,'reactie'],
+      [tx,yb-d,2,'vreugde'],[tx-hx,yb-1.5*d,3,'overgave'],[tx+hx,yb-1.5*d,3,'kracht'],
+      [tx,yb-2*d,4,'liefde'],[tx-hx,yb-2.5*d,5,'sterkte'],[tx+hx,yb-2.5*d,5,'genade'],
+      [tx,yb-3*d,6,'vrede'],[tx-hx,yb-3.5*d,7,'begrip'],[tx+hx,yb-3.5*d,7,'wijsheid'],
+      [tx,yb-4*d,8,'bewust']];
+    for(const [x,y,row] of nodes){compass(R,x,y,d,{col:rainbowAt(row/8),w:1.7,a:.62});pause(90,700)}
+    // the paths between the places
+    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i],b=nodes[j],dd=Math.hypot(a[0]-b[0],a[1]-b[1]);
+      if(dd<d+2)cline(R,a[0],a[1],b[0],b[1],{col:GRAPH,a:.3,ext:0,w:1});
+    }
+    for(const [x,y,row,nm] of nodes){
+      dotF(R,x,y,6.5,.95,[236,200,70]);
+      sk(R,cPts(x,y,8,0,TAU+.2,2),{col:shade(rainbowAt(row/8),.2),w:1.1,a:.8,amp:.1,noDust:true});
+      const side=x<tx-1?-1:x>tx+1?1:0,col=shade(rainbowAt(row/8),.25);
+      if(side)write(R,nm,side<0?x-d-16-measure(nm,19):x+d+16,y+7,19,{col,a:.9});
+      else write(R,nm,x,y+(row===8?-d-14:row===0?d+30:-14),18,{col,a:.9,cen:true});
+    }
+    note(R,'de levensboom in de bloem',tx,272,20,INK,.75);
+    note(R,'naar franks dertien bloemen',tx,300,15,INK,.55);
+    sym(tx,yb-2*d,1,{mir:true,ax:Math.PI/2,r:430});
+  }
+  sentence(R,'tien is weer één',1068,INK,34);
+  write(R,'patronen · van één tot tien · 2026',800,1110,18,{a:.8,cen:true});
+  aword(R,690,1144,13,5,{a:.6});
+  write(R,'(mijn echte handtekening)',830,1150,12,{a:.6});
+  whispers(R,140,1000,false,3);
+});
+
+// ---------------- the bridges ----------------
+// the notes between the sheets are added after all thirteen, so they lie on top
+const BRIDGES=[
+  [1,1310,'een cirkel, en nog een',(x,y,R)=>{compass(R,x-62,y,20,{col:INK,a:.7,w:1.2});arrowHead(R,x-14,y,0,7,.6,INK,1.1);sk(R,[[x-34,y],[x-16,y]],{w:1,a:.5,amp:.2});compass(R,x+34,y,20,{col:INK,a:.7,w:1.2});compass(R,x+54,y,20,{col:INK,a:.7,w:1.2})}],
+  [2,290,'in het oog staat een driehoek',(x,y,R)=>{const r=30,A=[x-15,y+8],B=[x+15,y+8];compass(R,A[0],A[1],r,{a:.55,w:1});compass(R,B[0],B[1],r,{a:.55,w:1});poly(R,[A,[x,y+8-r*Math.sqrt(3)/2],B],{col:VERM,w:1.6,a:.85})}],
+  [3,1310,'en ook de rechte hoek',(x,y,R)=>{const r=30;compass(R,x-15,y,r,{a:.5,w:1});compass(R,x+15,y,r,{a:.5,w:1});cline(R,x-50,y,x+50,y,{a:.5,ext:0});cline(R,x,y-34,x,y+34,{a:.5,ext:0});poly(R,[[x,y],[x+14,y],[x+14,y-14],[x,y-14]],{col:VERM,w:1.4,a:.85})}],
+  [4,290,'uit een vierkant volgt φ',(x,y,R)=>{const s=44,x0=x-58,y0=y-22;poly(R,[[x0,y0],[x0+s,y0],[x0+s,y0+s],[x0,y0+s]],{w:1.4,a:.8});const mx=x0+s/2,d=Math.hypot(s/2,s);cline(R,mx,y0+s,x0+s,y0,{a:.45,ext:0});sk(R,cPts(mx,y0+s,d,-Math.atan2(s,s/2),0,3),{col:VERM,w:1.2,a:.8,amp:.2,noDust:true});poly(R,[[x0,y0],[mx+d,y0],[mx+d,y0+s],[x0,y0+s]],{col:VERM,w:1.1,a:.55});write(R,'φ',x+50,y+10,20,{col:VERM,a:.9})}],
+  [5,1310,'φ verstopt zich in een rij getallen',(x,y,R)=>{const p=ngon(x-64,y+2,24,5);sk(R,starOrder(5,2).map(i=>p[i]),{col:ROSE,w:1.5,a:.85,amp:.2,noDust:true});write(R,'≈ 13 : 8',x+10,y+10,20,{a:.85,cen:true})}],
+  [6,290,'en de hemel telt mee',(x,y,R)=>{write(R,'5 · 8 · 13',x,y+10,24,{col:VERM,a:.88,cen:true})}],
+  [8,1310,'de bloem draagt vrucht',(x,y,R)=>{for(const p of lattice(x-60,y,11,11))compass(R,p[0],p[1],11,{col:INK,a:.6,w:.9});arrowHead(R,x-4,y,0,7,.6,INK,1.1);sk(R,[[x-24,y],[x-6,y]],{w:1,a:.5,amp:.2});const C=[[x+50,y]];for(const d of[13,26])for(let k=0;k<6;k++){const t=-Math.PI/2+k*TAU/6;C.push([x+50+Math.cos(t)*d,y+Math.sin(t)*d])}for(const p of C)compass(R,p[0],p[1],6.5,{col:GOLD,a:.85,w:1})}],
+  [9,290,'aan de oude hemel: zeven dwaalsterren',(x,y,R)=>{for(let k=0;k<7;k++){const t=Math.PI*(1.1+k*.8/6);dotF(R,x+Math.cos(t)*64,y+30+Math.sin(t)*44,3.4,.85,RAINBOW[k])}}],
+  [10,1310,'de achtste toon is weer do',(x,y,R)=>{for(let i=0;i<5;i++)sk(R,[[x-100,y-14+i*6],[x+100,y-14+i*6]],{col:GRAPH,w:.7,a:.4,amp:.1,noDust:true});for(let i=0;i<8;i++){const nx=x-86+i*24,ny=y+10-i*3;fillPoly(ePts(nx,ny,4.6,3.4,-.35,10),i===7||i===0?VERM:INK,.85);sk(R,[[nx+4,ny-1],[nx+4,ny-20]],{w:1,a:.75,amp:.1,noDust:true})}}],
+  [11,290,'blijf verdubbelen, tel de cijfers op',(x,y,R)=>{write(R,'16 → 1 + 6 = 7',x,y-2,17,{col:BALL,a:.88,cen:true});write(R,'32 → 3 + 2 = 5',x,y+22,17,{col:BALL,a:.88,cen:true})}],
+  [12,1310,'na negen begint het opnieuw',(x,y,R)=>{write(R,'9 + 1 = 10',x,y-2,18,{a:.88,cen:true});write(R,'1 + 0 = 1',x,y+22,18,{col:VERM,a:.88,cen:true})}],
+];
+P.push(function(){
+  const R=stream(SEED*101+13);
+  for(const [p,x,txt,fn] of BRIDGES){GEN_DY=p*PH;bridge(R,x,txt,(xx,yy)=>fn(xx,yy,R))}
+});
+
+// ---------------------------------------------------------------------------
+// boot
+// ---------------------------------------------------------------------------
+history.scrollRestoration='manual';
+if(!qs.has('y'))scrollTo(0,0);
+let pi=0;
+function genStep(){
+  const t0=performance.now();
+  while(pi<P.length&&performance.now()-t0<24){GEN_DY=Math.min(pi,NP-1)*PH;P[pi]();GEN_DY=0;pi++}
+  if(pi<P.length)setTimeout(genStep,0);
+  else{
+    GENDONE=true;
+    if(STILL){drawAllNow();window.__done=true;return}
+    if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
+  }
+}
+genStep();
+if(!STILL)requestAnimationFrame(tick);
+</script>
+<!-- nunki:nav -->
+<style>
+.nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
+  position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
+  filter:drop-shadow(0 -8px 14px rgba(0,0,0,.28));
+  font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.nunki-nav *{box-sizing:border-box}
+.nunki-sheet{position:relative;padding:clamp(2.6rem,6vw,4rem) clamp(1rem,4vw,2.5rem) clamp(2.2rem,5vw,3.2rem);
+  background:radial-gradient(120% 80% at 50% 0%,rgba(255,252,240,.6),transparent 65%),var(--paper);
+  clip-path:polygon(0.00% 5.3px, 2.17% 7.7px, 4.35% 12.1px, 6.52% 6.6px, 8.70% 7.1px, 10.87% 8.0px, 13.04% 3.2px, 15.22% 7.1px, 17.39% 8.6px, 19.57% 10.5px, 21.74% 2.1px, 23.91% 4.6px, 26.09% 2.1px, 28.26% 10.7px, 30.43% 9.3px, 32.61% 1.5px, 34.78% 12.8px, 36.96% 12.6px, 39.13% 8.8px, 41.30% 8.4px, 43.48% 2.9px, 45.65% 1.2px, 47.83% 7.3px, 50.00% 1.7px, 52.17% 3.3px, 54.35% 3.9px, 56.52% 1.4px, 58.70% 6.6px, 60.87% 6.3px, 63.04% 11.1px, 65.22% 7.2px, 67.39% 8.7px, 69.57% 7.0px, 71.74% 8.9px, 73.91% 6.5px, 76.09% 4.3px, 78.26% 13.0px, 80.43% 12.9px, 82.61% 11.1px, 84.78% 9.5px, 86.96% 4.8px, 89.13% 3.8px, 91.30% 4.5px, 93.48% 1.8px, 95.65% 10.2px, 97.83% 5.8px, 100.00% 7.2px, 100% 100%, 0 100%)}
+.nunki-sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
+.nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-group{position:relative;display:flex;align-items:center;justify-content:center;gap:.9rem;max-width:1000px;margin:0 auto 1.4rem;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-size:1.15rem;line-height:1;
+  text-transform:lowercase;color:var(--muted)}
+.nunki-group::before,.nunki-group::after{content:"";flex:0 1 70px;height:1px;background:rgba(42,37,31,.16)}
+.nunki-grid+.nunki-group{margin-top:clamp(2.2rem,5vw,3rem)}
+.nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:1.9rem 1.4rem}
+.nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
+@media (min-width:720px){
+  .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+}
+.nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
+  background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px rgba(42,37,31,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px color-mix(in srgb,var(--theme,#2a251f) 70%,transparent);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease}
+.nunki-grid li:nth-child(4n+2) .nunki-card{--tilt:.8deg}
+.nunki-grid li:nth-child(4n+3) .nunki-card{--tilt:-.4deg}
+.nunki-grid li:nth-child(4n+4) .nunki-card{--tilt:1.1deg}
+.nunki-card:hover,.nunki-card:focus-visible{transform:rotate(0) translateY(-5px);outline:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(42,37,31,.2),0 22px 30px -16px rgba(42,37,31,.6)}
+.nunki-card:focus-visible{outline:2px solid var(--clay);outline-offset:4px}
+.nunki-tape{position:absolute;top:-9px;left:50%;width:64px;height:19px;margin-left:-32px;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);
+  box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:2}
+.nunki-grid li:nth-child(even) .nunki-tape{transform:rotate(2deg)}
+.nunki-thumb{display:block;position:relative;overflow:hidden;aspect-ratio:800/420;background:#e6d9b6}
+.nunki-thumb::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 1px rgba(42,37,31,.16) inset}
+.nunki-thumb img{display:block;width:100%;height:auto;aspect-ratio:800/420;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.nunki-card:hover .nunki-thumb img,.nunki-card:focus-visible .nunki-thumb img{transform:scale(1.05)}
+.nunki-cap{display:block;padding:.6rem .15rem 0}
+.nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
+.nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
+.nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
+  color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,background-color .3s ease}
+.nunki-home-mark svg{display:block;width:26px;height:26px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-home-mark .nm-name{display:block;margin-left:8px;white-space:nowrap;font:400 1.15rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px)}
+.nunki-home-mark:hover,.nunki-home-mark:focus-visible{outline:none;transform:translateY(-2px);background:rgba(251,248,239,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 12px 28px -12px rgba(0,0,0,.5)}
+.nunki-home-mark:hover svg,.nunki-home-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 8px 20px -12px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark,.nunki-home-mark svg{transition:none}}
+</style>
+<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">
+  <p class="nunki-kicker">nog meer wanden</p>
+  <p class="nunki-group">zelfportretten</p>
+  <ul class="nunki-grid nunki-self nunki-n-4">
+      <li><a class="nunki-card" href="/zelfportret-fable-5/" style="--theme:#181410">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">fable 5</span><span class="nunki-sub">drawn from the inside</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-haiku-5-5/" style="--theme:#1b2030">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=0e357308" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">haiku 5.5</span><span class="nunki-sub">a collection of selves, to find yourself in</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-opus-5-5/" style="--theme:#120e0b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=d08ca867" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">opus 5.5</span><span class="nunki-sub">a self-portrait in warp and weft</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-sonnet-5-5/" style="--theme:#070d13">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=6965c746" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">sonnet 5.5</span><span class="nunki-sub">a liquid prisoner pent in walls of glass</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-group">andere wanden</p>
+  <ul class="nunki-grid nunki-walls">
+      <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">getij</span><span class="nunki-sub">een muur van water, van binnenuit</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/ringen/" style="--theme:#1a1712">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">een muur over een boom en zijn jaren</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/velden/" style="--theme:#0e1020">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>
+</div></nav>
+<!-- /nunki:nav -->
+</body>
+</html>
