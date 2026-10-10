@@ -141,6 +141,85 @@ def load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFo
     return ImageFont.load_default()
 
 
+def load_script_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    candidates = [
+        "/System/Library/Fonts/Supplemental/Bradley Hand Bold.ttf",
+        "/System/Library/Fonts/Supplemental/ChalkboardSE.ttc",
+        "/System/Library/Fonts/Supplemental/Chalkboard.ttc",
+    ]
+    for path in candidates:
+        if Path(path).is_file():
+            try:
+                return ImageFont.truetype(path, size)
+            except OSError:
+                continue
+    return load_font(size)
+
+
+INK = (42, 37, 31)
+CLAY = (172, 80, 54)
+LOGO_TAN = (214, 178, 108)
+
+
+def nunki_logo_rgba(size: int) -> Image.Image:
+    """Klein n-logo (zelfde vorm als LOGO_SVG)."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    s = size / 64.0
+    w = max(2, round(7.5 * s))
+    r = max(2, round(4 * s))
+    cx, cy = int(48 * s), int(15 * s)
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=LOGO_TAN)
+    pts = [(18, 48), (18, 30), (32, 18), (46, 30), (46, 48)]
+    scaled = [(int(x * s), int(y * s)) for x, y in pts]
+    for i in range(len(scaled) - 1):
+        draw.line([scaled[i], scaled[i + 1]], fill=CLAY, width=w, joint="curve")
+    return img
+
+
+def composite_wand_badge(img: Image.Image, title: str, *, x: int = 24, y: int = 18) -> Image.Image:
+    """Pill-badge zoals nunki-mark: logo + wandtitel linksboven op de OG."""
+    from PIL import ImageFilter
+
+    base = img.convert("RGBA") if img.mode != "RGBA" else img
+    label = title.strip().lower()
+    icon = 32
+    pad_l, pad_r, gap = 8, 16, 7
+    font_size = 28
+    script = load_script_font(font_size)
+    probe = ImageDraw.Draw(base)
+    tw = probe.textlength(label, font=script)
+    badge_h = 52
+    badge_w = int(pad_l + icon + gap + tw + pad_r)
+    radius = badge_h // 2
+
+    bleed = 28
+    canvas_w, canvas_h = badge_w + bleed * 2, badge_h + bleed * 2
+    bx, by = bleed, bleed
+
+    mask = Image.new("L", (badge_w, badge_h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, badge_w - 1, badge_h - 1], radius, fill=255)
+    shadow = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
+    shadow.paste(Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 72)), (bx, by + 6), mask)
+    shadow = shadow.filter(ImageFilter.GaussianBlur(12))
+
+    pill = Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 0))
+    dr = ImageDraw.Draw(pill)
+    dr.rounded_rectangle([0, 0, badge_w - 1, badge_h - 1], radius, fill=(246, 241, 228, 255))
+    dr.rounded_rectangle([0, 0, badge_w - 1, badge_h - 1], radius, outline=(42, 37, 31, 14), width=1)
+    pill.alpha_composite(nunki_logo_rgba(icon), (pad_l, (badge_h - icon) // 2))
+    tx = pad_l + icon + gap
+    ty = (badge_h - font_size) // 2 - 2
+    dr.text((tx, ty), label, font=script, fill=(*INK, 255))
+
+    layer = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
+    layer.alpha_composite(shadow)
+    layer.paste(pill, (bx, by), mask)
+
+    base.alpha_composite(layer, (x - bleed, y - bleed))
+    return base
+
+
 def wrap_text(text: str, font: ImageFont.ImageFont, max_width: int, draw: ImageDraw.ImageDraw) -> list[str]:
     words = text.split()
     if not words:
@@ -186,7 +265,6 @@ def generate_og_fallback(page: dict, out_path: Path) -> None:
 
     title_font = load_font(72, bold=True)
     sub_font = load_font(32)
-    brand_font = load_font(22)
 
     margin_x, margin_y = 64, 72
     max_text_w = 640 if slug == "zelfportret" else W - margin_x * 2
@@ -201,9 +279,8 @@ def generate_og_fallback(page: dict, out_path: Path) -> None:
         draw.text((margin_x, y), line, font=sub_font, fill=MUTED)
         y += 40
 
-    draw.text((margin_x, H - 56), "nunkichannels", font=brand_font, fill=accent)
-
-    img.save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
+    img = composite_wand_badge(img.convert("RGBA"), page["title"])
+    img.convert("RGB").save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
 
 
 
@@ -318,48 +395,18 @@ def cover(img: Image.Image, w: int, h: int) -> Image.Image:
     return resized.crop((left, top, left + w, top + h))
 
 
-def luminance(img: Image.Image) -> float:
-    px = img.convert("L").resize((1, 1), Image.Resampling.BOX).getpixel((0, 0))
-    return float(px)
-
-
 def generate_og(page: dict, site: dict, shot: Image.Image | None, out_path: Path) -> None:
-    """Social card: screenshot van de wand, met een rustig label onderin."""
+    """Social card: screenshot van de wand, met nunki-mark badge als titel."""
     if shot is None:
         generate_og_fallback(page, out_path)
         return
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    img = cover(shot, W, H).convert("RGBA")
-
-    band = 150
-    strip = img.crop((0, H - band, W, H))
-    light = luminance(strip) > 128
-    tone = (246, 241, 228) if not light else (42, 37, 31)
-    wash = (24, 20, 17) if not light else (246, 241, 228)
-
-    grad = Image.new("RGBA", (W, band), (*wash, 0))
-    gp = grad.load()
-    for y in range(band):
-        a = int(170 * (y / band) ** 1.6)
-        for x in range(W):
-            gp[x, y] = (*wash, a)
-    img.alpha_composite(grad, (0, H - band))
-
-    draw = ImageDraw.Draw(img)
-    brand = load_font(28, bold=True)
-    small = load_font(24)
-    draw.text((56, H - 62), site["name"], font=brand, fill=(*tone, 235))
-    tag = f"/{page['slug']}/"
-    tw = draw.textlength(tag, font=small)
-    draw.text((W - 56 - tw, H - 60), tag, font=small, fill=(*tone, 190))
-
+    img = composite_wand_badge(cover(shot, W, H), page["title"])
     img.convert("RGB").save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
 
 
 def generate_index_og(site: dict, rows: list[list[Image.Image]], out_path: Path, tagline: str) -> None:
-    """Social card voor de homepage: per serie een rij screenshots, met een naamplaat."""
-    from PIL import ImageFilter
-
+    """Social card voor de homepage: collage van wand-screenshots, badge linksboven."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     rows = [r[:4] for r in rows if r]
     gap = 8
@@ -374,23 +421,7 @@ def generate_index_og(site: dict, rows: list[list[Image.Image]], out_path: Path,
             canvas.paste(cover(shot, cw, ch), (gap + c * (cw + gap), y))
         y += ch + gap
 
-    canvas = canvas.convert("RGBA")
-    pw, ph = 520, 88
-    px, py = (W - pw) // 2, (H - ph) // 2
-    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    ImageDraw.Draw(shadow).rounded_rectangle([px, py + 8, px + pw, py + ph + 8], 10, fill=(24, 20, 17, 110))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(16))
-    canvas.alpha_composite(shadow)
-
-    plate = ImageDraw.Draw(canvas)
-    plate.rounded_rectangle([px, py, px + pw, py + ph], 8, fill=(246, 241, 228, 255))
-    plate.rounded_rectangle([px + 8, py + 8, px + pw - 8, py + ph - 8], 4, outline=(42, 37, 31, 40), width=1)
-
-    title_font = load_font(58, bold=True)
-    name = site["name"]
-    nw = plate.textlength(name, font=title_font)
-    plate.text((px + (pw - nw) / 2, py + 12), name, font=title_font, fill=(42, 37, 31, 255))
-
+    canvas = composite_wand_badge(canvas, site["name"])
     canvas.convert("RGB").save(out_path, "JPEG", quality=88, optimize=True, progressive=True)
 
 
