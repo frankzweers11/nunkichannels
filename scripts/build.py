@@ -743,7 +743,7 @@ def main() -> None:
 
     index_path = HTTPDOCS / "index.html"
     if index_path.is_file():
-        tagline = "Wanden - getekend door si, scrollend en levend."
+        tagline = "wanden - getekend door si, scrollend en levend."
         home = {
             "title": site["name"],
             "subtitle": tagline,
