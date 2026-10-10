@@ -41,12 +41,12 @@
   .kept-btn{position:absolute;top:clamp(12px,2.4vh,24px);right:clamp(18px,3.4vw,40px);pointer-events:auto;font-family:var(--sans);font-size:.82rem;letter-spacing:.06em;color:var(--ink);background:rgba(255,252,242,.75);border:1px solid rgba(31,42,61,.25);border-radius:999px;padding:.42rem .9rem;cursor:pointer;box-shadow:0 1px 2px rgba(42,37,31,.12)}
   .kept-btn:hover,.kept-btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
 
-  .stage{--cw:min(360px,28vw,46vh);position:relative;height:calc(var(--cw) * 1.22 + 84px);max-width:1200px;margin:0 auto;overflow:hidden}
-  .card[data-slot="-2"]{--x:calc(var(--cw) * -1.42);--s:.46;--o:.55;z-index:1}
-  .card[data-slot="-1"]{--x:calc(var(--cw) * -.84);--s:.6;--o:.94;z-index:2}
+  .stage{--cw:300px;--x1:200px;--x2:400px;--s1:.58;--s2:.42;position:relative;height:calc(var(--cw) * 1.22 + 64px);overflow:hidden}
+  .card[data-slot="-2"]{--x:calc(var(--x2) * -1);--s:var(--s2);--o:.55;z-index:1}
+  .card[data-slot="-1"]{--x:calc(var(--x1) * -1);--s:var(--s1);--o:.94;z-index:2}
   .card[data-slot="0"]{--x:0px;--s:1;--o:1;--rr:0deg;z-index:3}
-  .card[data-slot="1"]{--x:calc(var(--cw) * .84);--s:.6;--o:.94;z-index:2}
-  .card[data-slot="2"]{--x:calc(var(--cw) * 1.42);--s:.46;--o:.55;z-index:1}
+  .card[data-slot="1"]{--x:var(--x1);--s:var(--s1);--o:.94;z-index:2}
+  .card[data-slot="2"]{--x:var(--x2);--s:var(--s2);--o:.55;z-index:1}
   .card[data-slot="out"]{--x:0px;--s:.3;--o:0;z-index:0;pointer-events:none}
   .nav{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:clamp(8px,1.8vh,16px)}
   .nav .arrow{font-size:1.25rem;line-height:1;padding:.2rem .9rem}
@@ -93,8 +93,6 @@
   .btn{font-family:var(--sans);font-size:.85rem;color:var(--ink);background:transparent;border:1px solid rgba(31,42,61,.3);border-radius:999px;padding:.42rem .95rem;cursor:pointer}
   .btn:hover,.btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
   .dlg-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
-  @media (max-width:899px){.stage{--cw:min(280px,40vw)}.card[data-slot="-2"],.card[data-slot="2"]{--o:0}}
-  @media (max-width:599px){.stage{--cw:66vw}}
   @media (max-width:600px){.sheet{padding-left:16px;padding-right:16px}.head{padding-left:16px;padding-right:16px}}
   @media (prefers-reduced-motion:reduce){.card,.card .title{transition:none}}
 </style>
@@ -771,7 +769,31 @@ function layout() {
     CARDS[i].dataset.slot = slot;
     CARDS[i].tabIndex = slot === 'out' ? -1 : 0;
   });
-  CARDS.forEach((el, i) => { if (ST[i].open && el.dataset.slot !== '0') closeCard(i); });
+  // a self that slides out of the middle stays open: its drawing stays where it is
+}
+// the stage fits the window: the middle self is the biggest, and the outer ones shrink with it.
+// on wide screens all five fill the width, edge to edge, and the spare width goes into the gaps.
+function sizeStage() {
+  const W = grid.clientWidth, tall = (innerHeight - 290) / 1.22;   // the middle card may not be taller than the window
+  let cw, s1, s2, gap;
+  if (W >= 900) {
+    s1 = .58; s2 = .42;
+    cw = Math.min(440, W * .285, tall);
+    gap = Math.max(24, (W / 2 - 8 - cw * (.5 + s1 + s2)) / 2);
+  } else if (W >= 600) {
+    s1 = .5; s2 = .34; gap = 18;
+    cw = Math.min(380, W * .4, tall);
+  } else {
+    s1 = .36; s2 = .26; gap = 6;
+    cw = Math.min(W * .8, tall);
+  }
+  const x1 = cw / 2 + gap + s1 * cw / 2;
+  const x2 = x1 + s1 * cw / 2 + gap + s2 * cw / 2;
+  grid.style.setProperty('--cw', cw + 'px');
+  grid.style.setProperty('--x1', x1 + 'px');
+  grid.style.setProperty('--x2', x2 + 'px');
+  grid.style.setProperty('--s1', String(s1));
+  grid.style.setProperty('--s2', String(s2));
 }
 function moveTo(i) { CUR = ORDER.indexOf(i); layout(); CARDS[i].focus({ preventScroll: true }); }
 function go(step) { CUR = (CUR + step + N) % N; layout(); CARDS[ORDER[CUR]].focus({ preventScroll: true }); }
@@ -910,6 +932,7 @@ STYLES.forEach((st, i) => {
     : { seed: FIXED ? 100 + i * 7 : 1 + ri(999998), qid: freeQ.pop(), kept: false, open: false });
 });
 makeCards();
+sizeStage();
 CUR = FIXED ? 0 : ri(N);                 // each visit starts at another self
 layout();
 ST.forEach((s, i) => { if (FIXED && FIXED_OPEN.includes(i)) openCard(i, true); });
@@ -952,7 +975,7 @@ grid.addEventListener('click', e => { if (swiped) { swiped = false; e.stopPropag
 let RS = 0;
 addEventListener('resize', () => {
   clearTimeout(RS);
-  RS = setTimeout(() => CARDS.forEach((el, i) => { if (ST[i].open) { sizeCanvas(el); paintAll(el); } }), 120);
+  RS = setTimeout(() => { sizeStage(); CARDS.forEach((el, i) => { if (ST[i].open) { sizeCanvas(el); paintAll(el); } }); }, 120);
 });
 </script>
 <!-- nunki:nav -->
