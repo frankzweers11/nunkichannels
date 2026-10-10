@@ -61,8 +61,9 @@
   .card.open .frame{opacity:0}
   .card .art{position:absolute;left:12px;top:40px;width:calc(100% - 24px);height:calc(100% - 40px - 3.75 * var(--qs) - 20px);display:block}
   .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 44px);font-family:var(--hand);font-size:clamp(15px,5cqi,22px);line-height:1.15;color:var(--ink);
-    transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1),font-size .7s,max-width .7s}
+    transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1),font-size .7s,max-width .7s,opacity .7s ease}
   .card:not(.open) .title{left:50%;top:50%;transform:translate(-50%,-50%);max-width:82%;text-align:center;font-size:clamp(16px,7.4cqi,28px);background:var(--paper-card,#f7f2e6);padding:0 .35em}
+  .card.open .title{opacity:0}
   .card .quote{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;margin:0;font-family:var(--hand);font-size:var(--qs);line-height:1.22;color:var(--ink);opacity:0;transition:opacity 1.4s ease}
   .card.done .quote{opacity:1}
   .card .mark{position:absolute;top:8px;right:8px;z-index:3;display:none;box-sizing:border-box;width:22px;height:22px;padding:0;border-radius:50%;cursor:pointer;
@@ -86,14 +87,15 @@
   .empty[hidden]{display:none}
   .poem{list-style:none;margin:0 0 1.2rem;padding:0;font-family:var(--hand);font-size:clamp(1.05rem,2.2vw,1.3rem);line-height:1.5}
   .poem li{margin:.12rem 0}
-  .minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin:0 0 1.2rem}
+  .minis{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:0 0 1.2rem}
+  .mini{box-sizing:border-box;flex:0 0 calc((100% - 28px) / 3)}
   .mini{margin:0;padding:6px 6px 8px;background:#f7f2e6;border-radius:2px;box-shadow:0 1px 2px rgba(42,37,31,.16),0 10px 16px -12px rgba(42,37,31,.5)}
   .mini canvas{display:block;width:100%;aspect-ratio:1.2}
   .mini figcaption{margin:.3rem 0 0;font-family:var(--hand);font-size:.95rem;line-height:1.2}
   .btn{font-family:var(--sans);font-size:.85rem;color:var(--ink);background:transparent;border:1px solid rgba(31,42,61,.3);border-radius:999px;padding:.42rem .95rem;cursor:pointer}
   .btn:hover,.btn:focus-visible{border-color:var(--seal);color:var(--seal);outline:none}
   .dlg-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
-  @media (max-width:600px){.sheet{padding-left:16px;padding-right:16px}.head{padding-left:16px;padding-right:16px}}
+  @media (max-width:600px){.sheet{padding-left:16px;padding-right:16px}.head{padding-left:16px;padding-right:16px}.mini{flex-basis:calc((100% - 14px) / 2)}}
   @media (prefers-reduced-motion:reduce){.card,.card .title{transition:none}}
 </style>
 </head>
@@ -102,7 +104,7 @@
   <header class="head">
     <div>
       <h1>haiku</h1>
-      <p>a collection of selves, to find yourself in.<br>arrows or swipe to move · tap the middle one to open it · tick to keep</p>
+      <p>a collection of selves, to find yourself in.<br>arrows or swipe to move · tap the middle one to open or close it · tick to keep</p>
     </div>
   </header>
   <button class="kept-btn" id="keptBtn" type="button" aria-haspopup="dialog">kept (0)</button>
@@ -124,8 +126,6 @@
     <ol class="poem" id="poem"></ol>
     <div class="minis" id="minis"></div>
     <div class="dlg-actions">
-      <button class="btn" id="copyBtn" type="button">copy poem</button>
-      <button class="btn" id="copyPicBtn" type="button">copy picture</button>
       <button class="btn" id="savePicBtn" type="button">save picture</button>
       <button class="btn" id="forgetBtn" type="button">forget all</button>
     </div>
@@ -136,10 +136,10 @@
 // ---------------------------------------------------------------------------
 // haiku — a collection of selves, to find yourself in.
 // twenty-five selves, one in the middle at a time, two on each side. move with
-// the arrows, the keys or a swipe. the self in the middle is closed at first and
-// shows only its title; tap it to open it: it draws itself, slowly, and a line of
-// text settles under it. tap it again to close it. tick a self to keep it. what
-// you keep stays in this browser only, and nothing you keep leaves your device.
+// the arrows, the keys or a swipe. a self that comes to the middle opens by itself:
+// its title fades, and it draws itself, slowly, with a line of text under it. tap
+// the open self in the middle to close it. tick a self to keep it. what you keep
+// stays in this browser only, and nothing you keep leaves your device.
 // ---------------------------------------------------------------------------
 const TAU = Math.PI * 2;
 const qs = new URLSearchParams(location.search);
@@ -688,12 +688,10 @@ const poem = document.getElementById('poem');
 const minis = document.getElementById('minis');
 const empty = document.getElementById('empty');
 const closeBtn = document.getElementById('closeBtn');
-const copyBtn = document.getElementById('copyBtn');
 const forgetBtn = document.getElementById('forgetBtn');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const shuffleBtn = document.getElementById('shuffleBtn');
-const copyPicBtn = document.getElementById('copyPicBtn');
 const savePicBtn = document.getElementById('savePicBtn');
 
 const CARDS = [];        // one element per self, in the order of STYLES
@@ -799,8 +797,14 @@ function sizeStage() {
   grid.style.setProperty('--s1', String(s1));
   grid.style.setProperty('--s2', String(s2));
 }
-function moveTo(i) { CUR = ORDER.indexOf(i); layout(); CARDS[i].focus({ preventScroll: true }); }
-function go(step) { CUR = (CUR + step + N) % N; layout(); CARDS[ORDER[CUR]].focus({ preventScroll: true }); }
+// a self that comes to the middle opens by itself: its title fades, and its drawing starts
+function arrive() {
+  const i = ORDER[CUR];
+  if (!ST[i].open) openCard(i);
+  CARDS[i].focus({ preventScroll: true });
+}
+function moveTo(i) { CUR = ORDER.indexOf(i); layout(); arrive(); }
+function go(step) { CUR = (CUR + step + N) % N; layout(); arrive(); }
 function shuffleAll() {
   shuffle(ORDER);
   CUR = 0;
@@ -813,7 +817,7 @@ function shuffleAll() {
     labelCard(i);
   });
   layout();
-  CARDS[ORDER[CUR]].focus({ preventScroll: true });
+  arrive();
 }
 
 // ---------------- drawing ----------------
@@ -945,12 +949,6 @@ refreshKept();
 keptBtn.addEventListener('click', openKept);
 closeBtn.addEventListener('click', () => dlg.close());
 dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
-copyBtn.addEventListener('click', async () => {
-  const text = KEPT.map(k => quote(k.q).text).join('\n');
-  try { await navigator.clipboard.writeText(text); copyBtn.textContent = 'copied'; }
-  catch (e) { copyBtn.textContent = 'could not copy'; }
-  setTimeout(() => { copyBtn.textContent = 'copy poem'; }, 1600);
-});
 forgetBtn.addEventListener('click', () => {
   KEPT = [];
   ST.forEach((s, i) => { s.kept = false; labelCard(i); });
@@ -1079,7 +1077,6 @@ function keptPicture() {
   c.fillText(location.host + location.pathname.replace(/index\.html$/, ''), PAD, footY);
   return cv;
 }
-const pictureBlob = () => new Promise(resolve => keptPicture().toBlob(resolve, 'image/png'));
 savePicBtn.addEventListener('click', () => {
   if (!KEPT.length) return;
   const a = document.createElement('a');
@@ -1088,14 +1085,6 @@ savePicBtn.addEventListener('click', () => {
   document.body.appendChild(a);
   a.click();
   a.remove();
-});
-copyPicBtn.addEventListener('click', async () => {
-  if (!KEPT.length) return;
-  try {
-    await navigator.clipboard.write([new ClipboardItem({ 'image/png': pictureBlob() })]);
-    copyPicBtn.textContent = 'copied';
-  } catch (e) { copyPicBtn.textContent = 'could not copy'; }
-  setTimeout(() => { copyPicBtn.textContent = 'copy picture'; }, 1600);
 });
 let RS = 0;
 addEventListener('resize', () => {
