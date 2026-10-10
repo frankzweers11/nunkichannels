@@ -399,6 +399,12 @@ def generate_index_og(site: dict, rows: list[list[Image.Image]], out_path: Path,
 # Footer-navigatie onderaan elke wand: kleine kaartjes van de andere wanden
 # ---------------------------------------------------------------------------
 
+LOGO_SVG = (
+    '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
+    '<path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" '
+    'stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>'
+)
+
 NAV_CSS = """
 .nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
   position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
@@ -443,10 +449,17 @@ NAV_CSS = """
 .nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
 .nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
-.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center}
-.nunki-home a{color:var(--muted);font-size:.82rem;letter-spacing:.1em;text-decoration:none;border-bottom:1px solid rgba(42,37,31,.2);padding-bottom:2px}
-.nunki-home a:hover,.nunki-home a:focus-visible{color:var(--clay);border-color:var(--clay);outline:none}
-@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img{transition:none}}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:0}
+.nunki-home-mark{display:inline-flex;align-items:center;height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;
+  color:var(--ink);text-decoration:none;background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;transition:background-color .3s ease,box-shadow .3s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
+.nunki-home-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-home-mark .nm-name{display:block;margin-left:7px;white-space:nowrap;font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;transform:translateY(1px)}
+.nunki-home-mark:hover,.nunki-home-mark:focus-visible{background:rgba(251,248,239,.97);outline:none;transform:translateY(-1px)}
+.nunki-home-mark:hover svg,.nunki-home-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 8px 20px -12px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark,.nunki-home-mark svg{transition:none}}
 """
 
 
@@ -474,7 +487,16 @@ def nav_card(p: dict) -> str:
       </a></li>"""
 
 
-def nav_block(current: dict, pages: list[dict]) -> str:
+def nav_home_badge(site: dict) -> str:
+    name = esc(site["name"])
+    return (
+        f'  <p class="nunki-home">'
+        f'<a class="nunki-home-mark" href="/" title="{name}" aria-label="{name}, alle wanden">'
+        f"{LOGO_SVG}<span class=\"nm-name\">{name}</span></a></p>\n"
+    )
+
+
+def nav_block(current: dict, pages: list[dict], site: dict) -> str:
     groups = []
     for key, label, items in series_of(pages):
         others = [p for p in items if p["slug"] != current["slug"]]
@@ -492,16 +514,10 @@ def nav_block(current: dict, pages: list[dict]) -> str:
         '<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">\n'
         '  <p class="nunki-kicker">nog meer wanden</p>\n'
         + "".join(groups)
-        + '  <p class="nunki-home"><a href="/">← alle wanden</a></p>\n'
-        f"</div></nav>\n{NAV_END}"
+        + nav_home_badge(site)
+        + f"</div></nav>\n{NAV_END}"
     )
 
-
-LOGO_SVG = (
-    '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
-    '<path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" '
-    'stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>'
-)
 
 MARK_CSS = """
 .nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
@@ -716,7 +732,7 @@ def main() -> None:
     for html_path, html, page in sources:
         html = inject_social(html, social_block(page, site))
         html = inject_mark(html, mark_block(page))
-        write_public(html_path, inject_nav(html, nav_block(page, pages)))
+        write_public(html_path, inject_nav(html, nav_block(page, pages, site)))
 
     public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]
     payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": public_pages}
