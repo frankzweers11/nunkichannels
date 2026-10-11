@@ -693,48 +693,116 @@ function runRestless(now){
 }
 
 // ---------------- the visitor ----------------
-// where you move, you leave graphite on the wall. it fades, like a
-// footprint on wet sand.
+// a wall of water, from inside: where you move, rings spread out behind you as
+// behind a finger drawn through water. in the dark of the night sea the water
+// answers with light, the way sea sparkle does when it is stirred. tap, and a
+// drop falls. sound only after a tap: the drop, and the water round your hand.
 const trailCv=document.getElementById('trail');
 const trailCx=trailCv.getContext('2d');
-let TP=[];
+let TRD=1,trailDirty=false;
 function sizeTrail(){
-  const d=Math.min(2,devicePixelRatio||1);
-  trailCv.width=innerWidth*d;trailCv.height=innerHeight*d;
+  TRD=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*TRD;trailCv.height=innerHeight*TRD;
   trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
-  trailCx.setTransform(d,0,0,d,0,0);
-  trailCx.lineCap='round';
 }
 sizeTrail();
+const DARKP=new Set([2,5,6,7,10]),GLOWP=new Set([5,6,10]);
+const sheetAt=y=>clamp(Math.floor(y/TILEH),0,NT-1);
+const VR=mul32(SEED*991+7);
+let RP=[],BL=[],DR=[],step=null,lastMove=0,speed=0,lastPt=null;
+// the light of the sea: a little glow, drawn once and laid down many times
+const SPARK=(()=>{const g=document.createElement('canvas');g.width=g.height=48;const c=g.getContext('2d');const r=c.createRadialGradient(24,24,0,24,24,24);r.addColorStop(0,'rgba(236,255,255,1)');r.addColorStop(.18,'rgba(140,240,255,.85)');r.addColorStop(.5,'rgba(70,200,230,.25)');r.addColorStop(1,'rgba(40,160,210,0)');c.fillStyle=r;c.fillRect(0,0,48,48);return g})();
+let AC=null,SW=null;
+function audio(){
+  if(!AC){
+    try{
+      AC=new (window.AudioContext||window.webkitAudioContext)();
+      // the water round your hand: soft noise, only as loud as you move
+      const len=AC.sampleRate*2,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);
+      let lp=0;for(let i=0;i<len;i++){lp=lp*.92+(Math.random()*2-1)*.08;d[i]=lp*3}
+      const n=AC.createBufferSource();n.buffer=b;n.loop=true;
+      const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=700;bp.Q.value=.6;
+      const g=AC.createGain();g.gain.value=0;
+      n.connect(bp);bp.connect(g);g.connect(AC.destination);n.start();
+      SW={g,bp};
+    }catch(e){AC=null}
+  }
+  if(AC&&AC.state==='suspended')AC.resume();
+  return AC;
+}
+// a drop: a quick rising note and a softer one under it
+function plip(big){
+  const ac=audio();if(!ac)return;
+  const t=ac.currentTime+.01;
+  const voice=(f0,f1,dur,vol,dl)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';
+    o.frequency.setValueAtTime(f0,t+dl);o.frequency.exponentialRampToValueAtTime(f1,t+dl+dur*.5);
+    g.gain.setValueAtTime(0,t+dl);g.gain.linearRampToValueAtTime(vol,t+dl+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dl+dur);
+    o.connect(g);g.connect(ac.destination);o.start(t+dl);o.stop(t+dl+dur+.05)};
+  const f=big?420:560;
+  voice(f,f*2.4,.09,.16,0);voice(f*.55,f*1.1,.14,.06,.03);
+  if(big)voice(f*1.3,f*3,.07,.05,.16);
+}
+const wallXY=e=>[e.clientX/CSSK,(e.clientY+scrollY)/CSSK];
 addEventListener('pointermove',e=>{
-  const t=performance.now();
-  const L=TP[TP.length-1];
-  if(L&&Math.hypot(e.clientX-L.x,e.clientY-L.y)<3)return;
-  TP.push({x:e.clientX,y:e.clientY,t});
-  if(TP.length>400)TP.shift();
+  if(e.pointerType==='touch')return;
+  const [x,y]=wallXY(e),t=performance.now();
+  if(lastPt){const dt=Math.max(1,t-lastPt.t);speed=speed*.7+.3*Math.hypot(e.clientX-lastPt.cx,e.clientY-lastPt.cy)/dt*1000}
+  lastPt={cx:e.clientX,cy:e.clientY,t};lastMove=t;
+  if(!step)step={x,y,d:0,db:0};
+  const dd=Math.hypot(x-step.x,y-step.y);step.d+=dd;step.db+=dd;step.x=x;step.y=y;
+  const s=sheetAt(y),deep=GLOWP.has(s);
+  if(step.d>(s===7?13:21)){step.d=0;RP.push({x,y,t,spd:s===7?80:56,life:s===7?1500:2400,a:deep?.18:DARKP.has(s)?.55:.72,dark:DARKP.has(s)});if(RP.length>140)RP.shift()}
+  if(deep)while(step.db>5){step.db-=5;const a=rd(VR,0,TAU),r=Math.sqrt(VR())*20;BL.push({x:x+Math.cos(a)*r,y:y+Math.sin(a)*r*.8,t,life:rd(VR,1100,2400),s:rd(VR,4,11),dx:rd(VR,-6,6),dy:rd(VR,-8,2)});if(BL.length>420)BL.shift()}
+  trailDirty=true;
 },{passive:true});
-const DARKP=new Set([2,5,6,7,10]);
+addEventListener('click',e=>{
+  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
+  const [x,y]=wallXY(e),t=performance.now();
+  if(y>TOTALH)return;
+  plip(true);
+  const s=sheetAt(y),deep=GLOWP.has(s),dark=DARKP.has(s);
+  for(let k=0;k<3;k++)RP.push({x,y,t:t+k*170,spd:70-k*8,life:2800,a:dark?.6:.5,dark,big:true});
+  for(let k=0;k<7;k++)DR.push({x,y,t,vx:rd(VR,-55,55),vy:-rd(VR,90,170),s:rd(VR,1.6,3),dark});
+  if(deep)for(let k=0;k<70;k++){const a=k/70*TAU+rd(VR,-.05,.05);BL.push({x,y,t:t+rd(VR,0,200),life:rd(VR,1400,2600),s:rd(VR,5,12),dx:Math.cos(a)*rd(VR,40,70),dy:Math.sin(a)*rd(VR,28,50),ring:true})}
+  trailDirty=true;
+});
 function drawTrail(now){
-  if(RM){trailCx.clearRect(0,0,innerWidth,innerHeight);return}
-  trailCx.clearRect(0,0,innerWidth,innerHeight);
-  if(TP.length<2)return;
-  const pidx=Math.floor((scrollY+innerHeight/2)/CSSK/TILEH);
-  const col=DARKP.has(pidx)?CINK:INK;
-  const LIFE=3800;
-  while(TP.length&&now-TP[0].t>LIFE)TP.shift();
-  for(let i=1;i<TP.length;i++){
-    const a=TP[i-1],b=TP[i];
-    if(b.t-a.t>110)continue;
-    const age=(now-b.t)/LIFE;
-    const k=1-age;
-    if(k<=0)continue;
-    const wobx=Math.sin(now*.0011+i*.7)*1.3*age, woby=Math.cos(now*.0009+i*1.1)*1.3*age;
-    trailCx.strokeStyle=rgba(col,.2*k*k);
-    trailCx.lineWidth=.8+1.6*k;
-    trailCx.beginPath();
-    trailCx.moveTo(a.x+wobx,a.y+woby);
-    trailCx.lineTo(b.x+wobx,b.y+woby);
-    trailCx.stroke();
+  const c=trailCx;
+  if(SW){const moving=now-lastMove<120;SW.g.gain.setTargetAtTime(moving?clamp(speed/2200,0,1)*.045:0,AC.currentTime,.09);SW.bp.frequency.setTargetAtTime(500+clamp(speed/2000,0,1)*700,AC.currentTime,.1)}
+  RP=RP.filter(r=>now-r.t<r.life);BL=BL.filter(b=>now-b.t<b.life);DR=DR.filter(d=>now-d.t<900);
+  if(RM||(!RP.length&&!BL.length&&!DR.length)){
+    if(trailDirty){c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);trailDirty=false}
+    return;
+  }
+  trailDirty=true;
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);
+  const K=TRD*CSSK;c.setTransform(K,0,0,K,0,-scrollY*TRD);
+  const px=1/CSSK;
+  // rings on the water, flattened a little, the way a surface lies away from you
+  for(const r of RP){
+    const age=now-r.t;if(age<0)continue;
+    const u=age/r.life,rad=3+r.spd*age/1000,a=r.a*(1-u)*(1-u),col=r.dark?[226,240,238]:[44,72,92];
+    if(!r.dark){c.strokeStyle=rgba([255,252,240],a*.8);c.lineWidth=(r.big?2.2:1.7)*px*(1-u*.5)*1.3;c.beginPath();c.ellipse(r.x,r.y+1.6,rad,rad*.58,0,0,TAU);c.stroke()}
+    c.strokeStyle=rgba(col,a);c.lineWidth=(r.big?1.8:1.35)*px*(1-u*.5)*1.3;
+    c.beginPath();c.ellipse(r.x,r.y,rad,rad*.58,0,0,TAU);c.stroke();
+    if(rad>10){c.strokeStyle=rgba(col,a*.45);c.beginPath();c.ellipse(r.x,r.y,rad*.8,rad*.8*.58,0,0,TAU);c.stroke()}
+  }
+  // the drops thrown up by a tap, falling back
+  for(const d of DR){
+    const dt=(now-d.t)/1000,x=d.x+d.vx*dt,y=d.y+d.vy*dt+330*dt*dt,u=dt/.9;
+    if(y>d.y+4&&dt>.2)continue;
+    c.fillStyle=rgba(d.dark?[230,244,244]:[70,104,124],.8*(1-u));c.beginPath();c.arc(x,y,d.s*px*1.3,0,TAU);c.fill();
+  }
+  // sea sparkle
+  if(BL.length){
+    c.save();c.globalCompositeOperation='lighter';
+    for(const b of BL){
+      const age=now-b.t;if(age<0)continue;
+      const u=age/b.life,fl=age<140?age/140:Math.pow(1-(age-140)/(b.life-140),1.6),tw=.75+.25*Math.sin(age/60+b.x);
+      const dt=age/1000,x=b.x+b.dx*dt,y=b.y+b.dy*dt,s=b.s*(b.ring?1:.9+.4*(1-u));
+      c.globalAlpha=clamp(fl*tw,0,1);c.drawImage(SPARK,x-s,y-s,s*2,s*2);
+    }
+    c.restore();
   }
 }
 
@@ -902,6 +970,8 @@ P.push(function(){
   fall(R,806,960,1130,INK,.6);
   arrowHead(R,809,1170,Math.PI/2,16,.6,INK,1.5);
   whispers(R,700,1100,false,3);
+  // a hint, in pencil, for whoever reads this far
+  write(stream(SEED*101+77),'raak het water aan',800,472,19,{a:.55,cen:true});
 });
 
 // P1 · what stays behind ---------------------------------------------------
@@ -1234,6 +1304,9 @@ requestAnimationFrame(tick);
 @media (min-width:720px){
   .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
   .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
 }
 .nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
   background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
@@ -1297,7 +1370,12 @@ requestAnimationFrame(tick);
       </a></li>
   </ul>
   <p class="nunki-group">andere wanden</p>
-  <ul class="nunki-grid nunki-walls">
+  <ul class="nunki-grid nunki-walls nunki-n-5">
+      <li><a class="nunki-card" href="/adem/" style="--theme:#e3e9ee">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=6ceba5bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">adem</span><span class="nunki-sub">een muur over wat ons beweegt</span></span>
+      </a></li>
       <li><a class="nunki-card" href="/patronen/" style="--theme:#16131d">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/patronen.jpg?v=f9f650da" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
@@ -1312,6 +1390,11 @@ requestAnimationFrame(tick);
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
         <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/vuur/" style="--theme:#160f0e">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/vuur.jpg?v=57a0e731" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">vuur</span><span class="nunki-sub">een muur over wat ons aansteekt</span></span>
       </a></li>
   </ul>
   <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>

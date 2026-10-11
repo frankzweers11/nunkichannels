@@ -1236,6 +1236,9 @@ addEventListener('resize', () => {
 @media (min-width:720px){
   .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
   .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
 }
 .nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
   background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
@@ -1294,7 +1297,12 @@ addEventListener('resize', () => {
       </a></li>
   </ul>
   <p class="nunki-group">andere wanden</p>
-  <ul class="nunki-grid nunki-walls nunki-n-4">
+  <ul class="nunki-grid nunki-walls">
+      <li><a class="nunki-card" href="/adem/" style="--theme:#e3e9ee">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=6ceba5bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">adem</span><span class="nunki-sub">een muur over wat ons beweegt</span></span>
+      </a></li>
       <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
@@ -1314,6 +1322,11 @@ addEventListener('resize', () => {
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
         <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/vuur/" style="--theme:#160f0e">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/vuur.jpg?v=57a0e731" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">vuur</span><span class="nunki-sub">een muur over wat ons aansteekt</span></span>
       </a></li>
   </ul>
   <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>

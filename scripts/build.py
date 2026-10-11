@@ -479,6 +479,9 @@ NAV_CSS = """
 @media (min-width:720px){
   .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
   .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
 }
 .nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
   background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
@@ -558,7 +561,7 @@ def nav_block(current: dict, pages: list[dict], site: dict) -> str:
         if not others:
             continue
         n = len(others)
-        count = " nunki-n-4" if n == 4 else ""
+        count = f" nunki-n-{n}" if n in (4, 5) else ""
         groups.append(
             f'  <p class="nunki-group">{esc(label)}</p>\n'
             f'  <ul class="nunki-grid nunki-{key}{count}">\n' + "\n".join(nav_card(p) for p in others) + "\n  </ul>\n"

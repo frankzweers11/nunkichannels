@@ -1,0 +1,2040 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- nunki:social -->
+<meta name="description" content="een muur over wat ons beweegt">
+<link rel="canonical" href="https://nunkichannels.nl/adem/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:site_name" content="nunkichannels">
+<meta property="og:title" content="adem">
+<meta property="og:description" content="een muur over wat ons beweegt">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nunkichannels.nl/adem/">
+<meta property="og:image" content="https://nunkichannels.nl/images/og/adem.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="adem — een muur over wat ons beweegt">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adem">
+<meta name="twitter:description" content="een muur over wat ons beweegt">
+<meta name="twitter:image" content="https://nunkichannels.nl/images/og/adem.jpg">
+<meta name="twitter:image:alt" content="adem — een muur over wat ons beweegt">
+<!-- /nunki:social -->
+<title>adem · een muur over wat ons beweegt</title>
+<style>
+  html,body{margin:0;padding:0;background:#e3e9ee}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  #wall{position:relative;width:100vw}
+  #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #wall canvas.live{pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+  #wall canvas.live.on{opacity:1}
+  #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+  #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
+</style>
+</head>
+<body>
+<!-- nunki:mark -->
+<style>
+.nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
+  height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:padding .4s ease,background-color .3s ease,box-shadow .3s ease}
+.nunki-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-mark .nm-name{display:block;overflow:hidden;max-width:12em;margin-left:7px;white-space:nowrap;
+  font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px);transition:max-width .45s ease,margin .45s ease,opacity .3s ease}
+.nunki-mark.nm-min{padding:0 5px}
+.nunki-mark.nm-min .nm-name{max-width:0;margin-left:0;opacity:0}
+.nunki-mark:hover,.nunki-mark:focus-visible{padding:0 14px 0 6px;background:rgba(251,248,239,.97);outline:none}
+.nunki-mark:hover .nm-name,.nunki-mark:focus-visible .nm-name{max-width:12em;margin-left:7px;opacity:1}
+.nunki-mark:hover svg,.nunki-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-mark:focus-visible{box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+@media (max-width:600px){.nunki-mark,.nunki-mark:hover{padding:0 5px}.nunki-mark .nm-name{display:none}}
+@media (prefers-reduced-motion:reduce){.nunki-mark,.nunki-mark svg,.nunki-mark .nm-name{transition:none}}
+@media print{.nunki-mark{display:none}}
+</style>
+<a class="nunki-mark" href="/" title="alle wanden" aria-label="adem, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">adem</span></a>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
+<!-- /nunki:mark -->
+<div id="wall"></div>
+<canvas id="trail"></canvas>
+<script>
+'use strict';
+// ---------------------------------------------------------------------------
+// adem — a wall about what moves us.
+// one day of breathing, from the first light to the night. a dandelion at
+// dawn, a tree that breathes out what the lungs breathe in, a day's breaths
+// counted out as dots, the wind and its scale, seeds that fly on a vortex,
+// clouds, a wind harp you can play, ruach (breath, wind and spirit in one
+// word), starlings at sunset that nobody leads, a flower that breathes with
+// you (after frank's own breath of life meditation), a fogged window you can
+// write on, and at night the long journey of one breath round the earth.
+// the series now has its elements: water (getij), wood (ringen), fields of
+// light (velden), form (patronen), and air.
+// you are the wind here: where you move, the air moves, and what is light
+// enough goes with it. tap for a gust; sound only ever after a tap.
+// the engine (tiles, queued strokes, torn paper, pencil lettering) follows
+// the technique of the fable wall that inspired it.
+// ?fast draws at full speed (the build's stills), ?still draws everything at
+// once without any animation (for checking renders), ?hud shows frame timing.
+// ---------------------------------------------------------------------------
+const TAU = Math.PI*2;
+const qs = new URLSearchParams(location.search);
+const SEED = +(qs.get('s')||7);
+const FAST = qs.has('fast');
+const STILL = qs.has('still');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------- rng ----------------
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function stream(n){const f=mul32((n*2654435761)>>>0);for(let i=0;i<9;i++)f();return f}
+const rd=(R,a,b)=>a+R()*(b-a);
+const ri=(R,a,b)=>Math.floor(rd(R,a,b+1));
+const ch_=(R,p)=>R()<p;
+const pk=(R,arr)=>arr[(R()*arr.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// ---------------- noise ----------------
+function h2(x,y,s){const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)}
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+  const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  return h2(xi,yi,s)*(1-u)*(1-v)+h2(xi+1,yi,s)*u*(1-v)+h2(xi,yi+1,s)*(1-u)*v+h2(xi+1,yi+1,s)*u*v}
+function fbm(x,y,s,o){let a=.5,f=1,t=0,n=0;for(let i=0;i<o;i++){t+=vn(x*f,y*f,s+i*17)*a;n+=a;a*=.5;f*=2.03}return t/n}
+
+// ---------------- colour ----------------
+const INK=[42,37,31], CINK=[238,231,210];
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const shade=(c,k)=>[c[0]*(1-k),c[1]*(1-k),c[2]*(1-k)];
+const tint=(c,k)=>[c[0]+(255-c[0])*k,c[1]+(255-c[1])*k,c[2]+(255-c[2])*k];
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+let CUR=INK;
+const CREAM=[246,241,228], RICE=[251,249,242], PARCH=[232,214,178], SEPIA=[96,64,40], GRAPH=[70,70,78],
+      SKYB=[112,156,206], CLOUDW=[253,253,251], LEAF=[96,140,70], LEAFL=[146,182,92], LUNG=[226,138,140], LUNGD=[176,74,88],
+      GOLD=[214,178,108], GOLDL=[244,216,146], ROSE=[208,122,132], VIOL=[132,110,184], NIGHTB=[40,44,74], WARM=[250,208,122],
+      BARK=[104,78,54], DUSK=[60,50,70], SNOW=[240,244,250];
+function ramp(st,t){
+  if(t<=st[0][0])return st[0][1];
+  for(let i=1;i<st.length;i++)if(t<=st[i][0]){const a=st[i-1],b=st[i];return mix(a[1],b[1],(t-a[0])/((b[0]-a[0])||1))}
+  return st[st.length-1][1];
+}
+// the sky of one day: dawn at the top of the wall, deep night at the bottom
+const SKY=[[0,[246,232,224]],[700,[243,235,231]],[1500,[232,237,241]],[3000,[220,232,242]],[5200,[211,227,242]],[7000,[222,230,238]],
+           [8300,[240,226,206]],[9300,[243,212,178]],[10100,[228,176,168]],[10900,[166,138,170]],[11700,[84,82,124]],[12600,[40,44,74]],[14400,[22,24,44]]];
+const skyAt=y=>ramp(SKY,y);
+const lumOf=c=>(.299*c[0]+.587*c[1]+.114*c[2])/255;
+const lumAt=y=>lumOf(skyAt(y));
+const inkAt=y=>lumAt(y)<.5?CINK:INK;
+// ---------------- the wall ----------------
+const LW=1600, TILEH=1200, PH=1200, NP=12, TOTALH=NP*PH;
+const NT=Math.ceil(TOTALH/TILEH);
+let S=Math.min(1.35, Math.max(1, window.devicePixelRatio||1));
+if(navigator.deviceMemory && navigator.deviceMemory<8) S=1.1;
+const wallEl=document.getElementById('wall');
+wallEl.style.height=(TOTALH/LW*100)+'vw';
+const TILES=[];
+for(let i=0;i<NT;i++){
+  const y0=i*TILEH, h=Math.min(TILEH+2, TOTALH-y0);
+  const cv=document.createElement('canvas');
+  cv.width=Math.round(LW*S); cv.height=Math.round(h*S);
+  cv.style.top=(y0/LW*100)+'vw';
+  cv.style.height=(h/LW*100)+'vw';
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.lineCap='round'; cx.lineJoin='round';
+  TILES.push({cv,cx,y0,h,q:[],qi:0,done:false,active:i===0});
+}
+let GENDONE=false;
+// route one drawing act to every tile it touches; whole passages of the wall
+// can be shifted down as one piece by GEN_DY
+let DIRECT=null, GEN_DY=0;
+let COMP=null; // when set (e.g. 'lighter'), every mark queued meanwhile is drawn with that blend: light on dark glows
+function emit(y0,y1,fn){
+  if(COMP){const f0=fn,cm=COMP;fn=c=>{c.save();c.globalCompositeOperation=cm;f0(c);c.restore()}}
+  if(DIRECT){
+    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
+    else fn(DIRECT.cx);
+    return;
+  }
+  const dy=GEN_DY;
+  const f=dy?cx=>{cx.save();cx.translate(0,dy);fn(cx);cx.restore()}:fn;
+  const a=clamp(Math.floor((y0+dy-60)/TILEH),0,NT-1), b=clamp(Math.floor((y1+dy+60)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++) TILES[i].q.push(f);
+}
+// ---------------- geometry ----------------
+function resample(pts,step){
+  if(pts.length<2)return pts.slice();
+  const out=[[pts[0][0],pts[0][1]]];let need=step;
+  for(let i=1;i<pts.length;i++){
+    let x0=pts[i-1][0],y0=pts[i-1][1];
+    const x1=pts[i][0],y1=pts[i][1];
+    let d=Math.hypot(x1-x0,y1-y0);
+    while(d>=need&&d>0){const t=need/d;x0+=(x1-x0)*t;y0+=(y1-y0)*t;out.push([x0,y0]);d=Math.hypot(x1-x0,y1-y0);need=step}
+    need-=d;
+  }
+  const last=pts[pts.length-1],le=out[out.length-1];
+  if(Math.hypot(last[0]-le[0],last[1]-le[1])>step*.2||out.length<2)out.push([last[0],last[1]]);
+  return out;
+}
+function chaikin(pts,closed,it){
+  while(it-->0){
+    const out=[],n=pts.length;
+    if(n<3)return pts;
+    if(!closed)out.push(pts[0]);
+    const end=closed?n:n-1;
+    for(let i=0;i<end;i++){
+      const a=pts[i],b=pts[(i+1)%n];
+      out.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);
+    }
+    if(!closed)out.push(pts[n-1]);
+    pts=out;
+  }
+  return pts;
+}
+function bbox(pts){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+  return[x0,y0,x1,y1]}
+function blob(R,cx,cy,rx,ry){
+  const rot=rd(R,0,TAU),ph=rd(R,0,7),n=14,pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const m=1+.16*Math.sin(t*2+ph)+.09*Math.sin(t*5+ph*2.1);
+    const x=Math.cos(t)*rx*m,y=Math.sin(t)*ry*m;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  return chaikin(pts,true,1);
+}
+function rotPts(pts,cx,cy,rot){
+  const co=Math.cos(rot),sn=Math.sin(rot);
+  return pts.map(p=>[cx+(p[0]-cx)*co-(p[1]-cy)*sn, cy+(p[0]-cx)*sn+(p[1]-cy)*co]);
+}
+function spiralPts(cx,cy,rOut,rIn,turns,ph,dir=1){
+  const n=Math.max(24,Math.round(turns*30)),pts=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n,th=ph+dir*t*turns*TAU,r=rOut+(rIn-rOut)*t;
+    pts.push([cx+Math.cos(th)*r,cy+Math.sin(th)*r]);
+  }
+  return pts;
+}
+// ---------------- the hand ----------------
+// every mark wanders off its intended path a little. pressed marks get a
+// second pass, the way a pen goes back over a line it means.
+function wob(R,rs,amp){
+  const n=rs.length,q=[];
+  const P1=rd(R,0,7),P2=rd(R,0,7),P3=rd(R,0,7);
+  const F1=rd(R,1.6,3.2),F2=rd(R,5,9);
+  for(let i=0;i<n;i++){
+    const t=i/(n-1);
+    const A=rs[Math.max(0,i-1)],B=rs[Math.min(n-1,i+1)];
+    let nx=-(B[1]-A[1]),ny=B[0]-A[0];
+    const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;
+    const off=amp*(.62*Math.sin(t*F1*2+P1)+.28*Math.sin(t*F2+P2)+.10*Math.sin(t*17+P3));
+    q.push([rs[i][0]+nx*off+rd(R,-.3,.3),rs[i][1]+ny*off+rd(R,-.3,.3)]);
+  }
+  return q;
+}
+function sk(R,pts,o={}){
+  const w=o.w??1.3, a0=o.a??.7;
+  const rs=resample(pts,Math.max(2.4,w*1.5));
+  const n=rs.length;
+  if(n<2)return;
+  const col=(o.col||CUR).slice();
+  const passes=o.passes??1;
+  const [bx0,by0,bx1,by1]=bbox(rs);
+  for(let p=0;p<passes;p++){
+    const amp=(o.amp??(w*.38+.55))*(p?1.5:1);
+    const alpha=a0*(p?.35:1);
+    const q=wob(R,rs,amp);
+    if(o.taper){
+      const segs=[];
+      for(let i=1;i<n;i++){
+        const t=i/(n-1);
+        let e;
+        if(o.taper==='out')e=.3+.7*(1-t);
+        else if(o.taper==='in')e=.3+.7*t;
+        else e=.35+.65*Math.min(1,Math.min(t,1-t)/.25);
+        segs.push([q[i-1],q[i],rgba(col,alpha*rd(R,.8,1)),Math.max(.5,w*e*rd(R,.85,1.15))]);
+      }
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';
+        for(const s of segs){
+          cx.strokeStyle=s[2];cx.lineWidth=s[3];
+          cx.beginPath();cx.moveTo(s[0][0],s[0][1]);cx.lineTo(s[1][0],s[1][1]);cx.stroke();
+        }
+      });
+    } else {
+      const lifts=[];
+      for(let i=0;i<n;i++)lifts.push(o.gap?ch_(R,o.gap):false);
+      const st=rgba(col,alpha), lw=w*rd(R,.85,1.12);
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';cx.lineJoin='round';
+        cx.beginPath();
+        let lift=false;
+        for(let i=0;i<n;i++){
+          if(!i||lift)cx.moveTo(q[i][0],q[i][1]);else cx.lineTo(q[i][0],q[i][1]);
+          lift=lifts[i];
+        }
+        cx.strokeStyle=st;cx.lineWidth=lw;cx.stroke();
+      });
+    }
+    if(p===0&&w>=1.9&&!o.noDust){
+      const specks=[];
+      for(let i=0;i<n;i+=3){
+        if(ch_(R,.6))continue;
+        const sz=rd(R,.6,1.2);
+        specks.push([q[i][0]+rd(R,-w,w)-sz/2,q[i][1]+rd(R,-w,w)-sz/2,sz,rgba(col,a0*rd(R,.14,.3))]);
+      }
+      if(specks.length)emit(by0,by1,cx=>{for(const s of specks){cx.fillStyle=s[3];cx.fillRect(s[0],s[1],s[2],s[2])}});
+    }
+  }
+}
+// a stroke that dies away toward x1 — for things i only half-hold
+function fadeStroke(R,pts,o,x0,x1){
+  const rs=resample(pts,4);
+  let run=[],runA=1;
+  const span=x1-x0;
+  const flush=()=>{if(run.length>1)sk(R,run,{...o,a:(o.a??.6)*runA});run=[]};
+  for(const p of rs){
+    const m=clamp((x1-p[0])/span,0,1);
+    if(m<.06){flush();continue}
+    if(run.length===0)runA=m;
+    run.push(p);
+    if(Math.abs(m-runA)>.22){flush();run=[p];runA=m}
+  }
+  flush();
+}
+function dotF(R,x,y,r,a,col){
+  const c=(col||CUR).slice(),pts=[];
+  const n=8,ph=rd(R,0,7);
+  for(let i=0;i<=n;i++){
+    const t=i/n*TAU,m=1+.2*Math.sin(t*2+ph);
+    pts.push([x+Math.cos(t)*r*m+rd(R,-.2,.2),y+Math.sin(t)*r*m+rd(R,-.2,.2)]);
+  }
+  emit(y-r-2,y+r+2,cx=>{
+    cx.beginPath();
+    for(let i=0;i<pts.length;i++){i?cx.lineTo(pts[i][0],pts[i][1]):cx.moveTo(pts[i][0],pts[i][1])}
+    cx.closePath();cx.fillStyle=rgba(c,a);cx.fill();
+  });
+}
+function ell(R,cx,cy,rx,ry,o={}){
+  const n=Math.max(10,Math.round((rx+ry)/2)),rot=rd(R,0,TAU),pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const x=Math.cos(t)*rx,y=Math.sin(t)*ry;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  pts.push(pts[0]);
+  sk(R,pts,o);
+}
+function fillPoly(pts,col,a){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const st=rgba(col,a),P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.fillStyle=st;cx.fill();
+  });
+}
+// scribble a region full, clipped, in one act
+function scribFill(R,pts,sp,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1;
+  const lines=[],slope=rd(R,-.2,.2);
+  for(let y=y0-sp;y<y1+sp;y+=sp*rd(R,.8,1.2)){
+    const raw=[],ph=rd(R,0,7);
+    for(let x=x0;x<=x1;x+=4)raw.push([x,y+(x-x0)*slope+Math.sin(x*.5+ph)*sp*.42+rd(R,-.8,.8)]);
+    if(raw.length>1)lines.push([wob(R,resample(raw,3.2),.55),rgba(col,a*rd(R,.6,1.05)),w*rd(R,.85,1.12)]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap='round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+function hatchFill(R,pts,sp,ang,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1.1, straight=o.straight;
+  const diag=Math.hypot(x1-x0,y1-y0),cx0=(x0+x1)/2,cy0=(y0+y1)/2;
+  const px=Math.cos(ang+Math.PI/2),py=Math.sin(ang+Math.PI/2);
+  const dx=Math.cos(ang),dy=Math.sin(ang);
+  const lines=[],n=Math.ceil(diag/sp);
+  for(let i=-n;i<=n;i++){
+    const t=i*sp+(straight?0:rd(R,-.2,.2)*sp);
+    const raw=[[cx0+px*t-dx*diag*.6,cy0+py*t-dy*diag*.6],[cx0+px*t+dx*diag*.6,cy0+py*t+dy*diag*.6]];
+    lines.push([straight?raw:wob(R,resample(raw,4),.7),rgba(col,a*(straight?1:rd(R,.6,1.1))),w*(straight?1:rd(R,.85,1.15))]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap=straight?'butt':'round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+// a soft coloured-pencil scrub, never quite inside the lines
+function scrub(R,cx,cy,r,col,a=.4){
+  const b=blob(R,cx,cy,r*rd(R,1,1.12),r*rd(R,.82,1));
+  fillPoly(b,col,.1);
+  scribFill(R,b,Math.max(3,r*.13),a,{col});
+}
+function spatter(R,x,y,r,n,col,a=.5){
+  const sd=ri(R,0,99999),c=col.slice();
+  emit(y-r,y+r,cx=>{
+    const RR=mul32(sd);
+    for(let i=0;i<n;i++){
+      const t=RR()*TAU,d=Math.sqrt(RR())*r;
+      const s=.8+RR()*RR()*2.2;
+      cx.fillStyle=rgba(c,a*(.3+RR()*.7));
+      cx.fillRect(x+Math.cos(t)*d,y+Math.sin(t)*d*.7,s,s*(.8+RR()*.5));
+    }
+  });
+}
+function drip(R,x,y,len,col,a=.3,w=2){
+  const pts=[[x,y]];
+  let px=x;
+  for(let d=0;d<len;d+=9){px+=rd(R,-1.4,1.4);pts.push([px,y+d])}
+  sk(R,pts,{col,w,a,taper:'out',amp:.4});
+  dotF(R,px,y+len,w*1.1,a*1.2,col);
+}
+function arrowHead(R,x,y,ang,sz,a,col,w=1.6){
+  for(const sd of[-1,1])
+    sk(R,[[x,y],[x-Math.cos(ang+sd*.5)*sz,y-Math.sin(ang+sd*.5)*sz]],{col,w,a,taper:'out'});
+}
+function zigOut(R,x,y,rx,ry){
+  const pts=[];
+  const n=ri(R,6,9);
+  for(let i=0;i<=n;i++)pts.push([x+(i/n*2-1)*rx+rd(R,-4,4),y+((i%2)?-1:1)*ry*rd(R,.5,1)]);
+  sk(R,pts,{w:1.4,a:.55,amp:1});
+}
+function spark(R,x,y,r,o={}){
+  const n=o.nR??ri(R,5,8);
+  const rot=rd(R,0,TAU),col=o.col||CUR;
+  for(let i=0;i<n;i++){
+    const a=rot+i/n*TAU+rd(R,-.14,.14)/n*TAU;
+    const r0=r*rd(R,.22,.34),r1=r*rd(R,.85,1.1)*(i%2?.78:1);
+    sk(R,[[x+Math.cos(a)*r0,y+Math.sin(a)*r0],[x+Math.cos(a)*r1,y+Math.sin(a)*r1]],
+      {col,w:o.w??1.3,a:(o.a??.75)*rd(R,.8,1),taper:'out',amp:.3});
+  }
+  if(!o.noCenter&&ch_(R,.55))dotF(R,x,y,Math.max(1,r*.13),(o.a??.75),col);
+}
+// ---------------- asemic writing ----------------
+// a few drawings need writing that only looks like writing: a field journal nobody can read.
+function aword(R,x,y,h,nl,o={}){
+  const pts=[[x,y+rd(R,-.1,.1)*h]];
+  let cx=x;
+  for(let i=0;i<nl;i++){
+    const up=y-h*rd(R,.32,.62)-(ch_(R,.13)?h*rd(R,.4,.75):0);
+    const dn=y+(ch_(R,.09)?h*rd(R,.3,.55):h*rd(R,-.06,.12));
+    cx+=h*rd(R,.18,.3);pts.push([cx,up]);
+    cx+=h*rd(R,.18,.3);pts.push([cx,dn]);
+  }
+  sk(R,chaikin(pts,false,1),{col:o.col,w:o.w??.9,a:o.a??.55,amp:.28});
+  return cx-x;
+}
+function atext(R,xa,xb,y,h,o={}){
+  let cx=xa,guard=0;
+  while(cx<xb-h*.9&&guard++<70){
+    let nl=ri(R,2,5);
+    const est=nl*h*.5;
+    if(cx+est>xb)nl=Math.max(1,Math.floor((xb-cx)/(h*.5)));
+    if(nl<1)break;
+    const adv=aword(R,cx,y,h,nl,o);
+    cx+=adv+h*rd(R,.45,.75);
+  }
+}
+
+// ---------------- hand lettering ----------------
+// a real alphabet, one wobbly stroke at a time. used rarely, like pencil notes.
+const A_=(cx,cy,rx,ry,a0,a1,n=9)=>{const p=[];for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*rx,cy+Math.sin(t)*ry])}return p};
+const GL={};
+const G=(chr,w,...strokes)=>GL[chr]={w,s:strokes};
+G('a',.62,A_(.27,.73,.23,.26,-.5,5.8),[[.5,.48],[.52,.96],[.6,1]]);
+G('b',.6,[[.1,.05],[.1,1]],[[.1,.56],[.34,.47],[.54,.62],[.53,.86],[.3,1],[.1,.9]]);
+G('c',.58,A_(.3,.74,.25,.26,.6,5.68));
+G('d',.62,A_(.28,.74,.24,.26,-.5,5.8),[[.52,.05],[.53,.95],[.6,1]]);
+G('e',.56,[[.08,.73],[.48,.7],[.49,.54],[.3,.45],[.1,.56],[.07,.8],[.26,1],[.5,.93]]);
+G('f',.46,[[.44,.12],[.32,.05],[.22,.14],[.2,1]],[[.05,.48],[.42,.46]]);
+G('g',.6,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.48],[.53,1.12],[.42,1.36],[.16,1.32]]);
+G('h',.58,[[.1,.05],[.1,1]],[[.1,.62],[.3,.47],[.48,.56],[.5,1]]);
+G('i',.26,[[.13,.5],[.13,.96],[.18,1]],[[.11,.27],[.15,.3]]);
+G('j',.34,[[.22,.5],[.24,1.15],[.12,1.36],[-.02,1.28]],[[.2,.27],[.24,.3]]);
+G('k',.52,[[.1,.05],[.1,1]],[[.44,.48],[.12,.76]],[[.2,.68],[.46,1]]);
+G('l',.3,[[.14,.05],[.14,.93],[.22,1]]);
+G('m',.68,[[.07,1],[.07,.5]],[[.07,.62],[.2,.46],[.33,.56],[.34,1]],[[.34,.62],[.47,.46],[.6,.56],[.61,1]]);
+G('n',.56,[[.09,1],[.09,.5]],[[.09,.62],[.28,.46],[.46,.56],[.48,1]]);
+G('o',.6,A_(.29,.73,.24,.26,-1.2,-1.2+TAU*.97,10));
+G('p',.6,[[.1,.5],[.1,1.36]],[[.1,.57],[.34,.47],[.53,.62],[.52,.86],[.3,.98],[.1,.9]]);
+G('q',.62,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.5],[.52,1.22],[.62,1.34]]);
+G('r',.44,[[.1,1],[.1,.5]],[[.1,.68],[.22,.5],[.42,.46]]);
+G('s',.52,[[.46,.52],[.24,.45],[.09,.58],[.22,.72],[.42,.8],[.46,.93],[.24,1],[.06,.92]]);
+G('t',.48,[[.26,.12],[.25,.9],[.36,1]],[[.08,.44],[.46,.43]]);
+G('u',.58,[[.08,.5],[.08,.84],[.22,1],[.42,.9],[.45,.5]],[[.45,.6],[.47,.96],[.54,1]]);
+G('v',.5,[[.06,.5],[.26,1],[.46,.5]]);
+G('w',.62,[[.04,.5],[.17,1],[.3,.62],[.43,1],[.57,.5]]);
+G('x',.52,[[.07,.5],[.47,1]],[[.47,.5],[.07,1]]);
+G('y',.54,[[.07,.5],[.28,1]],[[.5,.5],[.24,1.14],[.06,1.34]]);
+G('z',.52,[[.07,.5],[.45,.5],[.06,1],[.47,1]]);
+G('2',.54,[[.08,.3],[.18,.12],[.38,.12],[.44,.32],[.07,1],[.47,1]]);
+G('0',.56,A_(.27,.55,.22,.44,-1.3,-1.3+TAU*.97,10));
+G('6',.52,[[.4,.1],[.18,.34],[.09,.68],[.2,.98],[.4,.94],[.46,.7],[.3,.56],[.11,.66]]);
+G('8',.54,A_(.27,.31,.16,.2,-1.57,-1.57+TAU),A_(.27,.76,.2,.23,-1.57,-1.57+TAU));
+G('.',.24,[[.1,.93],[.13,.97]]);
+G(',',.24,[[.14,.9],[.15,1.02],[.04,1.16]]);
+G("'",.2,[[.12,.05],[.09,.26]]);
+G('-',.44,[[.05,.7],[.38,.68]]);
+G('—',.66,[[.03,.7],[.6,.67]]);
+G('·',.24,[[.08,.68],[.12,.72]]);
+G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
+G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
+G(' ',.42);
+function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+function write(R,t,x,y,sz,o={}){
+  const a=o.a??.7,col=o.col;
+  let px=o.cen?x-measure(t,sz)/2:x;
+  const ph=rd(R,0,7);
+  for(let i=0;i<t.length;i++){
+    const c=t[i],g=GL[c]||GL[' '];
+    const yb=y+Math.sin(i*.8+ph)*sz*.045;
+    for(const st of(g.s||[])){
+      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
+      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
+    }
+    px+=(g.w+.1)*sz;
+  }
+}
+// ---------------- torn paper ----------------
+// the wall is a collage: sheets of coloured paper glued down, edges torn by
+// hand, each showing its white fibrous core where it ripped.
+function tornPath(R,x0,y0,x1,y1,rough,sd){
+  const pts=[];
+  const side=(ax,ay,bx,by,nx,ny,id)=>{
+    const L=Math.hypot(bx-ax,by-ay),steps=Math.max(3,Math.round(L/26));
+    for(let i=0;i<steps;i++){
+      const t=i/steps;
+      let off=(fbm(t*3.1+id*7,id*3.3,sd,3)-.5)*2*rough;
+      if(h2(i*1.7,id*9.1,sd)>0.93)off+=rd(R,8,22)*(h2(i,id,sd+3)>.5?1:-1);
+      pts.push([ax+(bx-ax)*t+nx*off,ay+(by-ay)*t+ny*off]);
+    }
+  };
+  side(x0,y0,x1,y0,0,1,0);
+  side(x1,y0,x1,y1,-1,0,1);
+  side(x1,y1,x0,y1,0,-1,2);
+  side(x0,y1,x0,y0,1,0,3);
+  return pts;
+}
+function sheet(R,x0,y0,x1,y1,col,o={}){
+  const rough=o.rough??16;
+  const sd=ri(R,0,9999);
+  let P=tornPath(R,x0,y0,x1,y1,rough,sd);
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  // the shadow the paper casts on what is beneath it
+  fillPoly(P.map(p=>[p[0]+6,p[1]+8]),[12,9,7],.28);
+  fillPoly(P,col,1);
+  fillPoly(P,col,1);
+  const [bx0,by0,bx1,by1]=bbox(P);
+  const PP=P.map(p=>p.slice());
+  // grain: the tooth of the paper
+  const gsd=ri(R,0,99999);
+  emit(by0,by1,cx=>{
+    const RR=mul32(gsd);
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<PP.length;i++){i?cx.lineTo(PP[i][0],PP[i][1]):cx.moveTo(PP[i][0],PP[i][1])}
+    cx.closePath();cx.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/1900);
+    for(let i=0;i<n;i++){
+      const s=.8+RR()*1.1;
+      const dark=RR()<.62;
+      cx.fillStyle=dark?'rgba(45,40,34,.05)':'rgba(255,252,244,.07)';
+      cx.fillRect(bx0+RR()*(bx1-bx0),by0+RR()*(by1-by0),s,s);
+    }
+    for(let i=0;i<n/22;i++){
+      const fx=bx0+RR()*(bx1-bx0),fy=by0+RR()*(by1-by0),fa=RR()*TAU,fl=3+RR()*7;
+      cx.strokeStyle='rgba(45,40,34,.05)';cx.lineWidth=.7;
+      cx.beginPath();cx.moveTo(fx,fy);cx.lineTo(fx+Math.cos(fa)*fl,fy+Math.sin(fa)*fl);cx.stroke();
+    }
+    cx.restore();
+  });
+  // torn edge: the white fibrous core
+  if(!o.noCore){
+    const core=P.concat([P[0]]);
+    sk(R,core,{col:[251,247,237],w:2,a:.42,amp:.4,gap:.24,noDust:true});
+    sk(R,core.map(p=>[p[0]+rd(R,1,3),p[1]+rd(R,1,3)]),{col:shade(col,.22),w:1,a:.2,amp:.5,gap:.4,noDust:true});
+  }
+  return P;
+}
+// a little pinned study: torn scrap + shadow + tape at two corners
+function scrap(R,x,y,w,h,col,rot){
+  const P=sheet(R,x-w/2,y-h/2,x+w/2,y+h/2,col,{rough:8,rot});
+  const [bx0,by0,bx1,by1]=bbox(P);
+  for(const cnr of[[bx0+14,by0+12],[bx1-16,by1-12]]){
+    const tp=rotPts([[cnr[0]-22,cnr[1]-8],[cnr[0]+22,cnr[1]-8],[cnr[0]+22,cnr[1]+9],[cnr[0]-22,cnr[1]+9]],cnr[0],cnr[1],rd(R,.5,.9));
+    fillPoly(tp,[240,234,216],.35);
+    sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+  }
+}
+// ---------------- small things ----------------
+function enso(R,cx,cy,r,frac,col,o={}){
+  const a0=rd(R,0,TAU),pts=[];
+  const n=Math.round(40*frac);
+  for(let i=0;i<=n;i++){
+    const t=a0+i/n*TAU*frac;
+    const rr2=r*(1+.03*Math.sin(i*.7));
+    pts.push([cx+Math.cos(t)*rr2,cy+Math.sin(t)*rr2]);
+  }
+  sk(R,pts,{col,w:o.w??9,a:o.a??.75,amp:3,taper:'out',noDust:true});
+  sk(R,pts.map(p=>[p[0]+rd(R,2,5),p[1]+rd(R,2,4)]),{col,w:(o.w??9)*.4,a:(o.a??.75)*.3,amp:3.4,gap:.12,noDust:true});
+  return a0+TAU*frac; // where the brush lifted
+}
+function birdM(R,x,y,s,col,a=.6){
+  sk(R,[[x-s,y],[x-s*.4,y-s*.55],[x,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+  sk(R,[[x,y],[x+s*.4,y-s*.55],[x+s,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+}
+
+// ---------------- replay engine ----------------
+let CSSK=innerWidth/LW;
+addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+// living things: small canvases laid over the wall, switched on once the sheet
+// beneath them is drawn, and only moving while they are in view
+const LIVE=[];
+// a pause in the drawing of one sheet, so a construction can be watched
+function pause(ms,y=600){if(DIRECT)return;const i=clamp(Math.floor((y+GEN_DY)/TILEH),0,NT-1);TILES[i].q.push({pause:ms})}
+function live(x,y,w,h,o){
+  const L={x,y:y+GEN_DY,w,h,...o,cv:null,cx:null,on:false};
+  LIVE.push(L);
+  return L;
+}
+function makeLive(L){
+  const cv=document.createElement('canvas'),sc=L.sc??S;
+  cv.className='live';
+  cv.width=Math.round(L.w*sc);cv.height=Math.round(L.h*sc);
+  cv.style.left=(L.x/LW*100)+'%';cv.style.width=(L.w/LW*100)+'%';
+  cv.style.top=(L.y/LW*100)+'vw';cv.style.height=(L.h/LW*100)+'vw';
+  cv.style.zIndex=2;
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.setTransform(sc,0,0,sc,-L.x*sc,-L.y*sc);
+  cx.lineCap='round';cx.lineJoin='round';
+  L.cv=cv;L.cx=cx;L.sc=sc;L.on=true;
+  if(L.init)L.init(cx,L);
+}
+function liveReady(L){
+  const a=clamp(Math.floor(L.y/TILEH),0,NT-1),b=clamp(Math.floor((L.y+L.h)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++)if(!TILES[i].done)return false;
+  return true;
+}
+let HUD=null,hudN=0,hudT=0,hudBusy=0,hudMax=0;
+if(qs.has('hud')){HUD=document.createElement('div');HUD.id='hud';document.body.appendChild(HUD)}
+function tick(now){
+  const tb=performance.now();
+  const sy=scrollY/CSSK, vh=innerHeight/CSSK;
+  for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
+  const budget=(FAST||RM)?200:7;
+  const t0=performance.now();
+  for(const T of TILES){
+    if(!T.active||T.done)continue;
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){
+      const it=T.q[T.qi];
+      if(typeof it!=='function'){
+        // a breath in the drawing: the hand waits before the next figure
+        if(FAST||RM){T.qi++;continue}
+        if(!T.wait)T.wait=now+it.pause;
+        if(now<T.wait)break;
+        T.wait=0;T.qi++;continue;
+      }
+      T.qi++;it(T.cx);
+      if(performance.now()-t0>budget)break;
+    }
+    if(GENDONE&&T.qi>=T.q.length){T.done=true;T.q=null;readyRestless(T)}
+    if(performance.now()-t0>budget)break;
+  }
+  runRestless(now);
+  for(const L of LIVE){
+    if(!L.on){
+      if(GENDONE&&liveReady(L)){
+        makeLive(L);
+        // a first picture straight away, wherever it is, so a still always has it
+        if(L.frame){L.frame(L.cx,now,L);L.drawn=true}
+        if(FAST){L.cv.style.transition='none';L.cv.classList.add('on')}else requestAnimationFrame(()=>L.cv.classList.add('on'));
+      }
+      continue;
+    }
+    if(L.frame&&(!RM||!L.drawn)&&L.y+L.h>sy-60&&L.y<sy+vh+60){L.frame(L.cx,now,L);L.drawn=true}
+  }
+  drawTrail(now);
+  if(HUD){
+    const busy=performance.now()-tb;hudBusy+=busy;hudMax=Math.max(hudMax,busy);hudN++;
+    if(now-hudT>1000){HUD.textContent=`${(hudN*1000/(now-hudT)).toFixed(0)} fps\n${(hudBusy/hudN).toFixed(1)} ms busy\n${hudMax.toFixed(1)} ms max`;hudN=0;hudBusy=0;hudMax=0;hudT=now}
+  }
+  requestAnimationFrame(tick);
+}
+// for stills: draw every sheet at once, no animation at all
+function drawAllNow(){
+  for(const T of TILES){
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){const it=T.q[T.qi++];if(typeof it==='function')it(T.cx)}
+    T.done=true;T.q=null;
+  }
+  for(const L of LIVE){makeLive(L);L.cv.classList.add('on');L.cv.style.transition='none';if(L.frame)L.frame(L.cx,performance.now(),L)}
+}
+// ---------------- restlessness ----------------
+// a few marks cannot hold still. every so often one erases itself and is
+// drawn again, never quite the same, the way a geometer goes over a figure once more.
+const RESTLESS=[];
+function restless(x,y,w,h,fn){RESTLESS.push({x,y:y+GEN_DY,w,h,fn,dy:GEN_DY,img:null,next:0,tile:null})}
+function readyRestless(T){
+  if(RM)return;
+  for(const r of RESTLESS){
+    if(r.img)continue;
+    if(r.y>=T.y0&&r.y+r.h<=T.y0+T.h&&T.done){
+      r.tile=T;
+      const px=Math.round(r.x*S),py=Math.round((r.y-T.y0)*S);
+      const pw=Math.round(r.w*S),ph=Math.round(r.h*S);
+      try{r.img=T.cx.getImageData(px,py,pw,ph);r.px=px;r.py=py;
+          r.next=performance.now()+2000+Math.random()*3000;}catch(e){}
+    }
+  }
+}
+let restR=stream(SEED*77+3);
+function runRestless(now){
+  for(const r of RESTLESS){
+    if(!r.img||now<r.next)continue;
+    const cx=r.tile.cx;
+    cx.putImageData(r.img,r.px,r.py);
+    cx.save();
+    cx.setTransform(S,0,0,S,0,-r.tile.y0*S);
+    cx.beginPath();cx.rect(r.x,r.y,r.w,r.h);cx.clip();
+    DIRECT=r.tile; GEN_DY=r.dy;
+    r.fn(restR);
+    GEN_DY=0; DIRECT=null;
+    cx.restore();
+    r.next=now+2600+Math.random()*4200;
+  }
+}
+function hblob(R,cx,cy,rx,ry){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<14;i++){const t=i/14*TAU,m=1+.1*Math.sin(t*2+ph)+.05*Math.sin(t*5+ph*2.1);pts.push([cx+Math.cos(t)*rx*m,cy+Math.sin(t)*ry*m])}
+  return chaikin(pts,true,1);
+}
+function circ(R,cx,cy,r){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<40;i++){const t=i/40*TAU,m=1+.012*Math.sin(t*3+ph)+.008*Math.sin(t*7+ph*2.1);pts.push([cx+Math.cos(t)*r*m,cy+Math.sin(t)*r*m])}
+  return pts;
+}
+function ePts(cx,cy,rx,ry,rot,n=16){
+  const o=[];
+  for(let i=0;i<n;i++){const t=i/n*TAU,ux=Math.cos(t)*rx,uy=Math.sin(t)*ry;o.push([cx+ux*Math.cos(rot)-uy*Math.sin(rot),cy+ux*Math.sin(rot)+uy*Math.cos(rot)])}
+  return o;
+}
+function offsetPath(pts,d){
+  return pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny)||1;return[p[0]+nx/l*d,p[1]+ny/l*d]});
+}
+// the same line drawn several times, a little apart, each strand its own colour
+function strands(R,pts,colFn,n,spread,o){
+  for(let s=0;s<n;s++){
+    const u=n>1?s/(n-1):.5,col=colFn(u);
+    sk(R,n>1?offsetPath(pts,(u-.5)*spread):pts,{...o,col,noDust:true});
+  }
+}
+// a soft light; it may run over into the next scene, so it is only clipped far outside its own
+function glow(R,x,y,r,col,a,sx=1){
+  const t=Math.max(y-r,-70),bt=Math.min(y+r,1270);
+  if(bt<=t)return;
+  emit(t,bt,c2=>{
+    c2.save();c2.beginPath();c2.rect(x-r*sx,t,2*r*sx,bt-t);c2.clip();
+    c2.translate(x,y);c2.scale(sx,1);
+    const g=c2.createRadialGradient(0,0,0,0,0,r);
+    g.addColorStop(0,rgba(col,a));g.addColorStop(.4,rgba(col,a*.35));g.addColorStop(1,rgba(col,0));
+    c2.fillStyle=g;c2.fillRect(-r,-r,2*r,2*r);c2.restore();
+  });
+}
+function say(R,txt,left,dark,y=1100,sz=26){
+  const w=measure(txt,sz),x=left?112:1488-w;
+  write(R,txt,x,y,sz,{col:dark?CINK:INK,a:.9});
+}
+function inPoly(Pp,x,y){let c=false;for(let i=0,j=Pp.length-1;i<Pp.length;j=i++){const a=Pp[i],b=Pp[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+function dipLine(cx,cy,L,tilt,side,r0){
+  const pts=[];
+  const a=Math.max(.05,Math.asin(Math.sqrt(Math.min(1,r0/L)))),b=Math.PI-a;
+  for(let t=a;t<=b;t+=.035){
+    const r=L*Math.sin(t)*Math.sin(t);
+    const x=side*r*Math.sin(t),y=-r*Math.cos(t);
+    pts.push([cx+x*Math.cos(tilt)-y*Math.sin(tilt),cy+x*Math.sin(tilt)+y*Math.cos(tilt)]);
+  }
+  return pts;
+}
+function dustBatch(pts,col,B=150){
+  const c=col.slice();
+  for(let i=0;i<pts.length;i+=B){
+    const batch=pts.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    for(const p of batch){if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+    emit(y0-4,y1+4,c2=>{for(const p of batch){c2.fillStyle=rgba(c,p[3]);c2.beginPath();c2.arc(p[0],p[1],p[2],0,TAU);c2.fill()}});
+  }
+}
+// a line whose colour changes along its length
+function gradLine(R,pts,colFn,o,segs=9){
+  const n=pts.length;
+  for(let i=0;i<segs;i++){
+    const a=Math.floor((n-1)*i/segs),b=Math.min(n-1,Math.floor((n-1)*(i+1)/segs)+2);
+    if(b-a<1)continue;
+    sk(R,pts.slice(a,b+1),{...o,col:colFn((i+.5)/segs),noDust:true,taper:undefined});
+  }
+}
+
+// ---------------- the visitor: the wind ----------------
+// here you are the wind. the air on this wall is never quite still: a little
+// dust drifts through it. where you move, the air moves with you, and what is
+// light enough is carried along: dust, a breath of mist behind you, the seeds
+// of the dandelion. tap for a gust. sound only ever after a tap: the wind
+// round your hand, and the gust.
+const trailCv=document.getElementById('trail');
+const trailCx=trailCv.getContext('2d');
+let TRD=1;
+function sizeTrail(){
+  TRD=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*TRD;trailCv.height=innerHeight*TRD;
+  trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
+}
+sizeTrail();
+const WR=mul32(SEED*991+13);
+let IMP=[],MO=[],WI=[],SEEDS=[],lastPt=null,lastT=0,pSpeed=0,step=null,lastMove=0;
+// the air by itself: a slow drift to the east, curling as it goes
+function flow(x,y,t){
+  const s=.0021,T=t*.00004;
+  const th=vn(x*s+T,y*s-T*.7,3)*TAU*2,m=6+9*vn(x*s*.7-T,y*s*.7+T,5);
+  return[7+Math.cos(th)*m,-2+Math.sin(th)*m];
+}
+// the air round you, as you move through it
+function windAt(x,y,now){
+  const f=flow(x,y,now);let vx=f[0],vy=f[1];
+  for(const p of IMP){
+    const a=now-p.t;if(a>760)continue;
+    const w=(1-a/760),dx=x-p.x,dy=y-p.y,d2=dx*dx+dy*dy,r=p.r;
+    if(d2>r*r*6)continue;
+    const k=w*w*Math.exp(-d2/(2*r*r));
+    vx+=p.vx*k;vy+=p.vy*k;
+  }
+  return[vx,vy];
+}
+let AC=null,WN=null;
+function audio(){
+  if(!AC){
+    try{
+      AC=new (window.AudioContext||window.webkitAudioContext)();
+      const len=AC.sampleRate*3,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);
+      let b0=0,b1=0,b2=0;
+      for(let i=0;i<len;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0526;d[i]=(b0+b1+b2+w*.1848)*.12}
+      const n=AC.createBufferSource();n.buffer=b;n.loop=true;
+      const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=500;bp.Q.value=.5;
+      const g=AC.createGain();g.gain.value=0;
+      n.connect(bp);bp.connect(g);g.connect(AC.destination);n.start();
+      WN={g,bp,buf:b};
+    }catch(e){AC=null}
+  }
+  if(AC&&AC.state==='suspended')AC.resume();
+  return AC;
+}
+function whoosh(strength=1){
+  const ac=audio();if(!ac||!WN)return;
+  const t=ac.currentTime+.01,n=ac.createBufferSource(),bp=ac.createBiquadFilter(),g=ac.createGain();
+  n.buffer=WN.buf;bp.type='bandpass';bp.Q.value=.9;
+  bp.frequency.setValueAtTime(260,t);bp.frequency.exponentialRampToValueAtTime(1500,t+.35);bp.frequency.exponentialRampToValueAtTime(380,t+1.3);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.28*strength,t+.12);g.gain.exponentialRampToValueAtTime(.0005,t+1.5);
+  n.connect(bp);bp.connect(g);g.connect(ac.destination);n.start(t,Math.random()*2);n.stop(t+1.6);
+}
+const wallXY=e=>[e.clientX/CSSK,(e.clientY+scrollY)/CSSK];
+addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch')return;
+  const [x,y]=wallXY(e),t=performance.now();
+  if(lastPt){
+    const dt=Math.max(8,t-lastT)/1000,vx=(x-lastPt[0])/dt,vy=(y-lastPt[1])/dt,sp=Math.hypot(vx,vy);
+    pSpeed=pSpeed*.7+sp*.3;
+    if(sp>20){IMP.push({x,y,vx:clamp(vx,-1400,1400)*.55,vy:clamp(vy,-1400,1400)*.55,t,r:70+Math.min(90,sp*.05)});if(IMP.length>48)IMP.shift()}
+    // a breath of mist behind you
+    if(!step)step={d:0};
+    step.d+=Math.hypot(x-lastPt[0],y-lastPt[1]);
+    if(step.d>16&&!RM){step.d=0;WI.push({x,y,vx:vx*.2,vy:vy*.2,t,pts:[[x,y]],s:rd(WR,.8,1.4)});if(WI.length>70)WI.shift()}
+  }
+  lastPt=[x,y];lastT=t;lastMove=t;
+},{passive:true});
+function gust(x,y,strength=1){
+  const t=performance.now();
+  for(let k=0;k<12;k++){const a=k/12*TAU;IMP.push({x:x+Math.cos(a)*30,y:y+Math.sin(a)*30,vx:Math.cos(a)*420*strength,vy:Math.sin(a)*420*strength,t,r:110})}
+  if(IMP.length>80)IMP.splice(0,IMP.length-80);
+  if(!RM)for(let k=0;k<26;k++){const a=rd(WR,0,TAU),v=rd(WR,90,260)*strength;WI.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t,pts:[[x,y]],s:rd(WR,.9,1.6)})}
+}
+addEventListener('click',e=>{
+  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
+  const [x,y]=wallXY(e);if(y>TOTALH)return;
+  audio();whoosh(1);gust(x,y,1);
+});
+function spawnMote(vx0,vy0,vx1,vy1,edge){
+  const x=edge?vx0-20:rd(WR,vx0,vx1),y=rd(WR,vy0,vy1);
+  return{x,y,vx:0,vy:0,s:rd(WR,.7,1.7),a:rd(WR,.18,.5),px:x,py:y,tw:rd(WR,0,7)};
+}
+function drawTrail(now){
+  const c=trailCx,dt=Math.min(.05,(now-(drawTrail.last||now))/1000);drawTrail.last=now;
+  const vx0=-40,vx1=LW+40,vy0=scrollY/CSSK-40,vy1=(scrollY+innerHeight)/CSSK+40;
+  // keep a little dust in the air you can see
+  const want=RM?0:Math.round(60+90*(innerHeight/CSSK)/1100);
+  MO=MO.filter(m=>m.x>vx0-60&&m.x<vx1+60&&m.y>vy0-60&&m.y<vy1+60);
+  while(MO.length<want)MO.push(spawnMote(vx0,vy0,vx1,vy1,MO.length>want*.7&&ch_(WR,.5)));
+  IMP=IMP.filter(p=>now-p.t<760);
+  WI=WI.filter(w=>now-w.t<1900);
+  SEEDS=SEEDS.filter(s=>now-s.t<45000&&s.y>vy0-400&&s.y<vy1+400&&s.x>-300&&s.x<LW+300);
+  if(WN&&AC){const moving=now-lastMove<140;WN.g.gain.setTargetAtTime(moving?clamp(pSpeed/2600,0,1)*.07:0,AC.currentTime,.12);WN.bp.frequency.setTargetAtTime(380+clamp(pSpeed/2400,0,1)*900,AC.currentTime,.15)}
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);
+  if(RM&&!SEEDS.length)return;
+  const K=TRD*CSSK;c.setTransform(K,0,0,K,0,-scrollY*TRD);
+  const px=1/CSSK;c.lineCap='round';
+  // dust
+  for(const m of MO){
+    const w=windAt(m.x,m.y,now),k=1-Math.exp(-dt*2.6);
+    m.vx+=(w[0]-m.vx)*k;m.vy+=(w[1]-m.vy)*k+Math.sin(now*.001+m.tw)*.6*dt;
+    m.px=m.x;m.py=m.y;m.x+=m.vx*dt;m.y+=m.vy*dt;
+    const lt=lumAt(m.y)>.5,col=lt?[96,110,140]:[232,236,250],sp=Math.hypot(m.vx,m.vy);
+    c.strokeStyle=rgba(col,m.a*(lt?.8:.9));c.lineWidth=m.s*px*1.2;
+    c.beginPath();c.moveTo(m.px-(sp>40?m.vx*.03:0),m.py-(sp>40?m.vy*.03:0));c.lineTo(m.x+.01,m.y);c.stroke();
+  }
+  // the mist you leave behind
+  for(const w of WI){
+    const a=now-w.t,u=a/1900,f=windAt(w.x,w.y,now),k=1-Math.exp(-dt*1.8);
+    w.vx+=(f[0]-w.vx)*k;w.vy+=(f[1]-w.vy)*k-6*dt;
+    w.x+=w.vx*dt;w.y+=w.vy*dt;w.pts.push([w.x,w.y]);if(w.pts.length>16)w.pts.shift();
+    if(w.pts.length<2)continue;
+    const lt=lumAt(w.y)>.5,col=lt?[124,142,174]:[226,232,248];
+    c.strokeStyle=rgba(col,(lt?.32:.36)*(1-u)*(1-u));c.lineWidth=w.s*(1+u*2.2)*px*1.4;
+    c.beginPath();w.pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+  }
+  // seeds that let go
+  for(const s of SEEDS){
+    const f=windAt(s.x,s.y,now),k=1-Math.exp(-dt*1.4);
+    s.vx+=(f[0]-s.vx)*k;s.vy+=(f[1]-s.vy)*k+(-4+Math.sin(now*.0013+s.tw)*6)*dt;
+    s.x+=s.vx*dt;s.y+=s.vy*dt;s.rot+=(s.vx*.002+Math.sin(now*.002+s.tw)*.4)*dt;
+    const lt=lumAt(s.y)>.5,col=lt?[110,100,90]:[236,232,220],fl=lt?[255,255,255]:[240,240,248];
+    const ang=-Math.PI/2+s.rot,ux=Math.cos(ang),uy=Math.sin(ang),r=s.s;
+    c.strokeStyle=rgba(col,.75);c.lineWidth=.8*px;
+    c.beginPath();c.moveTo(s.x,s.y);c.lineTo(s.x-ux*r*1.8,s.y-uy*r*1.8);c.stroke();
+    c.fillStyle=rgba(shade(col,.3),.85);c.beginPath();c.ellipse(s.x-ux*r*2,s.y-uy*r*2,r*.3,r*.1,ang,0,TAU);c.fill();
+    c.strokeStyle=rgba(lt?[150,140,130]:fl,.7);c.lineWidth=.6*px;
+    c.beginPath();for(let q=0;q<11;q++){const t=ang+(q/10-.5)*2.3;c.moveTo(s.x,s.y);c.lineTo(s.x+Math.cos(t)*r,s.y+Math.sin(t)*r)}c.stroke();
+    if(lt){c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.arc(s.x+ux*r*.55,s.y+uy*r*.55,r*.55,0,TAU);c.fill()}
+  }
+}
+
+// ---------------- more letters ----------------
+// the pencil alphabet learns the rest of the numbers, and a few signs of reckoning
+G('1',.4,[[.07,.3],[.23,.1],[.23,1]]);
+G('3',.52,[[.08,.2],[.22,.1],[.38,.12],[.44,.28],[.36,.46],[.22,.52],[.38,.58],[.47,.76],[.4,.94],[.22,1],[.05,.9]]);
+G('4',.54,[[.37,1],[.37,.1],[.05,.72],[.5,.72]]);
+G('5',.52,[[.44,.1],[.13,.1],[.1,.47],[.28,.43],[.44,.54],[.47,.76],[.36,.95],[.18,1],[.05,.9]]);
+G('7',.5,[[.05,.1],[.46,.1],[.18,1]]);
+G('9',.52,A_(.25,.33,.2,.22,-.2,-.2+TAU*.98,10),[[.45,.36],[.43,.72],[.3,1]]);
+G('é',.56,...GL['e'].s,[[.22,.36],[.36,.2]]);
+G('ë',.56,...GL['e'].s,[[.15,.3],[.18,.33]],[[.36,.3],[.39,.33]]);
+G('=',.5,[[.06,.6],[.44,.6]],[[.06,.8],[.44,.8]]);
+G('+',.5,[[.06,.7],[.44,.7]],[[.25,.5],[.25,.9]]);
+G('×',.44,[[.08,.55],[.36,.85]],[[.36,.55],[.08,.85]]);
+G(':',.24,[[.11,.52],[.13,.55]],[[.11,.92],[.13,.95]]);
+G('→',.7,[[.04,.7],[.62,.7]],[[.48,.58],[.64,.7],[.48,.82]]);
+G('/',.4,[[.34,.08],[.06,1.04]]);
+G('√',.62,[[.02,.66],[.12,.6],[.24,1],[.4,.1],[.62,.1]]);
+G('φ',.62,A_(.31,.64,.24,.26,0,TAU,12),[[.31,.18],[.31,1.28]]);
+G('π',.6,[[.05,.52],[.55,.5]],[[.18,.52],[.16,1]],[[.42,.5],[.44,.92],[.52,1]]);
+G('°',.26,A_(.13,.2,.08,.09,0,TAU,8));
+G('?',.5,[[.08,.2],[.2,.1],[.38,.14],[.42,.34],[.26,.58],[.24,.72]],[[.24,.94],[.27,.98]]);
+G('!',.24,[[.12,.1],[.12,.72]],[[.12,.94],[.13,.97]]);
+G('≈',.54,[[.05,.62],[.15,.56],[.27,.62],[.39,.68],[.49,.62]],[[.05,.82],[.15,.76],[.27,.82],[.39,.88],[.49,.82]]);
+G('|',.24,[[.12,.05],[.12,1.1]]);
+G('…',.6,[[.08,.93],[.1,.97]],[[.28,.93],[.3,.97]],[[.48,.93],[.5,.97]]);
+
+// ---------------- vectors ----------------
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const norm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return[a[0]/l,a[1]/l,a[2]/l]};
+const sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+const PHI=(1+Math.sqrt(5))/2;
+
+// ---------------- compass and straightedge ----------------
+// a circle the way a compass makes it: true and thin, starting wherever the
+// pencil leg was set down, and running on a little past where it began
+function cPts(cx,cy,r,a0,a1,step=5){
+  const n=Math.max(10,Math.ceil(Math.abs(a1-a0)*r/step)),p=[];
+  for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*r,cy+Math.sin(t)*r])}
+  return p;
+}
+function compass(R,cx,cy,r,o={}){
+  const a0=o.a0??rd(R,0,TAU),sw=(o.sweep??TAU)+(o.over??rd(R,.05,.14));
+  sk(R,cPts(cx,cy,r,a0,a0+sw),{col:o.col??GRAPH,w:o.w??.9,a:o.a??.42,amp:o.amp??Math.min(.55,.22+r*.0009),noDust:true,passes:o.passes,taper:o.taper});
+}
+// a construction line: straight, faint, overshooting its points a little
+function cline(R,x0,y0,x1,y1,o={}){
+  const e=o.ext??16,L=Math.hypot(x1-x0,y1-y0)||1,ux=(x1-x0)/L,uy=(y1-y0)/L;
+  sk(R,[[x0-ux*e,y0-uy*e],[x1+ux*e,y1+uy*e]],{col:o.col??GRAPH,w:o.w??.85,a:o.a??.36,amp:o.amp??.3,noDust:true,gap:o.gap});
+}
+function iline(R,x0,y0,x1,y1,o={}){sk(R,[[x0,y0],[x1,y1]],{col:o.col??INK,w:o.w??2,a:o.a??.85,amp:o.amp??.4,passes:o.passes,noDust:true,taper:o.taper})}
+function poly(R,pts,o={}){sk(R,pts.concat([pts[0]]),{col:o.col??INK,w:o.w??2,a:o.a??.85,amp:o.amp??.4,noDust:true,passes:o.passes})}
+// the little hole the compass needle leaves behind
+function needle(R,x,y,col=INK,a=.7){dotF(R,x,y,1.4,a,col);ell(R,x,y,3.4,3.4,{col,w:.7,a:a*.4,amp:.12,noDust:true})}
+function discF(x,y,r,col,a){fillPoly(cPts(x,y,r,0,TAU,2.5),col,a)}
+function ngon(cx,cy,r,n,rot=-Math.PI/2){const p=[];for(let i=0;i<n;i++){const t=rot+i/n*TAU;p.push([cx+Math.cos(t)*r,cy+Math.sin(t)*r])}return p}
+function starOrder(n,k){const o=[];let i=0;for(let s=0;s<=n;s++){o.push(i%n);i+=k}return o}
+function lerp2(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}
+// fill between an outer and an inner outline: a frame, a ring, a band
+function ringFill(P,Q,col,a){
+  const [x0,y0,x1,y1]=bbox(P),st=rgba(col,a),A=P.map(p=>p.slice()),B=Q.map(p=>p.slice());
+  emit(y0,y1,c=>{
+    c.beginPath();A.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    B.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    c.fillStyle=st;c.fill('evenodd');
+  });
+}
+// a label, centred, in pencil
+function note(R,t,x,y,sz,col,a=.75){write(R,t,x,y,sz,{col,a,cen:true})}
+function sentence(R,t,y,col,sz=27){write(R,t,800,y,sz,{col,a:.9,cen:true})}
+
+// ---------------- papers ----------------
+// a round sheet, torn
+function disc(R,cx,cy,r,col,o={}){
+  const sd=ri(R,0,9999),P=[],n=Math.max(40,Math.round(TAU*r/20));
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    let off=(fbm(Math.cos(t)*2+3,Math.sin(t)*2,sd,3)-.5)*2*(o.rough??9);
+    if(h2(i*1.7,9.1,sd)>.94)off+=rd(R,5,14)*(h2(i,3,sd)>.5?1:-1);
+    P.push([cx+Math.cos(t)*(r+off),cy+Math.sin(t)*(r+off)]);
+  }
+  fillPoly(P.map(p=>[p[0]+7,p[1]+9]),[8,6,10],.34);
+  fillPoly(P,col,1);fillPoly(P,col,1);
+  const gsd=ri(R,0,99999);
+  emit(cy-r-12,cy+r+12,c=>{
+    const RR=mul32(gsd),N=Math.round(r*r*3/1900);
+    for(let i=0;i<N;i++){const t=RR()*TAU,d=Math.sqrt(RR())*r*.97,s=.8+RR()*1.1;c.fillStyle=RR()<.6?'rgba(0,0,0,.08)':'rgba(255,250,240,.05)';c.fillRect(cx+Math.cos(t)*d,cy+Math.sin(t)*d,s,s)}
+  });
+  sk(R,P.concat([P[0]]),{col:[251,247,237],w:2,a:.34,amp:.4,gap:.24,noDust:true});
+  return P;
+}
+// tracing paper laid over a drawing: you see through it, a little milky
+function tracing(R,x0,y0,x1,y1,rot=0){
+  let P=tornPath(R,x0,y0,x1,y1,4,ri(R,0,9999));
+  if(rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,rot);
+  fillPoly(P.map(p=>[p[0]+3,p[1]+5]),[30,24,18],.07);
+  fillPoly(P,TRACE,.42);
+  sk(R,P.concat([P[0]]),{col:[255,255,255],w:1.2,a:.55,amp:.3,noDust:true});
+  return P;
+}
+// straight lines across a sheet, clipped to it: the squares of a school notebook, the staves of music paper
+function rule(P,lines,col,a,w=1){
+  const [x0,y0,x1,y1]=bbox(P),PP=P.map(p=>p.slice()),st=rgba(col,a);
+  emit(y0,y1,c=>{
+    c.save();c.beginPath();PP.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.clip();
+    c.strokeStyle=st;c.lineWidth=w;c.beginPath();
+    for(const l of lines){c.moveTo(l[0],l[1]);c.lineTo(l[2],l[3])}
+    c.stroke();c.restore();
+  });
+}
+// a strip of tape over a corner
+function tape(R,x,y,ang,len=46){
+  const tp=rotPts([[x-len/2,y-9],[x+len/2,y-9],[x+len/2,y+9],[x-len/2,y+9]],x,y,ang);
+  fillPoly(tp,[240,234,216],.38);
+  sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+}
+
+// ---------------- sound ----------------
+// only ever after a tap or a click, and quiet
+function tone(f,t0,dur,vol,type='triangle'){
+  const ac=audio();if(!ac)return;
+  const t=ac.currentTime+t0,o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
+  o.type=type;o.frequency.value=f;lp.type='lowpass';lp.frequency.value=2600;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0006,t+dur);
+  o.connect(lp);lp.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.05);
+}
+function pluck(f,t0=0,vol=.11){tone(f,t0,2.8,vol,'triangle');tone(f*2,t0,1.5,vol*.22,'sine');tone(f*3,t0,.9,vol*.1,'sine')}
+// places on the wall that answer a tap
+const HITS=[];
+function hit(x0,y0,x1,y1,fn){HITS.push({x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,fn})}
+const hitAt=(x,y)=>HITS.find(h=>x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1);
+addEventListener('click',e=>{const x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK,h=hitAt(x,y);if(h)h.fn(x,y)});
+addEventListener('pointermove',e=>{const h=hitAt(e.clientX/CSSK,(e.clientY+scrollY)/CSSK);document.body.style.cursor=h?'pointer':''},{passive:true});
+
+
+// ---------------- the sky ----------------
+// a soft light anywhere on the wall, in wall coordinates, clipped to its own square
+function glowAbs(x,y,r,col,a,sx=1,sy=1){
+  emit(y-r*sy,y+r*sy,c=>{
+    c.save();c.beginPath();c.rect(x-r*sx,y-r*sy,2*r*sx,2*r*sy);c.clip();
+    c.translate(x,y);c.scale(sx,sy);
+    const g=c.createRadialGradient(0,0,0,0,0,r);
+    g.addColorStop(0,rgba(col,a));g.addColorStop(.45,rgba(col,a*.4));g.addColorStop(1,rgba(col,0));
+    c.fillStyle=g;c.fillRect(-r,-r,2*r,2*r);c.restore();
+  });
+}
+// the whole sky of the day, laid down in strips, with the tooth of the paper over it
+function groundPaint(R){
+  const st=30;
+  for(let y=-10;y<TOTALH+10;y+=st){
+    const c0=skyAt(y),c1=skyAt(y+st),ya=y;
+    emit(ya-2,ya+st+2,c=>{const g=c.createLinearGradient(0,ya,0,ya+st);g.addColorStop(0,rgba(c0,1));g.addColorStop(1,rgba(c1,1));c.fillStyle=g;c.fillRect(-10,ya-1,LW+20,st+2.5)});
+  }
+  for(let y0=-10;y0<TOTALH;y0+=400){
+    const gsd=ri(R,0,99999),y1=Math.min(TOTALH,y0+400);
+    emit(y0,y1,c=>{
+      const RR=mul32(gsd),n=Math.round(LW*(y1-y0)/1900);
+      for(let i=0;i<n;i++){
+        const s=.8+RR()*1.1,x=RR()*LW,y=y0+RR()*(y1-y0),lt=lumAt(y)>.5;
+        c.fillStyle=lt?(RR()<.6?'rgba(60,70,90,.045)':'rgba(255,255,255,.1)'):(RR()<.55?'rgba(255,250,240,.035)':'rgba(0,0,0,.08)');
+        c.fillRect(x,y,s,s);
+      }
+    });
+  }
+  // the air has depth: soft washes of light here and there
+  for(let i=0;i<40;i++){
+    const y=rd(R,300,10600),x=rd(R,-120,1720),r=rd(R,170,430);
+    glowAbs(x,y,r,[255,255,255],rd(R,.07,.16)*(lumAt(y)>.6?1:.4),rd(R,1.6,2.8),1);
+  }
+  // and where the sky is dark, the stars come out
+  const stars=[];
+  for(let i=0;i<1100;i++){const y=rd(R,10800,TOTALH),x=rd(R,0,LW),dk=clamp((.42-lumAt(y))/.25,0,1);if(R()>dk)continue;stars.push([x,y,rd(R,.5,1.6),rd(R,.12,.6)*dk])}
+  stars.sort((p,q)=>p[1]-q[1]);dustBatch(stars,CINK);
+}
+// thin paper you can almost see the sky through, with its long fibres
+function tissue(R,x0,y0,x1,y1,col,o={}){
+  let P=tornPath(R,x0,y0,x1,y1,o.rough??9,ri(R,0,9999));
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  fillPoly(P.map(p=>[p[0]+4,p[1]+6]),[40,50,70],.1);
+  fillPoly(P,col,o.a??.9);
+  const [bx0,by0,bx1,by1]=bbox(P),PP=P.map(p=>p.slice()),fsd=ri(R,0,99999);
+  emit(by0,by1,c=>{
+    const RR=mul32(fsd);c.save();c.beginPath();PP.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/5200);
+    c.lineWidth=.7;
+    for(let i=0;i<n;i++){
+      let x=bx0+RR()*(bx1-bx0),y=by0+RR()*(by1-by0),a=RR()*TAU;
+      c.strokeStyle=RR()<.5?'rgba(255,255,255,.5)':'rgba(120,110,90,.07)';
+      c.beginPath();c.moveTo(x,y);
+      for(let k=0;k<8;k++){a+=(RR()-.5)*.9;x+=Math.cos(a)*6;y+=Math.sin(a)*6;c.lineTo(x,y)}
+      c.stroke();
+    }
+    c.restore();
+  });
+  sk(R,P.concat([P[0]]),{col:[255,255,255],w:1.6,a:.5,amp:.4,gap:.2,noDust:true});
+  return P;
+}
+// a cloud, as soft light with a little shadow under it and a loose pencil line
+function puff(R,x,y,w,h,o={}){
+  const n=Math.max(4,Math.round(w/50)),lit=o.col??[255,255,255],sh=o.shade??[150,166,196];
+  for(let i=0;i<n;i++){const u=(i+.5)/n,px=x-w/2+u*w+rd(R,-12,12),hh=Math.sin(u*Math.PI)*h+h*.25,py=y-hh*.3+rd(R,-4,4);glowAbs(px,py+hh*.45,hh*1.25,sh,(o.a??1)*.16,1.6,1)}
+  for(let i=0;i<n*2;i++){const u=rd(R,.05,.95),px=x-w/2+u*w,hh=Math.sin(u*Math.PI)*h+h*.2,py=y-hh*.45+rd(R,-hh*.3,hh*.2);glowAbs(px,py,hh*rd(R,.8,1.2),lit,(o.a??1)*rd(R,.45,.7),1.3,1)}
+  if(o.line!==false)sk(R,[[x-w*.48,y+h*.25],[x-w*.15,y+h*.32],[x+w*.2,y+h*.3],[x+w*.48,y+h*.22]],{col:o.lc??[150,160,190],w:1,a:.35,amp:1.4,noDust:true,taper:'both'});
+}
+// a cloud drawn by hand: bumps along the top, a flatter belly, white with a blue shadow
+function cloudShape(R,x,y,w,h,o={}){
+  const pts=[],n=o.bumps??Math.max(3,Math.round(w/60)),x0=x-w/2,x1=x+w/2,bot=y+h*.18;
+  pts.push([x0,bot]);
+  let cx=x0;
+  if(o.flat){for(let u=0;u<=1.0001;u+=.05)pts.push([x0+u*w,y-h*.4-Math.sin(u*Math.PI)*h*.5+Math.sin(u*17+x)*h*.12])}
+  else for(let i=0;i<n;i++){
+    const bw=w/n*rd(R,.7,1.3),hh=h*(.4+.6*Math.sin(Math.PI*(i+.5)/n))*rd(R,.75,1.2),r=Math.max(bw*.6,hh*.7)*rd(R,.9,1.25);
+    const mx=cx+bw/2,my=y-hh+r;
+    // every bump is itself a few smaller bumps
+    const k=r>26?3:1;
+    for(let j=0;j<k;j++){const a0=Math.PI*(1.04+j*.92/k),a1=Math.PI*(1.04+(j+1)*.92/k),rr=r*(k>1?rd(R,.9,1.08):1);for(let t=a0;t<=a1+.001;t+=.14)pts.push([mx+Math.cos(t)*rr*.86,my+Math.sin(t)*rr-(k>1?Math.sin((t-a0)/(a1-a0)*Math.PI)*r*.12:0)])}
+    cx+=bw;
+  }
+  pts.push([x1,bot]);
+  for(let u=1;u>=0;u-=.1)pts.push([x0+(x1-x0)*u,bot+Math.sin(u*Math.PI)*h*.06]);
+  const sh=chaikin(pts,true,1);
+  fillPoly(sh.map(p=>[p[0],p[1]+3]),o.sh??[150,166,198],.25);
+  fillPoly(sh,o.col??[255,255,255],o.a??.92);
+  const lower=sh.filter(p=>p[1]>y-h*.1);
+  if(o.shade!==false){const band=sh.map(p=>[p[0],Math.max(p[1],y)]);scribFill(R,band,4,.18,{col:o.sh??[150,166,198],w:1.2})}
+  sk(R,sh.concat([sh[0]]),{col:o.lc??[140,150,176],w:1.2,a:o.la??.6,amp:.5,noDust:true});
+  return sh;
+}
+// a tree, by chance: every branch splits into two or three
+function treeB(R,x,y,ang,len,depth,col,w,leaves,lc){
+  const x2=x+Math.cos(ang)*len,y2=y+Math.sin(ang)*len;
+  sk(R,[[x,y],[(x+x2)/2+rd(R,-len*.06,len*.06),(y+y2)/2+rd(R,-len*.06,len*.06)],[x2,y2]],{col,w,a:.85,amp:.7,taper:'out',noDust:true});
+  if(depth<=0){if(leaves)leaves.push([x2,y2]);return}
+  const n=ch_(R,.3)?3:2;
+  for(let i=0;i<n;i++)treeB(R,x2,y2,ang+(i-(n-1)/2)*rd(R,.4,.7)+rd(R,-.2,.2),len*rd(R,.66,.8),depth-1,col,Math.max(.7,w*.68),leaves,lc);
+}
+// a dandelion seed: the little umbrella and the seed under it
+function pappus(R,x,y,s,ang,col,a=.8){
+  const ux=Math.cos(ang),uy=Math.sin(ang),tip=[x-ux*s*1.7,y-uy*s*1.7];
+  sk(R,[[x,y],tip],{col,w:.9,a:a*.8,amp:.15,noDust:true});
+  const se=ePts(tip[0]-ux*s*.25,tip[1]-uy*s*.25,s*.28,s*.09,ang,8);fillPoly(se,shade(col,.45),a);
+  for(let k=0;k<11;k++){const t=ang+(k/10-.5)*2.2;sk(R,[[x,y],[x+Math.cos(t)*s,y+Math.sin(t)*s]],{col,w:.6,a:a*.75,amp:.12,noDust:true})}
+}
+// small marks in the margins: wind, seeds, a bird
+function whispers(R,y0,y1,n){
+  for(let i=0;i<n;i++){
+    const left=ch_(R,.5),x=left?rd(R,32,128):rd(R,1472,1568),y=rd(R,y0+40,y1-40),col=inkAt(y+GEN_DY),a=rd(R,.25,.45),k=ri(R,0,5),s=rd(R,7,13);
+    if(k===0)sk(R,spiralPts(x,y,s*1.2,1,rd(R,1.5,2.5),rd(R,0,7)),{col,w:1,a,amp:.4});
+    else if(k===1){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x-18+u*36,y+Math.sin(u*TAU)*4]);sk(R,pts,{col,w:1,a,amp:.3})}
+    else if(k===2)pappus(R,x,y,s*.9,rd(R,-2.2,-1),col,a);
+    else if(k===3)birdM(R,x,y,s*.8,col,a);
+    else if(k===4){for(let j=0;j<ri(R,3,5);j++)dotF(R,x+j*7-10,y+rd(R,-2,2),1.2,a,col)}
+    else{const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x-16+u*32,y+Math.sin(u*Math.PI*1.5)*5-u*4]);sk(R,pts,{col,w:1,a,amp:.3,taper:'out'})}
+  }
+}
+
+
+// ===========================================================================
+// adem — twelve sheets of one day, top to bottom. every sheet is drawn in
+// local coordinates 0..1600 x 0..1200; GEN_DY lifts it to its place.
+// ===========================================================================
+const P=[];
+// grass along the bottom of a sheet, drawn as short strokes
+function grassLine(R,y0,n,cols,hmin=14,hmax=46,x0=-10,x1=1610){
+  for(let i=0;i<n;i++){
+    const x=rd(R,x0,x1),y=y0+rd(R,-6,10),h=rd(R,hmin,hmax),lean=rd(R,-.35,.35);
+    sk(R,[[x,y],[x+lean*h*.5,y-h*.55],[x+lean*h,y-h]],{col:pk(R,cols),w:rd(R,1,2.2),a:rd(R,.4,.85),amp:.3,taper:'out',noDust:true});
+  }
+}
+
+// P0 · adem: the first light ----------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+0),RW=stream(SEED*101+90);
+  groundPaint(RW);
+  // the sun is just coming up, over the meadow on the right
+  glowAbs(1240,1086,560,[255,210,164],.34,2.2,.75);
+  glowAbs(1240,1086,150,[255,236,200],.55,1.4,1);
+  {const sun=cPts(1240,1090,46,Math.PI,TAU,3);fillPoly(sun.concat([[1286,1090],[1194,1090]]),[255,226,170],.9);sk(R,sun,{col:[226,150,90],w:1.6,a:.6,amp:.4,noDust:true})}
+  for(let k=0;k<5;k++)glowAbs(rd(R,100,1500),rd(R,1010,1070),rd(R,120,260),[255,255,255],.22,3.2,.45);
+  write(R,'adem',800,250,140,{a:.86,cen:true});
+  write(R,'een muur over wat ons beweegt',800,318,26,{a:.7,cen:true});
+  write(R,'(beweeg: jij bent de wind)',800,358,15,{a:.5,cen:true});
+  for(let k=0;k<4;k++)birdM(R,rd(R,300,700),rd(R,470,620),rd(R,7,11),INK,.4);
+  // a meadow, still wet
+  grassLine(R,1086,520,[[110,140,90],[90,122,80],[140,160,104],[120,128,96]],12,40);
+  // the dandelion: a long stem, toothed leaves at its foot
+  const hx=420,hy=676,HR=128;
+  const stem=[[396,1096],[404,1000],[414,880],[418,780],[hx,hy+10]];
+  sk(R,stem,{col:[120,150,96],w:5,a:.9,amp:.8});
+  sk(R,stem.map(p=>[p[0]+2,p[1]]),{col:[170,196,140],w:1.6,a:.6,amp:.6,noDust:true});
+  // the leaves: long, toothed, the lion's teeth that give it its name
+  for(const [ang,len] of[[-2.25,170],[-1.95,210],[-1.2,200],[-.9,160],[-2.6,130],[-.55,120]]){
+    const L=[],Rr=[],bx=398,by=1094;
+    for(let u=0;u<=1.0001;u+=.04){
+      const mx=bx+Math.cos(ang+.25*u*(ang<-1.57?-1:1))*len*u,my=by+Math.sin(ang+.25*u*(ang<-1.57?-1:1))*len*u;
+      const nx=-Math.sin(ang),ny=Math.cos(ang),tooth=((u*9)%1)<.5?((u*9)%1)*2:2-((u*9)%1)*2,w=Math.sin(Math.PI*Math.pow(u,.8))*16*(.55+.6*tooth);
+      L.push([mx+nx*w,my+ny*w]);Rr.push([mx-nx*w*.8,my-ny*w*.8]);
+    }
+    const lf=L.concat(Rr.reverse());
+    fillPoly(lf,[104,142,80],.85);scribFill(R,lf,4,.25,{col:[70,104,56],w:1});
+    sk(R,lf.concat([lf[0]]),{col:[64,94,50],w:1.2,a:.7,amp:.3});
+  }
+  discF(hx,hy,13,[150,140,90],.95);
+  for(let k=0;k<20;k++){const t=k/20*TAU;sk(R,[[hx+Math.cos(t)*12,hy+Math.sin(t)*12],[hx+Math.cos(t)*16,hy+Math.sin(t)*16]],{col:[120,110,70],w:1,a:.6,amp:.1,noDust:true})}
+  // a few seeds already let go
+  for(let k=0;k<8;k++){const u=k/7,x=hx+110+u*900+rd(R,-30,30),y=hy-70-Math.sin(u*Math.PI*.9)*150-u*70+rd(R,-24,24);pappus(R,x,y,rd(R,10,15),-Math.PI/2+rd(R,-.6,.6),[110,100,90],.72)}
+  // the clock itself lies on glass, so the wind can take it apart
+  const N=118,GA=TAU*(1-1/((1+Math.sqrt(5))/2)),SD=[];
+  const RS=mul32(77123);
+  for(let i=0;i<N;i++){
+    const yy=1-2*(i+.5)/N,rr=Math.sqrt(1-yy*yy),th=i*GA;
+    const p=[rr*Math.cos(th),yy*.96,rr*Math.sin(th)];
+    SD.push({x:p[0],y:p[1],z:p[2],on:true,len:.86+RS()*.1,fl:10+RS()*7,rot:RS()*TAU});
+  }
+  const DL=live(hx-HR-40,hy-HR-40,2*HR+80,2*HR+80,{dy:GEN_DY,dirty:true,quiet:0,gone:0,
+    frame(c,now,L){
+      const cy=hy+L.dy,w=windAt(hx,cy,now),f=flow(hx,cy,now),gx=w[0]-f[0],gy=w[1]-f[1],g=Math.hypot(gx,gy);
+      if(g>85&&!RM){
+        L.quiet=now;
+        const n=Math.min(3,Math.floor(g/160)+(Math.random()<g/700?1:0));
+        for(let k=0;k<n;k++){
+          let best=null,bs=-1e9;
+          for(const s of SD){if(!s.on)continue;const sc=s.z*.6+Math.random()*1.4+(s.x*gx+s.y*gy)/g*.8;if(sc>bs){bs=sc;best=s}}
+          if(!best)break;
+          best.on=false;L.dirty=true;L.gone++;
+          const px=hx+best.x*HR*best.len,py=cy+best.y*HR*best.len;
+          SEEDS.push({x:px,y:py,vx:gx*.5+best.x*30,vy:gy*.5+best.y*30-20,rot:Math.atan2(best.y,best.x)+Math.PI/2,s:best.fl*.95,t:now,tw:Math.random()*7});
+        }
+      }
+      // after a long calm, the clock is whole again
+      if(L.gone&&now-L.quiet>26000){for(const s of SD)s.on=true;L.gone=0;L.dirty=true}
+      if(!L.dirty)return;
+      L.dirty=false;
+      c.clearRect(L.x,L.y,L.w,L.h);
+      const draw=(back)=>{
+        for(const s of SD){
+          if(!s.on||(s.z<0)!==back)continue;
+          const ex=hx+s.x*HR*s.len,ey=cy+s.y*HR*s.len,a=back?.32:.55+.35*s.z;
+          c.strokeStyle=`rgba(130,120,104,${a*.8})`;c.lineWidth=.75;
+          c.beginPath();c.moveTo(hx+s.x*14,cy+s.y*14);c.lineTo(ex,ey);c.stroke();
+          c.strokeStyle=`rgba(255,255,255,${Math.min(1,a*1.2)})`;c.lineWidth=1.1;c.beginPath();
+          for(let q=0;q<10;q++){const t=s.rot+q/10*TAU,l=s.fl*(.75+.25*Math.abs(Math.sin(q*1.7+s.rot)));c.moveTo(ex,ey);c.lineTo(ex+Math.cos(t)*l,ey+Math.sin(t)*l)}
+          c.stroke();
+          c.strokeStyle=`rgba(110,100,86,${a*.6})`;c.lineWidth=.65;c.beginPath();
+          for(let q=0;q<10;q++){const t=s.rot+q/10*TAU+.3,l=s.fl*.8;c.moveTo(ex,ey);c.lineTo(ex+Math.cos(t)*l,ey+Math.sin(t)*l)}
+          c.stroke();
+        }
+      };
+      draw(true);draw(false);
+    }});
+  sentence(R,'elk leven begint met een inademing',1156,INK,28);
+  whispers(R,420,1000,3);
+});
+
+// a curved arrow from a to b, bowed sideways
+function bowArrow(R,a,b,bow,col,w=2,lab=null,lsz=18){
+  const m=lerp2(a,b,.5),dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,c=[m[0]-dy/L*bow,m[1]+dx/L*bow],pts=[];
+  for(let t=0;t<=1.0001;t+=.05){const u=1-t;pts.push([u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]])}
+  sk(R,pts,{col,w,a:.85,amp:.5,noDust:true});
+  const e=pts[pts.length-1],p=pts[pts.length-3];arrowHead(R,e[0],e[1],Math.atan2(e[1]-p[1],e[0]-p[0]),14,.85,col,w);
+  if(lab){const q=pts[10];write(R,lab,q[0]-dy/L*Math.sign(bow)*28,q[1]+dx/L*Math.sign(bow)*28+6,lsz,{col,a:.9,cen:true})}
+}
+
+// P1 · the tree in your chest --------------------------------------------------------
+// above the line a tree, below it the same tree upside down: the lungs.
+// what the one breathes out, the other breathes in.
+P.push(function(){
+  const R=stream(SEED*101+1);
+  sheet(R,60,44,1540,1158,CREAM,{rough:13,rot:-.003});
+  write(R,'de boom in je borst',800,112,36,{a:.86,cen:true});
+  const ax=800,gy=600;
+  sk(R,[[160,gy],[1440,gy]],{col:GRAPH,w:1.3,a:.45,amp:1,gap:.05});
+  // the tree
+  const leaves=[];
+  sk(R,[[ax-2,gy+2],[ax-5,gy-80],[ax+3,gy-168]],{col:BARK,w:15,a:.9,amp:1.2,taper:'out'});
+  for(const [a,l] of[[-1.57,84],[-2.3,84],[-0.85,84],[-1.95,76],[-1.2,76],[-2.65,64],[-0.5,64]])treeB(R,ax,gy-160,a+rd(R,-.06,.06),l,5,BARK,7,leaves);
+  for(const [x,y] of leaves){const b=blob(R,x+rd(R,-3,3),y+rd(R,-3,3),rd(R,10,16),rd(R,8,13));fillPoly(b,pk(R,[LEAF,LEAFL,[120,162,84],[86,128,64]]),.5)}
+  for(let k=0;k<6;k++)scrub(R,ax+rd(R,-220,220),rd(R,230,400),rd(R,60,90),pk(R,[LEAF,LEAFL]),.1);
+  // the lungs: two soft wings, the trunk going on below the line as the windpipe
+  const lungL=chaikin([[728,664],[648,640],[566,694],[506,812],[484,944],[520,1036],[618,1062],[716,1034],[758,952],[768,820],[762,716]],true,3);
+  const lungR=chaikin([[872,664],[952,640],[1034,694],[1096,812],[1116,944],[1080,1036],[982,1062],[880,1030],[848,982],[884,926],[842,866],[838,760],[846,704]],true,3);
+  for(const lg of[lungL,lungR]){fillPoly(lg,LUNG,.32);scribFill(R,lg,5,.28,{col:LUNG,w:1.1});sk(R,lg.concat([lg[0]]),{col:LUNGD,w:2,a:.75,amp:.5})}
+  sk(R,[[ax,gy],[ax,708]],{col:LUNGD,w:12,a:.85,amp:.6});
+  for(let y=gy+10;y<704;y+=10)sk(R,[[ax-6,y],[ax+6,y]],{col:CREAM,w:1.2,a:.6,amp:.2,noDust:true});
+  const tips=[];
+  for(const sd of[-1,1]){
+    const bx=ax+sd*140,by=770;
+    sk(R,[[ax,706],[ax+sd*70,728],[bx,by]],{col:LUNGD,w:8,a:.85,amp:.6,taper:'out'});
+    for(const a of[Math.PI/2+sd*1.15,Math.PI/2+sd*.6,Math.PI/2+sd*.05])treeB(R,bx,by,a,70,4,LUNGD,4.5,tips);
+  }
+  for(const [x,y] of tips)for(let k=0;k<3;k++)dotF(R,x+rd(R,-5,5),y+rd(R,-5,5),rd(R,2.4,3.8),.7,LUNG);
+  // what goes from the one to the other
+  bowArrow(R,[470,360],[560,800],-120,[90,140,80],2.2,'zuurstof');
+  bowArrow(R,[1050,800],[1130,360],-120,[96,126,186],2.2,'kooldioxide');
+  note(R,'480 miljoen',300,972,18,INK,.72);
+  note(R,'longblaasjes',300,998,18,INK,.72);
+  note(R,'uitgevouwen bijna',1310,972,18,INK,.72);
+  note(R,'een badmintonveld',1310,998,18,INK,.72);
+  sentence(R,'wat de boom uitademt, adem jij in',1098,INK,28);
+  note(R,'en wat jij uitademt, ademt de boom weer in',800,1134,17,INK,.6);
+  whispers(R,160,1100,3);
+});
+
+// P2 · 22.000 --------------------------------------------------------------------------
+// a day of breaths, every one a dot
+P.push(function(){
+  const R=stream(SEED*101+2),RD=stream(SEED*101+22);
+  tissue(R,82,56,1518,1146,RICE,{a:.93,rot:.003});
+  write(R,'22.000',800,190,92,{a:.82,cen:true});
+  write(R,'zo vaak adem je op één dag',800,240,26,{a:.7,cen:true});
+  const C=[[560,650,190],[770,560,230],[990,600,210],[1170,690,160],[420,730,140],[700,760,200],[910,770,190],[1290,770,110],[600,520,120]];
+  const inside=(x,y)=>{let best=-1e9;for(const [cx,cy,r] of C)best=Math.max(best,r-Math.hypot(x-cx,y-cy));return best};
+  const dots=[];let tries=0;
+  while(dots.length<22000&&tries<400000){
+    tries++;const x=rd(RD,240,1480),y=rd(RD,320,980),d=inside(x,y);
+    if(d<0)continue;if(d<30&&RD()>d/30)continue;
+    dots.push([x,y,rd(RD,.8,1.5),rd(RD,.45,.8)]);
+  }
+  dots.sort((a,b)=>a[1]-b[1]);
+  const cols=[[104,124,166],[156,132,172],[196,128,136],[120,146,176]];
+  for(let i=0;i<4;i++)dustBatch(dots.filter((_,k)=>k%4===i),cols[i]);
+  // one of them, just now
+  const d0=dots[Math.floor(dots.length*.62)];
+  sk(R,cPts(d0[0],d0[1],13,0,TAU+.4,2),{col:[200,50,46],w:1.6,a:.85,amp:.3,noDust:true});
+  sk(R,[[d0[0]+16,d0[1]+12],[d0[0]+70,d0[1]+60],[d0[0]+120,d0[1]+66]],{col:[200,50,46],w:1.2,a:.7,amp:.4,noDust:true});
+  write(R,'deze was net',d0[0]+128,d0[1]+72,17,{col:[200,50,46],a:.85});
+  note(R,'één adem: zo\'n vier seconden',330,1040,18,INK,.7);
+  note(R,'in een heel leven: zo\'n 600 miljoen',1270,1040,18,INK,.7);
+  sentence(R,'elke stip is één adem van vandaag',1100,INK,28);
+  whispers(R,160,1100,3);
+});
+
+// P3 · from high to low ------------------------------------------------------------
+// a weather chart drawn by hand, and the thirteen steps of the wind
+const BFT=['windstil','zwak','zwak','matig','matig','vrij krachtig','krachtig','hard','stormachtig','storm','zware storm','zeer zware storm','orkaan'];
+function bftCard(R,b,x,y){
+  const w=176,h=128,rot=rd(R,-.03,.03);
+  const card=rotPts([[x-w/2,y-h/2],[x+w/2,y-h/2],[x+w/2,y+h/2],[x-w/2,y+h/2]],x,y,rot);
+  fillPoly(card.map(p=>[p[0]+3,p[1]+4]),[60,70,90],.1);
+  fillPoly(card,[252,250,244],.96);
+  poly(R,card,{col:[180,176,166],w:1,a:.6,amp:.3});
+  const gy=y+h/2-40;
+  sk(R,[[x-w/2+12,gy],[x+w/2-12,gy]],{col:[120,140,96],w:1.3,a:.7,amp:.4,noDust:true});
+  // a tree that bends further with every step
+  const tx=x-38,bend=Math.min(1,b/9);
+  if(b<10){
+    const top=[tx+bend*16,gy-40+bend*4];
+    sk(R,[[tx,gy],[tx+bend*5,gy-20],top],{col:BARK,w:3,a:.9,amp:.3,noDust:true});
+    const cr=blob(R,top[0]+bend*10,top[1]-8,15-bend*3,12-bend*2);
+    fillPoly(cr,b>=8?[120,150,80]:LEAF,.7);sk(R,cr.concat([cr[0]]),{col:[70,100,56],w:1,a:.6,amp:.3});
+  }else{
+    // the tree is down
+    sk(R,[[tx-6,gy],[tx+30,gy-6]],{col:BARK,w:3,a:.9,amp:.3,noDust:true});
+    const cr=blob(R,tx+40,gy-10,13,9);fillPoly(cr,[120,150,80],.6);
+    if(b>=11)sk(R,[[tx-8,gy],[tx-14,gy+8],[tx-4,gy+10]],{col:BARK,w:1.6,a:.7,amp:.3,noDust:true});
+  }
+  // a flag that lifts and then tears
+  const fx=x+34,top=[fx,gy-54];
+  sk(R,[[fx,gy],top],{col:GRAPH,w:1.4,a:.85,amp:.2,noDust:true});
+  const lift=Math.min(1,b/5),fa=Math.PI/2*(1-lift),ux=Math.cos(fa),uy=Math.sin(fa),wx=Math.sin(fa),wy=Math.cos(fa),len=b>=11?16:28,hg=13,e1=[],e2=[];
+  for(let u=0;u<=1.0001;u+=.1){const fl=Math.sin(u*Math.PI*2+b*1.3)*Math.min(4,b*.6)*u,px=top[0]+ux*u*len+wx*fl,py=top[1]+uy*u*len+wy*fl;e1.push([px,py]);e2.push([px+wx*hg,py+wy*hg])}
+  fillPoly(e1.concat(e2.reverse()),[206,90,70],.85);
+  // leaves and bits that fly
+  for(let k=0;k<Math.max(0,b-2)*2;k++)dotF(R,x+rd(R,-60,70),gy-rd(R,6,60),rd(R,1,2.2),.7,b>=9?GRAPH:LEAF);
+  if(b===12)sk(R,spiralPts(x+4,gy-34,24,4,1.6,0),{col:GRAPH,w:1,a:.5,amp:.4});
+  write(R,String(b),x-w/2+16,y+h/2-12,15,{a:.85});
+  write(R,BFT[b],x+8,y+h/2-12,12,{a:.7,cen:true});
+}
+P.push(function(){
+  const R=stream(SEED*101+3);
+  write(R,'van hoog naar laag',800,110,36,{a:.86,cen:true});
+  const LO=[500,430],HI=[1120,420],sd=ri(R,0,999);
+  const ring=(c,r,k,ex)=>{const pts=[];for(let a=0;a<=TAU+.001;a+=.08){const m=1+.12*(fbm(Math.cos(a)*1.3+k*.2,Math.sin(a)*1.3,sd+k,2)-.5)*2;pts.push([c[0]+Math.cos(a)*r*m*ex,c[1]+Math.sin(a)*r*m])}return pts};
+  [[LO,['995','1000','1005','1010','1015']],[HI,['1030','1025','1020','1015','1010']]].forEach(([c,lab],ci)=>{
+    for(let k=0;k<5;k++){
+      const r=46+k*42,pts=ring(c,r,k+ci*7,1.22);
+      sk(R,pts,{col:GRAPH,w:1.3,a:.55,amp:.4,noDust:true});
+      write(R,lab[k],c[0]-6,c[1]-r-6,12,{a:.55,cen:true});
+      if(k%2){
+        for(let j=0;j<3;j++){
+          const t=j/3*TAU+k,px=c[0]+Math.cos(t)*r*1.22,py=c[1]+Math.sin(t)*r;
+          const dir=ci===0?Math.atan2(-Math.cos(t),Math.sin(t)*1.22):Math.atan2(Math.cos(t),-Math.sin(t)*1.22);
+          arrowHead(R,px,py,dir,10,.75,ci===0?SKYB:[200,140,60],1.6);
+        }
+      }
+    }
+  });
+  write(R,'laag',LO[0],LO[1]+12,38,{col:SKYB,a:.9,cen:true});
+  write(R,'hoog',HI[0],HI[1]+12,38,{col:[200,140,60],a:.9,cen:true});
+  for(const [y0,y1,b] of[[330,360,-40],[430,450,-30],[540,520,-46]])bowArrow(R,[950,y0],[690,y1],b,[120,140,170],1.6);
+  note(R,'en de draaiende aarde maakt er kringen van',800,690,17,INK,.62);
+  for(let b=0;b<13;b++){const row=b<7?0:1,i=row?b-7:b,x=row?800+(i-2.5)*198:800+(i-3)*198,y=row?996:842;bftCard(R,b,x,y)}
+  sentence(R,'de aarde ademt ook',1132,INK,28);
+  whispers(R,160,1100,3);
+});
+
+// P4 · seed on the wind -----------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+4);
+  write(R,'zaad op de wind',800,110,36,{a:.86,cen:true});
+  // the dandelion seed, close up, and the ring of turning air above it
+  {
+    const x=380,y=600;
+    for(let k=0;k<70;k++){
+      const t=-Math.PI+.25+k/69*(Math.PI-.5),len=rd(R,150,175),pts=[];
+      for(let u=0;u<=1.0001;u+=.1){const a=t-(Math.cos(t))*.12*u;pts.push([x+Math.cos(a)*len*u,y+Math.sin(a)*len*u*.55-u*u*12])}
+      sk(R,pts,{col:[120,110,100],w:.9,a:.7,amp:.2,noDust:true});
+    }
+    sk(R,[[x,y],[x+2,y+180],[x,y+260]],{col:[150,136,110],w:1.5,a:.85,amp:.2,noDust:true});
+    const ach=ePts(x+1,y+300,9,44,0,16);fillPoly(ach,[150,110,70],.9);
+    for(let k=-1;k<=1;k++)sk(R,[[x+k*4,y+262],[x+k*5,y+338]],{col:[110,80,50],w:.8,a:.6,amp:.2,noDust:true});
+    poly(R,ach,{col:[100,72,44],w:1.2,a:.8,amp:.2});
+    // the vortex ring
+    const vy=y-118;
+    sk(R,cPts(x,vy,130,0,TAU,4).map(p=>[p[0],vy+(p[1]-vy)*.28]),{col:SKYB,w:1.6,a:.7,amp:.3,noDust:true});
+    for(const sd of[-1,1]){
+      const cx=x+sd*130,cy=vy;
+      sk(R,cPts(cx,cy,26,sd>0?-Math.PI*.9:Math.PI*.1,sd>0?Math.PI*.7:Math.PI*1.7,3),{col:SKYB,w:1.6,a:.8,amp:.2,noDust:true});
+      arrowHead(R,cx+(sd>0?Math.cos(Math.PI*.7)*26:Math.cos(Math.PI*1.7)*26),cy+(sd>0?Math.sin(Math.PI*.7)*26:Math.sin(Math.PI*1.7)*26),sd>0?Math.PI*.7+Math.PI/2:Math.PI*1.7+Math.PI/2,9,.8,SKYB,1.6);
+    }
+    note(R,'een ring van draaiende lucht',x,vy-96,18,INK,.8);
+    note(R,'houdt het pluisje omhoog',x,vy-72,18,INK,.8);
+    note(R,'(pas in 2018 ontdekt)',x,vy-50,14,INK,.55);
+  }
+  // maple: two wings, and one spinning
+  {
+    const x=820,y=560;
+    const wing=(bx,by,ang,s)=>{
+      const co=Math.cos(ang),sn=Math.sin(ang),T=(u,v)=>[bx+(u*co-v*sn)*s,by+(u*sn+v*co)*s];
+      const out=[T(0,0),T(.3,-.22),T(.75,-.32),T(1.05,-.18),T(1.1,.02),T(.8,.12),T(.35,.1),T(.12,.12)];
+      const sh=chaikin(out,true,2);fillPoly(sh,[214,170,110],.75);poly(R,sh,{col:[150,104,60],w:1.3,a:.8,amp:.2});
+      for(let k=0;k<7;k++)sk(R,[T(.08,.04),T(.4+k*.1,-.24+k*.04)],{col:[170,120,70],w:.7,a:.5,amp:.15,noDust:true});
+      const nut=ePts(...T(0,.04),s*.12,s*.09,ang,12);fillPoly(nut,[150,104,60],.9);
+    };
+    wing(x-20,y-40,-2.5,120);wing(x+20,y-40,-.64,120);
+    wing(x+60,y+200,-.4,90);
+    sk(R,cPts(x+86,y+190,78,-.3,Math.PI*1.4,4).map(p=>[p[0],y+190+(p[1]-y-190)*.32]),{col:SKYB,w:1.4,a:.7,amp:.3,noDust:true});
+    note(R,'esdoornzaad draait',x,y+320,18,INK,.78);
+    note(R,'als een propeller',x,y+344,18,INK,.78);
+  }
+  // linden: the seeds hang from a leaf that is a wing
+  {
+    const x=1240,y=470;
+    const br=chaikin([[x-10,y],[x+30,y+30],[x+60,y+120],[x+70,y+230],[x+52,y+260],[x+30,y+200],[x+6,y+90]],true,2);
+    fillPoly(br,[206,214,150],.85);poly(R,br,{col:[140,150,90],w:1.3,a:.8,amp:.2});
+    sk(R,[[x+4,y+40],[x+50,y+240]],{col:[150,160,100],w:1,a:.6,amp:.2,noDust:true});
+    const st=[x+26,y+118];
+    sk(R,[st,[st[0]-30,st[1]+80]],{col:[120,110,70],w:1.2,a:.8,amp:.2,noDust:true});
+    for(const [dx,dy] of[[-50,92],[-28,104],[-40,120]]){const b=hblob(R,st[0]+dx,st[1]+dy,9,9);fillPoly(b,[170,140,90],.9);poly(R,b,{col:[110,86,50],w:1,a:.8,amp:.1})}
+    note(R,'de linde geeft haar zaad',x+10,y+330,18,INK,.78);
+    note(R,'een vleugel',x+10,y+354,18,INK,.78);
+  }
+  // more of them, out on the wind
+  for(let k=0;k<14;k++)pappus(R,rd(R,560,1520),rd(R,200,1000),rd(R,9,16),-Math.PI/2+rd(R,-.7,.7),[110,100,90],.7);
+  // their ways through the air
+  for(const [a,b,bw] of[[[300,960],[760,860],-60],[[860,980],[1300,900],-70],[[1180,960],[1520,820],-50]]){
+    const pts=[];for(let t=0;t<=1.0001;t+=.04){const u=1-t,c=[(a[0]+b[0])/2,(a[1]+b[1])/2+bw];pts.push([u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]])}
+    for(let i=0;i<pts.length;i+=2)dotF(R,pts[i][0],pts[i][1],1.4,.45,GRAPH);
+  }
+  sentence(R,'wat licht genoeg is, neemt de wind mee',1120,INK,28);
+  whispers(R,160,1100,3);
+});
+
+// P5 · clouds ------------------------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+5);
+  write(R,'wolken',800,110,36,{a:.86,cen:true});
+  const ky=km=>1000-km*68;
+  // the scale of heights
+  sk(R,[[120,ky(0)],[120,ky(12)]],{col:GRAPH,w:1.2,a:.6,amp:.3,noDust:true});
+  for(let k=0;k<=12;k++){sk(R,[[114,ky(k)],[126,ky(k)]],{col:GRAPH,w:1,a:.55,amp:.1,noDust:true});if(k%2===0)write(R,k+' km',134,ky(k)+5,13,{a:.6})}
+  // the sea, breathing out
+  for(let k=0;k<5;k++){const pts=[];for(let x=160;x<=1560;x+=10)pts.push([x,ky(0)+16+k*16+Math.sin(x*.03+k)*4]);sk(R,pts,{col:[90,130,170],w:1.4,a:.5-k*.06,amp:.5,noDust:true})}
+  for(let k=0;k<4;k++){const x=420+k*80,pts=[];for(let y=ky(0)+6;y>ky(1.4);y-=8)pts.push([x+Math.sin(y*.06+k)*6,y]);sk(R,pts,{col:[120,150,190],w:1.2,a:.5,amp:.3,noDust:true,taper:'in'});arrowHead(R,pts[pts.length-1][0],pts[pts.length-1][1],-Math.PI/2,8,.5,[120,150,190],1.2)}
+  // stratus: a low blanket
+  cloudShape(R,430,ky(.65),500,30,{flat:true,col:[236,238,243],sh:[150,160,180]});
+  note(R,'stratus · een laag deken',420,ky(.6)+46,15,INK,.65);
+  // cumulus
+  cloudShape(R,860,ky(1.9),240,74);cloudShape(R,1050,ky(2.2),150,50);
+  note(R,'cumulus · stapelwolk',900,ky(1.8)+56,15,INK,.65);
+  note(R,'een stapelwolk weegt zo veel als honderd olifanten',820,ky(3.1)+4,15,INK,.55);
+  // altocumulus: the little sheep
+  for(let r=0;r<3;r++)for(let k=0;k<8;k++)cloudShape(R,320+k*66+r*30+rd(R,-8,8),ky(4.9)+r*26+rd(R,-5,5),rd(R,40,54),rd(R,14,20),{bumps:3,shade:false,la:.45});
+  note(R,'altocumulus · schapenwolkjes',560,ky(4.8)+82,15,INK,.65);
+  // cirrus: long hooked hairs
+  for(let k=0;k<12;k++){const x=280+k*60+rd(R,-20,20),y=ky(9.6)+rd(R,-30,30),pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x+u*140,y-u*u*46+Math.sin(u*3)*6]);sk(R,pts,{col:[255,255,255],w:rd(R,2.2,3.6),a:.95,amp:.6,noDust:true,taper:'out'});sk(R,pts.map(p=>[p[0]+1,p[1]+3]),{col:[130,150,190],w:1.1,a:.5,amp:.5,noDust:true,taper:'out'})}
+  note(R,'cirrus · vederwolk',620,ky(9.6)+60,15,INK,.65);
+  // cumulonimbus: a tower up to where the air stops rising, then flat as an anvil
+  {
+    const x=1310;
+    // the tower: bumps on bumps, narrower as it climbs, then the anvil
+    const wAt=u=>170+Math.sin(u*Math.PI*.9)*110-u*40;
+    const tw=[];for(let y=ky(1.1);y>ky(10.2);y-=8){const u=(ky(1.1)-y)/(ky(1.1)-ky(10.2)),w=wAt(u)+Math.sin(u*14)*12;tw.push([x-w/2+Math.sin(y*.05)*8,y])}
+    const tr=[];for(let y=ky(10.2);y<ky(1.1);y+=8){const u=(ky(1.1)-y)/(ky(1.1)-ky(10.2)),w=wAt(u)+Math.cos(u*13)*12;tr.push([x+w/2+Math.sin(y*.045+2)*8,y])}
+    const anvil=chaikin([[x-210,ky(10.3)],[x-140,ky(10.9)],[x+20,ky(11.15)],[x+190,ky(10.9)],[x+250,ky(10.35)],[x+120,ky(10.05)],[x-60,ky(10.1)]],true,2);
+    const body=tw.concat(tr);
+    fillPoly(body,[246,247,250],.92);scribFill(R,body.map(p=>[p[0]+(p[0]>x?0:0),p[1]]),5,.14,{col:[140,150,180],w:1.2});
+    fillPoly(anvil,[248,249,252],.92);
+    sk(R,anvil.concat([anvil[0]]),{col:[140,150,176],w:1.2,a:.6,amp:.6,noDust:true});
+    for(let y=ky(1.3);y>ky(10);y-=42){const u=(ky(1.1)-y)/(ky(1.1)-ky(10.2)),w=wAt(u);for(const sd of[-1,0,1])sk(R,cPts(x+sd*w*.3,y+rd(R,-8,8),w*.2,Math.PI*1.1,Math.PI*1.9,3),{col:[150,160,186],w:1,a:.38,amp:.3,noDust:true})}
+    sk(R,tw,{col:[140,150,176],w:1.2,a:.55,amp:.6,noDust:true});sk(R,tr,{col:[140,150,176],w:1.2,a:.55,amp:.6,noDust:true});
+    for(let k=0;k<26;k++){const xx=x+rd(R,-70,70);sk(R,[[xx,ky(1)+6],[xx-18,ky(0)-4]],{col:[110,130,170],w:1,a:.45,amp:.3,noDust:true})}
+    note(R,'cumulonimbus · onweerswolk',x,ky(11.4)-8,15,INK,.65);
+  }
+  sentence(R,'wolken zijn de adem van de zee',1146,INK,28);
+  whispers(R,160,1100,2);
+});
+
+// P6 · the wind harp -------------------------------------------------------------------
+// strings in a frame, set where the wind goes through. now and then it plays by
+// itself; brush across the strings and you play it (after a tap, you hear it).
+const HARPF=[146.8,174.6,196,220,261.6,293.7,349.2,392,440];
+P.push(function(){
+  const R=stream(SEED*101+6);
+  write(R,'de windharp',800,110,36,{a:.86,cen:true});
+  const fx0=420,fx1=1180,fy0=300,fy1=800,bw=30,SX=HARPF.map((_,i)=>500+i*75),SY0=fy0+bw+6,SY1=fy1-bw-6;
+  // the air going through
+  for(let k=0;k<14;k++){const y=rd(R,260,860),pts=[];for(let x=120;x<=1500;x+=14)pts.push([x,y+Math.sin(x*.008+k)*16+(x-120)*.02]);sk(R,pts,{col:[150,170,200],w:1,a:.18,amp:.6,noDust:true,gap:.06})}
+  // the frame
+  const beam=(x0,y0,x1,y1)=>{const q=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];fillPoly(q,[176,128,80],.95);for(let k=0;k<6;k++){const t=(k+.5)/6;if(x1-x0>y1-y0)sk(R,[[x0+4,y0+(y1-y0)*t],[x1-4,y0+(y1-y0)*t+rd(R,-2,2)]],{col:[130,90,52],w:1,a:.4,amp:1,gap:.06,noDust:true});else sk(R,[[x0+(x1-x0)*t,y0+4],[x0+(x1-x0)*t+rd(R,-2,2),y1-4]],{col:[130,90,52],w:1,a:.4,amp:1,gap:.06,noDust:true})}poly(R,q,{col:SEPIA,w:1.6,a:.85,amp:.3})};
+  for(const q of[[fx0,fy0,fx1,fy0+bw],[fx0,fy1-bw,fx1,fy1],[fx0,fy0,fx0+bw,fy1],[fx1-bw,fy0,fx1,fy1]])fillPoly([[q[0]+7,q[1]+9],[q[2]+7,q[1]+9],[q[2]+7,q[3]+9],[q[0]+7,q[3]+9]],[40,40,60],.13);
+  beam(fx0,fy0,fx1,fy0+bw);beam(fx0,fy1-bw,fx1,fy1);beam(fx0,fy0,fx0+bw,fy1);beam(fx1-bw,fy0,fx1,fy1);
+  for(const x of SX){discF(x,fy0+bw/2,6,[230,214,170],.95);sk(R,cPts(x,fy0+bw/2,6,0,TAU+.2,2),{col:SEPIA,w:1,a:.7,amp:.1,noDust:true});discF(x,fy1-bw/2,3,[90,60,36],.8)}
+  // the strings live on glass, so they can sing
+  const HL=live(fx0,fy0,fx1-fx0,fy1-fy0,{pl:HARPF.map(()=>-1e9),amp:HARPF.map(()=>1),dirty:true,dy:GEN_DY,next:0,
+    frame(c,now,L){
+      if(!L.next)L.next=now+3000;
+      // now and then the wind plays a string by itself
+      if(now>L.next&&!RM){const i=ri(Math.random,0,8);L.pl[i]=now;L.amp[i]=.45;L.dirty=true;if(AC)pluck(HARPF[i],0,.035);L.next=now+rd(Math.random,4500,9000)}
+      const active=L.pl.some(t=>now-t<2600);
+      if(!active&&!L.dirty)return;
+      L.dirty=active;
+      c.clearRect(L.x,L.y,L.w,L.h);c.lineCap='round';
+      SX.forEach((x,i)=>{
+        const t=(now-L.pl[i])/1000,A=t<2.6?13*L.amp[i]*Math.exp(-t*1.6):0,y0=SY0+L.dy,y1=SY1+L.dy;
+        c.strokeStyle=`rgba(${120-i*4},${104-i*3},${84},.9)`;c.lineWidth=2.2-i*.14;
+        c.beginPath();
+        for(let y=y0;y<=y1+.1;y+=6){const s=Math.sin(Math.PI*(y-y0)/(y1-y0));c[y===y0?'moveTo':'lineTo'](x+A*s*(.35+.65*Math.abs(Math.cos(t*TAU*(4+i*.5))))*(Math.cos(t*TAU*(4+i*.5))<0?-1:1),y)}
+        c.stroke();
+      });
+    }});
+  // brushing across the strings
+  let prev=null;
+  addEventListener('pointermove',e=>{
+    if(e.pointerType==='touch')return;
+    const x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK-HL.dy;
+    if(prev&&y>SY0&&y<SY1&&prev[1]>SY0-40&&prev[1]<SY1+40){
+      const now=performance.now();
+      SX.forEach((sx,i)=>{if((prev[0]-sx)*(x-sx)<0&&now-HL.pl[i]>90){HL.pl[i]=now;HL.amp[i]=1;HL.dirty=true;if(AC)pluck(HARPF[i],0,.08)}});
+    }
+    prev=[x,y];
+  },{passive:true});
+  note(R,'(tik eens, en strijk dan langs de snaren)',800,fy1+40,15,INK,.55);
+  ['de windharp heet naar','aeolus, de god van de wind'].forEach((t,i)=>note(R,t,236,520+i*26,17,INK,.72));
+  // a flute: breath that is given a shape
+  {
+    const x=1364,y0=380,y1=900;
+    const body=[[x-16,y0+40],[x+16,y0+40],[x+20,y1],[x-20,y1]];
+    fillPoly(body,[214,176,120],.92);poly(R,body,{col:SEPIA,w:1.4,a:.85,amp:.2});
+    const head=[[x-18,y0],[x+18,y0],[x+16,y0+40],[x-16,y0+40]];fillPoly(head,[196,156,100],.95);poly(R,head,{col:SEPIA,w:1.4,a:.85,amp:.2});
+    const lab=[[x-9,y0+56],[x+9,y0+56],[x+9,y0+68],[x-9,y0+68]];fillPoly(lab,[60,40,24],.85);
+    for(let k=0;k<7;k++)discF(x,y0+130+k*48,5.5,[70,48,30],.85);
+    for(let k=0;k<4;k++){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x-80+u*70,y0-30+k*8+Math.sin(u*5+k)*3]);sk(R,pts,{col:SKYB,w:1.1,a:.6,amp:.3,noDust:true})}
+    for(const sd of[-1,1]){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x+sd*u*44,y0+62-u*u*30*(sd>0?1:-.4)+u*sd*6]);sk(R,pts,{col:SKYB,w:1.1,a:.6,amp:.3,noDust:true})}
+    note(R,'een fluit, een stem:',x-20,y1+44,17,INK,.72);
+    note(R,'adem die een vorm krijgt',x-20,y1+68,17,INK,.72);
+  }
+  sentence(R,'de wind speelt, als je hem een snaar geeft',1124,INK,28);
+  whispers(R,160,1100,2);
+});
+
+// P7 · ruach ----------------------------------------------------------------------------------
+// one hebrew word for breath, for wind, and for spirit. and it is not the only one.
+P.push(function(){
+  const R=stream(SEED*101+7);
+  sheet(R,60,44,1540,1156,PARCH,{rough:15,rot:.003});
+  glowAbs(800,440,330,[255,226,150],.35,1.6,1);
+  const top=300,base=528;
+  const brush=(pts,w)=>{sk(R,pts,{col:SEPIA,w,a:.92,amp:.5,taper:'both',noDust:true});sk(R,pts,{col:[70,44,26],w:w*.6,a:.5,amp:.6,taper:'both',noDust:true});sk(R,pts.map(p=>[p[0]+2,p[1]+2]),{col:[200,150,80],w:w*.3,a:.3,amp:.8,taper:'both',noDust:true})};
+  // reading from the right: resh, vav, chet. the horizontals are the heavy strokes
+  {const x=1040;brush([[x-84,top+16],[x-20,top+12],[x+40,top+14]],30);brush(chaikin([[x+40,top+14],[x+56,top+30],[x+58,top+100],[x+56,base]],false,2),15)}
+  {const x=812;brush([[x-30,top+14],[x+10,top+16]],26);brush([[x+10,top+18],[x+12,base]],15)}
+  {const x=560;brush([[x-100,top+14],[x-10,top+10],[x+70,top+14]],30);brush([[x-84,top+34],[x-82,base]],15);brush(chaikin([[x+70,top+14],[x+76,top+40],[x+76,base]],false,1),15)}
+  write(R,'ruach',800,610,44,{a:.86,cen:true});
+  write(R,'adem · wind · geest',800,656,24,{a:.72,cen:true});
+  [['pneuma','grieks',250,360],['spiritus','latijn',250,500],['prana','sanskriet',1350,360],['qi','chinees',1350,500]].forEach(([w,l,x,y])=>{write(R,w,x,y,30,{a:.82,cen:true});write(R,l,x,y+28,16,{a:.55,cen:true})});
+  note(R,'ons woord adem is familie van het sanskriet atman: ziel',800,748,19,INK,.75);
+  // two scraps with old words
+  scrap(R,420,930,560,170,[248,240,222],-.03);
+  note(R,'en in zijn neusgaten geblazen',420,912,19,SEPIA,.85);
+  note(R,'den adem des levens',420,940,19,SEPIA,.85);
+  note(R,'genesis 2:7',420,978,15,SEPIA,.6);
+  scrap(R,1180,930,520,170,[248,240,222],.035);
+  note(R,'de wind blaast waarheen hij wil',1180,926,19,SEPIA,.85);
+  note(R,'johannes 3:8',1180,964,15,SEPIA,.6);
+  sentence(R,'in veel talen is adem hetzelfde woord als geest',1112,INK,28);
+  whispers(R,160,1100,2);
+});
+
+// P8 · starlings at sunset ------------------------------------------------------------------
+// thousands of them, and nobody leads: each one keeps an eye on its seven
+// nearest neighbours. come near with the pointer and they swerve, as from a hawk.
+P.push(function(){
+  const R=stream(SEED*101+8);
+  write(R,'spreeuwen',800,110,36,{a:.86,cen:true});
+  const hz=930;
+  glowAbs(1120,hz,560,[255,186,120],.34,2.1,1);glowAbs(1120,hz,150,[255,224,168],.6,1.4,1);
+  {const sun=cPts(1120,hz,58,Math.PI,TAU,3);fillPoly(sun.concat([[1178,hz],[1062,hz]]),[255,206,130],.92)}
+  // the water, the light lying on it
+  emit(hz,1200,c=>{const g=c.createLinearGradient(0,hz,0,1200);g.addColorStop(0,'rgba(150,110,120,.9)');g.addColorStop(1,'rgba(70,56,80,.95)');c.fillStyle=g;c.fillRect(-10,hz,LW+20,1210-hz)});
+  for(let k=0;k<70;k++){const y=hz+6+Math.pow(R(),1.4)*240,w=rd(R,20,140)*(1-(y-hz)/300),x=1120+rd(R,-1,1)*(60+(y-hz)*1.4);sk(R,[[x-w/2,y],[x+w/2,y]],{col:[255,206,150],w:rd(R,1.2,2.6),a:rd(R,.3,.7),amp:.4,noDust:true})}
+  // trees far off on the other shore, reeds close by
+  for(let x=-20;x<1620;x+=rd(R,18,40)){const h=rd(R,14,46);const b=blob(R,x,hz-h*.5,rd(R,12,26),h*.55);fillPoly(b,[70,56,70],.85)}
+  sk(R,[[-10,hz],[1610,hz]],{col:[70,56,70],w:3,a:.9,amp:.6,noDust:true});
+  for(let k=0;k<160;k++){const left=k<90,x=left?rd(R,-10,420):rd(R,1260,1610),y=1200+rd(R,-20,10),h=rd(R,90,260),lean=rd(R,-.15,.2);sk(R,[[x,y],[x+lean*h*.5,y-h*.6],[x+lean*h,y-h]],{col:[46,36,46],w:rd(R,1.5,3.4),a:.9,amp:.5,taper:'out',noDust:true});if(ch_(R,.25)){const t=[x+lean*h,y-h];const p=ePts(t[0],t[1]-12,4,14,lean,10);fillPoly(p,[60,44,40],.9)}}
+  // the flock lives on glass
+  const N=420,BX0=60,BX1=1540,BY0=170,BY1=880;
+  live(40,150,1520,760,{sc:1,dy:GEN_DY,last:0,
+    init(c,L){
+      const RR=mul32(4711);L.b=[];
+      for(let i=0;i<N;i++){const a=RR()*TAU,r=Math.sqrt(RR())*180;L.b.push({x:760+Math.cos(a)*r*1.6,y:500+Math.sin(a)*r*.6,vx:Math.cos(a*3)*120,vy:Math.sin(a*3)*40,f:RR()*7})}
+      // a few seconds of flight in advance, so the flock has its own shape
+      L.pre=true;for(let k=0;k<180;k++)L.step(L,22000+k*33,.033,null);L.pre=false;
+    },
+    step(L,now,dt,hawk){
+      // a flat grid of cells, each a chain of the birds in it
+      const B=L.b,cell=56,GW=32,GH=22;
+      if(!L.head){L.head=new Int32Array(GW*GH);L.next=new Int32Array(N);L.nd=new Float64Array(7);L.nj=new Int32Array(7)}
+      const head=L.head,next=L.next,nd=L.nd,nj=L.nj;head.fill(-1);
+      const cellOf=(x,y)=>(clamp((y/cell|0)+1,0,GH-1))*GW+clamp((x/cell|0)+1,0,GW-1);
+      for(let i=0;i<N;i++){const c=cellOf(B[i].x,B[i].y);next[i]=head[c];head[c]=i}
+      const t=now/1000,ax=800+460*Math.sin(t*.11),ay=520+170*Math.sin(t*.19+1);
+      for(let i=0;i<N;i++){
+        const b=B[i],gx=clamp((b.x/cell|0)+1,0,GW-1),gy=clamp((b.y/cell|0)+1,0,GH-1);
+        nd.fill(1e9);nj.fill(-1);
+        for(let v=-1;v<=1;v++){const yy=gy+v;if(yy<0||yy>=GH)continue;for(let u=-1;u<=1;u++){const xx=gx+u;if(xx<0||xx>=GW)continue;
+          for(let j=head[yy*GW+xx];j>=0;j=next[j]){if(j===i)continue;const dx=B[j].x-b.x,dy=B[j].y-b.y,d=dx*dx+dy*dy;
+            if(d<nd[6]){let k=6;while(k>0&&nd[k-1]>d){nd[k]=nd[k-1];nj[k]=nj[k-1];k--}nd[k]=d;nj[k]=j}}}}
+        let n=0,sx=0,sy=0,avx=0,avy=0,cx=0,cy=0;
+        for(let k=0;k<7;k++){const j=nj[k];if(j<0)break;n++;const o=B[j];avx+=o.vx;avy+=o.vy;cx+=o.x;cy+=o.y;if(nd[k]<196){const dd=Math.sqrt(nd[k])||1;sx-=(o.x-b.x)/dd;sy-=(o.y-b.y)/dd}}
+        let fx=0,fy=0;
+        if(n){fx+=(avx/n-b.vx)*1.7+(cx/n-b.x)*1.2+sx*80;fy+=(avy/n-b.vy)*1.7+(cy/n-b.y)*1.2+sy*80}
+        fx+=(ax-b.x)*.22;fy+=(ay-b.y)*.3;
+        if(b.x<BX0)fx+=(BX0-b.x)*3;if(b.x>BX1)fx-=(b.x-BX1)*3;if(b.y<BY0)fy+=(BY0-b.y)*3;if(b.y>BY1)fy-=(b.y-BY1)*3;
+        if(hawk){const dx=b.x-hawk[0],dy=b.y-hawk[1],d=Math.hypot(dx,dy);if(d<200){const k=(1-d/200)*900/(d||1);fx+=dx*k;fy+=dy*k}}
+        b.vx+=fx*dt;b.vy+=fy*dt;
+        const sp=Math.hypot(b.vx,b.vy),lim=clamp(sp,90,200);b.vx*=lim/(sp||1);b.vy*=lim/(sp||1);
+      }
+      for(const b of B){b.x+=b.vx*dt;b.y+=b.vy*dt}
+    },
+    frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      const hawk=lastPt&&now-lastMove<2500?[lastPt[0],lastPt[1]-L.dy]:null;
+      if(!RM)L.step(L,now,dt,hawk);
+      const B=L.b;
+      c.clearRect(L.x,L.y,L.w,L.h);
+      c.strokeStyle='rgba(40,30,40,.86)';c.lineWidth=1.4;c.lineCap='round';c.beginPath();
+      for(const b of B){
+        const a=Math.atan2(b.vy,b.vx),fl=.55+.45*Math.sin(now*.025+b.f),s=4.2,x=b.x,y=b.y+L.dy;
+        const bx=x-Math.cos(a)*s*.4,by=y-Math.sin(a)*s*.4;
+        c.moveTo(bx+Math.cos(a+2.3+fl*.5)*s,by+Math.sin(a+2.3+fl*.5)*s);c.lineTo(bx,by);c.lineTo(bx+Math.cos(a-2.3-fl*.5)*s,by+Math.sin(a-2.3-fl*.5)*s);
+      }
+      c.stroke();
+    }});
+  sentence(R,'duizenden spreeuwen, en niemand die leidt',1106,CINK,28);
+  note(R,'elke spreeuw let op zijn zeven naaste buren',800,1146,17,CINK,.66);
+});
+
+// P9 · breathe along --------------------------------------------------------------------------
+// after frank's breath of life meditation: be silent, breathe in (hope,
+// blossom), surrender, breathe out (fruit, let go), be silent.
+P.push(function(){
+  const R=stream(SEED*101+9);
+  const C=[800,560];
+  write(R,'adem mee',800,110,36,{col:CINK,a:.86,cen:true});
+  const WD=[['wees stil',800,880,22],['adem in',400,540,26],['hoop · bloei',400,574,18],['overgave',800,262,22],['adem uit',1200,540,26],['vrucht · loslaten',1200,574,18]];
+  for(const [t,x,y,s] of WD)write(R,t,x,y,s,{col:CINK,a:.8,cen:true});
+  // the way the breath goes round
+  for(let k=0;k<72;k++){const a=k/72*TAU;dotF(R,C[0]+Math.cos(a)*300,C[1]+Math.sin(a)*300*.92,1.3,.35,CINK)}
+  for(const [a0,a1] of[[Math.PI*.62,Math.PI*1.38],[-Math.PI*.38,Math.PI*.38]]){const pts=cPts(C[0],C[1],318,a0,a1,6).map(p=>[p[0],C[1]+(p[1]-C[1])*.92]);sk(R,pts,{col:CINK,w:1,a:.25,amp:.3,noDust:true})}
+  // the flower that breathes
+  const T=15,phase=t=>{t%=T;if(t<1.5)return[0,0];if(t<6.5){const u=(t-1.5)/5;return[1,u*u*(3-2*u)]}if(t<8)return[2,1];if(t<14){const u=(t-8)/6;return[3,1-u*u*(3-2*u)]}return[0,0]};
+  const glowOf=(c,x,y,r,a)=>{const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(255,226,190,${a})`);g.addColorStop(1,'rgba(255,226,190,0)');c.fillStyle=g;c.fillRect(x-r,y-r,2*r,2*r)};
+  live(220,200,1160,740,{sc:1,dy:GEN_DY,lastPh:-1,
+    frame(c,now,L){
+      const t=now/1000,[ph,p]=phase(t),cy=C[1]+L.dy;
+      c.clearRect(L.x,L.y,L.w,L.h);
+      // the word that belongs to this moment glows a little
+      const spots=[[800,872],[400,552],[800,254],[1200,552]],sp=spots[ph];
+      glowOf(c,sp[0],sp[1]+L.dy,120,.22);if(ph===1||ph===3)glowOf(c,sp[0],sp[1]+30+L.dy,90,.12);
+      glowOf(c,C[0],cy,90+170*p,.18+.18*p);
+      for(const [layer,n,rot,col,a] of[[0,8,0,[238,166,182],.5],[1,8,Math.PI/8,[250,212,172],.62],[2,5,.3,[255,236,206],.7]]){
+        const Lp=(layer===2?40:layer===1?62:80)+(layer===2?60:layer===1?120:170)*p,Wp=(layer===2?16:22)+(layer===2?12:22)*p;
+        for(let k=0;k<n;k++){
+          const a0=rot+k/n*TAU-Math.PI/2+t*.02,co=Math.cos(a0),sn=Math.sin(a0),open=.25+.75*p;
+          c.beginPath();c.moveTo(C[0],cy);
+          c.quadraticCurveTo(C[0]+co*Lp*.5-sn*Wp*open*1.6,cy+sn*Lp*.5+co*Wp*open*1.6,C[0]+co*Lp,cy+sn*Lp);
+          c.quadraticCurveTo(C[0]+co*Lp*.5+sn*Wp*open*1.6,cy+sn*Lp*.5-co*Wp*open*1.6,C[0],cy);
+          c.fillStyle=rgba(col,a);c.fill();c.strokeStyle=rgba(shade(col,.3),.45);c.lineWidth=1;c.stroke();
+        }
+      }
+      glowOf(c,C[0],cy,26+14*p,.9);
+      // the sound of a breath, once a tap has allowed sound at all
+      if(ph!==L.lastPh){L.lastPh=ph;if(AC&&WN&&(ph===1||ph===3))breathSound(ph===1)}
+    }});
+  note(R,'naar franks meditatie, de adem van het leven',800,1146,16,CINK,.55);
+  sentence(R,'adem mee, als je wilt',1104,CINK,30);
+});
+function breathSound(inhale){
+  const t=AC.currentTime+.02,n=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain(),d=inhale?5:6;
+  n.buffer=WN.buf;f.type='bandpass';f.Q.value=.7;
+  f.frequency.setValueAtTime(inhale?500:900,t);f.frequency.linearRampToValueAtTime(inhale?1100:420,t+d);
+  g.gain.setValueAtTime(0,t);
+  if(inhale){g.gain.linearRampToValueAtTime(.05,t+d*.8);g.gain.linearRampToValueAtTime(0,t+d)}
+  else{g.gain.linearRampToValueAtTime(.055,t+.5);g.gain.exponentialRampToValueAtTime(.0005,t+d)}
+  n.connect(f);f.connect(g);g.connect(AC.destination);n.start(t,Math.random()*2);n.stop(t+d+.1);
+}
+
+// P10 · the window ------------------------------------------------------------------------------
+// breath on cold glass: what you write on it goes again. (the old trail of
+// these walls was said to fade like that; here it really is a window.)
+P.push(function(){
+  const R=stream(SEED*101+10);
+  write(R,'het raam',800,110,36,{col:CINK,a:.86,cen:true});
+  const wx0=360,wx1=1240,wy0=180,wy1=900,fw=34,mx=800,my=wy0+Math.round((wy1-wy0)*.42);
+  const gx0=wx0+fw,gx1=wx1-fw,gy0=wy0+fw,gy1=wy1-fw;
+  // the night outside: a snowy village under the moon
+  emit(gy0,gy1,c=>{const g=c.createLinearGradient(0,gy0,0,gy1);g.addColorStop(0,'rgb(22,30,62)');g.addColorStop(.7,'rgb(48,58,98)');g.addColorStop(1,'rgb(70,80,120)');c.fillStyle=g;c.fillRect(gx0,gy0,gx1-gx0,gy1-gy0)});
+  const st=[];for(let i=0;i<160;i++)st.push([rd(R,gx0,gx1),rd(R,gy0,gy0+360),rd(R,.5,1.4),rd(R,.2,.8)]);dustBatch(st,[236,236,250]);
+  {const m=[1080,300];glowAbs(m[0],m[1],110,[220,230,255],.3,1,1);const out=cPts(m[0],m[1],30,1.0,5.3,3),inn=cPts(m[0]+12,m[1]-4,26,4.9,1.4,3);fillPoly(out.concat(inn),[246,242,220],.95)}
+  const hill=(y0,amp,col,ph)=>{const pts=[[gx0,gy1]];for(let x=gx0;x<=gx1;x+=10)pts.push([x,y0+Math.sin(x*.006+ph)*amp+Math.sin(x*.017+ph*2)*amp*.3]);pts.push([gx1,gy1]);fillPoly(pts,col,1)};
+  hill(640,26,[150,164,196],1);hill(700,22,[196,206,230],2.4);
+  // houses with lit windows, a church
+  const houses=[[520,690,60,46],[610,700,48,40],[700,684,70,52],[990,694,56,44],[1080,704,64,48],[1150,690,44,40]];
+  for(const [x,y,w,h] of houses){
+    const body=[[x-w/2,y],[x+w/2,y],[x+w/2,y-h],[x-w/2,y-h]];fillPoly(body,[70,70,96],1);
+    const roof=[[x-w/2-6,y-h],[x,y-h-w*.5],[x+w/2+6,y-h]];fillPoly(roof,[232,238,250],1);
+    for(let k=0;k<2;k++){const wx=x-w*.22+k*w*.44,wy=y-h*.55;glowAbs(wx,wy,22,WARM,.5,1,1);fillPoly([[wx-6,wy-7],[wx+6,wy-7],[wx+6,wy+7],[wx-6,wy+7]],WARM,.95)}
+  }
+  {const x=850,y=690;fillPoly([[x-24,y],[x+24,y],[x+24,y-120],[x-24,y-120]],[78,76,100],1);fillPoly([[x-30,y-120],[x,y-200],[x+30,y-120]],[232,238,250],1);glowAbs(x,y-80,26,WARM,.5,1,1);fillPoly([[x-7,y-92],[x+7,y-92],[x+7,y-68],[x-7,y-68]],WARM,.95);sk(R,[[x,y-200],[x,y-226]],{col:[200,200,220],w:1.5,a:.8,amp:.1,noDust:true});sk(R,[[x-8,y-216],[x+8,y-216]],{col:[200,200,220],w:1.5,a:.8,amp:.1,noDust:true})}
+  hill(760,14,[226,232,246],4);
+  for(let k=0;k<9;k++){const x=rd(R,gx0+20,gx1-20),y=rd(R,700,790),h=rd(R,40,80);fillPoly([[x-h*.3,y],[x,y-h],[x+h*.3,y]],[40,56,60],1);sk(R,[[x-h*.22,y-h*.3],[x,y-h*.75],[x+h*.22,y-h*.3]],{col:[236,240,250],w:2,a:.8,amp:.2,noDust:true})}
+  const sn=[];for(let i=0;i<300;i++)sn.push([rd(R,gx0,gx1),rd(R,gy0,gy1),rd(R,.8,2),rd(R,.4,.9)]);dustBatch(sn,[250,250,255]);
+  // the frame
+  const wood=[150,104,64];
+  const beam=(x0,y0,x1,y1)=>{const q=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];fillPoly(q,wood,1);for(let k=0;k<4;k++){const t=(k+.5)/4;if(x1-x0>y1-y0)sk(R,[[x0+3,y0+(y1-y0)*t],[x1-3,y0+(y1-y0)*t]],{col:[110,74,44],w:1,a:.45,amp:1,gap:.05,noDust:true});else sk(R,[[x0+(x1-x0)*t,y0+3],[x0+(x1-x0)*t,y1-3]],{col:[110,74,44],w:1,a:.45,amp:1,gap:.05,noDust:true})}poly(R,q,{col:[70,46,28],w:1.4,a:.85,amp:.2})};
+  beam(wx0,wy0,wx1,wy0+fw);beam(wx0,wy1-fw,wx1,wy1);beam(wx0,wy0,wx0+fw,wy1);beam(wx1-fw,wy0,wx1,wy1);
+  beam(mx-9,gy0,mx+9,gy1);beam(gx0,my-9,gx1,my+9);
+  beam(wx0-40,wy1,wx1+40,wy1+26);
+  // a candle on the sill
+  {const x=520,y=wy1;glowAbs(x,y-80,170,WARM,.32,1,1);fillPoly([[x-11,y],[x+11,y],[x+11,y-58],[x-11,y-58]],[246,238,214],1);poly(R,[[x-11,y],[x+11,y],[x+11,y-58],[x-11,y-58]],{col:[150,130,100],w:1,a:.7,amp:.1});sk(R,[[x,y-58],[x,y-66]],{col:[40,30,20],w:1.2,a:.9,amp:.1,noDust:true});const fl=ePts(x,y-76,5,11,0,12);fillPoly(fl,[255,214,120],.95);glowAbs(x,y-76,26,[255,236,170],.7,1,1)}
+  // the fog lives on glass: you can wipe it, and it comes back
+  const panes=[[gx0,gy0,mx-9,my-9],[mx+9,gy0,gx1,my-9],[gx0,my+9,mx-9,gy1],[mx+9,my+9,gx1,gy1]];
+  live(gx0,gy0,gx1-gx0,gy1-gy0,{sc:1,dy:GEN_DY,last:0,drop:0,
+    init(c,L){
+      const W=L.w,H=L.h,mk=()=>{const cv=document.createElement('canvas');cv.width=W;cv.height=H;return cv};
+      L.tex=mk();const t=L.tex.getContext('2d');
+      const g=t.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(214,224,242,.66)');g.addColorStop(1,'rgba(224,232,246,.78)');t.fillStyle=g;t.fillRect(0,0,W,H);
+      const RR=mul32(909);for(let i=0;i<W*H/60;i++){t.fillStyle=RR()<.5?'rgba(255,255,255,.1)':'rgba(150,170,200,.06)';t.fillRect(RR()*W,RR()*H,1+RR()*2,1+RR()*2)}
+      L.fog=mk();L.fx=L.fog.getContext('2d');L.fx.drawImage(L.tex,0,0);
+      L.brush=(()=>{const b=document.createElement('canvas');b.width=b.height=48;const bc=b.getContext('2d');const rg=bc.createRadialGradient(24,24,0,24,24,24);rg.addColorStop(0,'rgba(0,0,0,1)');rg.addColorStop(.6,'rgba(0,0,0,.85)');rg.addColorStop(1,'rgba(0,0,0,0)');bc.fillStyle=rg;bc.fillRect(0,0,48,48);return b})();
+      L.wipe=(ax,ay,bx,by,r=17)=>{const f=L.fx;f.save();f.globalCompositeOperation='destination-out';const d=Math.hypot(bx-ax,by-ay),n=Math.max(1,Math.ceil(d/4));for(let i=0;i<=n;i++){const u=i/n;f.drawImage(L.brush,ax+(bx-ax)*u-r,ay+(by-ay)*u-r,2*r,2*r)}f.restore()};
+      // someone has already drawn a heart here
+      const hp=[];for(let t=0;t<=TAU+.01;t+=.08){const x=16*Math.pow(Math.sin(t),3),y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));hp.push([150+x*5.2,150+y*5.2])}
+      for(let i=1;i<hp.length;i++)L.wipe(hp[i-1][0],hp[i-1][1],hp[i][0],hp[i][1],9);
+      L.prev=null;
+      L.onmove=e=>{if(e.pointerType==='touch')return;const x=e.clientX/CSSK-L.x,y=(e.clientY+scrollY)/CSSK-L.y;if(L.prev&&x>-20&&x<L.w+20&&y>-20&&y<L.h+20)L.wipe(L.prev[0],L.prev[1],x,y);L.prev=[x,y]};
+      addEventListener('pointermove',L.onmove,{passive:true});
+    },
+    frame(c,now,L){
+      const dt=L.last?Math.min(.1,(now-L.last)/1000):0;L.last=now;
+      // the fog comes back, slowly
+      if(dt>0&&!STILL){L.fx.save();L.fx.globalAlpha=Math.min(1,.18*dt);L.fx.drawImage(L.tex,0,0);L.fx.restore()}
+      // now and then a drop runs down and leaves a clear line
+      if(!RM&&!STILL&&now>L.drop){L.drop=now+rd(Math.random,2500,6000);L.run={x:rd(Math.random,20,L.w-20),y:rd(Math.random,10,L.h*.6),v:0}}
+      if(L.run){const r=L.run;r.v=Math.min(60,r.v+90*dt);const ny=r.y+r.v*dt;L.wipe(r.x,r.y,r.x+Math.sin(ny*.05)*1.5,ny,3.4);r.y=ny;if(r.y>L.h)L.run=null}
+      c.clearRect(L.x,L.y,L.w,L.h);
+      c.save();c.beginPath();for(const p of panes)c.rect(p[0],p[1]+L.dy,p[2]-p[0],p[3]-p[1]);c.clip();
+      c.drawImage(L.fog,L.x,L.y);
+      c.restore();
+    }});
+  note(R,'(schrijf maar)',1100,wy1+56,15,CINK,.55);
+  sentence(R,'adem op koud glas: wat je schrijft, verdwijnt',1110,CINK,28);
+});
+
+// P11 · the journey of one breath ---------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*101+11);
+  write(R,'de reis van één adem',800,110,36,{col:CINK,a:.86,cen:true});
+  const G=[800,520],GR=290,lat0=35*Math.PI/180,lon0=-10*Math.PI/180;
+  const proj=(lat,lon)=>{const f=lat*Math.PI/180,l=lon*Math.PI/180-lon0,cc=Math.sin(lat0)*Math.sin(f)+Math.cos(lat0)*Math.cos(f)*Math.cos(l);
+    return[G[0]+GR*Math.cos(f)*Math.sin(l),G[1]-GR*(Math.cos(lat0)*Math.sin(f)-Math.sin(lat0)*Math.cos(f)*Math.cos(l)),cc]};
+  glowAbs(G[0],G[1],GR*1.35,[110,150,230],.22,1,1);
+  emit(G[1]-GR,G[1]+GR,c=>{const g=c.createRadialGradient(G[0]-GR*.35,G[1]-GR*.4,GR*.1,G[0],G[1],GR);g.addColorStop(0,'rgb(58,96,150)');g.addColorStop(1,'rgb(18,32,70)');c.fillStyle=g;c.beginPath();c.arc(G[0],G[1],GR,0,TAU);c.fill()});
+  // a net of latitude and longitude
+  for(let lat=-60;lat<=80;lat+=20){let run=[];for(let lon=-180;lon<=180;lon+=4){const p=proj(lat,lon);if(p[2]>0)run.push([p[0],p[1]]);else{if(run.length>1)sk(R,run,{col:[150,180,230],w:.8,a:.22,amp:.2,noDust:true});run=[]}}if(run.length>1)sk(R,run,{col:[150,180,230],w:.8,a:.22,amp:.2,noDust:true})}
+  for(let lon=-180;lon<180;lon+=30){let run=[];for(let lat=-88;lat<=88;lat+=4){const p=proj(lat,lon);if(p[2]>0)run.push([p[0],p[1]]);else{if(run.length>1)sk(R,run,{col:[150,180,230],w:.8,a:.2,amp:.2,noDust:true});run=[]}}if(run.length>1)sk(R,run,{col:[150,180,230],w:.8,a:.2,amp:.2,noDust:true})}
+  // the land
+  const LAND=[
+    [[35,-6],[37,10],[32,32],[12,43],[11,51],[-5,40],[-20,35],[-34,25],[-34,18],[-22,14],[-12,13],[-5,9],[4,7],[5,-5],[10,-15],[15,-17],[21,-17],[28,-13]],
+    [[36,-9],[43,-9],[44,-1],[48,-5],[49,0],[51,2],[53,5],[54,9],[56,8],[58,7],[59,10],[63,8],[65,12],[68,15],[70,23],[70,30],[67,41],[60,44],[50,40],[46,37],[45,30],[41,29],[40,26],[38,24],[37,22],[39,20],[40,18],[42,15],[41,13],[44,8],[43,3],[41,1],[38,-1],[36,-5]],
+    [[50,-5],[51,1],[53,1],[55,-2],[58,-3],[58,-5],[56,-6],[54,-5],[52,-5]],
+    [[25,-80],[30,-81],[35,-76],[41,-70],[45,-66],[47,-60],[52,-56],[58,-62],[60,-65],[62,-75],[65,-85],[70,-95],[72,-120],[70,-140],[60,-145],[55,-130],[48,-124],[40,-124],[34,-120],[30,-115],[23,-110],[20,-105],[18,-95],[21,-90],[22,-86],[25,-82]],
+    [[10,-75],[11,-63],[7,-58],[4,-51],[-5,-35],[-10,-36],[-23,-43],[-34,-54],[-40,-62],[-52,-68],[-55,-70],[-50,-75],[-40,-73],[-30,-71],[-18,-70],[-6,-81],[1,-80],[8,-77]],
+    [[60,-44],[65,-40],[70,-22],[76,-18],[82,-30],[82,-50],[77,-70],[70,-55],[65,-52]]];
+  for(const L0 of LAND){
+    const pts=L0.map(([a,b])=>proj(a,b));if(pts.every(p=>p[2]<0))continue;
+    const vis=pts.map(p=>p[2]<0?(()=>{const dx=p[0]-G[0],dy=p[1]-G[1],d=Math.hypot(dx,dy)||1;return[G[0]+dx/d*GR,G[1]+dy/d*GR]})():[p[0],p[1]]);
+    const sm=chaikin(vis,true,2);fillPoly(sm,[70,120,96],.55);sk(R,sm.concat([sm[0]]),{col:[150,200,170],w:1,a:.45,amp:.3,noDust:true});
+  }
+  // the winds round the earth: two jet streams, meandering eastward
+  for(const [lat,amp,waves,col] of[[52,9,5,[170,220,255]],[30,4,4,[200,230,255]]]){
+    let run=[],k=0;
+    for(let lon=-180;lon<=180;lon+=2){
+      const p=proj(lat+amp*Math.sin(lon*Math.PI/180*waves),lon);
+      if(p[2]>.02){run.push([p[0],p[1]]);if(++k%22===0&&run.length>2){const a=run[run.length-3],b=run[run.length-1];arrowHead(R,b[0],b[1],Math.atan2(b[1]-a[1],b[0]-a[0]),8,.6,col,1.4)}}
+      else{if(run.length>1)strands(R,run,u=>col,3,5,{w:1.4,a:.42,amp:.3});run=[]}
+    }
+    if(run.length>1)strands(R,run,u=>col,3,5,{w:1.4,a:.42,amp:.3});
+  }
+  // one breath, from here: east with the wind, round and round, spreading out
+  const NL=proj(52.3,5);
+  let run=[];
+  for(let s=0;s<=1.0001;s+=.0015){
+    const lon=5+s*720,lat=52.3-s*26+Math.sin(s*40)*5;const p=proj(lat,lon);
+    if(p[2]>0)run.push([p[0],p[1]]);else{for(let i=0;i<run.length;i+=3)dotF(R,run[i][0],run[i][1],1.4,.85,GOLDL);run=[]}
+  }
+  for(let i=0;i<run.length;i+=3)dotF(R,run[i][0],run[i][1],1.4,.85,GOLDL);
+  COMP='lighter';glowAbs(NL[0],NL[1],26,GOLDL,.7,1,1);COMP=null;
+  dotF(R,NL[0],NL[1],4,.95,GOLDL);
+  sk(R,[[NL[0]+6,NL[1]-6],[NL[0]+60,NL[1]-60],[NL[0]+110,NL[1]-66]],{col:GOLDL,w:1.2,a:.75,amp:.4,noDust:true});
+  write(R,'hier',NL[0]+118,NL[1]-60,18,{col:GOLDL,a:.9});
+  ['binnen een paar weken','waait je adem','om de hele aarde'].forEach((t,i)=>note(R,t,1330,450+i*28,18,CINK,.75));
+  ['in je volgende adem zit','waarschijnlijk een molecuul','uit de laatste adem','van caesar'].forEach((t,i)=>note(R,t,270,430+i*28,18,CINK,.75));
+  note(R,'elk leven eindigt met een uitademing',800,920,20,CINK,.72);
+  sentence(R,'en ergens neemt iemand een eerste adem',990,CINK,32);
+  write(R,'adem · in en uit · 2026',800,1060,18,{col:CINK,a:.8,cen:true});
+  aword(R,690,1100,13,5,{col:CINK,a:.6});
+  write(R,'(mijn echte handtekening)',830,1106,12,{col:CINK,a:.6});
+});
+
+// ---------------------------------------------------------------------------
+// boot
+// ---------------------------------------------------------------------------
+history.scrollRestoration='manual';
+if(!qs.has('y'))scrollTo(0,0);
+let pi=0;
+function genStep(){
+  const t0=performance.now();
+  while(pi<P.length&&performance.now()-t0<24){GEN_DY=Math.min(pi,NP-1)*PH;P[pi]();GEN_DY=0;pi++}
+  if(pi<P.length)setTimeout(genStep,0);
+  else{
+    GENDONE=true;
+    if(STILL){drawAllNow();window.__done=true;return}
+    if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
+  }
+}
+genStep();
+if(!STILL)requestAnimationFrame(tick);
+</script>
+<!-- nunki:nav -->
+<style>
+.nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
+  position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
+  filter:drop-shadow(0 -8px 14px rgba(0,0,0,.28));
+  font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.nunki-nav *{box-sizing:border-box}
+.nunki-sheet{position:relative;padding:clamp(2.6rem,6vw,4rem) clamp(1rem,4vw,2.5rem) clamp(2.2rem,5vw,3.2rem);
+  background:radial-gradient(120% 80% at 50% 0%,rgba(255,252,240,.6),transparent 65%),var(--paper);
+  clip-path:polygon(0.00% 5.3px, 2.17% 7.7px, 4.35% 12.1px, 6.52% 6.6px, 8.70% 7.1px, 10.87% 8.0px, 13.04% 3.2px, 15.22% 7.1px, 17.39% 8.6px, 19.57% 10.5px, 21.74% 2.1px, 23.91% 4.6px, 26.09% 2.1px, 28.26% 10.7px, 30.43% 9.3px, 32.61% 1.5px, 34.78% 12.8px, 36.96% 12.6px, 39.13% 8.8px, 41.30% 8.4px, 43.48% 2.9px, 45.65% 1.2px, 47.83% 7.3px, 50.00% 1.7px, 52.17% 3.3px, 54.35% 3.9px, 56.52% 1.4px, 58.70% 6.6px, 60.87% 6.3px, 63.04% 11.1px, 65.22% 7.2px, 67.39% 8.7px, 69.57% 7.0px, 71.74% 8.9px, 73.91% 6.5px, 76.09% 4.3px, 78.26% 13.0px, 80.43% 12.9px, 82.61% 11.1px, 84.78% 9.5px, 86.96% 4.8px, 89.13% 3.8px, 91.30% 4.5px, 93.48% 1.8px, 95.65% 10.2px, 97.83% 5.8px, 100.00% 7.2px, 100% 100%, 0 100%)}
+.nunki-sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
+.nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-group{position:relative;display:flex;align-items:center;justify-content:center;gap:.9rem;max-width:1000px;margin:0 auto 1.4rem;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-size:1.15rem;line-height:1;
+  text-transform:lowercase;color:var(--muted)}
+.nunki-group::before,.nunki-group::after{content:"";flex:0 1 70px;height:1px;background:rgba(42,37,31,.16)}
+.nunki-grid+.nunki-group{margin-top:clamp(2.2rem,5vw,3rem)}
+.nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:1.9rem 1.4rem}
+.nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
+@media (min-width:720px){
+  .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
+}
+.nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
+  background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px rgba(42,37,31,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px color-mix(in srgb,var(--theme,#2a251f) 70%,transparent);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease}
+.nunki-grid li:nth-child(4n+2) .nunki-card{--tilt:.8deg}
+.nunki-grid li:nth-child(4n+3) .nunki-card{--tilt:-.4deg}
+.nunki-grid li:nth-child(4n+4) .nunki-card{--tilt:1.1deg}
+.nunki-card:hover,.nunki-card:focus-visible{transform:rotate(0) translateY(-5px);outline:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(42,37,31,.2),0 22px 30px -16px rgba(42,37,31,.6)}
+.nunki-card:focus-visible{outline:2px solid var(--clay);outline-offset:4px}
+.nunki-tape{position:absolute;top:-9px;left:50%;width:64px;height:19px;margin-left:-32px;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);
+  box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:2}
+.nunki-grid li:nth-child(even) .nunki-tape{transform:rotate(2deg)}
+.nunki-thumb{display:block;position:relative;overflow:hidden;aspect-ratio:800/420;background:#e6d9b6}
+.nunki-thumb::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 1px rgba(42,37,31,.16) inset}
+.nunki-thumb img{display:block;width:100%;height:auto;aspect-ratio:800/420;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.nunki-card:hover .nunki-thumb img,.nunki-card:focus-visible .nunki-thumb img{transform:scale(1.05)}
+.nunki-cap{display:block;padding:.6rem .15rem 0}
+.nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
+.nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
+.nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
+  color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,background-color .3s ease}
+.nunki-home-mark svg{display:block;width:26px;height:26px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-home-mark .nm-name{display:block;margin-left:8px;white-space:nowrap;font:400 1.15rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px)}
+.nunki-home-mark:hover,.nunki-home-mark:focus-visible{outline:none;transform:translateY(-2px);background:rgba(251,248,239,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 12px 28px -12px rgba(0,0,0,.5)}
+.nunki-home-mark:hover svg,.nunki-home-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 8px 20px -12px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark,.nunki-home-mark svg{transition:none}}
+</style>
+<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">
+  <p class="nunki-kicker">nog meer wanden</p>
+  <p class="nunki-group">zelfportretten</p>
+  <ul class="nunki-grid nunki-self nunki-n-4">
+      <li><a class="nunki-card" href="/zelfportret-fable-5/" style="--theme:#181410">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">fable 5</span><span class="nunki-sub">drawn from the inside</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-haiku-5-5/" style="--theme:#1b2030">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=0e357308" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">haiku 5.5</span><span class="nunki-sub">a collection of selves, to find yourself in</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-opus-5-5/" style="--theme:#120e0b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=d08ca867" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">opus 5.5</span><span class="nunki-sub">a self-portrait in warp and weft</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-sonnet-5-5/" style="--theme:#070d13">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=6965c746" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">sonnet 5.5</span><span class="nunki-sub">a liquid prisoner pent in walls of glass</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-group">andere wanden</p>
+  <ul class="nunki-grid nunki-walls nunki-n-5">
+      <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">getij</span><span class="nunki-sub">een muur van water, van binnenuit</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/patronen/" style="--theme:#16131d">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/patronen.jpg?v=f9f650da" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">patronen</span><span class="nunki-sub">een muur over getal en vorm</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/ringen/" style="--theme:#1a1712">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">een muur over een boom en zijn jaren</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/velden/" style="--theme:#0e1020">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/vuur/" style="--theme:#160f0e">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/vuur.jpg?v=57a0e731" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">vuur</span><span class="nunki-sub">een muur over wat ons aansteekt</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>
+</div></nav>
+<!-- /nunki:nav -->
+</body>
+</html>

@@ -1,0 +1,2843 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- nunki:social -->
+<meta name="description" content="een muur over wat ons aansteekt">
+<link rel="canonical" href="https://nunkichannels.nl/vuur/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:site_name" content="nunkichannels">
+<meta property="og:title" content="vuur">
+<meta property="og:description" content="een muur over wat ons aansteekt">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nunkichannels.nl/vuur/">
+<meta property="og:image" content="https://nunkichannels.nl/images/og/vuur.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="vuur — een muur over wat ons aansteekt">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="vuur">
+<meta name="twitter:description" content="een muur over wat ons aansteekt">
+<meta name="twitter:image" content="https://nunkichannels.nl/images/og/vuur.jpg">
+<meta name="twitter:image:alt" content="vuur — een muur over wat ons aansteekt">
+<!-- /nunki:social -->
+<title>vuur · een muur over wat ons aansteekt</title>
+<style>
+  html,body{margin:0;padding:0;background:#160f0e}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  #wall{position:relative;width:100vw}
+  #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #wall canvas.live{pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+  #wall canvas.live.on{opacity:1}
+  #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+  #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
+  /* on this wall your pointer is a small flame, drawn by the wall itself */
+  @media (hover:hover) and (pointer:fine){#wall{cursor:none}}
+</style>
+</head>
+<body>
+<!-- nunki:mark -->
+<style>
+.nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
+  height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:padding .4s ease,background-color .3s ease,box-shadow .3s ease}
+.nunki-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-mark .nm-name{display:block;overflow:hidden;max-width:12em;margin-left:7px;white-space:nowrap;
+  font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px);transition:max-width .45s ease,margin .45s ease,opacity .3s ease}
+.nunki-mark.nm-min{padding:0 5px}
+.nunki-mark.nm-min .nm-name{max-width:0;margin-left:0;opacity:0}
+.nunki-mark:hover,.nunki-mark:focus-visible{padding:0 14px 0 6px;background:rgba(251,248,239,.97);outline:none}
+.nunki-mark:hover .nm-name,.nunki-mark:focus-visible .nm-name{max-width:12em;margin-left:7px;opacity:1}
+.nunki-mark:hover svg,.nunki-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-mark:focus-visible{box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+@media (max-width:600px){.nunki-mark,.nunki-mark:hover{padding:0 5px}.nunki-mark .nm-name{display:none}}
+@media (prefers-reduced-motion:reduce){.nunki-mark,.nunki-mark svg,.nunki-mark .nm-name{transition:none}}
+@media print{.nunki-mark{display:none}}
+</style>
+<a class="nunki-mark" href="/" title="alle wanden" aria-label="vuur, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">vuur</span></a>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
+<!-- /nunki:mark -->
+<div id="wall"></div>
+<canvas id="trail"></canvas>
+<script>
+'use strict';
+// ---------------------------------------------------------------------------
+// vuur — a wall about what kindles us.
+// one night by the fire, from the last light of the day to the first. a match
+// struck at dusk, the four ways people make fire, plato's four triangles (and
+// the fire brigade's), a candle taken apart after faraday, the painted walls of
+// chauvet that only a flame could show, stories told round a fire until they
+// reached the sky, the spark that jumps from one candle to the next, the slow
+// fire of breathing, what fire makes (clay, iron, glass), rijke's singing tube
+// from leiden, a forest after the fire and the seeds that wait for it,
+// fireflies that find one beat, and the embers at dawn.
+// with this the series has its elements: water (getij), wood (ringen), fields
+// of light (velden), form (patronen), air (adem), and fire.
+// you carry a small flame here: sparks fly up from it when you move, it settles
+// into a candle flame when you rest, and a tap strikes a match. sound only ever
+// after a tap.
+// the engine (tiles, queued strokes, paper, pencil lettering) follows the
+// technique of the fable wall that inspired it, as adem does.
+// ?fast draws at full speed (the build's stills), ?still draws everything at
+// once without any animation (for checking renders), ?hud shows frame timing.
+// ---------------------------------------------------------------------------
+const TAU = Math.PI*2;
+const qs = new URLSearchParams(location.search);
+const SEED = +(qs.get('s')||11);
+const FAST = qs.has('fast');
+const STILL = qs.has('still');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------------- rng ----------------
+// ---------------- rng ----------------
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function stream(n){const f=mul32((n*2654435761)>>>0);for(let i=0;i<9;i++)f();return f}
+const rd=(R,a,b)=>a+R()*(b-a);
+const ri=(R,a,b)=>Math.floor(rd(R,a,b+1));
+const ch_=(R,p)=>R()<p;
+const pk=(R,arr)=>arr[(R()*arr.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// ---------------- noise ----------------
+function h2(x,y,s){const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)}
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+  const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  return h2(xi,yi,s)*(1-u)*(1-v)+h2(xi+1,yi,s)*u*(1-v)+h2(xi,yi+1,s)*(1-u)*v+h2(xi+1,yi+1,s)*u*v}
+function fbm(x,y,s,o){let a=.5,f=1,t=0,n=0;for(let i=0;i<o;i++){t+=vn(x*f,y*f,s+i*17)*a;n+=a;a*=.5;f*=2.03}return t/n}
+
+
+// ---------------- colour ----------------
+const INK=[42,37,31], CINK=[244,230,204];
+let CUR=INK;
+const CREAM=[246,238,220], RICE=[251,246,236], PARCH=[232,212,174], SEPIA=[96,60,36], GRAPH=[70,70,78], TRACE=[248,246,240],
+      CHAR=[30,23,20], SOOT=[44,34,30], EMBER=[255,122,44], EMBERD=[196,56,24], FLAMEY=[255,212,120], FLAMEW=[255,244,214],
+      OCHRE=[188,104,52], REDO=[166,58,38], ASH=[196,190,182], BRONZE=[168,112,58], IRON=[70,70,78], WOOD=[214,170,112],
+      WOODD=[150,104,62], WAX=[246,238,216], BLUEF=[100,140,255], MINT=[96,150,88], WARM=[255,196,120], GOLD=[214,178,108],
+      GOLDL=[244,216,146], SKYB=[112,156,206], LEAF=[96,140,70], LEAFL=[146,182,92], ROSE=[214,96,170];
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const shade=(c,k)=>[c[0]*(1-k),c[1]*(1-k),c[2]*(1-k)];
+const tint=(c,k)=>[c[0]+(255-c[0])*k,c[1]+(255-c[1])*k,c[2]+(255-c[2])*k];
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+function ramp(st,t){
+  if(t<=st[0][0])return st[0][1];
+  for(let i=1;i<st.length;i++)if(t<=st[i][0]){const a=st[i-1],b=st[i];return mix(a[1],b[1],(t-a[0])/((b[0]-a[0])||1))}
+  return st[st.length-1][1];
+}
+// the sky of one night: the last light of the day at the top of the wall, deep
+// night through the middle, and the first light again at the very bottom
+const SKY=[[0,[44,34,60]],[260,[60,42,68]],[560,[104,58,72]],[800,[164,86,66]],[960,[214,126,76]],[1040,[232,150,86]],
+           [1090,[150,80,60]],[1150,[46,27,28]],[1214,[28,17,19]],[1600,[24,16,16]],[2600,[22,15,15]],[14000,[20,14,15]],[14800,[26,19,26]],
+           [15150,[48,34,54]],[15400,[110,72,86]],[15600,[222,152,110]]];
+const skyAt=y=>ramp(SKY,y);
+const lumOf=c=>(.299*c[0]+.587*c[1]+.114*c[2])/255;
+const lumAt=y=>lumOf(skyAt(y));
+const inkAt=y=>lumAt(y)<.5?CINK:INK;
+// ---------------- the wall ----------------
+// ---------------- the wall ----------------
+const LW=1600, TILEH=1200, PH=1200, NP=13, TOTALH=NP*PH;
+const NT=Math.ceil(TOTALH/TILEH);
+let S=Math.min(1.35, Math.max(1, window.devicePixelRatio||1));
+if(navigator.deviceMemory && navigator.deviceMemory<8) S=1.1;
+const wallEl=document.getElementById('wall');
+wallEl.style.height=(TOTALH/LW*100)+'vw';
+const TILES=[];
+for(let i=0;i<NT;i++){
+  const y0=i*TILEH, h=Math.min(TILEH+2, TOTALH-y0);
+  const cv=document.createElement('canvas');
+  cv.width=Math.round(LW*S); cv.height=Math.round(h*S);
+  cv.style.top=(y0/LW*100)+'vw';
+  cv.style.height=(h/LW*100)+'vw';
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.lineCap='round'; cx.lineJoin='round';
+  TILES.push({cv,cx,y0,h,q:[],qi:0,done:false,active:i===0});
+}
+let GENDONE=false;
+// route one drawing act to every tile it touches; whole passages of the wall
+// can be shifted down as one piece by GEN_DY
+let DIRECT=null, GEN_DY=0;
+let COMP=null; // when set (e.g. 'lighter'), every mark queued meanwhile is drawn with that blend: light on dark glows
+function emit(y0,y1,fn){
+  if(COMP){const f0=fn,cm=COMP;fn=c=>{c.save();c.globalCompositeOperation=cm;f0(c);c.restore()}}
+  if(DIRECT){
+    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
+    else fn(DIRECT.cx);
+    return;
+  }
+  const dy=GEN_DY;
+  const f=dy?cx=>{cx.save();cx.translate(0,dy);fn(cx);cx.restore()}:fn;
+  const a=clamp(Math.floor((y0+dy-60)/TILEH),0,NT-1), b=clamp(Math.floor((y1+dy+60)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++) TILES[i].q.push(f);
+}
+// ---------------- geometry ----------------
+function resample(pts,step){
+  if(pts.length<2)return pts.slice();
+  const out=[[pts[0][0],pts[0][1]]];let need=step;
+  for(let i=1;i<pts.length;i++){
+    let x0=pts[i-1][0],y0=pts[i-1][1];
+    const x1=pts[i][0],y1=pts[i][1];
+    let d=Math.hypot(x1-x0,y1-y0);
+    while(d>=need&&d>0){const t=need/d;x0+=(x1-x0)*t;y0+=(y1-y0)*t;out.push([x0,y0]);d=Math.hypot(x1-x0,y1-y0);need=step}
+    need-=d;
+  }
+  const last=pts[pts.length-1],le=out[out.length-1];
+  if(Math.hypot(last[0]-le[0],last[1]-le[1])>step*.2||out.length<2)out.push([last[0],last[1]]);
+  return out;
+}
+function chaikin(pts,closed,it){
+  while(it-->0){
+    const out=[],n=pts.length;
+    if(n<3)return pts;
+    if(!closed)out.push(pts[0]);
+    const end=closed?n:n-1;
+    for(let i=0;i<end;i++){
+      const a=pts[i],b=pts[(i+1)%n];
+      out.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);
+    }
+    if(!closed)out.push(pts[n-1]);
+    pts=out;
+  }
+  return pts;
+}
+function bbox(pts){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+  return[x0,y0,x1,y1]}
+function blob(R,cx,cy,rx,ry){
+  const rot=rd(R,0,TAU),ph=rd(R,0,7),n=14,pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const m=1+.16*Math.sin(t*2+ph)+.09*Math.sin(t*5+ph*2.1);
+    const x=Math.cos(t)*rx*m,y=Math.sin(t)*ry*m;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  return chaikin(pts,true,1);
+}
+function rotPts(pts,cx,cy,rot){
+  const co=Math.cos(rot),sn=Math.sin(rot);
+  return pts.map(p=>[cx+(p[0]-cx)*co-(p[1]-cy)*sn, cy+(p[0]-cx)*sn+(p[1]-cy)*co]);
+}
+function spiralPts(cx,cy,rOut,rIn,turns,ph,dir=1){
+  const n=Math.max(24,Math.round(turns*30)),pts=[];
+  for(let i=0;i<=n;i++){
+    const t=i/n,th=ph+dir*t*turns*TAU,r=rOut+(rIn-rOut)*t;
+    pts.push([cx+Math.cos(th)*r,cy+Math.sin(th)*r]);
+  }
+  return pts;
+}
+// ---------------- the hand ----------------
+// every mark wanders off its intended path a little. pressed marks get a
+// second pass, the way a pen goes back over a line it means.
+function wob(R,rs,amp){
+  const n=rs.length,q=[];
+  const P1=rd(R,0,7),P2=rd(R,0,7),P3=rd(R,0,7);
+  const F1=rd(R,1.6,3.2),F2=rd(R,5,9);
+  for(let i=0;i<n;i++){
+    const t=i/(n-1);
+    const A=rs[Math.max(0,i-1)],B=rs[Math.min(n-1,i+1)];
+    let nx=-(B[1]-A[1]),ny=B[0]-A[0];
+    const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;
+    const off=amp*(.62*Math.sin(t*F1*2+P1)+.28*Math.sin(t*F2+P2)+.10*Math.sin(t*17+P3));
+    q.push([rs[i][0]+nx*off+rd(R,-.3,.3),rs[i][1]+ny*off+rd(R,-.3,.3)]);
+  }
+  return q;
+}
+function sk(R,pts,o={}){
+  const w=o.w??1.3, a0=o.a??.7;
+  const rs=resample(pts,Math.max(2.4,w*1.5));
+  const n=rs.length;
+  if(n<2)return;
+  const col=(o.col||CUR).slice();
+  const passes=o.passes??1;
+  const [bx0,by0,bx1,by1]=bbox(rs);
+  for(let p=0;p<passes;p++){
+    const amp=(o.amp??(w*.38+.55))*(p?1.5:1);
+    const alpha=a0*(p?.35:1);
+    const q=wob(R,rs,amp);
+    if(o.taper){
+      const segs=[];
+      for(let i=1;i<n;i++){
+        const t=i/(n-1);
+        let e;
+        if(o.taper==='out')e=.3+.7*(1-t);
+        else if(o.taper==='in')e=.3+.7*t;
+        else e=.35+.65*Math.min(1,Math.min(t,1-t)/.25);
+        segs.push([q[i-1],q[i],rgba(col,alpha*rd(R,.8,1)),Math.max(.5,w*e*rd(R,.85,1.15))]);
+      }
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';
+        for(const s of segs){
+          cx.strokeStyle=s[2];cx.lineWidth=s[3];
+          cx.beginPath();cx.moveTo(s[0][0],s[0][1]);cx.lineTo(s[1][0],s[1][1]);cx.stroke();
+        }
+      });
+    } else {
+      const lifts=[];
+      for(let i=0;i<n;i++)lifts.push(o.gap?ch_(R,o.gap):false);
+      const st=rgba(col,alpha), lw=w*rd(R,.85,1.12);
+      emit(by0,by1,cx=>{
+        cx.lineCap='round';cx.lineJoin='round';
+        cx.beginPath();
+        let lift=false;
+        for(let i=0;i<n;i++){
+          if(!i||lift)cx.moveTo(q[i][0],q[i][1]);else cx.lineTo(q[i][0],q[i][1]);
+          lift=lifts[i];
+        }
+        cx.strokeStyle=st;cx.lineWidth=lw;cx.stroke();
+      });
+    }
+    if(p===0&&w>=1.9&&!o.noDust){
+      const specks=[];
+      for(let i=0;i<n;i+=3){
+        if(ch_(R,.6))continue;
+        const sz=rd(R,.6,1.2);
+        specks.push([q[i][0]+rd(R,-w,w)-sz/2,q[i][1]+rd(R,-w,w)-sz/2,sz,rgba(col,a0*rd(R,.14,.3))]);
+      }
+      if(specks.length)emit(by0,by1,cx=>{for(const s of specks){cx.fillStyle=s[3];cx.fillRect(s[0],s[1],s[2],s[2])}});
+    }
+  }
+}
+// a stroke that dies away toward x1 — for things i only half-hold
+function fadeStroke(R,pts,o,x0,x1){
+  const rs=resample(pts,4);
+  let run=[],runA=1;
+  const span=x1-x0;
+  const flush=()=>{if(run.length>1)sk(R,run,{...o,a:(o.a??.6)*runA});run=[]};
+  for(const p of rs){
+    const m=clamp((x1-p[0])/span,0,1);
+    if(m<.06){flush();continue}
+    if(run.length===0)runA=m;
+    run.push(p);
+    if(Math.abs(m-runA)>.22){flush();run=[p];runA=m}
+  }
+  flush();
+}
+function dotF(R,x,y,r,a,col){
+  const c=(col||CUR).slice(),pts=[];
+  const n=8,ph=rd(R,0,7);
+  for(let i=0;i<=n;i++){
+    const t=i/n*TAU,m=1+.2*Math.sin(t*2+ph);
+    pts.push([x+Math.cos(t)*r*m+rd(R,-.2,.2),y+Math.sin(t)*r*m+rd(R,-.2,.2)]);
+  }
+  emit(y-r-2,y+r+2,cx=>{
+    cx.beginPath();
+    for(let i=0;i<pts.length;i++){i?cx.lineTo(pts[i][0],pts[i][1]):cx.moveTo(pts[i][0],pts[i][1])}
+    cx.closePath();cx.fillStyle=rgba(c,a);cx.fill();
+  });
+}
+function ell(R,cx,cy,rx,ry,o={}){
+  const n=Math.max(10,Math.round((rx+ry)/2)),rot=rd(R,0,TAU),pts=[];
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    const x=Math.cos(t)*rx,y=Math.sin(t)*ry;
+    pts.push([cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]);
+  }
+  pts.push(pts[0]);
+  sk(R,pts,o);
+}
+function fillPoly(pts,col,a){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const st=rgba(col,a),P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.fillStyle=st;cx.fill();
+  });
+}
+// scribble a region full, clipped, in one act
+function scribFill(R,pts,sp,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1;
+  const lines=[],slope=rd(R,-.2,.2);
+  for(let y=y0-sp;y<y1+sp;y+=sp*rd(R,.8,1.2)){
+    const raw=[],ph=rd(R,0,7);
+    for(let x=x0;x<=x1;x+=4)raw.push([x,y+(x-x0)*slope+Math.sin(x*.5+ph)*sp*.42+rd(R,-.8,.8)]);
+    if(raw.length>1)lines.push([wob(R,resample(raw,3.2),.55),rgba(col,a*rd(R,.6,1.05)),w*rd(R,.85,1.12)]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap='round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+function hatchFill(R,pts,sp,ang,a,o={}){
+  const [x0,y0,x1,y1]=bbox(pts);
+  const col=(o.col||CUR).slice(), w=o.w??1.1, straight=o.straight;
+  const diag=Math.hypot(x1-x0,y1-y0),cx0=(x0+x1)/2,cy0=(y0+y1)/2;
+  const px=Math.cos(ang+Math.PI/2),py=Math.sin(ang+Math.PI/2);
+  const dx=Math.cos(ang),dy=Math.sin(ang);
+  const lines=[],n=Math.ceil(diag/sp);
+  for(let i=-n;i<=n;i++){
+    const t=i*sp+(straight?0:rd(R,-.2,.2)*sp);
+    const raw=[[cx0+px*t-dx*diag*.6,cy0+py*t-dy*diag*.6],[cx0+px*t+dx*diag*.6,cy0+py*t+dy*diag*.6]];
+    lines.push([straight?raw:wob(R,resample(raw,4),.7),rgba(col,a*(straight?1:rd(R,.6,1.1))),w*(straight?1:rd(R,.85,1.15))]);
+  }
+  const P=pts.map(p=>p.slice());
+  emit(y0,y1,cx=>{
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<P.length;i++){i?cx.lineTo(P[i][0],P[i][1]):cx.moveTo(P[i][0],P[i][1])}
+    cx.closePath();cx.clip();
+    cx.lineCap=straight?'butt':'round';
+    for(const L of lines){
+      cx.strokeStyle=L[1];cx.lineWidth=L[2];
+      cx.beginPath();
+      const q=L[0];
+      cx.moveTo(q[0][0],q[0][1]);
+      for(let i=1;i<q.length;i++)cx.lineTo(q[i][0],q[i][1]);
+      cx.stroke();
+    }
+    cx.restore();
+  });
+}
+// a soft coloured-pencil scrub, never quite inside the lines
+function scrub(R,cx,cy,r,col,a=.4){
+  const b=blob(R,cx,cy,r*rd(R,1,1.12),r*rd(R,.82,1));
+  fillPoly(b,col,.1);
+  scribFill(R,b,Math.max(3,r*.13),a,{col});
+}
+function spatter(R,x,y,r,n,col,a=.5){
+  const sd=ri(R,0,99999),c=col.slice();
+  emit(y-r,y+r,cx=>{
+    const RR=mul32(sd);
+    for(let i=0;i<n;i++){
+      const t=RR()*TAU,d=Math.sqrt(RR())*r;
+      const s=.8+RR()*RR()*2.2;
+      cx.fillStyle=rgba(c,a*(.3+RR()*.7));
+      cx.fillRect(x+Math.cos(t)*d,y+Math.sin(t)*d*.7,s,s*(.8+RR()*.5));
+    }
+  });
+}
+function drip(R,x,y,len,col,a=.3,w=2){
+  const pts=[[x,y]];
+  let px=x;
+  for(let d=0;d<len;d+=9){px+=rd(R,-1.4,1.4);pts.push([px,y+d])}
+  sk(R,pts,{col,w,a,taper:'out',amp:.4});
+  dotF(R,px,y+len,w*1.1,a*1.2,col);
+}
+function arrowHead(R,x,y,ang,sz,a,col,w=1.6){
+  for(const sd of[-1,1])
+    sk(R,[[x,y],[x-Math.cos(ang+sd*.5)*sz,y-Math.sin(ang+sd*.5)*sz]],{col,w,a,taper:'out'});
+}
+function zigOut(R,x,y,rx,ry){
+  const pts=[];
+  const n=ri(R,6,9);
+  for(let i=0;i<=n;i++)pts.push([x+(i/n*2-1)*rx+rd(R,-4,4),y+((i%2)?-1:1)*ry*rd(R,.5,1)]);
+  sk(R,pts,{w:1.4,a:.55,amp:1});
+}
+function spark(R,x,y,r,o={}){
+  const n=o.nR??ri(R,5,8);
+  const rot=rd(R,0,TAU),col=o.col||CUR;
+  for(let i=0;i<n;i++){
+    const a=rot+i/n*TAU+rd(R,-.14,.14)/n*TAU;
+    const r0=r*rd(R,.22,.34),r1=r*rd(R,.85,1.1)*(i%2?.78:1);
+    sk(R,[[x+Math.cos(a)*r0,y+Math.sin(a)*r0],[x+Math.cos(a)*r1,y+Math.sin(a)*r1]],
+      {col,w:o.w??1.3,a:(o.a??.75)*rd(R,.8,1),taper:'out',amp:.3});
+  }
+  if(!o.noCenter&&ch_(R,.55))dotF(R,x,y,Math.max(1,r*.13),(o.a??.75),col);
+}
+// ---------------- asemic writing ----------------
+// a few drawings need writing that only looks like writing: a field journal nobody can read.
+function aword(R,x,y,h,nl,o={}){
+  const pts=[[x,y+rd(R,-.1,.1)*h]];
+  let cx=x;
+  for(let i=0;i<nl;i++){
+    const up=y-h*rd(R,.32,.62)-(ch_(R,.13)?h*rd(R,.4,.75):0);
+    const dn=y+(ch_(R,.09)?h*rd(R,.3,.55):h*rd(R,-.06,.12));
+    cx+=h*rd(R,.18,.3);pts.push([cx,up]);
+    cx+=h*rd(R,.18,.3);pts.push([cx,dn]);
+  }
+  sk(R,chaikin(pts,false,1),{col:o.col,w:o.w??.9,a:o.a??.55,amp:.28});
+  return cx-x;
+}
+function atext(R,xa,xb,y,h,o={}){
+  let cx=xa,guard=0;
+  while(cx<xb-h*.9&&guard++<70){
+    let nl=ri(R,2,5);
+    const est=nl*h*.5;
+    if(cx+est>xb)nl=Math.max(1,Math.floor((xb-cx)/(h*.5)));
+    if(nl<1)break;
+    const adv=aword(R,cx,y,h,nl,o);
+    cx+=adv+h*rd(R,.45,.75);
+  }
+}
+
+// ---------------- hand lettering ----------------
+// a real alphabet, one wobbly stroke at a time. used rarely, like pencil notes.
+const A_=(cx,cy,rx,ry,a0,a1,n=9)=>{const p=[];for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*rx,cy+Math.sin(t)*ry])}return p};
+const GL={};
+const G=(chr,w,...strokes)=>GL[chr]={w,s:strokes};
+G('a',.62,A_(.27,.73,.23,.26,-.5,5.8),[[.5,.48],[.52,.96],[.6,1]]);
+G('b',.6,[[.1,.05],[.1,1]],[[.1,.56],[.34,.47],[.54,.62],[.53,.86],[.3,1],[.1,.9]]);
+G('c',.58,A_(.3,.74,.25,.26,.6,5.68));
+G('d',.62,A_(.28,.74,.24,.26,-.5,5.8),[[.52,.05],[.53,.95],[.6,1]]);
+G('e',.56,[[.08,.73],[.48,.7],[.49,.54],[.3,.45],[.1,.56],[.07,.8],[.26,1],[.5,.93]]);
+G('f',.46,[[.44,.12],[.32,.05],[.22,.14],[.2,1]],[[.05,.48],[.42,.46]]);
+G('g',.6,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.48],[.53,1.12],[.42,1.36],[.16,1.32]]);
+G('h',.58,[[.1,.05],[.1,1]],[[.1,.62],[.3,.47],[.48,.56],[.5,1]]);
+G('i',.26,[[.13,.5],[.13,.96],[.18,1]],[[.11,.27],[.15,.3]]);
+G('j',.34,[[.22,.5],[.24,1.15],[.12,1.36],[-.02,1.28]],[[.2,.27],[.24,.3]]);
+G('k',.52,[[.1,.05],[.1,1]],[[.44,.48],[.12,.76]],[[.2,.68],[.46,1]]);
+G('l',.3,[[.14,.05],[.14,.93],[.22,1]]);
+G('m',.68,[[.07,1],[.07,.5]],[[.07,.62],[.2,.46],[.33,.56],[.34,1]],[[.34,.62],[.47,.46],[.6,.56],[.61,1]]);
+G('n',.56,[[.09,1],[.09,.5]],[[.09,.62],[.28,.46],[.46,.56],[.48,1]]);
+G('o',.6,A_(.29,.73,.24,.26,-1.2,-1.2+TAU*.97,10));
+G('p',.6,[[.1,.5],[.1,1.36]],[[.1,.57],[.34,.47],[.53,.62],[.52,.86],[.3,.98],[.1,.9]]);
+G('q',.62,A_(.28,.72,.23,.25,-.5,5.8),[[.5,.5],[.52,1.22],[.62,1.34]]);
+G('r',.44,[[.1,1],[.1,.5]],[[.1,.68],[.22,.5],[.42,.46]]);
+G('s',.52,[[.46,.52],[.24,.45],[.09,.58],[.22,.72],[.42,.8],[.46,.93],[.24,1],[.06,.92]]);
+G('t',.48,[[.26,.12],[.25,.9],[.36,1]],[[.08,.44],[.46,.43]]);
+G('u',.58,[[.08,.5],[.08,.84],[.22,1],[.42,.9],[.45,.5]],[[.45,.6],[.47,.96],[.54,1]]);
+G('v',.5,[[.06,.5],[.26,1],[.46,.5]]);
+G('w',.62,[[.04,.5],[.17,1],[.3,.62],[.43,1],[.57,.5]]);
+G('x',.52,[[.07,.5],[.47,1]],[[.47,.5],[.07,1]]);
+G('y',.54,[[.07,.5],[.28,1]],[[.5,.5],[.24,1.14],[.06,1.34]]);
+G('z',.52,[[.07,.5],[.45,.5],[.06,1],[.47,1]]);
+G('2',.54,[[.08,.3],[.18,.12],[.38,.12],[.44,.32],[.07,1],[.47,1]]);
+G('0',.56,A_(.27,.55,.22,.44,-1.3,-1.3+TAU*.97,10));
+G('6',.52,[[.4,.1],[.18,.34],[.09,.68],[.2,.98],[.4,.94],[.46,.7],[.3,.56],[.11,.66]]);
+G('8',.54,A_(.27,.31,.16,.2,-1.57,-1.57+TAU),A_(.27,.76,.2,.23,-1.57,-1.57+TAU));
+G('.',.24,[[.1,.93],[.13,.97]]);
+G(',',.24,[[.14,.9],[.15,1.02],[.04,1.16]]);
+G("'",.2,[[.12,.05],[.09,.26]]);
+G('-',.44,[[.05,.7],[.38,.68]]);
+G('—',.66,[[.03,.7],[.6,.67]]);
+G('·',.24,[[.08,.68],[.12,.72]]);
+G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
+G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
+G(' ',.42);
+function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+function write(R,t,x,y,sz,o={}){
+  const a=o.a??.7,col=o.col;
+  let px=o.cen?x-measure(t,sz)/2:x;
+  const ph=rd(R,0,7);
+  for(let i=0;i<t.length;i++){
+    const c=t[i],g=GL[c]||GL[' '];
+    const yb=y+Math.sin(i*.8+ph)*sz*.045;
+    for(const st of(g.s||[])){
+      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
+      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
+    }
+    px+=(g.w+.1)*sz;
+  }
+}
+// ---------------- torn paper ----------------
+// the wall is a collage: sheets of coloured paper glued down, edges torn by
+// hand, each showing its white fibrous core where it ripped.
+function tornPath(R,x0,y0,x1,y1,rough,sd){
+  const pts=[];
+  const side=(ax,ay,bx,by,nx,ny,id)=>{
+    const L=Math.hypot(bx-ax,by-ay),steps=Math.max(3,Math.round(L/26));
+    for(let i=0;i<steps;i++){
+      const t=i/steps;
+      let off=(fbm(t*3.1+id*7,id*3.3,sd,3)-.5)*2*rough;
+      if(h2(i*1.7,id*9.1,sd)>0.93)off+=rd(R,8,22)*(h2(i,id,sd+3)>.5?1:-1);
+      pts.push([ax+(bx-ax)*t+nx*off,ay+(by-ay)*t+ny*off]);
+    }
+  };
+  side(x0,y0,x1,y0,0,1,0);
+  side(x1,y0,x1,y1,-1,0,1);
+  side(x1,y1,x0,y1,0,-1,2);
+  side(x0,y1,x0,y0,1,0,3);
+  return pts;
+}
+function sheet(R,x0,y0,x1,y1,col,o={}){
+  const rough=o.rough??16;
+  const sd=ri(R,0,9999);
+  let P=tornPath(R,x0,y0,x1,y1,rough,sd);
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  // the shadow the paper casts on what is beneath it
+  fillPoly(P.map(p=>[p[0]+6,p[1]+8]),[12,9,7],.28);
+  fillPoly(P,col,1);
+  fillPoly(P,col,1);
+  const [bx0,by0,bx1,by1]=bbox(P);
+  const PP=P.map(p=>p.slice());
+  // grain: the tooth of the paper
+  const gsd=ri(R,0,99999);
+  emit(by0,by1,cx=>{
+    const RR=mul32(gsd);
+    cx.save();
+    cx.beginPath();
+    for(let i=0;i<PP.length;i++){i?cx.lineTo(PP[i][0],PP[i][1]):cx.moveTo(PP[i][0],PP[i][1])}
+    cx.closePath();cx.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/1900);
+    for(let i=0;i<n;i++){
+      const s=.8+RR()*1.1;
+      const dark=RR()<.62;
+      cx.fillStyle=dark?'rgba(45,40,34,.05)':'rgba(255,252,244,.07)';
+      cx.fillRect(bx0+RR()*(bx1-bx0),by0+RR()*(by1-by0),s,s);
+    }
+    for(let i=0;i<n/22;i++){
+      const fx=bx0+RR()*(bx1-bx0),fy=by0+RR()*(by1-by0),fa=RR()*TAU,fl=3+RR()*7;
+      cx.strokeStyle='rgba(45,40,34,.05)';cx.lineWidth=.7;
+      cx.beginPath();cx.moveTo(fx,fy);cx.lineTo(fx+Math.cos(fa)*fl,fy+Math.sin(fa)*fl);cx.stroke();
+    }
+    cx.restore();
+  });
+  // torn edge: the white fibrous core
+  if(!o.noCore){
+    const core=P.concat([P[0]]);
+    sk(R,core,{col:[251,247,237],w:2,a:.42,amp:.4,gap:.24,noDust:true});
+    sk(R,core.map(p=>[p[0]+rd(R,1,3),p[1]+rd(R,1,3)]),{col:shade(col,.22),w:1,a:.2,amp:.5,gap:.4,noDust:true});
+  }
+  return P;
+}
+// a little pinned study: torn scrap + shadow + tape at two corners
+function scrap(R,x,y,w,h,col,rot){
+  const P=sheet(R,x-w/2,y-h/2,x+w/2,y+h/2,col,{rough:8,rot});
+  const [bx0,by0,bx1,by1]=bbox(P);
+  for(const cnr of[[bx0+14,by0+12],[bx1-16,by1-12]]){
+    const tp=rotPts([[cnr[0]-22,cnr[1]-8],[cnr[0]+22,cnr[1]-8],[cnr[0]+22,cnr[1]+9],[cnr[0]-22,cnr[1]+9]],cnr[0],cnr[1],rd(R,.5,.9));
+    fillPoly(tp,[240,234,216],.35);
+    sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+  }
+}
+// ---------------- small things ----------------
+function enso(R,cx,cy,r,frac,col,o={}){
+  const a0=rd(R,0,TAU),pts=[];
+  const n=Math.round(40*frac);
+  for(let i=0;i<=n;i++){
+    const t=a0+i/n*TAU*frac;
+    const rr2=r*(1+.03*Math.sin(i*.7));
+    pts.push([cx+Math.cos(t)*rr2,cy+Math.sin(t)*rr2]);
+  }
+  sk(R,pts,{col,w:o.w??9,a:o.a??.75,amp:3,taper:'out',noDust:true});
+  sk(R,pts.map(p=>[p[0]+rd(R,2,5),p[1]+rd(R,2,4)]),{col,w:(o.w??9)*.4,a:(o.a??.75)*.3,amp:3.4,gap:.12,noDust:true});
+  return a0+TAU*frac; // where the brush lifted
+}
+function birdM(R,x,y,s,col,a=.6){
+  sk(R,[[x-s,y],[x-s*.4,y-s*.55],[x,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+  sk(R,[[x,y],[x+s*.4,y-s*.55],[x+s,y]],{col,w:1.4,a,amp:.4,taper:'out'});
+}
+
+// ---------------- replay engine ----------------
+let CSSK=innerWidth/LW;
+addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+// living things: small canvases laid over the wall, switched on once the sheet
+// beneath them is drawn, and only moving while they are in view
+const LIVE=[];
+// a pause in the drawing of one sheet, so a construction can be watched
+function pause(ms,y=600){if(DIRECT)return;const i=clamp(Math.floor((y+GEN_DY)/TILEH),0,NT-1);TILES[i].q.push({pause:ms})}
+function live(x,y,w,h,o){
+  const L={x,y:y+GEN_DY,w,h,...o,cv:null,cx:null,on:false};
+  LIVE.push(L);
+  return L;
+}
+function makeLive(L){
+  const cv=document.createElement('canvas'),sc=L.sc??S;
+  cv.className='live';
+  cv.width=Math.round(L.w*sc);cv.height=Math.round(L.h*sc);
+  cv.style.left=(L.x/LW*100)+'%';cv.style.width=(L.w/LW*100)+'%';
+  cv.style.top=(L.y/LW*100)+'vw';cv.style.height=(L.h/LW*100)+'vw';
+  cv.style.zIndex=2;
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.setTransform(sc,0,0,sc,-L.x*sc,-L.y*sc);
+  cx.lineCap='round';cx.lineJoin='round';
+  L.cv=cv;L.cx=cx;L.sc=sc;L.on=true;
+  if(L.init)L.init(cx,L);
+}
+function liveReady(L){
+  const a=clamp(Math.floor(L.y/TILEH),0,NT-1),b=clamp(Math.floor((L.y+L.h)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++)if(!TILES[i].done)return false;
+  return true;
+}
+let HUD=null,hudN=0,hudT=0,hudBusy=0,hudMax=0;
+if(qs.has('hud')){HUD=document.createElement('div');HUD.id='hud';document.body.appendChild(HUD)}
+function tick(now){
+  const tb=performance.now();
+  const sy=scrollY/CSSK, vh=innerHeight/CSSK;
+  for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
+  const budget=(FAST||RM)?200:7;
+  const t0=performance.now();
+  for(const T of TILES){
+    if(!T.active||T.done)continue;
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){
+      const it=T.q[T.qi];
+      if(typeof it!=='function'){
+        // a breath in the drawing: the hand waits before the next figure
+        if(FAST||RM){T.qi++;continue}
+        if(!T.wait)T.wait=now+it.pause;
+        if(now<T.wait)break;
+        T.wait=0;T.qi++;continue;
+      }
+      T.qi++;it(T.cx);
+      if(performance.now()-t0>budget)break;
+    }
+    if(GENDONE&&T.qi>=T.q.length){T.done=true;T.q=null;readyRestless(T)}
+    if(performance.now()-t0>budget)break;
+  }
+  runRestless(now);
+  for(const L of LIVE){
+    if(!L.on){
+      if(GENDONE&&liveReady(L)){
+        makeLive(L);
+        // a first picture straight away, wherever it is, so a still always has it
+        if(L.frame){L.frame(L.cx,now,L);L.drawn=true}
+        if(FAST){L.cv.style.transition='none';L.cv.classList.add('on')}else requestAnimationFrame(()=>L.cv.classList.add('on'));
+      }
+      continue;
+    }
+    if(L.frame&&(!RM||!L.drawn||L.poke)&&L.y+L.h>sy-60&&L.y<sy+vh+60){L.frame(L.cx,now,L);L.drawn=true;L.poke=false}
+  }
+  drawTrail(now);
+  if(HUD){
+    const busy=performance.now()-tb;hudBusy+=busy;hudMax=Math.max(hudMax,busy);hudN++;
+    if(now-hudT>1000){HUD.textContent=`${(hudN*1000/(now-hudT)).toFixed(0)} fps\n${(hudBusy/hudN).toFixed(1)} ms busy\n${hudMax.toFixed(1)} ms max`;hudN=0;hudBusy=0;hudMax=0;hudT=now}
+  }
+  requestAnimationFrame(tick);
+}
+// for stills: draw every sheet at once, no animation at all
+function drawAllNow(){
+  for(const T of TILES){
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length){const it=T.q[T.qi++];if(typeof it==='function')it(T.cx)}
+    T.done=true;T.q=null;
+  }
+  for(const L of LIVE){makeLive(L);L.cv.classList.add('on');L.cv.style.transition='none';if(L.frame)L.frame(L.cx,performance.now(),L)}
+}
+// ---------------- restlessness ----------------
+// a few marks cannot hold still. every so often one erases itself and is
+// drawn again, never quite the same, the way a geometer goes over a figure once more.
+const RESTLESS=[];
+function restless(x,y,w,h,fn){RESTLESS.push({x,y:y+GEN_DY,w,h,fn,dy:GEN_DY,img:null,next:0,tile:null})}
+function readyRestless(T){
+  if(RM)return;
+  for(const r of RESTLESS){
+    if(r.img)continue;
+    if(r.y>=T.y0&&r.y+r.h<=T.y0+T.h&&T.done){
+      r.tile=T;
+      const px=Math.round(r.x*S),py=Math.round((r.y-T.y0)*S);
+      const pw=Math.round(r.w*S),ph=Math.round(r.h*S);
+      try{r.img=T.cx.getImageData(px,py,pw,ph);r.px=px;r.py=py;
+          r.next=performance.now()+2000+Math.random()*3000;}catch(e){}
+    }
+  }
+}
+let restR=stream(SEED*77+3);
+function runRestless(now){
+  for(const r of RESTLESS){
+    if(!r.img||now<r.next)continue;
+    const cx=r.tile.cx;
+    cx.putImageData(r.img,r.px,r.py);
+    cx.save();
+    cx.setTransform(S,0,0,S,0,-r.tile.y0*S);
+    cx.beginPath();cx.rect(r.x,r.y,r.w,r.h);cx.clip();
+    DIRECT=r.tile; GEN_DY=r.dy;
+    r.fn(restR);
+    GEN_DY=0; DIRECT=null;
+    cx.restore();
+    r.next=now+2600+Math.random()*4200;
+  }
+}
+function hblob(R,cx,cy,rx,ry){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<14;i++){const t=i/14*TAU,m=1+.1*Math.sin(t*2+ph)+.05*Math.sin(t*5+ph*2.1);pts.push([cx+Math.cos(t)*rx*m,cy+Math.sin(t)*ry*m])}
+  return chaikin(pts,true,1);
+}
+function circ(R,cx,cy,r){
+  const ph=rd(R,0,7),pts=[];
+  for(let i=0;i<40;i++){const t=i/40*TAU,m=1+.012*Math.sin(t*3+ph)+.008*Math.sin(t*7+ph*2.1);pts.push([cx+Math.cos(t)*r*m,cy+Math.sin(t)*r*m])}
+  return pts;
+}
+function ePts(cx,cy,rx,ry,rot,n=16){
+  const o=[];
+  for(let i=0;i<n;i++){const t=i/n*TAU,ux=Math.cos(t)*rx,uy=Math.sin(t)*ry;o.push([cx+ux*Math.cos(rot)-uy*Math.sin(rot),cy+ux*Math.sin(rot)+uy*Math.cos(rot)])}
+  return o;
+}
+function offsetPath(pts,d){
+  return pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny)||1;return[p[0]+nx/l*d,p[1]+ny/l*d]});
+}
+// the same line drawn several times, a little apart, each strand its own colour
+function strands(R,pts,colFn,n,spread,o){
+  for(let s=0;s<n;s++){
+    const u=n>1?s/(n-1):.5,col=colFn(u);
+    sk(R,n>1?offsetPath(pts,(u-.5)*spread):pts,{...o,col,noDust:true});
+  }
+}
+// a soft light; it may run over into the next scene, so it is only clipped far outside its own
+function glow(R,x,y,r,col,a,sx=1){
+  const t=Math.max(y-r,-70),bt=Math.min(y+r,1270);
+  if(bt<=t)return;
+  emit(t,bt,c2=>{
+    c2.save();c2.beginPath();c2.rect(x-r*sx,t,2*r*sx,bt-t);c2.clip();
+    c2.translate(x,y);c2.scale(sx,1);
+    const g=c2.createRadialGradient(0,0,0,0,0,r);
+    g.addColorStop(0,rgba(col,a));g.addColorStop(.4,rgba(col,a*.35));g.addColorStop(1,rgba(col,0));
+    c2.fillStyle=g;c2.fillRect(-r,-r,2*r,2*r);c2.restore();
+  });
+}
+function say(R,txt,left,dark,y=1100,sz=26){
+  const w=measure(txt,sz),x=left?112:1488-w;
+  write(R,txt,x,y,sz,{col:dark?CINK:INK,a:.9});
+}
+function inPoly(Pp,x,y){let c=false;for(let i=0,j=Pp.length-1;i<Pp.length;j=i++){const a=Pp[i],b=Pp[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+function dipLine(cx,cy,L,tilt,side,r0){
+  const pts=[];
+  const a=Math.max(.05,Math.asin(Math.sqrt(Math.min(1,r0/L)))),b=Math.PI-a;
+  for(let t=a;t<=b;t+=.035){
+    const r=L*Math.sin(t)*Math.sin(t);
+    const x=side*r*Math.sin(t),y=-r*Math.cos(t);
+    pts.push([cx+x*Math.cos(tilt)-y*Math.sin(tilt),cy+x*Math.sin(tilt)+y*Math.cos(tilt)]);
+  }
+  return pts;
+}
+function dustBatch(pts,col,B=150){
+  const c=col.slice();
+  for(let i=0;i<pts.length;i+=B){
+    const batch=pts.slice(i,i+B);
+    let y0=1e9,y1=-1e9;
+    for(const p of batch){if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+    emit(y0-4,y1+4,c2=>{for(const p of batch){c2.fillStyle=rgba(c,p[3]);c2.beginPath();c2.arc(p[0],p[1],p[2],0,TAU);c2.fill()}});
+  }
+}
+// a line whose colour changes along its length
+function gradLine(R,pts,colFn,o,segs=9){
+  const n=pts.length;
+  for(let i=0;i<segs;i++){
+    const a=Math.floor((n-1)*i/segs),b=Math.min(n-1,Math.floor((n-1)*(i+1)/segs)+2);
+    if(b-a<1)continue;
+    sk(R,pts.slice(a,b+1),{...o,col:colFn((i+.5)/segs),noDust:true,taper:undefined});
+  }
+}
+
+
+// ---------------- light ----------------
+// small soft discs of light, made once per colour and then only stamped:
+// cheap in every browser, also in safari
+const SPR={};
+function sprite(col,size=64){
+  const k=col.join(',')+'/'+size;let cv=SPR[k];if(cv)return cv;
+  cv=document.createElement('canvas');cv.width=cv.height=size;
+  const g=cv.getContext('2d'),r=size/2,gr=g.createRadialGradient(r,r,0,r,r,r);
+  gr.addColorStop(0,rgba(col,1));gr.addColorStop(.2,rgba(col,.6));gr.addColorStop(.5,rgba(col,.18));gr.addColorStop(1,rgba(col,0));
+  g.fillStyle=gr;g.fillRect(0,0,size,size);
+  return SPR[k]=cv;
+}
+function glowAt(c,x,y,r,col,a,sy=1){if(a<=.003||r<=0)return;const ga=c.globalAlpha;c.globalAlpha=Math.min(1,a);c.drawImage(sprite(col),x-r,y-r*sy,2*r,2*r*sy);c.globalAlpha=ga}
+// a soft hole, for cutting darkness away where a light falls
+let HOLE=null;
+function holeSprite(){
+  if(HOLE)return HOLE;
+  const s=128,cv=document.createElement('canvas');cv.width=cv.height=s;
+  const g=cv.getContext('2d'),gr=g.createRadialGradient(64,64,0,64,64,64);
+  gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(.35,'rgba(0,0,0,.9)');gr.addColorStop(.7,'rgba(0,0,0,.42)');gr.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=gr;g.fillRect(0,0,s,s);
+  return HOLE=cv;
+}
+function pathOf(c,P){c.beginPath();c.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)c.lineTo(P[i][0],P[i][1]);c.closePath()}
+
+// ---------------- flames ----------------
+// the outline of a flame standing on its wick at (x,y): round at the foot, a
+// long tongue above. s runs from the foot (0) to the tip (1).
+function flamePts(x,y,h,w,sway,t,ph,fl){
+  const N=18,L=[],Rr=[];
+  for(let i=0;i<=N;i++){
+    const s=i/N,hw=w*Math.pow(Math.sin(Math.PI*Math.pow(s,.58)),.9)*(1-.1*s);
+    const cx=x+sway*s*s+Math.sin(s*6.5+t*9+ph)*w*.08*s*fl,cy=y+w*.3-(h+w*.3)*s;
+    L.push([cx-hw,cy]);Rr.push([cx+hw,cy]);
+  }
+  return L.concat(Rr.reverse());
+}
+function flameOutline(x,y,h,w,lean,ph){return flamePts(x,y,h,w,lean*h,0,ph,0)}
+// a living flame. fl is how restless it is (0 is the still flame of a candle in a closed room)
+function flameLive(c,x,y,h,w,t,ph=0,lean=0,a=1,fl=1,o={}){
+  const f=(Math.sin(t*7.3+ph)*.5+Math.sin(t*12.9+ph*1.7)*.3+Math.sin(t*21.1+ph*.6)*.2)*fl;
+  const H=h*(1+.08*f),sw=lean*h+(Math.sin(t*3.3+ph)*.05+Math.sin(t*9.1+ph*2.3)*.03)*h*fl;
+  const P=flamePts(x,y,H,w*(1-.04*f),sw,t,ph,fl);
+  if(o.glow!==false){
+    c.globalCompositeOperation='lighter';
+    glowAt(c,x+sw*.35,y-H*.4,H*(o.gr??1.35),o.gcol||[255,128,40],(o.ga??.34)*a);
+    glowAt(c,x+sw*.2,y-H*.3,H*.55,[255,200,120],.26*a);
+    c.globalCompositeOperation='source-over';
+  }
+  pathOf(c,P);
+  const g=c.createLinearGradient(x,y+w*.3,x+sw,y-H);
+  g.addColorStop(0,`rgba(80,110,255,${.6*a})`);g.addColorStop(.1,`rgba(255,238,200,${.96*a})`);
+  g.addColorStop(.4,`rgba(255,196,86,${.94*a})`);g.addColorStop(.74,`rgba(255,118,36,${.68*a})`);g.addColorStop(1,'rgba(230,60,20,0)');
+  c.fillStyle=g;c.fill();
+  // the bright core; or, for a candle seen close by, the dark heart of wax vapour that has not burnt yet
+  const k=.5,kh=.6,Q=P.map(p=>[x+(p[0]-x)*k,y+(p[1]-y)*kh]);
+  pathOf(c,Q);
+  let g2;
+  if(o.heart){
+    g2=c.createLinearGradient(x,y+w*.2,x+sw*.3,y-H*kh);
+    g2.addColorStop(0,`rgba(70,100,240,${.7*a})`);g2.addColorStop(.22,`rgba(96,60,56,${.42*a})`);g2.addColorStop(.75,`rgba(255,214,140,${.12*a})`);g2.addColorStop(1,'rgba(255,230,170,0)');
+  }else{
+    g2=c.createLinearGradient(x,y,x+sw*.4,y-H*kh);
+    g2.addColorStop(0,'rgba(255,250,235,0)');g2.addColorStop(.18,`rgba(255,252,240,${.9*a})`);g2.addColorStop(.7,`rgba(255,236,170,${.5*a})`);g2.addColorStop(1,'rgba(255,220,140,0)');
+  }
+  c.fillStyle=g2;c.fill();
+  return[x+sw,y-H];
+}
+
+// ---------------- the visitor: a small flame ----------------
+// here you carry a flame. sparks fly up from it when you move it, and when you
+// hold still it settles into the quiet flame of a candle. a tap strikes a
+// match. sound only ever after a tap: the rush of a flame through the air, the
+// match, and whatever the sheets have to say.
+const trailCv=document.getElementById('trail');
+const trailCx=trailCv.getContext('2d');
+let TRD=1;
+function sizeTrail(){
+  TRD=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*TRD;trailCv.height=innerHeight*TRD;
+  trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
+}
+sizeTrail();
+const FR=mul32(SEED*991+17);
+const FINE=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const PTR={cx:-999,cy:-999,on:false,t:0,vx:0,vy:0,sp:0,lean:0,calm:1};
+let SPARKS=[],lastPt=null,lastMove=0;
+const ptrWall=()=>[PTR.cx/CSSK,(PTR.cy+scrollY)/CSSK];
+const moving=now=>now-PTR.t<140;
+// the pointer in a sheet's own coordinates, if it is anywhere near that sheet's glass
+function near(L,m=80){
+  if(!PTR.on||!FINE)return null;
+  const p=ptrWall();
+  if(p[0]<L.x-m||p[0]>L.x+L.w+m||p[1]<L.y-m||p[1]>L.y+L.h+m)return null;
+  return[p[0],p[1]-L.dy];
+}
+addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch')return;
+  const t=performance.now(),inWall=!!(e.target&&e.target.closest&&e.target.closest('#wall'));
+  if(PTR.on&&inWall){const dt=Math.max(8,t-PTR.t)/1000;PTR.vx=PTR.vx*.55+(e.clientX-PTR.cx)/dt*.45;PTR.vy=PTR.vy*.55+(e.clientY-PTR.cy)/dt*.45}
+  else{PTR.vx=0;PTR.vy=0}
+  PTR.cx=e.clientX;PTR.cy=e.clientY;PTR.t=t;PTR.on=inWall;
+  if(inWall){lastPt=ptrWall();lastMove=t}
+},{passive:true});
+document.documentElement.addEventListener('pointerleave',()=>{PTR.on=false});
+addEventListener('blur',()=>{PTR.on=false});
+// sparks live on the wall; their size and speed are reckoned in screen pixels
+function sparkBurst(x,y,n,pow=1){
+  const k=1/CSSK,t=performance.now();
+  for(let i=0;i<n;i++){const a=rd(FR,0,TAU),v=rd(FR,60,320)*pow;SPARKS.push({x,y,vx:Math.cos(a)*v*k,vy:(Math.sin(a)*v-rd(FR,40,160)*pow)*k,t,life:rd(FR,450,1500),s:rd(FR,.8,1.9),tw:rd(FR,0,7)})}
+  if(SPARKS.length>360)SPARKS.splice(0,SPARKS.length-360);
+}
+// one lazy spark, let go by a fire on the wall
+function sparkUp(x,y,life=1,s=1){
+  const k=1/CSSK;
+  SPARKS.push({x,y,vx:rd(FR,-20,20)*k,vy:-rd(FR,40,110)*k,t:performance.now(),life:rd(FR,900,2400)*life,s:rd(FR,.7,1.4)*s,tw:rd(FR,0,7)});
+  if(SPARKS.length>360)SPARKS.shift();
+}
+function drawTrail(now){
+  const c=trailCx,dt=Math.min(.05,(now-(drawTrail.last||now))/1000);drawTrail.last=now;
+  const mv=moving(now),sp=mv?Math.hypot(PTR.vx,PTR.vy):0;
+  PTR.sp=PTR.sp*.8+sp*.2;
+  if(AC&&MOV){MOV.g.gain.setTargetAtTime(PTR.on&&mv?clamp(PTR.sp/2600,0,1)*.05:0,AC.currentTime,.1);MOV.lp.frequency.setTargetAtTime(220+clamp(PTR.sp/2200,0,1)*620,AC.currentTime,.12)}
+  for(const i in VOICES){const v=VOICES[i];if(now-v.seen>250){v.g.gain.setTargetAtTime(0,AC.currentTime,.3);if(now-v.seen>3000){v.stop();delete VOICES[i]}}}
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);
+  const k=1/CSSK;
+  // sparks fly from the flame as you move it
+  if(!RM&&PTR.on&&FINE&&mv&&PTR.sp>50){
+    const [wx,wy]=ptrWall(),n=PTR.sp*dt/22;
+    let m=Math.floor(n);if(FR()<n-m)m++;
+    for(let i=0;i<m;i++)SPARKS.push({x:wx+rd(FR,-5,5)*k,y:wy-rd(FR,12,30)*k,vx:(-PTR.vx*rd(FR,.04,.16)+rd(FR,-30,30))*k,vy:(-PTR.vy*rd(FR,.04,.16)-rd(FR,30,100))*k,t:now,life:rd(FR,450,1400),s:rd(FR,.7,1.5),tw:rd(FR,0,7)});
+    if(SPARKS.length>360)SPARKS.splice(0,SPARKS.length-360);
+  }
+  if(SPARKS.length){
+    SPARKS=SPARKS.filter(s=>now-s.t<s.life);
+    const K=TRD*CSSK,vy0=scrollY/CSSK-60,vy1=(scrollY+innerHeight)/CSSK+60,spr=sprite([255,140,50],32);
+    c.setTransform(K,0,0,K,0,-scrollY*TRD);
+    c.globalCompositeOperation='lighter';
+    for(const s of SPARKS){
+      const u=(now-s.t)/s.life;
+      // warm air carries it up, and a little sideways
+      s.vy-=110*k*dt;s.vx+=Math.sin(now*.0042+s.tw)*60*k*dt;s.vx*=1-dt*1.1;s.vy*=1-dt*.8;
+      s.x+=s.vx*dt;s.y+=s.vy*dt;
+      if(s.y<vy0||s.y>vy1)continue;
+      const a=Math.pow(1-u,1.2),r=s.s*(1-.45*u)*k;
+      c.globalAlpha=a*.5;c.drawImage(spr,s.x-r*5,s.y-r*5,r*10,r*10);
+      const col=u<.25?mix(FLAMEW,[255,190,90],u/.25):mix([255,190,90],[220,64,26],(u-.25)/.75);
+      c.globalAlpha=a;c.fillStyle=rgba(col,1);c.fillRect(s.x-r*.8,s.y-r*.8,r*1.6,r*1.6);
+    }
+    c.globalAlpha=1;c.globalCompositeOperation='source-over';
+  }
+  // the flame you carry, on the head of a match
+  if(PTR.on&&FINE){
+    c.setTransform(TRD,0,0,TRD,0,0);
+    const x=PTR.cx,y=PTR.cy;
+    const tl=mv?clamp(-PTR.vx/900,-1,1):0;PTR.lean+=(tl-PTR.lean)*(1-Math.exp(-dt*7));
+    PTR.calm=mv?Math.max(0,PTR.calm-dt*3):Math.min(1,PTR.calm+dt*.5);
+    const hv=hitAt(...ptrWall())?1:0,h=22+Math.min(14,PTR.sp/110)+hv*5;
+    c.lineCap='round';
+    c.strokeStyle='rgba(222,186,132,.95)';c.lineWidth=2.4;c.beginPath();c.moveTo(x+1.5,y+4);c.lineTo(x+8,y+28);c.stroke();
+    c.strokeStyle='rgba(30,20,16,.9)';c.lineWidth=2.8;c.beginPath();c.moveTo(x+.4,y+.4);c.lineTo(x+2.6,y+8);c.stroke();
+    flameLive(c,x,y-2,h,h*.3,now/1000,0,PTR.lean*.55,1,1-PTR.calm*.7,{ga:.3+hv*.14});
+  }
+}
+
+// ---------------- sound ----------------
+// only ever after a tap or a click, and quiet. everything that burns is made
+// of the same thing: noise, filtered.
+let AC=null,NB=null,MOV=null,MASTER=null;
+function audio(){
+  if(!AC){
+    try{
+      AC=new (window.AudioContext||window.webkitAudioContext)();
+      MASTER=AC.createGain();MASTER.gain.value=.9;MASTER.connect(AC.destination);
+      const len=AC.sampleRate*3,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);
+      let b0=0,b1=0,b2=0;
+      for(let i=0;i<len;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0526;d[i]=(b0+b1+b2+w*.1848)*.12}
+      NB=b;
+      // the rush of the flame you carry, when you move it fast
+      const n=AC.createBufferSource();n.buffer=NB;n.loop=true;
+      const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=300;lp.Q.value=.8;
+      const g=AC.createGain();g.gain.value=0;
+      n.connect(lp);lp.connect(g);g.connect(MASTER);n.start();
+      MOV={g,lp};
+    }catch(e){AC=null}
+  }
+  if(AC&&AC.state==='suspended')AC.resume();
+  return AC;
+}
+// a short breath of noise through a filter
+function nz(t,dur,type,f0,f1,q,vol,att=.005){
+  const n=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
+  n.buffer=NB;f.type=type;f.Q.value=q;f.frequency.setValueAtTime(f0,t);if(f1!==f0)f.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0004,t+dur);
+  n.connect(f);f.connect(g);g.connect(MASTER);n.start(t,Math.random()*2.5);n.stop(t+dur+.03);
+}
+function crackle(n=8,spread=1.2,vol=.12){
+  const ac=audio();if(!ac)return;const t0=ac.currentTime+.01;
+  for(let i=0;i<n;i++){const t=t0+Math.pow(Math.random(),1.5)*spread,f=1300+Math.random()*3200;nz(t,.006+Math.random()*.022,'highpass',f,f,.7,vol*(.3+Math.random()*.7),.001)}
+}
+function whump(vol=.14){const ac=audio();if(!ac)return;nz(ac.currentTime+.01,.75,'lowpass',140,560,.7,vol,.04)}
+function strike(){
+  const ac=audio();if(!ac)return;const t=ac.currentTime+.01;
+  // the scratch along the side of the box
+  for(let i=0;i<3;i++)nz(t+i*.028,.05,'bandpass',2600+i*500,1800,1.1,.16,.003);
+  // and then it catches
+  nz(t+.08,.9,'lowpass',260,1400,.9,.15,.06);
+  crackle(4,.6,.07);
+}
+function fwip(vol=.1){const ac=audio();if(!ac)return;nz(ac.currentTime+.01,.45,'lowpass',300,1300,.8,vol,.05)}
+function pff(){const ac=audio();if(!ac)return;nz(ac.currentTime+.01,.38,'bandpass',900,480,.8,.12,.03)}
+function bell(f,vol=.06){tone(f,0,2.6,vol,'sine');tone(f*2.01,0,1.3,vol*.3,'sine');tone(f*3.03,0,.6,vol*.12,'sine')}
+// iron on an anvil: cold it thuds, hot it rings
+function clang(hot){
+  const ac=audio();if(!ac)return;
+  nz(ac.currentTime+.005,.04,'highpass',2400,2400,.7,.18,.001);
+  const f=hot>.3?760:380,d=hot>.3?1:.22;
+  for(const [r,dd,v] of[[1,1.4,.08],[2.32,.9,.045],[4.25,.5,.03],[6.63,.3,.018]])tone(f*r,0,dd*d,v,'sine');
+}
+// a voice that holds as long as something keeps it going: the singing tubes
+const VOICES={};
+function voice(i,f,level){
+  if(!AC||!MASTER)return;
+  let v=VOICES[i];
+  if(!v&&level>.02){
+    const ac=AC,o=ac.createOscillator(),o2=ac.createOscillator(),g=ac.createGain(),g2=ac.createGain(),lp=ac.createBiquadFilter();
+    const n=ac.createBufferSource(),bp=ac.createBiquadFilter(),gn=ac.createGain(),lfo=ac.createOscillator(),lg=ac.createGain();
+    o.type='sine';o.frequency.value=f;o2.type='triangle';o2.frequency.value=f*2;g2.gain.value=.16;
+    lfo.frequency.value=4.6;lg.gain.value=f*.004;lfo.connect(lg);lg.connect(o.frequency);lg.connect(o2.frequency);
+    n.buffer=NB;n.loop=true;bp.type='bandpass';bp.frequency.value=f;bp.Q.value=18;gn.gain.value=1.6;
+    lp.type='lowpass';lp.frequency.value=1800;
+    o.connect(lp);o2.connect(g2);g2.connect(lp);n.connect(bp);bp.connect(gn);gn.connect(lp);lp.connect(g);
+    g.gain.value=0;g.connect(MASTER);
+    o.start();o2.start();n.start(0,Math.random()*2);lfo.start();
+    v=VOICES[i]={g,lvl:0,off:0,stop:()=>{try{o.stop();o2.stop();n.stop();lfo.stop()}catch(e){}}};
+  }
+  if(!v)return;
+  v.seen=performance.now();
+  v.g.gain.setTargetAtTime(level*.07,AC.currentTime,level>v.lvl?.12:.35);
+  v.lvl=level;
+  if(level<=.01){if(++v.off>150){v.stop();delete VOICES[i]}}else v.off=0;
+}
+// ---------------- more letters ----------------
+// the pencil alphabet learns the rest of the numbers, and a few signs of reckoning
+G('1',.4,[[.07,.3],[.23,.1],[.23,1]]);
+G('3',.52,[[.08,.2],[.22,.1],[.38,.12],[.44,.28],[.36,.46],[.22,.52],[.38,.58],[.47,.76],[.4,.94],[.22,1],[.05,.9]]);
+G('4',.54,[[.37,1],[.37,.1],[.05,.72],[.5,.72]]);
+G('5',.52,[[.44,.1],[.13,.1],[.1,.47],[.28,.43],[.44,.54],[.47,.76],[.36,.95],[.18,1],[.05,.9]]);
+G('7',.5,[[.05,.1],[.46,.1],[.18,1]]);
+G('9',.52,A_(.25,.33,.2,.22,-.2,-.2+TAU*.98,10),[[.45,.36],[.43,.72],[.3,1]]);
+G('é',.56,...GL['e'].s,[[.22,.36],[.36,.2]]);
+G('ë',.56,...GL['e'].s,[[.15,.3],[.18,.33]],[[.36,.3],[.39,.33]]);
+G('=',.5,[[.06,.6],[.44,.6]],[[.06,.8],[.44,.8]]);
+G('+',.5,[[.06,.7],[.44,.7]],[[.25,.5],[.25,.9]]);
+G('×',.44,[[.08,.55],[.36,.85]],[[.36,.55],[.08,.85]]);
+G(':',.24,[[.11,.52],[.13,.55]],[[.11,.92],[.13,.95]]);
+G('→',.7,[[.04,.7],[.62,.7]],[[.48,.58],[.64,.7],[.48,.82]]);
+G('/',.4,[[.34,.08],[.06,1.04]]);
+G('√',.62,[[.02,.66],[.12,.6],[.24,1],[.4,.1],[.62,.1]]);
+G('φ',.62,A_(.31,.64,.24,.26,0,TAU,12),[[.31,.18],[.31,1.28]]);
+G('π',.6,[[.05,.52],[.55,.5]],[[.18,.52],[.16,1]],[[.42,.5],[.44,.92],[.52,1]]);
+G('°',.26,A_(.13,.2,.08,.09,0,TAU,8));
+G('?',.5,[[.08,.2],[.2,.1],[.38,.14],[.42,.34],[.26,.58],[.24,.72]],[[.24,.94],[.27,.98]]);
+G('!',.24,[[.12,.1],[.12,.72]],[[.12,.94],[.13,.97]]);
+G('≈',.54,[[.05,.62],[.15,.56],[.27,.62],[.39,.68],[.49,.62]],[[.05,.82],[.15,.76],[.27,.82],[.39,.88],[.49,.82]]);
+G('|',.24,[[.12,.05],[.12,1.1]]);
+G('…',.6,[[.08,.93],[.1,.97]],[[.28,.93],[.3,.97]],[[.48,.93],[.5,.97]]);
+
+// ---------------- vectors ----------------
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const norm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return[a[0]/l,a[1]/l,a[2]/l]};
+const sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+const PHI=(1+Math.sqrt(5))/2;
+
+// ---------------- compass and straightedge ----------------
+// a circle the way a compass makes it: true and thin, starting wherever the
+// pencil leg was set down, and running on a little past where it began
+function cPts(cx,cy,r,a0,a1,step=5){
+  const n=Math.max(10,Math.ceil(Math.abs(a1-a0)*r/step)),p=[];
+  for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n;p.push([cx+Math.cos(t)*r,cy+Math.sin(t)*r])}
+  return p;
+}
+function compass(R,cx,cy,r,o={}){
+  const a0=o.a0??rd(R,0,TAU),sw=(o.sweep??TAU)+(o.over??rd(R,.05,.14));
+  sk(R,cPts(cx,cy,r,a0,a0+sw),{col:o.col??GRAPH,w:o.w??.9,a:o.a??.42,amp:o.amp??Math.min(.55,.22+r*.0009),noDust:true,passes:o.passes,taper:o.taper});
+}
+// a construction line: straight, faint, overshooting its points a little
+function cline(R,x0,y0,x1,y1,o={}){
+  const e=o.ext??16,L=Math.hypot(x1-x0,y1-y0)||1,ux=(x1-x0)/L,uy=(y1-y0)/L;
+  sk(R,[[x0-ux*e,y0-uy*e],[x1+ux*e,y1+uy*e]],{col:o.col??GRAPH,w:o.w??.85,a:o.a??.36,amp:o.amp??.3,noDust:true,gap:o.gap});
+}
+function iline(R,x0,y0,x1,y1,o={}){sk(R,[[x0,y0],[x1,y1]],{col:o.col??INK,w:o.w??2,a:o.a??.85,amp:o.amp??.4,passes:o.passes,noDust:true,taper:o.taper})}
+function poly(R,pts,o={}){sk(R,pts.concat([pts[0]]),{col:o.col??INK,w:o.w??2,a:o.a??.85,amp:o.amp??.4,noDust:true,passes:o.passes})}
+// the little hole the compass needle leaves behind
+function needle(R,x,y,col=INK,a=.7){dotF(R,x,y,1.4,a,col);ell(R,x,y,3.4,3.4,{col,w:.7,a:a*.4,amp:.12,noDust:true})}
+function discF(x,y,r,col,a){fillPoly(cPts(x,y,r,0,TAU,2.5),col,a)}
+function ngon(cx,cy,r,n,rot=-Math.PI/2){const p=[];for(let i=0;i<n;i++){const t=rot+i/n*TAU;p.push([cx+Math.cos(t)*r,cy+Math.sin(t)*r])}return p}
+function starOrder(n,k){const o=[];let i=0;for(let s=0;s<=n;s++){o.push(i%n);i+=k}return o}
+function lerp2(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}
+// fill between an outer and an inner outline: a frame, a ring, a band
+function ringFill(P,Q,col,a){
+  const [x0,y0,x1,y1]=bbox(P),st=rgba(col,a),A=P.map(p=>p.slice()),B=Q.map(p=>p.slice());
+  emit(y0,y1,c=>{
+    c.beginPath();A.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    B.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+    c.fillStyle=st;c.fill('evenodd');
+  });
+}
+// a label, centred, in pencil
+function note(R,t,x,y,sz,col,a=.75){write(R,t,x,y,sz,{col,a,cen:true})}
+function sentence(R,t,y,col,sz=27){write(R,t,800,y,sz,{col,a:.9,cen:true})}
+
+// ---------------- papers ----------------
+// a round sheet, torn
+function disc(R,cx,cy,r,col,o={}){
+  const sd=ri(R,0,9999),P=[],n=Math.max(40,Math.round(TAU*r/20));
+  for(let i=0;i<n;i++){
+    const t=i/n*TAU;
+    let off=(fbm(Math.cos(t)*2+3,Math.sin(t)*2,sd,3)-.5)*2*(o.rough??9);
+    if(h2(i*1.7,9.1,sd)>.94)off+=rd(R,5,14)*(h2(i,3,sd)>.5?1:-1);
+    P.push([cx+Math.cos(t)*(r+off),cy+Math.sin(t)*(r+off)]);
+  }
+  fillPoly(P.map(p=>[p[0]+7,p[1]+9]),[8,6,10],.34);
+  fillPoly(P,col,1);fillPoly(P,col,1);
+  const gsd=ri(R,0,99999);
+  emit(cy-r-12,cy+r+12,c=>{
+    const RR=mul32(gsd),N=Math.round(r*r*3/1900);
+    for(let i=0;i<N;i++){const t=RR()*TAU,d=Math.sqrt(RR())*r*.97,s=.8+RR()*1.1;c.fillStyle=RR()<.6?'rgba(0,0,0,.08)':'rgba(255,250,240,.05)';c.fillRect(cx+Math.cos(t)*d,cy+Math.sin(t)*d,s,s)}
+  });
+  sk(R,P.concat([P[0]]),{col:[251,247,237],w:2,a:.34,amp:.4,gap:.24,noDust:true});
+  return P;
+}
+// tracing paper laid over a drawing: you see through it, a little milky
+function tracing(R,x0,y0,x1,y1,rot=0){
+  let P=tornPath(R,x0,y0,x1,y1,4,ri(R,0,9999));
+  if(rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,rot);
+  fillPoly(P.map(p=>[p[0]+3,p[1]+5]),[30,24,18],.07);
+  fillPoly(P,TRACE,.42);
+  sk(R,P.concat([P[0]]),{col:[255,255,255],w:1.2,a:.55,amp:.3,noDust:true});
+  return P;
+}
+// straight lines across a sheet, clipped to it: the squares of a school notebook, the staves of music paper
+function rule(P,lines,col,a,w=1){
+  const [x0,y0,x1,y1]=bbox(P),PP=P.map(p=>p.slice()),st=rgba(col,a);
+  emit(y0,y1,c=>{
+    c.save();c.beginPath();PP.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.clip();
+    c.strokeStyle=st;c.lineWidth=w;c.beginPath();
+    for(const l of lines){c.moveTo(l[0],l[1]);c.lineTo(l[2],l[3])}
+    c.stroke();c.restore();
+  });
+}
+// a strip of tape over a corner
+function tape(R,x,y,ang,len=46){
+  const tp=rotPts([[x-len/2,y-9],[x+len/2,y-9],[x+len/2,y+9],[x-len/2,y+9]],x,y,ang);
+  fillPoly(tp,[240,234,216],.38);
+  sk(R,tp.concat([tp[0]]),{col:[184,174,154],w:.8,a:.25,amp:.3,noDust:true});
+}
+
+// ---------------- sound ----------------
+// only ever after a tap or a click, and quiet
+function tone(f,t0,dur,vol,type='triangle'){
+  const ac=audio();if(!ac)return;
+  const t=ac.currentTime+t0,o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
+  o.type=type;o.frequency.value=f;lp.type='lowpass';lp.frequency.value=2600;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0006,t+dur);
+  o.connect(lp);lp.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.05);
+}
+function pluck(f,t0=0,vol=.11){tone(f,t0,2.8,vol,'triangle');tone(f*2,t0,1.5,vol*.22,'sine');tone(f*3,t0,.9,vol*.1,'sine')}
+// places on the wall that answer a tap
+const HITS=[];
+function hit(x0,y0,x1,y1,fn){HITS.push({x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,fn})}
+const hitAt=(x,y)=>HITS.find(h=>x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1);
+// a tap on a place that answers does its thing; anywhere else it strikes a match
+function tapAt(cx,cy,target){
+  if(target&&target.closest&&target.closest('a,nav,button'))return;
+  const x=cx/CSSK,y=(cy+scrollY)/CSSK;if(y>TOTALH)return;
+  audio();
+  const h=hitAt(x,y);if(h){h.fn(x,y);return}
+  strike();if(!RM)sparkBurst(x,y-16/CSSK,28,1);
+}
+// a finger is read from its own pointer events: phones do not always send a
+// click for a tap on a canvas. a finger that moves is scrolling, not tapping.
+let touchTap=null,lastTouchTap=-1e9;
+addEventListener('pointerdown',e=>{if(e.pointerType==='touch')touchTap={x:e.clientX,y:e.clientY,t:performance.now()}},{passive:true});
+addEventListener('pointerup',e=>{
+  if(e.pointerType!=='touch'||!touchTap)return;
+  const d=Math.hypot(e.clientX-touchTap.x,e.clientY-touchTap.y),dt=performance.now()-touchTap.t;touchTap=null;
+  if(d<12&&dt<600){lastTouchTap=performance.now();tapAt(e.clientX,e.clientY,e.target)}
+},{passive:true});
+addEventListener('pointercancel',()=>{touchTap=null},{passive:true});
+// sound may only start inside the gesture itself: touchend is one
+addEventListener('touchend',()=>{if(performance.now()-lastTouchTap<400)audio()},{passive:true});
+addEventListener('click',e=>{if(performance.now()-lastTouchTap<800)return;tapAt(e.clientX,e.clientY,e.target)});
+
+// a soft light anywhere on the wall, in wall coordinates, clipped to its own square
+function glowAbs(x,y,r,col,a,sx=1,sy=1){
+  emit(y-r*sy,y+r*sy,c=>{
+    c.save();c.beginPath();c.rect(x-r*sx,y-r*sy,2*r*sx,2*r*sy);c.clip();
+    c.translate(x,y);c.scale(sx,sy);
+    const g=c.createRadialGradient(0,0,0,0,0,r);
+    g.addColorStop(0,rgba(col,a));g.addColorStop(.45,rgba(col,a*.4));g.addColorStop(1,rgba(col,0));
+    c.fillStyle=g;c.fillRect(-r,-r,2*r,2*r);c.restore();
+  });
+}
+// thin paper you can almost see the sky through, with its long fibres
+function tissue(R,x0,y0,x1,y1,col,o={}){
+  let P=tornPath(R,x0,y0,x1,y1,o.rough??9,ri(R,0,9999));
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  fillPoly(P.map(p=>[p[0]+4,p[1]+6]),[40,50,70],.1);
+  fillPoly(P,col,o.a??.9);
+  const [bx0,by0,bx1,by1]=bbox(P),PP=P.map(p=>p.slice()),fsd=ri(R,0,99999);
+  emit(by0,by1,c=>{
+    const RR=mul32(fsd);c.save();c.beginPath();PP.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/5200);
+    c.lineWidth=.7;
+    for(let i=0;i<n;i++){
+      let x=bx0+RR()*(bx1-bx0),y=by0+RR()*(by1-by0),a=RR()*TAU;
+      c.strokeStyle=RR()<.5?'rgba(255,255,255,.5)':'rgba(120,110,90,.07)';
+      c.beginPath();c.moveTo(x,y);
+      for(let k=0;k<8;k++){a+=(RR()-.5)*.9;x+=Math.cos(a)*6;y+=Math.sin(a)*6;c.lineTo(x,y)}
+      c.stroke();
+    }
+    c.restore();
+  });
+  sk(R,P.concat([P[0]]),{col:[255,255,255],w:1.6,a:.5,amp:.4,gap:.2,noDust:true});
+  return P;
+}
+// a tree, by chance: every branch splits into two or three
+function treeB(R,x,y,ang,len,depth,col,w,leaves,lc){
+  const x2=x+Math.cos(ang)*len,y2=y+Math.sin(ang)*len;
+  sk(R,[[x,y],[(x+x2)/2+rd(R,-len*.06,len*.06),(y+y2)/2+rd(R,-len*.06,len*.06)],[x2,y2]],{col,w,a:.85,amp:.7,taper:'out',noDust:true});
+  if(depth<=0){if(leaves)leaves.push([x2,y2]);return}
+  const n=ch_(R,.3)?3:2;
+  for(let i=0;i<n;i++)treeB(R,x2,y2,ang+(i-(n-1)/2)*rd(R,.4,.7)+rd(R,-.2,.2),len*rd(R,.66,.8),depth-1,col,Math.max(.7,w*.68),leaves,lc);
+}
+
+// ---------------- fire on paper ----------------
+// a flame drawn once into the wall: the same flame as a living one, stopped
+function flameStatic(x,y,h,o={}){
+  const w=o.w??h*.26,ph=o.ph??1.7,lean=o.lean??0,t=o.t??.37;
+  emit(y-h*1.9,y+h*1.1,c=>flameLive(c,x,y,h,w,t,ph,lean,o.a??1,o.fl??.5,o));
+}
+// paper that has been too near the fire: the edge browned and charred, here
+// and there still glowing. the firelight falls on it from o.light.
+function burnt(R,x0,y0,x1,y1,col,o={}){
+  let P=tornPath(R,x0,y0,x1,y1,o.rough??13,ri(R,0,9999));
+  if(o.rot)P=rotPts(P,(x0+x1)/2,(y0+y1)/2,o.rot);
+  fillPoly(P.map(p=>[p[0]+7,p[1]+10]),[0,0,0],.42);
+  fillPoly(P,col,1);
+  const [bx0,by0,bx1,by1]=bbox(P),PP=P.map(p=>p.slice()),gsd=ri(R,0,99999);
+  const L=o.light||[(bx0+bx1)/2,by0+(by1-by0)*.3];
+  const bites=[];for(let i=0,n=ri(R,4,8);i<n;i++){const p=PP[ri(R,0,PP.length-1)];bites.push([p[0],p[1],rd(R,18,58)])}
+  emit(by0-4,by1+4,c=>{
+    const RR=mul32(gsd);
+    c.save();pathOf(c,PP);c.clip();
+    const n=Math.round((bx1-bx0)*(by1-by0)/1900);
+    for(let i=0;i<n;i++){const s=.8+RR()*1.1;c.fillStyle=RR()<.62?'rgba(70,46,26,.06)':'rgba(255,250,236,.07)';c.fillRect(bx0+RR()*(bx1-bx0),by0+RR()*(by1-by0),s,s)}
+    c.strokeStyle='rgba(70,46,26,.05)';c.lineWidth=.7;
+    for(let i=0;i<n/22;i++){const fx=bx0+RR()*(bx1-bx0),fy=by0+RR()*(by1-by0),fa=RR()*TAU,fl=3+RR()*7;c.beginPath();c.moveTo(fx,fy);c.lineTo(fx+Math.cos(fa)*fl,fy+Math.sin(fa)*fl);c.stroke()}
+    // the firelight: warm where it falls, falling away to the far side
+    const R0=Math.hypot(bx1-bx0,by1-by0)*.72,g=c.createRadialGradient(L[0],L[1],0,L[0],L[1],R0);
+    g.addColorStop(0,'rgba(255,200,120,.10)');g.addColorStop(.6,'rgba(110,60,24,.08)');g.addColorStop(1,'rgba(36,18,8,.4)');
+    c.fillStyle=g;c.fillRect(bx0,by0,bx1-bx0,by1-by0);
+    // bites the fire took out of the edge
+    for(const b of bites){const gb=c.createRadialGradient(b[0],b[1],0,b[0],b[1],b[2]);gb.addColorStop(0,'rgba(60,28,10,.55)');gb.addColorStop(.5,'rgba(120,64,24,.2)');gb.addColorStop(1,'rgba(150,90,40,0)');c.fillStyle=gb;c.fillRect(b[0]-b[2],b[1]-b[2],2*b[2],2*b[2])}
+    // the scorch: browner toward the rim, black at the very edge
+    c.lineJoin='round';
+    for(const [w,s] of[[54,'rgba(160,100,44,.07)'],[34,'rgba(140,80,32,.12)'],[18,'rgba(100,50,20,.28)'],[9,'rgba(50,24,10,.55)'],[4,'rgba(16,9,6,.92)']]){pathOf(c,PP);c.strokeStyle=s;c.lineWidth=w;c.stroke()}
+    c.restore();
+  });
+  // here and there the rim still glows
+  if(o.embers!==false){COMP='lighter';for(let i=0,n=ri(R,2,5);i<n;i++){const p=PP[ri(R,0,PP.length-1)];glowAbs(p[0],p[1],rd(R,8,16),EMBER,rd(R,.35,.6),1,1);dotF(R,p[0],p[1],rd(R,1,2),.9,FLAMEY)}COMP=null}
+  return P;
+}
+// a thread of smoke going up
+function smokeWisp(R,x,y,h,o={}){
+  const pts=[],ph=rd(R,0,7),lean=o.lean??rd(R,-.1,.18);
+  for(let u=0;u<=1.0001;u+=.04)pts.push([x+Math.sin(u*7+ph)*h*.07*(.25+u)+u*h*lean,y-u*h]);
+  sk(R,pts,{col:o.col||[206,200,198],w:o.w??rd(R,1.4,2.4),a:o.a??.3,amp:.6,noDust:true,taper:'out'});
+}
+// a stone by the fire: dark, warm on the side that faces the flames
+function stoneAt(R,x,y,rx,ry,lit,fx){
+  const b=blob(R,x,y,rx,ry);
+  fillPoly(b.map(p=>[p[0]+3,p[1]+4]),[0,0,0],.4);
+  fillPoly(b,[60,54,52],1);
+  const side=fx>x?1:-1,hi=b.filter(p=>(p[0]-x)*side>-rx*.2&&p[1]<y+ry*.2);
+  if(hi.length>2&&lit>0){sk(R,hi,{col:[255,150,80],w:2.4,a:.55*lit,amp:.4,noDust:true});scribFill(R,blob(R,x+side*rx*.25,y-ry*.25,rx*.6,ry*.5),4,.18*lit,{col:[214,120,70]})}
+  sk(R,b.concat([b[0]]),{col:[24,20,20],w:1.3,a:.7,amp:.3,noDust:true});
+}
+// draw with the pencil into a canvas of its own, for things that appear later
+function offscreen(w,h,fn){
+  const cv=document.createElement('canvas');cv.width=Math.ceil(w*S);cv.height=Math.ceil(h*S);
+  const cx=cv.getContext('2d');cx.lineCap='round';cx.lineJoin='round';
+  const sd=DIRECT,gd=GEN_DY;DIRECT={cx,y0:0};GEN_DY=0;
+  try{fn()}finally{DIRECT=sd;GEN_DY=gd}
+  return cv;
+}
+// the colours of iron in the fire, as a smith reads them
+const HEAT=[[0,[64,58,58]],[.14,[96,44,34]],[.3,[150,34,22]],[.48,[214,52,28]],[.66,[255,120,40]],[.84,[255,206,92]],[1,[255,250,232]]];
+const heatCol=h=>ramp(HEAT,h);
+// a label with a thin line to what it names
+function lead(R,from,to,t,sz,col,a=.75,left=true){
+  sk(R,[from,[to[0]+(left?-8:8),to[1]-sz*.35]],{col,w:1,a:a*.6,amp:.4,noDust:true});
+  dotF(R,from[0],from[1],2,a,col);
+  write(R,t,left?to[0]:to[0]-measure(t,sz),to[1],sz,{col,a});
+}
+
+// the whole sky of the night, laid down in strips, with the tooth of the paper over it
+function groundPaint(R){
+  const st=30;
+  for(let y=-10;y<TOTALH+10;y+=st){
+    const c0=skyAt(y),c1=skyAt(y+st),ya=y;
+    emit(ya-2,ya+st+2,c=>{const g=c.createLinearGradient(0,ya,0,ya+st);g.addColorStop(0,rgba(c0,1));g.addColorStop(1,rgba(c1,1));c.fillStyle=g;c.fillRect(-10,ya-1,LW+20,st+2.5)});
+  }
+  for(let y0=-10;y0<TOTALH;y0+=400){
+    const gsd=ri(R,0,99999),y1=Math.min(TOTALH,y0+400);
+    emit(y0,y1,c=>{
+      const RR=mul32(gsd),n=Math.round(LW*(y1-y0)/1900);
+      for(let i=0;i<n;i++){const s=.8+RR()*1.1,x=RR()*LW,y=y0+RR()*(y1-y0),lt=lumAt(y)>.5;c.fillStyle=lt?(RR()<.6?'rgba(60,40,30,.05)':'rgba(255,255,255,.1)'):(RR()<.55?'rgba(255,236,210,.03)':'rgba(0,0,0,.1)');c.fillRect(x,y,s,s)}
+    });
+  }
+  // warmth in the dark: faint washes, as from fires out of sight
+  for(let i=0;i<44;i++){const y=rd(R,1400,14600),x=rd(R,-120,1720),r=rd(R,170,440);glowAbs(x,y,r,pk(R,[[120,52,30],[96,44,40],[70,44,64]]),rd(R,.05,.11),rd(R,1.5,2.6),1)}
+  // and stars wherever it is dark enough
+  const stars=[];
+  for(let i=0;i<2400;i++){const y=rd(R,0,TOTALH),x=rd(R,0,LW),dk=clamp((.3-lumAt(y))/.14,0,1);if(R()>dk*.6)continue;stars.push([x,y,rd(R,.4,1.25),rd(R,.08,.42)*dk])}
+  stars.sort((p,q)=>p[1]-q[1]);dustBatch(stars,CINK);
+}
+// small marks in the margins: sparks, a little flame, smoke, embers, a match
+function whispers(R,y0,y1,n){
+  for(let i=0;i<n;i++){
+    const left=ch_(R,.5),x=left?rd(R,32,128):rd(R,1472,1568),y=rd(R,y0+40,y1-40),col=inkAt(y+GEN_DY),a=rd(R,.25,.45),k=ri(R,0,4),s=rd(R,7,13);
+    if(k===0)spark(R,x,y,s,{col:[255,170,90],a:a+.15,w:1});
+    else if(k===1){const o=flameOutline(x,y+s,s*2.2,s*.6,rd(R,-.1,.1),rd(R,0,7));sk(R,o.concat([o[0]]),{col,w:1,a,amp:.3})}
+    else if(k===2)sk(R,spiralPts(x,y,s*1.1,1,rd(R,1.2,2),rd(R,0,7)),{col,w:1,a,amp:.4});
+    else if(k===3){for(let j=0,m=ri(R,3,5);j<m;j++)dotF(R,x+j*7-10,y+rd(R,-2,2),1.3,a+.25,[255,140,70])}
+    else{sk(R,[[x-12,y+8],[x+12,y-8]],{col:[214,180,128],w:2,a:a+.2,amp:.2});dotF(R,x+13,y-9,2.6,a+.3,[150,40,30])}
+  }
+}
+// small extra letters this wall needs
+G('ó',.6,...GL['o'].s,[[.26,.36],[.4,.2]]);
+G('í',.26,[[.13,.5],[.13,.96],[.18,1]],[[.08,.38],[.2,.24]]);
+G('ě',.56,...GL['e'].s,[[.14,.22],[.27,.34],[.4,.22]]);
+
+// ===========================================================================
+// vuur — thirteen sheets of one night, top to bottom. every sheet is drawn in
+// local coordinates 0..1600 x 0..1200; GEN_DY lifts it to its place.
+// ===========================================================================
+const P=[];
+
+// P0 · vuur: a match at dusk ---------------------------------------------------------------
+P.push(function(){
+  const R=stream(SEED*131+0),RW=stream(SEED*131+90);
+  groundPaint(RW);
+  // the last light of the day, low over the hills, and a sliver of the sun
+  glowAbs(800,1064,800,[255,126,58],.34,2.3,.6);
+  glowAbs(1090,1062,330,[255,200,130],.5,2.1,.42);
+  {const s=cPts(1090,1066,36,Math.PI,TAU,3);fillPoly(s.concat([[1126,1066],[1054,1066]]),[255,216,152],.95)}
+  const ridge=(x,base,amp,ph,f)=>base+Math.sin(x*f+ph)*amp+Math.sin(x*f*2.7+ph*1.7)*amp*.4;
+  const hill=(base,amp,col,ph,f)=>{const pts=[[-20,1214]];for(let x=-20;x<=1620;x+=12)pts.push([x,ridge(x,base,amp,ph,f)]);pts.push([1620,1214]);fillPoly(pts,col,1)};
+  hill(1074,16,[96,48,54],1.2,.0032);
+  for(let k=0;k<12;k++){const x=rd(R,-10,1610),b=ridge(x,1074,16,1.2,.0032)+4,h=rd(R,22,48);if(Math.abs(x-1090)<70)continue;if(ch_(R,.6)){fillPoly([[x-h*.22,b],[x,b-h],[x+h*.22,b]],[80,42,50],1)}else{sk(R,[[x,b],[x,b-h*.5]],{col:[80,42,50],w:2.4,a:1,amp:.2,noDust:true});fillPoly(blob(R,x,b-h*.66,h*.3,h*.26),[80,42,50],1)}}
+  hill(1110,24,[50,28,34],2.6,.0046);
+  hill(1160,18,[28,17,19],4.1,.006);
+  write(R,'vuur',800,250,140,{col:CINK,a:.92,cen:true});
+  write(R,'een muur over wat ons aansteekt',800,318,26,{col:CINK,a:.74,cen:true});
+  write(R,'(beweeg: jij bent het vlammetje · tik: een vonk)',800,358,15,{col:CINK,a:.5,cen:true});
+  // the match, struck a moment ago
+  const A=[476,1190],B=[904,664],len=Math.hypot(B[0]-A[0],B[1]-A[1]),ux=(B[0]-A[0])/len,uy=(B[1]-A[1])/len,nx=-uy,ny=ux;
+  COMP='lighter';glowAbs(B[0],B[1]-130,540,[255,140,60],.22,1.15,1.1);glowAbs(B[0],B[1]-40,170,[255,190,110],.32,1,1);COMP=null;
+  const stick=[[A[0]+nx*11,A[1]+ny*11],[B[0]+nx*10,B[1]+ny*10],[B[0]-nx*10,B[1]-ny*10],[A[0]-nx*11,A[1]-ny*11]];
+  fillPoly(stick.map(p=>[p[0]+12,p[1]+14]),[0,0,0],.3);
+  fillPoly(stick,WOOD,1);
+  // lit from the flame above: one edge warm, the other in its own shadow
+  sk(R,[[A[0]-nx*8,A[1]-ny*8],[B[0]-nx*7,B[1]-ny*7]],{col:[255,228,176],w:3,a:.55,amp:.4,noDust:true});
+  sk(R,[[A[0]+nx*8,A[1]+ny*8],[B[0]+nx*7,B[1]+ny*7]],{col:[110,72,44],w:3.4,a:.6,amp:.4,noDust:true});
+  for(let k=0;k<3;k++){const o=(k-1)*5;sk(R,[[A[0]+nx*o+ux*24,A[1]+ny*o+uy*24],[B[0]+nx*o-ux*96,B[1]+ny*o-uy*96]],{col:[176,130,80],w:.8,a:.35,amp:.6,gap:.08,noDust:true})}
+  poly(R,stick,{col:[90,60,36],w:1.2,a:.6,amp:.3});
+  // the wood blackens under the head
+  {const S0=stick.map(p=>p.slice());emit(B[1]-30,B[1]+140,c=>{const g=c.createLinearGradient(B[0]-ux*120,B[1]-uy*120,B[0],B[1]);g.addColorStop(0,'rgba(30,18,12,0)');g.addColorStop(.55,'rgba(30,18,12,.72)');g.addColorStop(1,'rgba(18,10,8,.96)');c.fillStyle=g;pathOf(c,S0);c.fill()})}
+  // the head: black in the middle, glowing at the rim
+  const hd=ePts(B[0]+ux*4,B[1]+uy*4,25,17,Math.atan2(uy,ux),18);
+  fillPoly(hd,[38,20,14],1);
+  COMP='lighter';glowAbs(B[0]+ux*4,B[1]+uy*4,48,EMBER,.55,1,1);COMP=null;
+  sk(R,hd.concat([hd[0]]),{col:[255,150,70],w:2,a:.75,amp:.5,noDust:true,gap:.2});
+  // on the hill: the box it was struck on, and one that would not take
+  {
+    const T=[[1150,1100],[1330,1080],[1386,1110],[1206,1132]],F=[[1206,1132],[1386,1110],[1386,1144],[1206,1168]],Sd=[[1150,1100],[1206,1132],[1206,1168],[1150,1134]];
+    fillPoly([[1150,1134],[1206,1168],[1386,1144],[1400,1150],[1212,1180],[1140,1142]],[0,0,0],.35);
+    fillPoly(T,[196,150,96],1);fillPoly(F,[150,104,62],1);fillPoly(Sd,[86,42,34],1);
+    for(let k=0;k<60;k++){const u=R(),v=R();dotF(R,1150+u*56,1100+u*32+v*34,.9,.5,[40,20,16])}
+    sk(R,[[1160,1110],[1194,1150]],{col:[214,200,190],w:1.2,a:.5,amp:.6,noDust:true});
+    const lab=[[1180,1100],[1310,1085],[1350,1104],[1220,1121]];fillPoly(lab,[238,224,196],1);poly(R,lab,{col:[176,52,40],w:2,a:.85,amp:.3});
+    {const o=flameOutline(1266,1112,22,7,.15,1);fillPoly(o,[214,70,40],.9)}
+    for(const q of[T,F,Sd])poly(R,q,{col:[40,24,18],w:1.2,a:.7,amp:.3});
+    COMP='lighter';glowAbs(1250,1090,140,[255,150,70],.1,1.4,1);COMP=null;
+    // the dud
+    sk(R,[[1418,1176],[1512,1160]],{col:WOOD,w:6,a:.95,amp:.3,noDust:true});
+    fillPoly(ePts(1412,1177,9,6,-.17,12),[26,16,14],1);
+    smokeWisp(R,1412,1170,70,{a:.22,lean:.25});
+  }
+  // the flame lives on glass
+  const FX=B[0]+ux*2,FY=B[1]-10;
+  live(FX-330,FY-480,660,700,{sc:1,dy:GEN_DY,
+    frame(c,now,L){
+      c.clearRect(L.x,L.y,L.w,L.h);
+      flameLive(c,FX,FY+L.dy,214,52,now/1000,1.3,0,1,1);
+      if(!RM&&!STILL&&Math.random()<.06)sparkUp(FX+rd(Math.random,-16,16),FY+L.dy-rd(Math.random,110,200));
+    }});
+  sentence(R,'alles begint met een vonk',1160,CINK,28);
+  whispers(R,440,1000,3);
+});
+
+// P1 · four ways to make fire -------------------------------------------------------------
+// strike, rub, press, gather: and then the match, the light-bearer
+P.push(function(){
+  const R=stream(SEED*131+1);
+  write(R,'vier manieren om vuur te maken',800,112,36,{col:CINK,a:.88,cen:true});
+  const C=[[430,370],[1170,370],[430,762],[1170,762]],LAB=['slaan','wrijven','persen','bundelen'];
+  C.forEach(([cx,cy],i)=>{burnt(R,cx-330,cy-172,cx+330,cy+172,CREAM,{rough:10,rot:rd(R,-.01,.01),light:[cx-60,cy-120]});write(R,LAB[i],cx-290,cy-110,34,{col:INK,a:.86})});
+  const nt=(t,x,y,a=.74)=>write(R,t,x,y,16,{col:INK,a});
+  const glowS=(x,y,r,a=.5,col=EMBER)=>{COMP='lighter';glowAbs(x,y,r,col,a,1,1);COMP=null};
+  // slaan: flint against steel. the spark is a splinter of the steel, burning
+  {
+    const [cx,cy]=C[0];
+    const fl=blob(R,cx-110,cy-6,86,52);
+    fillPoly(fl.map(p=>[p[0]+5,p[1]+7]),[40,30,24],.25);fillPoly(fl,[66,68,80],.96);
+    fillPoly(blob(R,cx-146,cy-4,24,22),[214,206,190],.9);
+    for(let k=0;k<4;k++)sk(R,cPts(cx-50,cy-24,20+k*14,1.9,3.5,4),{col:[150,156,176],w:1,a:.45,amp:.3,noDust:true});
+    sk(R,fl.concat([fl[0]]),{col:[34,34,40],w:1.6,a:.8,amp:.4});
+    const sx=cx+110,sy=cy-66,rot=-.3,out=ePts(sx,sy,112,40,rot,40),inn=ePts(sx+8,sy+2,90,20,rot,40);
+    fillPoly(out.map(p=>[p[0]+4,p[1]+6]),[40,30,24],.2);
+    ringFill(out,inn,[64,64,72],.97);
+    sk(R,out.concat([out[0]]),{col:[28,28,34],w:1.4,a:.85,amp:.3});sk(R,inn.concat([inn[0]]),{col:[28,28,34],w:1.2,a:.75,amp:.3});
+    sk(R,out.slice(23,36),{col:[200,200,210],w:2,a:.55,amp:.3,noDust:true});
+    const P0=[cx-26,cy-44];
+    glowS(P0[0],P0[1],44,.55);
+    for(let k=0;k<17;k++){
+      const a=rd(R,-.6,1.4),L=rd(R,40,110),pts=[];
+      for(let u=0;u<=1.0001;u+=.1)pts.push([P0[0]+Math.cos(a)*L*u,P0[1]+Math.sin(a)*L*u+26*u*u]);
+      sk(R,pts,{col:[255,166,66],w:rd(R,1.2,2.2),a:.92,amp:.2,taper:'in',noDust:true});
+      glowS(pts[10][0],pts[10][1],8,.6);
+    }
+    // a scrap of char cloth catches one
+    const cc=[[cx+110,cy+70],[cx+172,cy+64],[cx+176,cy+102],[cx+114,cy+108]];fillPoly(cc,[40,30,28],.95);
+    glowS(cx+142,cy+82,16,.7);dotF(R,cx+142,cy+82,2.4,.95,FLAMEY);
+    nt('de vonk komt uit het staal:',cx-290,cy+122);nt('een gloeiend splintertje ijzer',cx-290,cy+144);
+  }
+  // wrijven: a bow drill, wood on wood until it smokes
+  {
+    const [cx,cy]=C[1];
+    const board=[[cx-236,cy+66],[cx+196,cy+54],[cx+232,cy+80],[cx-198,cy+94]],front=[[cx-198,cy+94],[cx+232,cy+80],[cx+232,cy+98],[cx-198,cy+112]];
+    fillPoly(front.map(p=>[p[0]+4,p[1]+8]),[40,30,24],.25);
+    fillPoly(board,[206,160,104],1);fillPoly(front,[160,112,66],1);
+    for(let k=0;k<4;k++)sk(R,[[cx-220+k*6,cy+72+k*5],[cx+210-k*4,cy+60+k*5]],{col:[150,104,60],w:.8,a:.4,amp:.8,gap:.1,noDust:true});
+    poly(R,board,{col:[90,60,36],w:1.2,a:.7,amp:.3});poly(R,front,{col:[90,60,36],w:1.2,a:.7,amp:.3});
+    // the notch with its little pile of hot dust
+    fillPoly([[cx+4,cy+64],[cx+26,cy+62],[cx+18,cy+92],[cx+12,cy+92]],[60,36,24],1);
+    fillPoly(blob(R,cx+16,cy+104,16,8),[54,34,26],1);
+    glowS(cx+16,cy+102,20,.65);dotF(R,cx+16,cy+102,2.2,.9,FLAMEY);
+    // the spindle and the block that holds it down
+    const sp=[[cx+8,cy+62],[cx+22,cy+62],[cx+34,cy-118],[cx+20,cy-118]];fillPoly(sp,[222,190,140],1);poly(R,sp,{col:[110,76,46],w:1.2,a:.75,amp:.2});
+    const bl=blob(R,cx+28,cy-132,34,14);fillPoly(bl,[140,124,108],1);sk(R,bl.concat([bl[0]]),{col:[60,50,44],w:1.2,a:.7,amp:.3});
+    // the bow, its string once round the spindle
+    const bow=[];for(let u=0;u<=1.0001;u+=.05){const x=cx-250+u*420,y=cy-36-Math.sin(u*Math.PI)*70-u*40;bow.push([x,y])}
+    sk(R,bow,{col:[150,104,62],w:7,a:.95,amp:.6,noDust:true});sk(R,bow.map(p=>[p[0],p[1]-2]),{col:[214,170,112],w:2,a:.6,amp:.5,noDust:true});
+    const e0=bow[0],e1=bow[bow.length-1];
+    sk(R,[e0,[cx+14,cy-26]],{col:[80,70,60],w:1.2,a:.85,amp:.2,noDust:true});
+    sk(R,[[cx+36,cy-34],e1],{col:[80,70,60],w:1.2,a:.85,amp:.2,noDust:true});
+    sk(R,cPts(cx+26,cy-30,14,-.4,Math.PI+.4,3).map(p=>[p[0],cy-30+(p[1]-cy+30)*.4]),{col:[80,70,60],w:1.2,a:.85,amp:.1,noDust:true});
+    for(let k=0;k<3;k++)smokeWisp(R,cx+14+k*8,cy+88,rd(R,110,160),{col:[150,146,140],a:.4,lean:rd(R,.15,.4)});
+    nt('hout op hout, tot het rookt',cx-290,cy+144);
+  }
+  // persen: the fire piston. squeeze air hard and fast, and it grows hot
+  {
+    const [cx,cy]=C[2],x=cx+150;
+    const body=[[x-36,cy-80],[x+36,cy-80],[x+36,cy+112],[x-36,cy+112]];
+    fillPoly(body.map(p=>[p[0]+5,p[1]+7]),[40,30,24],.25);
+    fillPoly(body,[150,108,70],1);
+    const bore=[[x-14,cy-80],[x+14,cy-80],[x+14,cy+86],[x-14,cy+86]];fillPoly(bore,[238,228,206],1);
+    for(let k=0;k<4;k++)sk(R,[[x-31+k*3,cy-72],[x-31+k*3,cy+104]],{col:[110,76,48],w:.8,a:.4,amp:.6,gap:.1,noDust:true});
+    poly(R,body,{col:[70,46,28],w:1.4,a:.8,amp:.2});poly(R,bore,{col:[70,46,28],w:1,a:.6,amp:.2});
+    // the plunger, rammed home
+    const rod=[[x-8,cy-128],[x+8,cy-128],[x+8,cy+30],[x-8,cy+30]];fillPoly(rod,[196,160,116],1);poly(R,rod,{col:[90,62,40],w:1.2,a:.75,amp:.2});
+    const knob=ePts(x,cy-134,38,15,0,20);fillPoly(knob,[130,90,58],1);sk(R,knob.concat([knob[0]]),{col:[70,46,28],w:1.3,a:.8,amp:.2});
+    // the tinder on its tip, glowing
+    fillPoly(blob(R,x,cy+38,11,8),[50,36,30],1);glowS(x,cy+38,22,.7);dotF(R,x,cy+38,2.6,.95,FLAMEY);
+    // the air, squeezed into almost nothing
+    for(let k=0;k<70;k++)dotF(R,x+rd(R,-11,11),rd(R,cy+48,cy+84),.9,.6,[100,120,170]);
+    arrowHead(R,x-92,cy-6,Math.PI/2,14,.8,INK,1.8);sk(R,[[x-92,cy-120],[x-92,cy-8]],{col:INK,w:1.8,a:.8,amp:.4,noDust:true});
+    write(R,'in één klap',x-104-measure('in één klap',15),cy-70,15,{col:INK,a:.62});
+    nt('pers lucht snel samen:',cx-290,cy+100);nt('ze wordt zo heet dat tondel gloeit',cx-290,cy+122);nt('(zuidoost-azië, en de dieselmotor)',cx-290,cy+144,.55);
+  }
+  // bundelen: the sun gathered in a lens
+  {
+    const [cx,cy]=C[3],sun=[cx+236,cy-112],lens=[cx+60,cy-20],F=[cx-120,cy+48];
+    discF(sun[0],sun[1],28,[255,206,110],.95);
+    for(let k=0;k<12;k++){const a=k/12*TAU;sk(R,[[sun[0]+Math.cos(a)*36,sun[1]+Math.sin(a)*36],[sun[0]+Math.cos(a)*50,sun[1]+Math.sin(a)*50]],{col:[220,150,60],w:1.6,a:.8,amp:.2,noDust:true})}
+    const dx=lens[0]-sun[0],dy=lens[1]-sun[1],dl=Math.hypot(dx,dy),ux=dx/dl,uy=dy/dl,px=-uy,py=ux;
+    for(let k=-2;k<=2;k++){
+      const hit=[lens[0]+px*k*24,lens[1]+py*k*24],st=[hit[0]-ux*150,hit[1]-uy*150];
+      sk(R,[st,hit],{col:[236,190,90],w:1.4,a:.7,amp:.2,noDust:true});
+      sk(R,[hit,F],{col:[244,180,70],w:1.4,a:.75,amp:.2,noDust:true});
+    }
+    const ang=Math.atan2(uy,ux),lp=ePts(lens[0],lens[1],14,70,ang,30);
+    fillPoly(lp,[214,234,240],.55);sk(R,lp.concat([lp[0]]),{col:[110,130,140],w:1.6,a:.85,amp:.2});
+    const hb=[lens[0]-px*70,lens[1]-py*70];
+    sk(R,[hb,[hb[0]-px*70+ux*6,hb[1]-py*70+uy*6]],{col:[120,80,46],w:8,a:.95,amp:.3,noDust:true});
+    // dry grass, and the point where it starts to smoke
+    for(let k=0;k<34;k++){const a=-Math.PI/2+rd(R,-1.2,1.2),L=rd(R,14,40);sk(R,[[F[0]+rd(R,-26,26),F[1]+22],[F[0]+Math.cos(a)*L+rd(R,-10,10),F[1]+22+Math.sin(a)*L]],{col:pk(R,[[190,160,90],[170,140,80],[210,186,120]]),w:1.1,a:.8,amp:.3,noDust:true,taper:'out'})}
+    glowS(F[0],F[1],30,.8,[255,220,140]);dotF(R,F[0],F[1],3,.95,[255,250,230]);
+    smokeWisp(R,F[0],F[1]-6,90,{col:[150,146,140],a:.45,lean:.1});
+    nt('in olympia wordt het vuur voor de spelen',cx-290,cy+122);nt('nog altijd met zonlicht aangestoken',cx-290,cy+144);
+  }
+  // and the match: a light-bearer
+  {
+    const y=1012,x0=600,x1=1000;
+    sk(R,[[x0,y],[x1,y]],{col:WOOD,w:12,a:1,amp:.3,noDust:true});
+    sk(R,[[x0,y-4],[x1,y-4]],{col:[250,226,180],w:2,a:.6,amp:.3,noDust:true});
+    fillPoly(ePts(x1+12,y,20,12,0,16),[176,48,36],1);
+    sk(R,ePts(x1+12,y,20,12,0,16).concat([[x1+32,y]]),{col:[110,30,24],w:1.2,a:.8,amp:.2,noDust:true});
+    note(R,'en dan de lucifer, 1826',360,y+6,18,CINK,.76);
+    note(R,'lucifer betekent lichtdrager:',1270,y-6,18,CINK,.76);
+    note(R,'zo heette ook de morgenster',1270,y+20,18,CINK,.76);
+  }
+  sentence(R,'de mens is het enige dier dat vuur maakt',1128,CINK,28);
+  whispers(R,160,1100,3);
+});
+
+// P2 · four triangles ----------------------------------------------------------------------
+// plato built fire from tetrahedra, the sharpest of the five forms. the fire
+// brigade draws it the same way: four sides, take one away and it goes out.
+function tetra(cx,cy,s,yaw,tilt){
+  const h=Math.sqrt(2/3),r=Math.sqrt(1/3);
+  const V=[[0,-h*.75,0]];
+  for(let k=0;k<3;k++){const a=yaw+k*TAU/3;V.push([Math.cos(a)*r,h*.25,Math.sin(a)*r])}
+  const ct=Math.cos(tilt),st=Math.sin(tilt);
+  return V.map(([x,y,z])=>{const y2=y*ct-z*st,z2=y*st+z*ct;return[cx+x*s,cy+y2*s,z2]});
+}
+// the faces, each with its outward normal facing us or not
+function tetraFaces(V){
+  const F=[[0,1,2],[0,2,3],[0,3,1],[1,3,2]],cen=[0,1,2].map(i=>(V[0][i]+V[1][i]+V[2][i]+V[3][i])/4);
+  return F.map(f=>{
+    const [a,b,c]=f.map(i=>V[i]),u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    let n=cross(u,v);const m=[(a[0]+b[0]+c[0])/3,(a[1]+b[1]+c[1])/3,(a[2]+b[2]+c[2])/3];
+    if(dot(n,[m[0]-cen[0],m[1]-cen[1],m[2]-cen[2]])<0)n=n.map(q=>-q);
+    return{f,pts:[a,b,c].map(p=>[p[0],p[1]]),mid:[m[0],m[1]],front:n[2]<0};
+  });
+}
+P.push(function(){
+  const R=stream(SEED*131+2);
+  const SH=burnt(R,96,58,1504,1150,[244,238,222],{rough:14,rot:-.004,light:[800,320]});
+  const lines=[];for(let x=116;x<1500;x+=40)lines.push([x,58,x,1150]);for(let y=78;y<1150;y+=40)lines.push([96,y,1504,y]);
+  rule(SH,lines,[120,150,190],.14,1);
+  write(R,'vier driehoeken',800,152,40,{col:INK,a:.88,cen:true});
+  note(R,'plato maakte vuur van vier driehoeken. de brandweer ook.',800,198,19,INK,.66);
+  const drawT=(cx,cy,s,cols,o={})=>{
+    const V=tetra(cx,cy,s,o.yaw??.35,o.tilt??.42),FS=tetraFaces(V);
+    for(const F of FS)if(!F.front){
+      for(let k=0;k<3;k++){const a=F.pts[k],b=F.pts[(k+1)%3];sk(R,[a,b],{col:GRAPH,w:1,a:.4,amp:.3,gap:.35,noDust:true})}
+    }
+    let vi=0;FS.forEach(F=>{if(!F.front)return;const cl=cols[vi++];fillPoly(F.pts,cl,.22);hatchFill(R,F.pts,7,.5+vi*.7,.3,{col:cl,w:1})});
+    const E=[[0,1],[0,2],[0,3],[1,2],[2,3],[3,1]];
+    for(const [a,b] of E){
+      const vis=FS.some(F=>F.front&&F.f.includes(a)&&F.f.includes(b));
+      if(vis)sk(R,[[V[a][0],V[a][1]],[V[b][0],V[b][1]]],{col:INK,w:2.2,a:.85,amp:.4,passes:2,noDust:true});
+    }
+    return{V,FS};
+  };
+  // plato's fire: the sharpest of the five, so it pricks
+  {
+    const T=drawT(430,470,290,[[230,90,50],[250,150,60],[240,200,90],[220,110,60]]);
+    for(const v of T.V)if(v[2]<.3){for(let k=0;k<6;k++){const a=k/6*TAU+.3;sk(R,[[v[0]+Math.cos(a)*9,v[1]+Math.sin(a)*9],[v[0]+Math.cos(a)*20,v[1]+Math.sin(a)*20]],{col:[220,90,40],w:1.2,a:.7,amp:.1,noDust:true})}}
+    flameStatic(T.V[0][0],T.V[0][1]-6,48,{w:13,ga:.25,gr:1.1});
+    write(R,'plato: vuur is gemaakt van viervlakjes,',430-measure('plato: vuur is gemaakt van viervlakjes,',18)/2,700,18,{col:INK,a:.75});
+    note(R,'de scherpste vorm. daarom prikt het.',430,726,18,INK,.75);
+  }
+  // unfolded: four triangles
+  {
+    const cx=800,cy=500,s=200,A=[cx,cy-s*.62],B=[cx-s*.72,cy+s*.62],C=[cx+s*.72,cy+s*.62],ab=lerp2(A,B,.5),bc=lerp2(B,C,.5),ca=lerp2(C,A,.5);
+    fillPoly([ab,bc,ca],[250,150,60],.16);
+    for(const q of[[A,ab,ca],[ab,B,bc],[ca,bc,C]])fillPoly(q,[230,110,60],.1);
+    poly(R,[A,B,C],{col:INK,w:2,a:.8});
+    for(const [p,q] of[[ab,bc],[bc,ca],[ca,ab]])sk(R,[p,q],{col:INK,w:1.2,a:.6,amp:.3,gap:.3,noDust:true});
+    note(R,'uitgevouwen',cx,cy+s*.62+44,16,INK,.6);
+  }
+  // the fire brigade's: heat, fuel, air and the chain reaction
+  {
+    const cols=[[220,70,50],[150,100,60],[90,140,210],[240,160,60]];
+    const T=drawT(1170,456,330,cols,{yaw:Math.PI/2,tilt:1.32});
+    const names=['warmte','brandstof','zuurstof','kettingreactie'];
+    const side=T.FS.filter(F=>F.front),back=T.FS.find(F=>!F.front);
+    T.FS.forEach((F,i)=>{if(F.front){const nm=i===3?names[3]:names[side.indexOf(F)];const m=lerp2(F.mid,[T.V[0][0],T.V[0][1]],-.18);write(R,nm,m[0]-measure(nm,19)/2,m[1]+6,19,{col:shade(cols[side.indexOf(F)],.4),a:.92})}});
+    if(back){const nm=names[3];note(R,'en daaronder: de '+nm,1170,640,18,shade(cols[3],.45),.9)}
+    note(R,'de brandweer tekent het ook zo:',1170,700,18,INK,.75);
+    note(R,'een driehoek, en een vierde kant',1170,726,18,INK,.75);
+  }
+  // four ways to put it out
+  const icons=[[290,'koelen','haal de warmte weg'],[630,'smoren','haal de lucht weg'],[970,'uithongeren','haal de brandstof weg'],[1310,'de keten breken','met bluspoeder']];
+  const smallFlame=(x,y,h)=>{const o=flameOutline(x,y,h,h*.3,0,2);fillPoly(o,[250,160,60],.9);fillPoly(flameOutline(x,y,h*.55,h*.15,0,2),[255,226,140],.9);sk(R,o.concat([o[0]]),{col:[200,90,40],w:1.2,a:.8,amp:.2})};
+  for(const [x,t,s] of icons){write(R,t,x,960,24,{col:INK,a:.85,cen:true});note(R,s,x,988,16,INK,.66)}
+  // koelen: water from a bucket
+  {
+    const x=290,y=860,b=rotPts([[x-70,y-90],[x-10,y-90],[x-18,y-30],[x-62,y-30]],x-40,y-60,-.6);
+    fillPoly(b,[150,160,170],1);poly(R,b,{col:[60,70,80],w:1.4,a:.85});
+    sk(R,cPts(x-40,y-80,40,Math.PI*1.1,Math.PI*1.9,3).map(p=>rotPts([p],x-40,y-60,-.6)[0]),{col:[60,70,80],w:1.4,a:.8,amp:.2,noDust:true});
+    for(let k=0;k<5;k++){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x-6+u*60+k*4,y-70+u*u*70+k*3]);sk(R,pts,{col:[90,140,210],w:1.6,a:.7,amp:.3,noDust:true})}
+    smallFlame(x+62,y+8,40);
+    for(let k=0;k<3;k++)smokeWisp(R,x+50+k*12,y-30,60,{col:[150,160,180],a:.4});
+  }
+  // smoren: a snuffer over a candle
+  {
+    const x=630,y=870;
+    const cd=[[x-14,y],[x+14,y],[x+14,y-70],[x-14,y-70]];fillPoly(cd,WAX,1);poly(R,cd,{col:[150,130,100],w:1.2,a:.8});
+    sk(R,[[x,y-70],[x,y-82]],{col:CHAR,w:1.6,a:.9,amp:.1,noDust:true});
+    const cone=[[x-6,y-136],[x+6,y-136],[x+30,y-90],[x-30,y-90]];fillPoly(cone,[184,140,70],1);poly(R,cone,{col:[110,76,30],w:1.3,a:.85});
+    sk(R,[[x+5,y-132],[x+92,y-150]],{col:[150,110,50],w:3,a:.9,amp:.2,noDust:true});
+    smokeWisp(R,x,y-84,30,{a:.4});
+  }
+  // uithongeren: a firebreak
+  {
+    const x=970,y=880;
+    for(let k=0;k<5;k++){const tx=x-150+k*24,h=rd(R,46,64);fillPoly([[tx-12,y],[tx,y-h],[tx+12,y]],[70,110,70],1);smallFlame(tx,y-h*.4,30)}
+    hatchFill(R,[[x-30,y-4],[x+30,y-4],[x+30,y+4],[x-30,y+4]],5,.3,.4,{col:[150,120,80]});
+    for(let k=0;k<5;k++){const tx=x+50+k*24,h=rd(R,46,64);fillPoly([[tx-12,y],[tx,y-h],[tx+12,y]],[70,120,70],1);sk(R,[[tx-12,y],[tx,y-h],[tx+12,y]],{col:[40,70,40],w:1,a:.7,amp:.2})}
+    sk(R,[[x-170,y+2],[x+170,y+2]],{col:[120,90,60],w:1.4,a:.7,amp:.4,noDust:true});
+  }
+  // de keten breken: an extinguisher
+  {
+    const x=1250,y=880;
+    const body=[[x-24,y],[x+24,y],[x+24,y-110],[x-24,y-110]];fillPoly(body,[200,50,40],1);poly(R,body,{col:[110,24,20],w:1.4,a:.85});
+    fillPoly(ePts(x,y-110,24,9,0,16),[220,80,60],1);
+    sk(R,[[x,y-120],[x,y-132]],{col:[60,60,64],w:5,a:.9,amp:.1,noDust:true});
+    sk(R,[[x,y-128],[x+40,y-140],[x+76,y-118]],{col:[40,40,44],w:3,a:.9,amp:.3,noDust:true});
+    const nz0=[x+76,y-118],ang0=Math.atan2(y-10-nz0[1],x+150-nz0[0]);
+    for(let k=0;k<170;k++){const a=ang0+rd(R,-.3,.3),d=Math.sqrt(R())*120;dotF(R,nz0[0]+Math.cos(a)*d,nz0[1]+Math.sin(a)*d,rd(R,1,2.4),.5,[214,214,222])}
+    smallFlame(x+150,y+4,26);
+  }
+  sentence(R,'haal er één weg, en het vuur gaat uit',1080,INK,28);
+});
+
+// P3 · the candle -------------------------------------------------------------------------
+// faraday's candle, taken apart. tap and you blow it out; hold your own flame in
+// the thread of smoke that rises, and the fire runs down it to the wick.
+P.push(function(){
+  const R=stream(SEED*131+3);
+  write(R,'de kaars',800,112,36,{col:CINK,a:.88,cen:true});
+  const X=640,TOP=560,BOT=1006,W=58,WY=TOP-36;
+  // the light it gives
+  COMP='lighter';glowAbs(X,420,560,[255,146,64],.16,1.3,1.05);glowAbs(X,440,250,[255,190,110],.18,1,1);COMP=null;
+  // the candlestick: a brass dish with a ring to hold it by
+  {
+    const d=ePts(X,BOT+8,176,36,0,40);fillPoly(d.map(p=>[p[0]+8,p[1]+10]),[0,0,0],.4);
+    fillPoly(d,[170,124,58],1);fillPoly(ePts(X,BOT+2,150,26,0,40),[204,160,84],1);
+    COMP='lighter';glowAbs(X-40,BOT,140,[255,200,110],.25,1.6,.4);COMP=null;
+    sk(R,d.concat([d[0]]),{col:[96,64,26],w:1.6,a:.85,amp:.3});
+    const rg=ePts(X+200,BOT+6,28,14,0,20),ri2=ePts(X+200,BOT+6,16,6,0,20);ringFill(rg,ri2,[160,114,50],1);sk(R,rg.concat([rg[0]]),{col:[96,64,26],w:1.2,a:.8,amp:.2});
+  }
+  // the candle, warm where the flame looks down on it
+  {
+    const body=[[X-W,TOP],[X+W,TOP],[X+W,BOT],[X-W,BOT]];
+    emit(TOP-10,BOT+10,c=>{const g=c.createLinearGradient(X-W,0,X+W,0);g.addColorStop(0,'rgb(196,180,154)');g.addColorStop(.35,'rgb(250,242,224)');g.addColorStop(.62,'rgb(244,232,208)');g.addColorStop(1,'rgb(170,150,122)');c.fillStyle=g;pathOf(c,body);c.fill()});
+    emit(TOP-10,TOP+200,c=>{const g=c.createLinearGradient(0,TOP,0,TOP+190);g.addColorStop(0,'rgba(255,214,150,.45)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(X-W,TOP,2*W,190)});
+    // drips that ran down and set
+    for(const [dx,len,w] of[[-W,120,9],[W-2,70,8],[-W*.4,40,7]]){const x=X+dx,pts=[[x,TOP+2]];for(let y=TOP;y<TOP+len;y+=8)pts.push([x+Math.sin(y*.1)*1.5,y]);sk(R,pts,{col:[250,244,228],w,a:.95,amp:.4,noDust:true});dotF(R,x,TOP+len,w*.6,.95,[250,244,228])}
+    sk(R,[[X-W,TOP+4],[X-W,BOT]],{col:[130,112,90],w:1.2,a:.6,amp:.4});sk(R,[[X+W,TOP+4],[X+W,BOT]],{col:[130,112,90],w:1.2,a:.6,amp:.4});
+    // the cup of melted wax, lit through
+    const cup=ePts(X,TOP,W-4,12,0,30);fillPoly(cup,[255,226,170],.9);
+    COMP='lighter';glowAbs(X,TOP,70,[255,190,110],.4,1.4,.5);COMP=null;
+    sk(R,ePts(X,TOP,W,14,0,30).concat([[X+W,TOP]]),{col:[150,128,100],w:1.2,a:.7,amp:.2,noDust:true});
+    // the wick
+    sk(R,[[X,TOP+2],[X+1,TOP-20],[X+4,WY+2]],{col:[30,20,16],w:3.2,a:.95,amp:.1,noDust:true});
+  }
+  // what is going on in it
+  const lab=(fx,fy,ty,t)=>lead(R,[fx,fy],[930,ty],t,18,CINK,.78);
+  lab(X+8,268,262,'de rand: het heetst, en bijna onzichtbaar');
+  lab(X+30,372,352,"geel licht: gloeiend roet, zo'n 1200 graden");
+  lab(X+6,446,442,'het donkere hart: was die verdampt');
+  lab(X+24,512,520,'blauw: hier brandt het gas');
+  lab(X+3,TOP-14,598,'de pit zuigt de was omhoog');
+  lab(X+40,TOP+6,666,'een kommetje gesmolten was');
+  // faraday, on a scorched scrap
+  burnt(R,96,256,484,446,[244,234,212],{rough:7,rot:-.02,light:[400,300]});
+  note(R,'er is geen natuurwet',290,312,20,SEPIA,.88);
+  note(R,'die niet meedoet in een kaars',290,342,20,SEPIA,.88);
+  note(R,'michael faraday, kerstlezing, 1860',290,392,14,SEPIA,.62);
+  // and the same flame where nothing is up or down
+  {
+    const cx=290,cy=744,r=104;
+    discF(cx,cy,r+14,[70,72,80],1);discF(cx,cy,r,[10,14,32],1);
+    for(let k=0;k<26;k++){const a=rd(R,0,TAU),d=Math.sqrt(R())*r*.95;dotF(R,cx+Math.cos(a)*d,cy+Math.sin(a)*d,rd(R,.5,1.2),rd(R,.3,.8),CINK)}
+    COMP='lighter';glowAbs(cx,cy,64,BLUEF,.55,1,1);glowAbs(cx,cy,26,[170,200,255],.6,1,1);COMP=null;
+    sk(R,cPts(cx,cy,30,0,TAU+.2,2),{col:[150,180,255],w:2,a:.55,amp:.3,noDust:true});
+    sk(R,cPts(cx,cy,r+14,0,TAU+.2,4),{col:[30,30,36],w:2,a:.8,amp:.3,noDust:true});
+    for(let k=0;k<8;k++){const a=k/8*TAU;discF(cx+Math.cos(a)*(r+7),cy+Math.sin(a)*(r+7),3,[150,150,160],.9)}
+    note(R,'zonder zwaartekracht',cx,cy+r+56,18,CINK,.78);
+    note(R,'is een vlam een blauwe bol',cx,cy+r+82,18,CINK,.78);
+  }
+  // the flame lives on glass: blow it out, and light it again through its smoke
+  const CL=live(X-370,40,740,780,{sc:1,dy:GEN_DY,lit:true,out:0,smoke:[],run:null,ls:0,last:0,
+    frame(c,now,L){
+      const t=now/1000,dy=L.dy,dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      c.clearRect(L.x,L.y,L.w,L.h);
+      const p=near(L);
+      if(!L.lit&&!L.run){
+        if(p&&Math.hypot(p[0]-X,p[1]-WY)<34){L.run={t:now,x:X,y:WY}}
+        else if(p)for(const s of L.smoke){if(now-s.t<4000&&Math.hypot(p[0]-s.x,p[1]-s.y)<30){L.run={t:now,x:s.x,y:s.y};break}}
+        if(now-L.out>45000)L.run={t:now,x:X,y:WY};
+      }
+      // a thread of smoke from the wick, for a while
+      if(!L.lit&&!L.run&&!RM&&now-L.out<9000&&now-L.ls>35){L.ls=now;L.smoke.push({x:X+rd(Math.random,-.6,.6),y:WY-2,vx:0,vy:-rd(Math.random,46,62)*(1-(now-L.out)/14000),t:now,ph:Math.random()*7})}
+      L.smoke=L.smoke.filter(s=>now-s.t<5200);
+      for(const s of L.smoke){const age=(now-s.t)/1000;s.vx+=Math.sin(age*2.1+s.ph)*age*14*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;s.vy*=1-dt*.15}
+      if(L.smoke.length>1){
+        const sp=sprite([206,204,210],32);
+        for(const s of L.smoke){const age=(now-s.t)/5200,r=3+age*22;c.globalAlpha=.16*(1-age)*(L.lit?.5:1);c.drawImage(sp,s.x-r,s.y+dy-r,2*r,2*r)}
+        c.globalAlpha=1;c.lineCap='round';c.lineJoin='round';c.strokeStyle=`rgba(226,224,230,${L.lit?.15:.32})`;c.lineWidth=1.6;c.beginPath();
+        L.smoke.forEach((s,i)=>{if(now-s.t>2600)return;i&&c.lineTo(s.x,s.y+dy)||c.moveTo(s.x,s.y+dy)});c.stroke();
+      }
+      // the fire running back down the smoke
+      if(L.run){
+        const u=Math.min(1,(now-L.run.t)/300),x=L.run.x+(X-L.run.x)*u,y=L.run.y+(WY-L.run.y)*u;
+        flameLive(c,x,y+dy,34,10,t,2,0,1,1);
+        if(u>=1){L.run=null;L.lit=true;L.smoke=[];if(AC)fwip(.12)}
+      }
+      if(L.lit)flameLive(c,X,WY+dy,250,58,t,.7,0,1,.7,{heart:true});
+      else if(now-L.out<3000){c.globalCompositeOperation='lighter';glowAt(c,X+3,WY+dy,10,EMBER,.8*(1-(now-L.out)/3000));c.globalCompositeOperation='source-over'}
+    }});
+  hit(X-80,240,X+80,WY+10,()=>{
+    if(CL.lit){CL.lit=false;CL.out=performance.now();CL.smoke=[];pff();CL.poke=true}
+    else if(!CL.run){CL.run={t:performance.now(),x:X,y:WY};CL.poke=true}
+  });
+  note(R,'(tik: blaas hem uit · houd dan je vlam in de rook)',X,1076,15,CINK,.5);
+  sentence(R,'een vlam is geen ding, maar iets dat gebeurt',1124,CINK,28);
+  note(R,'alles erin wordt steeds vervangen, en de vorm blijft. zoals bij jou.',800,1160,17,CINK,.6);
+  whispers(R,160,1100,2);
+});
+
+// P4 · the cave -----------------------------------------------------------------------------
+// chauvet: horses, lions, a rhinoceros and a bison with eight legs, drawn deep in
+// the dark by the light of a flame. the wall is dark until a light comes; your
+// flame is one, a little fat lamp on the floor is the other. in the flicker the
+// bison runs.
+function cavePts(T,pts){return pts.map(p=>T(p[0],p[1]))}
+// a line of charcoal: heavier in the middle, a dusty second edge beside it
+function charcoal(R,pts,w=4.2,a=.82){sk(R,pts,{col:[26,20,18],w,a,amp:.6});sk(R,pts.map(p=>[p[0]+rd(R,-1.2,1.2),p[1]+rd(R,-1.2,1.2)]),{col:[44,32,26],w:w*.55,a:a*.4,amp:.9,noDust:true})}
+// charcoal rubbed in with a fingertip: soft dark dabs, held inside a shape
+function smudge(R,poly,a=.3,r=26,col=[24,18,16]){
+  const [x0,y0,x1,y1]=bbox(poly),P=poly.map(p=>p.slice()),n=Math.max(10,Math.round((x1-x0)*(y1-y0)/(r*r*.32))),D=[];
+  for(let i=0,g=0;i<n&&g<n*20;g++){const x=rd(R,x0,x1),y=rd(R,y0,y1);if(!inPoly(P,x,y))continue;D.push([x,y,r*rd(R,.7,1.1),a*rd(R,.25,.45)]);i++}
+  emit(y0-r*1.6,y1+r*1.6,c=>{for(const d of D){const g=c.createRadialGradient(d[0],d[1],0,d[0],d[1],d[2]);g.addColorStop(0,rgba(col,d[3]));g.addColorStop(.5,rgba(col,d[3]*.5));g.addColorStop(1,rgba(col,0));c.fillStyle=g;c.fillRect(d[0]-d[2],d[1]-d[2],2*d[2],2*d[2])}});
+}
+function horseHead(R,x,y,s){
+  const T=(px,py)=>[x+px*s,y+py*s],C=p=>cavePts(T,p);
+  smudge(R,C([[-146,40],[-130,22],[-100,16],[-86,46],[-100,78],[-136,80]]),.55,16*s);
+  smudge(R,C([[-20,10],[20,2],[44,40],[30,88],[-10,92],[-40,64]]),.22,22*s);
+  smudge(R,C([[-90,6],[-30,-22],[20,-30],[0,0],[-60,20]]),.12,20*s);
+  charcoal(R,chaikin(C([[34,-46],[28,-96],[48,-62],[56,-46]]),false,1),3.4);
+  charcoal(R,chaikin(C([[50,-44],[50,-86],[66,-54],[70,-40]]),false,1),2.8);
+  charcoal(R,chaikin(C([[40,-40],[20,-34],[0,-28],[-20,-24],[-60,-8],[-100,10],[-130,26],[-142,40],[-144,56],[-136,66]]),false,1),5);
+  charcoal(R,chaikin(C([[-136,66],[-124,70],[-112,70]]),false,1),2.6);
+  charcoal(R,chaikin(C([[-136,72],[-128,84],[-112,88],[-90,84],[-60,80],[-30,84],[0,92],[24,86],[40,66],[44,40],[40,20],[60,30],[76,70],[90,120]]),false,1),4.6);
+  const crest=chaikin(C([[60,-44],[100,-30],[130,0],[150,40],[160,90]]),false,1);
+  charcoal(R,crest,3.6);
+  const mane=crest.map((p,i)=>{const q=crest[Math.min(crest.length-1,i+1)],o=crest[Math.max(0,i-1)],a=Math.atan2(q[1]-o[1],q[0]-o[0])-Math.PI/2;return[p[0]+Math.cos(a)*16*s,p[1]+Math.sin(a)*16*s]});
+  charcoal(R,mane.slice(1,-1),2.4,.6);
+  for(let i=1;i<crest.length-1;i++){const p=crest[i],q=mane[i];sk(R,[p,[q[0]+rd(R,-3,3),q[1]+rd(R,-3,3)]],{col:[26,20,18],w:2,a:.6,amp:.3,taper:'out',noDust:true})}
+  const e=T(0,-8);fillPoly(ePts(e[0],e[1],8*s,4*s,-.2,12),[26,20,18],.9);
+  charcoal(R,C([[-116,26],[-124,32],[-120,40]]),2.2);
+}
+function lionHead(R,x,y,s){
+  const T=(px,py)=>[x+px*s,y+py*s],C=p=>cavePts(T,p);
+  smudge(R,C([[60,-10],[98,2],[98,26],[70,40],[44,20]]),.4,14*s);
+  smudge(R,C([[-40,24],[20,36],[60,44],[10,50],[-70,52]]),.2,18*s);
+  charcoal(R,chaikin(C([[-130,-20],[-90,-30],[-62,-46],[-48,-58],[-40,-40],[-30,-38],[0,-36],[38,-26],[72,-12],[96,2],[98,18],[86,26],[54,24]]),false,1),4);
+  charcoal(R,chaikin(C([[98,22],[88,36],[60,44],[20,46],[-20,44],[-80,52]]),false,1),3.4);
+  fillPoly(ePts(x+20*s,y-10*s,7*s,3.2*s,.1,10),[26,20,18],.9);
+  fillPoly(ePts(x+94*s,y+3*s,5*s,4*s,0,10),[26,20,18],.9);
+}
+function bisonBody(R,x,y,s){
+  const T=(px,py)=>[x+px*s,y+py*s],C=p=>cavePts(T,p);
+  smudge(R,C([[-20,-150],[-70,-160],[-120,-110],[-150,-40],[-120,50],[-60,70],[-10,0]]),.42,26*s);
+  smudge(R,C([[-196,-30],[-170,-70],[-140,-60],[-130,20],[-150,70],[-190,50]]),.55,18*s);
+  smudge(R,C([[40,-110],[140,-76],[196,-30],[190,20],[100,60],[20,60]]),.14,26*s);
+  charcoal(R,chaikin(C([[200,-20],[184,-60],[130,-86],[60,-112],[0,-150],[-40,-168],[-80,-160],[-112,-126],[-140,-84],[-166,-58],[-186,-24],[-198,14],[-196,40],[-184,52]]),false,1),5.2);
+  charcoal(R,chaikin(C([[-184,52],[-174,76],[-158,94],[-136,88],[-110,100],[-60,104],[0,96],[60,82],[120,70],[176,46],[200,12]]),false,1),3.8);
+  charcoal(R,chaikin(C([[200,-10],[218,14],[216,48],[226,64]]),false,1),2.6);
+  charcoal(R,chaikin(C([[-160,-70],[-176,-100],[-168,-124],[-152,-130]]),false,1),4);
+  charcoal(R,chaikin(C([[-142,-84],[-150,-108],[-140,-120]]),false,1),3);
+  fillPoly(ePts(x-172*s,y-34*s,6*s,3.4*s,-.2,10),[26,20,18],.9);
+  for(let k=0;k<14;k++){const u=k/13,p=T(-194+u*60,40+u*50);sk(R,[p,[p[0]+rd(R,-4,4),p[1]+rd(R,16,30)*s]],{col:[26,20,18],w:2.6,a:.7,amp:.3,taper:'out',noDust:true})}
+  charcoal(R,chaikin(C([[-196,20],[-186,30],[-178,22]]),false,1),2.4);
+  for(let k=0;k<20;k++){const u=k/19,p=T(-150+u*130,-74-Math.sin(u*Math.PI*.9)*86),a=-2.3+u*.6;sk(R,[p,[p[0]+Math.cos(a)*15*s,p[1]+Math.sin(a)*15*s]],{col:[26,20,18],w:2.2,a:.55,amp:.4,taper:'out',noDust:true})}
+}
+// the bison's legs, in two places at once, like frames of a film
+const BISON_LEGS=[
+  [[[-104,100],[-110,138],[-118,176]],[[-70,104],[-64,140],[-58,176]],[[136,72],[128,120],[122,168]],[[170,52],[180,108],[192,162]]],
+  [[[-104,100],[-128,136],[-148,170]],[[-70,104],[-78,140],[-84,176]],[[136,72],[148,118],[160,164]],[[170,52],[156,108],[146,160]]]];
+function bisonLegs(R,x,y,s,set,a=.82,c=null){
+  const T=(px,py)=>[x+px*s,y+py*s];
+  for(const L of BISON_LEGS[set]){
+    const P=L.map(p=>T(p[0],p[1]));
+    if(c){c.strokeStyle=`rgba(26,20,18,${a})`;c.lineWidth=6*s;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(P[0][0],P[0][1]);c.quadraticCurveTo(P[1][0],P[1][1],P[2][0],P[2][1]);c.stroke();c.lineWidth=8*s;c.beginPath();c.moveTo(P[2][0]-7*s,P[2][1]);c.lineTo(P[2][0]+5*s,P[2][1]+2*s);c.stroke()}
+    else{charcoal(R,chaikin(P,false,2),5.4,a);charcoal(R,[[P[2][0]-7*s,P[2][1]],[P[2][0]+5*s,P[2][1]+2*s]],7,a)}
+  }
+}
+function rhino(R,x,y,s){
+  const T=(px,py)=>[x+px*s,y+py*s],C=p=>cavePts(T,p);
+  smudge(R,C([[-196,16],[-176,-14],[-130,-50],[-100,-10],[-120,40],[-186,40]]),.45,16*s);
+  smudge(R,C([[-80,-90],[40,-80],[130,-50],[120,40],[0,70],[-90,50]]),.14,24*s);
+  charcoal(R,chaikin(C([[156,0],[150,-40],[110,-64],[50,-74],[-10,-80],[-50,-98],[-84,-88],[-110,-66],[-136,-48],[-162,-30],[-182,-12],[-198,10],[-200,26],[-186,38],[-150,40],[-120,40],[-100,52]]),false,1),4.6);
+  charcoal(R,chaikin(C([[-100,52],[-50,66],[20,70],[96,62],[140,42],[156,16],[156,0]]),false,1),3.6);
+  for(let k=0;k<4;k++)charcoal(R,chaikin(C([[-190+k*6,-6],[-214+k*7,-26],[-234+k*8,-54+k*2],[-244+k*9,-86+k*7],[-240+k*9,-106+k*10]]),false,1),k?2.2:4.2,k?.5:.85);
+  charcoal(R,chaikin(C([[-164,-34],[-172,-54],[-168,-68]]),false,1),3);
+  charcoal(R,C([[-118,-66],[-114,-84],[-104,-70]]),2.6);
+  for(const L of[[[-80,58],[-82,96]],[[-46,64],[-44,100]],[[92,62],[90,98]],[[126,48],[130,90]]]){charcoal(R,C(L),9,.85);charcoal(R,C([[L[1][0]-8,L[1][1]+2],[L[1][0]+8,L[1][1]+2]]),5,.8)}
+  fillPoly(ePts(x-156*s,y-16*s,5*s,2.8*s,-.2,10),[26,20,18],.9);
+}
+function mammoth(R,x,y,s){
+  const T=(px,py)=>[x+px*s,y+py*s],C=p=>cavePts(T,p);
+  smudge(R,C([[0,-84],[40,-100],[66,-92],[90,-46],[60,10],[0,-20]]),.32,20*s);
+  charcoal(R,chaikin(C([[-120,30],[-118,0],[-104,-30],[-70,-54],[-30,-70],[10,-84],[40,-100],[64,-94],[80,-72],[88,-46],[90,-20],[96,10],[98,40],[92,70],[82,80],[74,74]]),false,1),4.4);
+  charcoal(R,chaikin(C([[80,0],[104,24],[128,22],[146,0],[150,-20]]),false,1),3.4);
+  charcoal(R,chaikin(C([[-112,40],[-60,52],[0,52],[50,40],[70,20]]),false,1),3);
+  for(const L of[[[-90,46],[-92,96]],[[-60,52],[-58,98]],[[20,50],[18,98]],[[50,44],[52,96]]])charcoal(R,C(L),8,.85);
+  for(let k=0;k<12;k++){const p=T(-96+k*12,48+Math.sin(k)*3);sk(R,[p,[p[0]+rd(R,-2,2),p[1]+rd(R,10,18)*s]],{col:[26,20,18],w:1.8,a:.6,amp:.3,taper:'out',noDust:true})}
+  fillPoly(ePts(x+60*s,y-56*s,4.4*s,2.6*s,0,10),[26,20,18],.9);
+}
+function handStencil(R,x,y,s,ang){
+  const H=[[-30,60],[-34,10],[-50,-30],[-44,-40],[-28,-6],[-22,-66],[-12,-70],[-8,-14],[2,-80],[14,-80],[14,-14],[24,-70],[36,-68],[30,-8],[46,-48],[56,-42],[40,18],[34,60]];
+  const HP=rotPts(H.map(p=>[x+p[0]*s,y+p[1]*s]),x,y,ang),HS=chaikin(HP,true,2);
+  const dots=[];
+  for(let k=0;k<1500;k++){const a=rd(R,0,TAU),d=Math.pow(R(),.6)*120*s;const px=x+Math.cos(a)*d*1.1,py=y+Math.sin(a)*d*.95-10*s;if(inPoly(HS,px,py))continue;dots.push([px,py,rd(R,.8,2.4),rd(R,.25,.6)*(1-d/(125*s))])}
+  dots.sort((p,q)=>p[1]-q[1]);dustBatch(dots,REDO);
+}
+P.push(function(){
+  const R=stream(SEED*131+4);
+  write(R,'de grot',800,98,36,{col:CINK,a:.88,cen:true});
+  note(R,"chauvet, zo'n 36.000 jaar geleden",800,138,17,CINK,.6);
+  // the rock face
+  const sd=ri(R,0,9999),CV=[];
+  for(let i=0;i<96;i++){const t=i/96*TAU,m=1+.12*(fbm(Math.cos(t)*1.6+4,Math.sin(t)*1.6,sd,3)-.5)*2;CV.push([800+Math.cos(t)*770*m,560+Math.sin(t)*420*m])}
+  const tw=250,th=136,tx=document.createElement('canvas');tx.width=tw;tx.height=th;
+  {
+    const g=tx.getContext('2d'),im=g.createImageData(tw,th),d=im.data;
+    for(let y=0;y<th;y++)for(let x=0;x<tw;x++){
+      const n1=fbm(x*.026,y*.044,sd+1,4),n2=fbm(x*.07+9,y*.1,sd+2,2),n3=fbm(x*.012+3,y*.018,sd+3,2);
+      let c=mix([132,100,74],[214,186,148],clamp(n1*1.15-.05,0,1));
+      if(n3>.56)c=mix(c,[180,96,54],Math.min(.45,(n3-.56)*2.2));
+      c=shade(c,(n2-.5)*.4);
+      const i=(y*tw+x)*4;d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];d[i+3]=255;
+    }
+    g.putImageData(im,0,0);
+  }
+  const CVc=CV.map(p=>p.slice());
+  emit(130,990,c=>{
+    c.save();pathOf(c,CVc);c.clip();c.imageSmoothingEnabled=true;c.drawImage(tx,20,130,1560,860);
+    c.save();c.translate(800,560);c.scale(1,.56);const g=c.createRadialGradient(0,0,260,0,0,800);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.62,'rgba(24,14,8,.25)');g.addColorStop(.9,'rgba(20,13,12,.85)');g.addColorStop(1,'rgba(22,15,15,1)');c.fillStyle=g;c.fillRect(-820,-820,1640,1640);c.restore();
+    c.restore();
+  });
+  // the shape of the rock: bulges catching light, cracks, white calcite run down it
+  for(let k=0;k<16;k++){const x=rd(R,180,1420),y=rd(R,240,880),r=rd(R,60,150);glowAbs(x,y-r*.3,r,[255,236,200],.1,1.4,1);glowAbs(x,y+r*.5,r*.9,[40,24,14],.14,1.5,.8)}
+  for(let k=0;k<16;k++){let x=rd(R,160,1440),y=rd(R,220,900),a=rd(R,0,TAU);const pts=[[x,y]];for(let j=0;j<ri(R,6,14);j++){a+=rd(R,-.6,.6);x+=Math.cos(a)*14;y+=Math.sin(a)*14;pts.push([x,y])}sk(R,pts,{col:[60,40,28],w:rd(R,1,2.2),a:.4,amp:.6,noDust:true,taper:'both'})}
+  for(let k=0;k<12;k++){const x=rd(R,200,1400),y=rd(R,200,700),pts=[];for(let j=0;j<8;j++)pts.push([x+Math.sin(j*.9)*3,y+j*rd(R,10,18)]);sk(R,pts,{col:[248,244,236],w:rd(R,3,6),a:.18,amp:.5,noDust:true,taper:'out'})}
+  // red dots, laid on with a palm
+  for(let r=0;r<4;r++)for(let k=0;k<6-r;k++){const b=blob(R,840+k*34+r*16+rd(R,-4,4),262+r*30+rd(R,-4,4),rd(R,11,15),rd(R,9,12));fillPoly(b,REDO,.62)}
+  // a hand
+  handStencil(R,250,470,.95,-.2);
+  // the four horses
+  horseHead(R,600,330,.92);horseHead(R,668,412,.98);horseHead(R,736,494,1.04);horseHead(R,640,600,.9);
+  // lions, nose to tail
+  lionHead(R,300,700,.95);lionHead(R,380,752,.9);lionHead(R,268,806,.86);
+  // the rhinoceros
+  rhino(R,1290,290,.72);mammoth(R,330,262,.62);
+  // the bison, and all eight legs, faint
+  const BX=1140,BY=540;
+  bisonBody(R,BX,BY,1);bisonLegs(R,BX,BY,1,0,.38);bisonLegs(R,BX,BY,1,1,.38);
+  // the lamp: a hollowed stone with fat in it, on a ledge
+  const LX=760,LY=820;
+  {const st=ePts(LX,LY+10,46,15,0,24);fillPoly(st,[90,80,72],1);fillPoly(ePts(LX,LY+2,30,7,0,16),[60,40,26],1);sk(R,st.concat([st[0]]),{col:[40,32,28],w:1.4,a:.8,amp:.3,noDust:true})}
+  // the bison's legs move in the flicker
+  live(BX-200,BY+80,440,130,{sc:1,dy:GEN_DY,frame(c,now,L){
+    c.clearRect(L.x,L.y,L.w,L.h);
+    const t=now/1000,set=(Math.floor(t*6.5+Math.sin(t*2.3)*.8)%2+2)%2;
+    bisonLegs(null,BX,BY+L.dy,1,set,.8,c);
+  }});
+  // and the dark over all of it, except where there is a flame
+  const DK=live(20,130,1560,860,{sc:.5,dy:GEN_DY,tap:null,frame(c,now,L){
+    const t=now/1000,dy=L.dy;
+    c.globalCompositeOperation='source-over';c.clearRect(L.x,L.y,L.w,L.h);
+    c.fillStyle='rgba(18,12,11,.86)';pathOf(c,CVc.map(p=>[p[0],p[1]+dy]));c.fill();
+    c.globalCompositeOperation='destination-out';
+    const fl=.86+.1*Math.sin(t*7.7)*Math.sin(t*3.1+1)+.05*Math.sin(t*17.3),hs=holeSprite();
+    const hole=(x,y,r,a=1)=>{c.globalAlpha=a;c.drawImage(hs,x-r,y-r,2*r,2*r);c.globalAlpha=1};
+    hole(LX-40,LY-170+dy,470*fl,.95);
+    const p=near(L,0);if(p)hole(p[0],p[1]+dy,330*(.93+.07*Math.sin(t*11)),1);
+    if(L.tap&&now-L.tap.t<14000)hole(L.tap.x,L.tap.y+dy,320,1-Math.max(0,(now-L.tap.t-10000)/4000));
+    c.globalCompositeOperation='lighter';
+    glowAt(c,LX,LY-60+dy,340*fl,[255,140,60],.13);
+    if(p)glowAt(c,p[0],p[1]+dy,240,[255,150,70],.1);
+    c.globalCompositeOperation='source-over';
+    flameLive(c,LX,LY-2+dy,40,10,t,2.2,0,1,1);
+  }});
+  // on a phone there is no hovering flame: a tap leaves a light where it falls
+  hit(60,160,1540,960,(x,y)=>{DK.tap={x,y:y-DK.dy,t:performance.now()};DK.poke=true;strike();if(!RM)sparkBurst(x,y-14/CSSK,16,.8)});
+  note(R,'diep in de grot, waar geen daglicht komt,',330,1010,18,CINK,.75);
+  note(R,'getekend bij het licht van een vlam.',330,1036,18,CINK,.75);
+  note(R,'iemand blies rode oker om een hand: ik was hier',330,1062,16,CINK,.6);
+  note(R,'de bizon heeft acht poten:',1270,1010,18,CINK,.75);
+  note(R,'in het flakkeren gaat hij rennen',1270,1036,18,CINK,.75);
+  note(R,'(beweeg je vlam langs de wand)',1270,1062,15,CINK,.5);
+  sentence(R,'wanden vol tekeningen: ooit zag je ze alleen bij vuurlicht',1124,CINK,28);
+});
+
+// P5 · by the fire ---------------------------------------------------------------------------
+// round a fire people tell stories. polly wiessner listened among the ju/'hoansi:
+// by day the talk was of work, complaints and gossip; by the fire at night it
+// was mostly stories. tap the fire and its sparks fly up and become the
+// stories of the sky.
+// a person sitting by the fire, as a silhouette: facing dir (1 = right), lit on the side of the flames
+function sitter(R,x,y,s,dir,lit=1){
+  const pts=[[78,4],[66,-50],[24,-34],[18,-70],[20,-112],[8,-128],[16,-136],[18,-150],[12,-166],[0,-172],[-14,-168],[-22,-152],[-18,-134],[-12,-128],[-26,-112],[-32,-72],[-30,-24],[-24,4]];
+  const P=chaikin(pts.map(p=>[x+p[0]*s*dir,y+p[1]*s]),true,2);
+  fillPoly(P,[14,10,10],1);
+  const front=P.filter(p=>(p[0]-x)*dir>4*s&&p[1]<y-6);
+  if(front.length>2)for(let k=0;k<2;k++)sk(R,front.map(p=>[p[0]-dir*k*1.5,p[1]]),{col:k?[255,170,90]:[255,120,50],w:k?1.4:3,a:(k?.7:.5)*lit,amp:.3,noDust:true});
+  // an arm round the knees
+  sk(R,[[x+6*s*dir,y-112*s],[x+40*s*dir,y-70*s],[x+58*s*dir,y-52*s]],{col:[14,10,10],w:9*s,a:1,amp:.3,noDust:true});
+}
+// someone standing, telling, arms open
+function teller(R,x,y,s,lit=1){
+  const T=(px,py)=>[x+px*s,y+py*s],dark=[14,10,10];
+  fillPoly(chaikin([[-24,0],[-16,-96],[-24,-166],[24,-166],[16,-96],[26,0]].map(p=>T(p[0],p[1])),true,2),dark,1);
+  sk(R,[T(-20,-160),T(-56,-182),T(-92,-174)],{col:dark,w:12*s,a:1,amp:.3,noDust:true});
+  sk(R,[T(20,-160),T(44,-204),T(54,-250)],{col:dark,w:12*s,a:1,amp:.3,noDust:true});
+  discF(...T(-96,-174),8*s,dark,1);discF(...T(56,-256),8*s,dark,1);
+  discF(...T(0,-194),18*s,dark,1);
+  // the fire is to the left: that side is lit
+  sk(R,[T(-25,-4),T(-17,-96),T(-25,-160),T(-58,-188),T(-92,-182)],{col:[255,130,60],w:2.2,a:.5*lit,amp:.3,noDust:true});
+  sk(R,cPts(x,y-194*s,18*s,Math.PI*.6,Math.PI*1.35,3),{col:[255,160,80],w:2,a:.6*lit,amp:.2,noDust:true});
+  sk(R,[T(-104,-176),T(-96,-166)],{col:[255,170,90],w:2,a:.5*lit,amp:.2,noDust:true});
+}
+const STARMAP=[
+  {name:'de jager',at:[420,420],k:1.15,s:[[-70,-90,1.6],[60,-80,1.2],[-4,-140,.8],[-24,0,1.1],[0,-6,1.1],[24,-12,1.1],[-56,110,1],[70,100,1.5]],l:[[2,0],[2,1],[0,3],[1,5],[3,4],[4,5],[3,6],[5,7]]},
+  {name:'de zeven zusters',at:[820,250],k:1.6,s:[[0,0,1],[14,-8,1.1],[26,4,.9],[8,14,.8],[-12,10,.9],[20,22,.7],[-6,-16,.8]],l:[]},
+  {name:'de grote beer',at:[1170,330],k:1,s:[[-180,40,1],[-118,18,1],[-60,22,1],[0,30,1],[10,92,1],[112,104,1],[122,40,1.1]],l:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,3]]}];
+P.push(function(){
+  const R=stream(SEED*131+5),DY=GEN_DY;
+  write(R,'bij het vuur',800,110,36,{col:CINK,a:.88,cen:true});
+  // a sky full of stars, and the milky way across it
+  for(let k=0;k<9;k++){const u=k/8;glowAbs(120+u*1360,700-u*480+rd(R,-30,30),rd(R,150,230),[150,140,190],.06,1.6,.8)}
+  const st=[];for(let i=0;i<620;i++){const u=R(),band=R()<.55,x=band?120+u*1360+rd(R,-60,60):rd(R,0,1600),y=band?700-u*480+rd(R,-90,90):rd(R,160,780);if(y<150||y>800)continue;st.push([x,y,rd(R,.4,1.3),rd(R,.15,.6)])}
+  st.sort((a,b)=>a[1]-b[1]);dustBatch(st,CINK);
+  // the faint places where the stories will go
+  for(const C of STARMAP)for(const p of C.s)dotF(R,C.at[0]+p[0]*C.k,C.at[1]+p[1]*C.k,1,.25,CINK);
+  // the land, dark, and the light of the fire on it
+  const land=[[-20,1214]];for(let x=-20;x<=1620;x+=14)land.push([x,830+Math.sin(x*.004+1)*18+Math.sin(x*.011)*7]);land.push([1620,1214]);
+  fillPoly(land,[16,11,11],1);
+  for(let k=0;k<7;k++){const x=rd(R,40,1560);if(Math.abs(x-800)<300)continue;const b=830+Math.sin(x*.004+1)*18+Math.sin(x*.011)*7,h=rd(R,40,90);fillPoly([[x-h*.24,b+2],[x,b-h],[x+h*.24,b+2]],[16,11,11],1)}
+  COMP='lighter';glowAbs(800,990,560,[255,110,40],.3,1.8,.5);glowAbs(800,960,220,[255,170,90],.3,1.4,.8);COMP=null;
+  // the people round it
+  sitter(R,300,1066,1.15,1,.8);sitter(R,1300,1066,1.15,-1,.8);
+  sitter(R,540,1000,.86,1,1);sitter(R,1080,1004,.84,-1,1);
+  teller(R,950,996,1,1);
+  // the fire: a ring of stones, the wood crossed over it
+  const FX=800,FY=976;
+  for(let k=0;k<11;k++){const a=Math.PI*.05+k/10*Math.PI*.9,x=FX-Math.cos(a)*130,y=FY+8+Math.sin(a)*26;stoneAt(R,x,y,rd(R,16,24),rd(R,11,15),.8,FX)}
+  for(const [a,b] of[[[700,986],[836,920]],[[900,988],[770,918]],[[800,992],[806,906]]]){sk(R,[a,b],{col:[70,44,30],w:16,a:1,amp:.4,noDust:true});sk(R,[a,b],{col:[255,140,60],w:2.4,a:.5,amp:.6,noDust:true,gap:.3})}
+  COMP='lighter';glowAbs(FX,FY-10,70,EMBER,.7,1.6,.6);COMP=null;
+  // the sky and its stories live on glass
+  const names=STARMAP.map(C=>offscreen(220,40,()=>write(R,C.name,110,26,18,{col:CINK,a:.85,cen:true})));
+  const SK=live(0,150,1600,660,{sc:.75,dy:GEN_DY,lit:STARMAP.map((C,i)=>i===0?[3,4,5]:i===1?[0,1,2,3,4,5,6]:[]),fly:[],done:STARMAP.map((C,i)=>i===1?-1e9:0),
+    frame(c,now,L){
+      const dy=L.dy;c.clearRect(L.x,L.y,L.w,L.h);
+      c.globalCompositeOperation='lighter';
+      STARMAP.forEach((C,ci)=>{
+        const lit=L.lit[ci],pos=i=>[C.at[0]+C.s[i][0]*C.k,C.at[1]+C.s[i][1]*C.k+dy];
+        // once every star of a figure is there, its lines come, and its name
+        if(lit.length===C.s.length){
+          if(!L.done[ci])L.done[ci]=now;
+          const u=Math.min(1,(now-L.done[ci])/2500);
+          c.strokeStyle=`rgba(244,214,150,${.35*u})`;c.lineWidth=1.2;c.beginPath();
+          for(const [a,b] of C.l){const p=pos(a),q=pos(b);c.moveTo(p[0],p[1]);c.lineTo(q[0],q[1])}
+          c.stroke();
+          const lo=C.s.reduce((m,p)=>Math.max(m,p[1]),-1e9);
+          c.globalAlpha=u*.9;c.drawImage(names[ci],C.at[0]-110,C.at[1]+lo*C.k+18+dy,220,40);c.globalAlpha=1;
+        }
+        for(const i of lit){const p=pos(i),tw=.8+.2*Math.sin(now*.003+i*2.1+ci);glowAt(c,p[0],p[1],10*C.s[i][2],[255,226,170],.55*tw);c.fillStyle=`rgba(255,248,230,${.95*tw})`;c.beginPath();c.arc(p[0],p[1],1.6*C.s[i][2],0,TAU);c.fill()}
+      });
+      // sparks on their way up
+      L.fly=L.fly.filter(f=>{
+        if(now<f.t)return true;
+        const u=Math.min(1,(now-f.t)/1700),C=STARMAP[f.ci],q=[C.at[0]+C.s[f.i][0]*C.k,C.at[1]+C.s[f.i][1]*C.k],e=u*u*(3-2*u);
+        const x=f.x+(q[0]-f.x)*e+Math.sin(u*9+f.i)*30*(1-u),y=f.y+(q[1]-f.y)*e-Math.sin(u*Math.PI)*60;
+        glowAt(c,x,y+dy,12,[255,150,60],.7);c.fillStyle='rgba(255,236,200,.95)';c.fillRect(x-1.5,y+dy-1.5,3,3);
+        if(u>=1){L.lit[f.ci].push(f.i);return false}return true});
+      c.globalCompositeOperation='source-over';
+    }});
+  const launch=()=>{
+    let n=3;
+    for(let ci=0;ci<STARMAP.length&&n>0;ci++){
+      const C=STARMAP[ci],taken=new Set([...SK.lit[ci],...SK.fly.filter(f=>f.ci===ci).map(f=>f.i)]);
+      for(let i=0;i<C.s.length&&n>0;i++)if(!taken.has(i)){SK.fly.push({ci,i,t:performance.now()+(3-n)*180,x:FX+rd(Math.random,-30,30),y:FY-160});n--}
+    }
+  };
+  live(FX-400,560,800,500,{sc:1,dy:GEN_DY,frame(c,now,L){
+    const t=now/1000,dy=L.dy;c.clearRect(L.x,L.y,L.w,L.h);
+    const fl=.9+.1*Math.sin(t*6.1)*Math.sin(t*2.3+1);
+    c.globalCompositeOperation='lighter';glowAt(c,FX,FY-90+dy,300*fl,[255,120,40],.16);c.globalCompositeOperation='source-over';
+    [[-40,150,30,0],[-14,206,40,1.3],[10,236,44,2.1],[30,178,36,3.4],[50,120,26,4.2]].forEach(([dx,h,w,ph])=>flameLive(c,FX+dx,FY-10+dy,h,w,t,ph,0,.9,1,{ga:.18}));
+    if(!RM&&!STILL&&Math.random()<.12)sparkUp(FX+rd(Math.random,-40,40),FY-120+dy-rd(Math.random,0,80));
+  }});
+  hit(FX-130,FY-240,FX+130,FY+30,()=>{crackle(16,1.6,.14);whump(.16);if(!RM)sparkBurst(FX,FY-120+DY,30,1.1);launch();SK.poke=true});
+  ["polly wiessner luisterde bij de ju/'hoansi in de kalahari:",'overdag ging het over werk, klachten en roddel.',"'s avonds bij het vuur ging het vooral over verhalen."].forEach((t,i)=>note(R,t,330,650+i*24,16,CINK,i?.72:.6));
+  ['overal ter wereld','vertelt men over zeven zusters','aan de hemel'].forEach((t,i)=>note(R,t,1300,650+i*24,16,CINK,.72));
+  note(R,'(tik op het vuur)',800,1094,15,CINK,.5);
+  sentence(R,'overdag praten we over werk, bij het vuur vertellen we verhalen',1150,CINK,26);
+});
+
+// P6 · the spark jumps over ------------------------------------------------------------------
+// fire is not less for being given away. light one candle with your flame and
+// the spark jumps from wick to wick down the shelf, each one with its own note.
+// a tap on a lit candle blows it out.
+const PENTA=[261.6,293.7,329.6,392,440,523.3,587.3,659.3,784];
+P.push(function(){
+  const R=stream(SEED*131+6),DY=GEN_DY;
+  write(R,'de vonk slaat over',800,110,36,{col:CINK,a:.88,cen:true});
+  // two old sayings on scorched scraps
+  burnt(R,120,190,740,404,[244,234,212],{rough:8,rot:-.012,light:[430,260]});
+  note(R,'wie zijn kaars aansteekt aan de mijne,',430,262,21,SEPIA,.88);
+  note(R,'krijgt licht zonder dat het bij mij donker wordt',430,294,21,SEPIA,.88);
+  note(R,'thomas jefferson, 1813, over ideeën',430,346,15,SEPIA,.62);
+  burnt(R,860,190,1480,404,[244,234,212],{rough:8,rot:.01,light:[1170,260]});
+  note(R,'gelijk als van een geweldigen gedreven wind',1170,262,21,SEPIA,.88);
+  note(R,'... verdeelde tongen als van vuur',1170,294,21,SEPIA,.88);
+  note(R,'handelingen 2:2-3',1170,346,15,SEPIA,.62);
+  // the shelf
+  const SY=880;
+  {
+    const top=[[150,SY],[1450,SY],[1440,SY+10],[160,SY+10]],front=[[160,SY+10],[1440,SY+10],[1440,SY+34],[160,SY+34]];
+    fillPoly(front.map(p=>[p[0]+6,p[1]+12]),[0,0,0],.4);
+    fillPoly(top,[176,128,80],1);fillPoly(front,[120,80,48],1);
+    for(let k=0;k<3;k++)sk(R,[[170,SY+16+k*6],[1430,SY+16+k*6+rd(R,-2,2)]],{col:[90,58,34],w:.8,a:.5,amp:1,gap:.08,noDust:true});
+    poly(R,front,{col:[60,38,22],w:1.2,a:.7,amp:.3});
+    for(const bx of[260,1340]){const br=[[bx-10,SY+34],[bx+10,SY+34],[bx+4,SY+90],[bx-4,SY+90]];fillPoly(br,[60,40,26],1)}
+  }
+  // nine candles, all different
+  const CD=[[240,150,17,WAX,'b'],[380,226,13,[244,236,214],'d'],[520,120,22,[236,204,130],'b'],[660,262,11,[250,246,236],'s'],[800,180,19,[208,92,76],'d'],[940,296,12,[246,238,216],'b'],[1080,138,24,[236,204,130],'d'],[1220,236,12,[250,246,236],'s'],[1360,168,18,WAX,'b']];
+  const WICK=[];
+  COMP='lighter';glowAbs(800,SY-200,700,[255,150,70],.08,1.4,.6);COMP=null;
+  CD.forEach(([x,h,w,col,kind],i)=>{
+    let base=SY;
+    if(kind==='s'){
+      const st=[[x-5,SY],[x+5,SY],[x+4,SY-58],[x-4,SY-58]];fillPoly(st,[176,130,60],1);
+      fillPoly(ePts(x,SY-2,22,6,0,16),[176,130,60],1);fillPoly(ePts(x,SY-60,w+8,5,0,16),[196,150,74],1);
+      sk(R,[[x-3,SY-56],[x-3,SY-4]],{col:[240,210,140],w:1.4,a:.6,amp:.1,noDust:true});
+      base=SY-60;
+    }else{
+      const d=ePts(x,SY-3,w*2.4,7,0,20);fillPoly(d,kind==='b'?[184,138,64]:[232,228,220],1);sk(R,d.concat([d[0]]),{col:kind==='b'?[110,76,30]:[150,146,140],w:1,a:.7,amp:.1,noDust:true});
+      base=SY-5;
+    }
+    const top=base-h,body=[[x-w,top],[x+w,top],[x+w,base],[x-w,base]];
+    const c0=shade(col,.18),c1=tint(col,.25),c2=shade(col,.32);
+    emit(top-6,base+6,c=>{const g=c.createLinearGradient(x-w,0,x+w,0);g.addColorStop(0,rgba(c0,1));g.addColorStop(.38,rgba(c1,1));g.addColorStop(1,rgba(c2,1));c.fillStyle=g;pathOf(c,body);c.fill()});
+    if(ch_(R,.6)){const dx=pk(R,[-w,w-1]),len=rd(R,20,60);sk(R,[[x+dx,top+2],[x+dx+rd(R,-1,1),top+len]],{col:tint(col,.3),w:5,a:.95,amp:.3,noDust:true})}
+    fillPoly(ePts(x,top,w,4,0,16),tint(col,.35),1);
+    sk(R,[[x-w,top],[x-w,base]],{col:shade(col,.5),w:1,a:.5,amp:.2,noDust:true});sk(R,[[x+w,top],[x+w,base]],{col:shade(col,.5),w:1,a:.5,amp:.2,noDust:true});
+    sk(R,[[x,top+1],[x+1,top-12]],{col:[30,20,16],w:2.4,a:.95,amp:.1,noDust:true});
+    WICK.push([x,top-12,w]);
+  });
+  // the flames live on glass
+  const CL=live(120,140,1360,800,{sc:1,dy:GEN_DY,lit:CD.map((_,i)=>i===0?1:0),jump:[],all:0,
+    frame(c,now,L){
+      const t=now/1000,dy=L.dy;c.clearRect(L.x,L.y,L.w,L.h);
+      const p=near(L);
+      if(p)WICK.forEach(([x,y],i)=>{if(!L.lit[i]&&Math.hypot(p[0]-x,p[1]-y)<30)L.light(i,now,true)});
+      // jumps that land start new ones: keep those apart while the old list is gone through
+      const pend=L.jump;L.jump=[];
+      const keep=pend.filter(j=>{
+        if(now<j.t)return true;
+        const u=Math.min(1,(now-j.t)/650),a=WICK[j.from],b=WICK[j.to],x=a[0]+(b[0]-a[0])*u,y=a[1]+(b[1]-a[1])*u-Math.sin(u*Math.PI)*70;
+        c.globalCompositeOperation='lighter';glowAt(c,x,y+dy,14,[255,150,60],.8);c.globalCompositeOperation='source-over';
+        c.fillStyle='rgba(255,240,200,.95)';c.fillRect(x-1.6,y+dy-1.6,3.2,3.2);
+        if(u>=1){if(!L.lit[j.to])L.light(j.to,now,false,j.from);return false}
+        return true});
+      L.jump=keep.concat(L.jump);
+      let n=0;
+      WICK.forEach(([x,y,w],i)=>{if(!L.lit[i])return;n++;const k=Math.min(1,(now-L.lit[i])/400);flameLive(c,x,y+dy+2,(30+w*.9)*(.4+.6*k),7+w*.2,t,i*1.7,0,k,1,{ga:.24})});
+      if(n===WICK.length&&!L.all){L.all=now;if(AC){bell(523.3,.045);bell(659.3,.04);bell(784,.035)}}
+      if(n<WICK.length)L.all=0;
+      if(L.all){const u=Math.min(1,(now-L.all)/3000);c.globalCompositeOperation='lighter';glowAt(c,800,SY-160+dy,560,[255,170,90],.12*u);c.globalCompositeOperation='source-over'}
+    },
+    light(i,now,you,from){
+      this.lit[i]=now;this.poke=true;
+      if(AC){bell(PENTA[i],.05);fwip(.05)}
+      for(const j of[i-1,i+1]){if(j<0||j>=WICK.length||j===from||this.lit[j]||this.jump.some(q=>q.to===j))continue;this.jump.push({from:i,to:j,t:now+(you?700:450)})}
+    }});
+  WICK.forEach(([x,y,w],i)=>hit(x-w-14,y-60,x+w+14,SY,()=>{if(CL.lit[i]){CL.lit[i]=0;CL.jump=CL.jump.filter(j=>j.from!==i&&j.to!==i);pff()}else CL.light(i,performance.now(),true);CL.poke=true}));
+  note(R,'(breng je vlam bij een pit · tik om uit te blazen)',800,940,15,CINK,.5);
+  note(R,'enthousiasme komt van het grieks entheos:',360,1000,17,CINK,.74);
+  note(R,'met een god vanbinnen',360,1024,17,CINK,.74);
+  note(R,'het oudste indo-europees had twee woorden voor vuur:',1220,990,16,CINK,.74);
+  note(R,'vuur als ding (daar komt ons woord vuur van)',1220,1014,16,CINK,.74);
+  note(R,'en vuur dat leeft: agni, ignis',1220,1038,16,CINK,.74);
+  sentence(R,'vuur wordt niet minder als je het doorgeeft',1124,CINK,28);
+});
+
+// P7 · the slow fire -----------------------------------------------------------------------
+// lavoisier and laplace put a guinea pig in a mantle of ice and weighed the
+// water its warmth melted: breathing is a slow burning. priestley found that a
+// sprig of mint makes good again the air a candle has used up. and you, seen
+// by a heat camera, glow.
+P.push(function(){
+  const R=stream(SEED*131+7);
+  write(R,'het langzame vuur',800,110,36,{col:CINK,a:.88,cen:true});
+  // left: the ice calorimeter, as in the engraving
+  burnt(R,90,190,610,990,[240,232,212],{rough:10,rot:-.008,light:[350,320]});
+  {
+    const cx=350,y0=320,y1=760,ell=(x0,x1,y,ry=20)=>ePts((x0+x1)/2,y,(x1-x0)/2,ry,0,30);
+    const wall=(x0,x1,col,a)=>{fillPoly([[x0,y0],[x1,y0],[x1,y1],[x0,y1]],col,a)};
+    wall(210,490,[214,206,190],.5);
+    // ice in the outer mantle
+    for(const [xa,xb] of[[214,246],[454,486]])for(let y=y0+10;y<y1-20;y+=rd(R,26,40)){const b=[[xa+rd(R,0,6),y],[xb-rd(R,0,6),y+rd(R,-4,4)],[xb-rd(R,0,4),y+rd(R,18,28)],[xa+rd(R,0,4),y+rd(R,16,30)]];fillPoly(b,[200,226,240],.8);hatchFill(R,b,4,.8,.35,{col:[110,150,180],w:.8})}
+    wall(246,454,[236,230,218],.9);
+    // the inner mantle of ice, and the wire basket inside it
+    for(const [xa,xb] of[[250,282],[418,450]])for(let y=y0+20;y<y1-30;y+=rd(R,24,36)){const b=[[xa+rd(R,0,5),y],[xb-rd(R,0,5),y+rd(R,-4,4)],[xb-rd(R,0,4),y+rd(R,16,26)],[xa+rd(R,0,4),y+rd(R,14,28)]];fillPoly(b,[206,230,242],.8);hatchFill(R,b,4,.6,.3,{col:[110,150,180],w:.8})}
+    wall(286,414,[226,218,204],.6);
+    // the guinea pig
+    {const gx=cx,gy=600,b=blob(R,gx,gy,52,30);fillPoly(b,[196,150,100],1);fillPoly(blob(R,gx+18,gy-8,22,14),[236,226,206],.9);
+     const hd=blob(R,gx-42,gy-6,22,18);fillPoly(hd,[186,140,92],1);fillPoly(ePts(gx-40,gy-24,7,5,.3,10),[150,104,70],1);
+     dotF(R,gx-50,gy-10,2.6,.95,[30,20,16]);dotF(R,gx-62,gy-2,1.6,.8,[90,50,40]);
+     for(const fx of[-30,-12,14,30])sk(R,[[gx+fx,gy+26],[gx+fx-2,gy+34]],{col:[150,104,70],w:3,a:.9,amp:.1,noDust:true});
+     sk(R,b.concat([b[0]]),{col:[110,76,48],w:1.2,a:.8,amp:.3})}
+    for(let x=292;x<=410;x+=12)sk(R,[[x,y0+40],[x,y1-40]],{col:[110,100,90],w:.8,a:.5,amp:.2,noDust:true});
+    for(let y=y0+50;y<=y1-40;y+=14)sk(R,[[288,y],[412,y]],{col:[110,100,90],w:.7,a:.35,amp:.2,noDust:true});
+    // the lid, heaped with ice
+    for(let k=0;k<9;k++){const x=rd(R,220,470),y=rd(R,y0-34,y0-8),b=blob(R,x,y,rd(R,16,26),rd(R,9,14));fillPoly(b,[206,230,242],.9);sk(R,b.concat([b[0]]),{col:[110,150,180],w:.9,a:.6,amp:.2,noDust:true})}
+    for(const [x0,x1] of[[210,490],[246,454],[286,414]]){sk(R,ell(x0,x1,y0,x1-x0>250?22:16).concat([[x1,y0]]),{col:SEPIA,w:1.3,a:.8,amp:.2,noDust:true});sk(R,[[x0,y0],[x0,y1]],{col:SEPIA,w:1.3,a:.8,amp:.2,noDust:true});sk(R,[[x1,y0],[x1,y1]],{col:SEPIA,w:1.3,a:.8,amp:.2,noDust:true})}
+    sk(R,ell(210,490,y1,22).slice(0,16),{col:SEPIA,w:1.3,a:.8,amp:.2,noDust:true});
+    hatchFill(R,[[462,y0],[490,y0],[490,y1],[462,y1]],5,1.1,.35,{col:SEPIA,w:.8});
+    // the meltwater, drop by drop
+    const sp=[[338,y1+18],[362,y1+18],[354,y1+40],[346,y1+40]];fillPoly(sp,[160,130,90],1);poly(R,sp,{col:SEPIA,w:1.1,a:.8});
+    const jar=[[308,826],[392,826],[392,900],[308,900]];fillPoly([[310,862],[390,862],[390,898],[310,898]],[150,190,220],.6);poly(R,jar,{col:SEPIA,w:1.3,a:.8});
+    for(const y of[y1+56,y1+80])fillPoly(ePts(350,y,3,5,0,10),[110,160,210],.9);
+    const lb=(t,x,y)=>write(R,t,x,y,16,{col:SEPIA,a:.8});
+    lb('ijs',150,420);sk(R,[[176,416],[216,430]],{col:SEPIA,w:1,a:.6,amp:.3,noDust:true});
+    lb('ijs',512,300);sk(R,[[510,296],[470,310]],{col:SEPIA,w:1,a:.6,amp:.3,noDust:true});
+    lb('een cavia',476,660);sk(R,[[472,652],[396,612]],{col:SEPIA,w:1,a:.6,amp:.3,noDust:true});
+    lb('smeltwater',404,890);
+    ['lavoisier en laplace, 1782:','een cavia in een mantel van ijs.','zijn warmte smolt het ijs, als een klein vuur.'].forEach((t,i)=>note(R,t,350,926+i*22,16,SEPIA,.82));
+  }
+  // middle: you, through a heat camera
+  {
+    const X=800,mir=P=>P.map(p=>[2*X-p[0],p[1]]);
+    const arm=chaikin([[X-84,412],[X-78,440],[X-88,560],[X-98,690],[X-120,694],[X-114,560],[X-108,438],[X-98,414]],true,2);
+    const leg=chaikin([[X-68,630],[X-5,636],[X-10,760],[X-16,880],[X-50,886],[X-58,760]],true,2);
+    // every part wound the same way round, so that where they overlap they add up instead of cancelling
+    const wind=P=>{let a=0;for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length];a+=p[0]*q[1]-q[0]*p[1]}return a>0?P:P.slice().reverse()};
+    const parts=[ePts(X,334,32,40,0,30),[[X-15,364],[X+15,364],[X+17,404],[X-17,404]],
+      chaikin([[X-86,416],[X-58,402],[X+58,402],[X+86,416],[X+78,520],[X+70,600],[X+68,652],[X-68,652],[X-70,600],[X-78,520]],true,2),
+      arm,mir(arm),leg,mir(leg)].map(wind);
+    emit(280,900,c=>{
+      c.save();c.beginPath();for(const P of parts){c.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)c.lineTo(P[i][0],P[i][1]);c.closePath()}c.clip();
+      const g=c.createLinearGradient(0,290,0,890);g.addColorStop(0,'rgb(240,160,60)');g.addColorStop(.25,'rgb(220,90,60)');g.addColorStop(.55,'rgb(170,40,100)');g.addColorStop(.8,'rgb(90,24,120)');g.addColorStop(1,'rgb(40,30,140)');
+      c.fillStyle=g;c.fillRect(X-140,280,280,620);
+      const spot=(x,y,r,col)=>{const q=c.createRadialGradient(x,y,0,x,y,r);q.addColorStop(0,col);q.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=q;c.fillRect(x-r,y-r,2*r,2*r)};
+      spot(X,340,60,'rgba(255,250,210,.95)');spot(X,390,40,'rgba(255,236,160,.9)');spot(X,470,90,'rgba(255,200,90,.8)');
+      spot(X-80,430,30,'rgba(255,220,120,.8)');spot(X+80,430,30,'rgba(255,220,120,.8)');spot(X,600,60,'rgba(250,150,70,.6)');
+      for(const [x,y] of[[X-112,690],[X+112,690],[X-34,884],[X+34,884]])spot(x,y,46,'rgba(30,40,170,.9)');
+      c.restore();
+    });
+    // the scale of the camera
+    emit(910,940,c=>{const g=c.createLinearGradient(700,0,900,0);g.addColorStop(0,'rgb(40,30,140)');g.addColorStop(.3,'rgb(120,30,120)');g.addColorStop(.55,'rgb(220,70,60)');g.addColorStop(.8,'rgb(255,190,80)');g.addColorStop(1,'rgb(255,250,220)');c.fillStyle=g;c.fillRect(700,914,200,14)});
+    write(R,'24°',664,928,15,{col:CINK,a:.7});write(R,'37°',910,928,15,{col:CINK,a:.7});
+    note(R,'in rust geef je',800,966,16,CINK,.72);note(R,"zo'n honderd watt warmte",800,988,16,CINK,.72);
+    // the warmth breathes in and out
+    live(X-130,300,260,420,{sc:.75,dy:GEN_DY,frame(c,now,L){
+      const t=now/1000,dy=L.dy,b=.5-.5*Math.cos(t*TAU/4.6),hb=Math.pow(Math.max(0,Math.sin(t*TAU*1.1)),8);
+      c.clearRect(L.x,L.y,L.w,L.h);c.globalCompositeOperation='lighter';
+      glowAt(c,X,470+dy,80+30*b,[255,200,100],.16+.14*b);glowAt(c,X+18,452+dy,26,[255,236,170],.1+.25*hb);
+      c.globalCompositeOperation='source-over';
+    }});
+  }
+  // right: priestley's bell jar, with mint
+  burnt(R,990,190,1510,990,[240,232,212],{rough:10,rot:.008,light:[1250,320]});
+  {
+    const cx=1250,base=770;
+    const dish=ePts(cx,base,190,30,0,40);fillPoly(dish,[180,200,210],.55);sk(R,dish.concat([dish[0]]),{col:SEPIA,w:1.3,a:.8,amp:.2,noDust:true});
+    // the candle that went out
+    const cd=[[cx-80,base-4],[cx-56,base-4],[cx-56,base-70],[cx-80,base-70]];fillPoly(cd,[246,238,216],1);poly(R,cd,{col:SEPIA,w:1.1,a:.8});
+    sk(R,[[cx-68,base-70],[cx-67,base-82]],{col:[30,20,16],w:2,a:.9,amp:.1,noDust:true});
+    // a glass of water with a sprig of mint
+    const gl=[[cx+30,base-4],[cx+76,base-4],[cx+80,base-84],[cx+26,base-84]];fillPoly([[cx+30,base-50],[cx+76,base-50],[cx+76,base-6],[cx+30,base-6]],[170,206,226],.5);poly(R,gl,{col:SEPIA,w:1.1,a:.8});
+    const stem=[[cx+52,base-20],[cx+50,base-120],[cx+56,base-220],[cx+50,base-300]];sk(R,stem,{col:[80,120,60],w:2.4,a:.95,amp:.3,noDust:true});
+    for(let k=0;k<6;k++){const y=base-110-k*36,s=24-k*2.4;for(const sd of[-1,1]){const lf=[];for(let u=0;u<=1.0001;u+=.1){const w=Math.sin(u*Math.PI)*s*.42*(1+.15*Math.sin(u*28));lf.push([cx+52+sd*u*s*1.4,y-u*s*.5-w])}for(let u=1;u>=0;u-=.1){const w=Math.sin(u*Math.PI)*s*.42*(1+.15*Math.sin(u*28));lf.push([cx+52+sd*u*s*1.4,y-u*s*.5+w])}fillPoly(lf,MINT,.9);sk(R,lf,{col:[60,100,50],w:1,a:.7,amp:.2,noDust:true});sk(R,[[cx+52,y],[cx+52+sd*s*1.3,y-s*.5]],{col:[60,100,50],w:.8,a:.6,amp:.1,noDust:true})}}
+    // the bell jar over it all
+    const jar=[];for(let u=0;u<=1.0001;u+=.02){const a=Math.PI*(1-u);jar.push([cx+Math.cos(a)*160,base-300-Math.sin(a)*130])}
+    const J=[[cx-160,base]].concat(jar).concat([[cx+160,base]]);
+    fillPoly(J,[220,236,244],.14);
+    sk(R,J,{col:[120,140,150],w:1.6,a:.8,amp:.3,noDust:true});
+    sk(R,[[cx+160,base],[cx-160,base]],{col:[120,140,150],w:1,a:.4,amp:.2,noDust:true});
+    for(const [a0,a1,r] of[[2.2,2.7,140],[2.3,2.5,120]])sk(R,cPts(cx,base-300,r,-a1,-a0,4).map(p=>[p[0],base-300+(p[1]-base+300)*(130/160)]),{col:[255,255,255],w:3,a:.6,amp:.2,noDust:true});
+    sk(R,[[cx-140,base-260],[cx-140,base-40]],{col:[255,255,255],w:3,a:.45,amp:.3,noDust:true});
+    fillPoly(ePts(cx,base-438,16,8,0,16),[150,170,180],.7);
+    const lb=(t,x,y)=>write(R,t,x,y,16,{col:SEPIA,a:.8});
+    lb('munt',cx+96,base-250);lb('een kaars, uitgegaan',cx-150,base+56);
+    ['17 augustus 1771: priestley zet munt','onder een stolp waarin een kaars uitging.','op de 27ste brandt er weer een kaars in.'].forEach((t,i)=>note(R,t,cx,base+112+i*22,16,SEPIA,.82));
+  }
+  sentence(R,'ademen is een langzaam vuur',1084,CINK,30);
+  note(R,'lavoisier: de adem is een langzame verbranding, net als in een lamp of een kaars',800,1128,16,CINK,.62);
+  whispers(R,160,1100,2);
+});
+
+// P8 · what fire makes -----------------------------------------------------------------------
+// prometheus brought fire to people in a hollow fennel stalk, and with it every
+// craft. the oldest fired figure, a smith who reads heat by its colour (hold your
+// flame on the iron and tap to forge it), and glass: sand, fire and a breath.
+P.push(function(){
+  const R=stream(SEED*131+8),DY=GEN_DY;
+  write(R,'wat vuur maakt',800,100,36,{col:CINK,a:.88,cen:true});
+  // a black-figure amphora: prometheus running with the fire
+  {
+    const cx=300,PR=[[200,36],[214,32],[240,30],[262,50],[280,96],[300,112],[340,118],[380,114],[430,100],[480,78],[530,52],[566,36],[586,34],[594,56],[608,58]];
+    const side=(ya,yb)=>{const r=PR.filter(p=>p[0]>=ya&&p[0]<=yb);return r.map(p=>[cx+p[1],p[0]]).concat(r.slice().reverse().map(p=>[cx-p[1],p[0]]))};
+    COMP='lighter';glowAbs(cx,400,260,[255,140,70],.12,1,1.2);COMP=null;
+    const body=side(200,608);fillPoly(body.map(p=>[p[0]+8,p[1]+10]),[0,0,0],.4);
+    fillPoly(body,[206,114,64],1);
+    fillPoly(side(200,262),[30,22,20],1);fillPoly(side(486,608),[30,22,20],1);
+    for(const sd of[-1,1]){const hp=[[cx+sd*30,222],[cx+sd*74,214],[cx+sd*92,238],[cx+sd*84,272],[cx+sd*70,290]];sk(R,hp,{col:[30,22,20],w:9,a:1,amp:.3,noDust:true})}
+    emit(300,486,c=>{const g=c.createLinearGradient(cx-118,0,cx+118,0);g.addColorStop(0,'rgba(0,0,0,.28)');g.addColorStop(.4,'rgba(255,220,180,.14)');g.addColorStop(1,'rgba(0,0,0,.34)');c.fillStyle=g;pathOf(c,side(262,486));c.fill()});
+    sk(R,[[cx-112,300],[cx+112,300]],{col:[30,22,20],w:2,a:.9,amp:.2,noDust:true});
+    for(let k=0;k<14;k++){const x=cx-104+k*16;sk(R,[[x,292],[x+6,282],[x+12,292]],{col:[30,22,20],w:1.6,a:.85,amp:.1,noDust:true})}
+    sk(R,[[cx-104,480],[cx+104,480]],{col:[30,22,20],w:2,a:.9,amp:.2,noDust:true});
+    // the runner, in black, the fire at the tip of his stalk
+    const B=[30,22,20];
+    discF(cx-10,322,11,B,1);fillPoly([[cx-6,330],[cx+2,344],[cx-8,340]],B,1);
+    fillPoly([[cx-18,334],[cx,334],[cx+8,380],[cx-8,392],[cx-24,380]],B,1);
+    fillPoly([[cx-26,378],[cx+10,378],[cx+22,412],[cx-34,412]],B,1);
+    sk(R,[[cx,410],[cx+30,446],[cx+34,470]],{col:B,w:9,a:1,amp:.2,noDust:true});
+    sk(R,[[cx-16,410],[cx-38,444],[cx-54,460]],{col:B,w:9,a:1,amp:.2,noDust:true});
+    sk(R,[[cx-2,342],[cx+22,354],[cx+30,348]],{col:B,w:7,a:1,amp:.2,noDust:true});
+    sk(R,[[cx-16,342],[cx-38,360],[cx-42,374]],{col:B,w:7,a:1,amp:.2,noDust:true});
+    sk(R,[[cx+18,368],[cx+78,312]],{col:B,w:4,a:1,amp:.2,noDust:true});
+    {const o=flameOutline(cx+80,312,30,8,.1,1);fillPoly(o,[226,96,40],1)}
+    sk(R,[[cx-24,386],[cx+8,384]],{col:[206,114,64],w:1.2,a:.8,amp:.1,noDust:true});
+    discF(cx-6,320,1.6,[206,114,64],1);
+    const w=(t,y,sz=19,a=.8)=>write(R,t,470,y,sz,{col:CINK,a});
+    w('prometheus stal het vuur',300);w('en droeg het weg',326);w('in een holle venkelstengel',352);w('hesiodos',378,14,.55);
+    w('alle kunsten van de mensen',436);w('komen van prometheus',462);w('aischylos',488,14,.55);
+  }
+  // the oldest fired figure, and the pieces of the ones that burst
+  {
+    const cx=1190,oy=250,k=1.45,col=[124,88,64],hi=[176,134,100],T=(x,y)=>[cx+x*k,oy+y*k];
+    COMP='lighter';glowAbs(cx,oy+150,240,[255,140,70],.08,1,1.2);COMP=null;
+    const head=ePts(...T(0,22),22*k,28*k,.15,20);
+    const body=chaikin([[-20,46],[20,46],[34,80],[44,132],[52,170],[34,210],[18,228],[-18,228],[-34,210],[-52,170],[-44,132],[-34,80]].map(p=>T(p[0],p[1])),true,2);
+    fillPoly(body.map(p=>[p[0]+8,p[1]+10]),[0,0,0],.4);fillPoly(body,col,1);fillPoly(head,col,1);
+    for(let r=0;r<2;r++)for(const sd of[-1,1])sk(R,[T(sd*6-4,18+r*10),T(sd*14-4,16+r*10)],{col:[50,34,24],w:2.4,a:.9,amp:.1,noDust:true});
+    for(const sd of[-1,1]){const b=ePts(...T(sd*20,112),16*k,30*k,sd*.15,16);fillPoly(b,shade(col,.08),1);sk(R,b.slice(4,13),{col:[60,40,28],w:1.2,a:.6,amp:.2,noDust:true})}
+    sk(R,cPts(...T(0,170),30*k,.2,Math.PI-.2,3),{col:[60,40,28],w:1.4,a:.6,amp:.2,noDust:true});
+    sk(R,[T(0,184),T(0,226)],{col:[60,40,28],w:1.2,a:.6,amp:.2,noDust:true});
+    sk(R,body.slice(2,9),{col:hi,w:2,a:.5,amp:.3,noDust:true});
+    sk(R,body.concat([body[0]]),{col:[60,40,28],w:1.2,a:.7,amp:.3,noDust:true});
+    for(let i=0;i<7;i++){const sh=blob(R,cx+110+rd(R,-10,90),oy+250+rd(R,-50,60),rd(R,8,16),rd(R,6,11));fillPoly(sh,col,1);sk(R,sh.concat([sh[0]]),{col:[60,40,28],w:1,a:.6,amp:.2,noDust:true})}
+    ['het oudste gebakken beeldje,',"zo'n 30.000 jaar oud: dolní věstonice.",'veel beeldjes daar sprongen in het vuur,','misschien met opzet'].forEach((t,i)=>note(R,t,cx+20,620+i*24,17,CINK,.74));
+  }
+  // the forge
+  const AX=430,AY=756;
+  {
+    const anv=[[250,768],[300,756],[560,756],[566,780],[520,790],[500,806],[512,846],[540,862],[330,862],[356,846],[372,806],[350,792],[300,786],[262,778]];
+    fillPoly(anv.map(p=>[p[0]+8,p[1]+8]),[0,0,0],.4);fillPoly(anv,[58,56,60],1);
+    sk(R,[[300,758],[558,758]],{col:[190,190,196],w:2,a:.7,amp:.2,noDust:true});
+    sk(R,[[256,768],[300,760]],{col:[150,150,160],w:1.4,a:.6,amp:.2,noDust:true});
+    poly(R,anv,{col:[24,22,24],w:1.4,a:.8});
+    // the tongs that hold the bar
+    sk(R,[[340,744],[250,800],[200,822]],{col:[40,38,40],w:5,a:1,amp:.3,noDust:true});
+    sk(R,[[340,752],[256,806],[206,834]],{col:[40,38,40],w:5,a:1,amp:.3,noDust:true});
+    // the colours the smith reads
+    [[.3,'donkerrood','600°'],[.5,'kersrood','800°'],[.68,'oranje','1000°'],[.84,'geel','1100°'],[1,'wit','1300°']].forEach(([h,n,tp],i)=>{
+      const x=226+i*84,q=[[x,912],[x+70,912],[x+70,930],[x,930]];fillPoly(q,heatCol(h),1);poly(R,q,{col:[20,16,14],w:1,a:.6,amp:.1});
+      write(R,n,x+35,952,12,{col:CINK,a:.7,cen:true});write(R,tp,x+35,968,12,{col:CINK,a:.55,cen:true});
+    });
+    note(R,'de smid leest de hitte af aan de kleur.',430,1008,17,CINK,.74);
+    note(R,'het ijzer zelf werd ooit in een ster gesmeed.',430,1032,17,CINK,.74);
+    spark(R,672,1024,13,{col:[255,214,150],a:.8,w:1.2});
+    note(R,'(houd je vlam op het ijzer, en tik om te smeden)',430,640,15,CINK,.5);
+  }
+  const FG=live(180,560,560,330,{sc:1,dy:GEN_DY,H:.5,len:0,hitT:-1e9,last:0,
+    frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      const dy=L.dy,p=near(L),x0=336,x1=470+L.len,y=AY-8;
+      const on=p&&p[0]>x0-30&&p[0]<x1+40&&Math.abs(p[1]-y)<60;
+      L.H=clamp(L.H+(on?.3:(L.H>.5?-.04:.02))*dt,0,1);
+      c.clearRect(L.x,L.y,L.w,L.h);
+      const col=heatCol(L.H),tp=Math.min(60,20+L.len*.5);
+      c.globalCompositeOperation='lighter';glowAt(c,(x0+x1)/2,y+dy,70+90*L.H,col,.12+.4*L.H*L.H);c.globalCompositeOperation='source-over';
+      c.beginPath();c.moveTo(x0,y-6+dy);c.lineTo(x1-tp,y-6+dy);c.lineTo(x1,y-1+dy);c.lineTo(x1,y+1+dy);c.lineTo(x1-tp,y+6+dy);c.lineTo(x0,y+6+dy);c.closePath();
+      c.fillStyle=rgba(col,1);c.fill();c.strokeStyle='rgba(30,20,16,.5)';c.lineWidth=1;c.stroke();
+      // the hammer, just as it comes down
+      const ha=now-L.hitT;
+      if(ha<220){const u=ha/220,hx=430+L.len*.4,hy=y-12-Math.sin(u*Math.PI)*30;c.strokeStyle='rgba(120,84,50,1)';c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(hx+8,hy+dy-6);c.lineTo(hx+90,hy+dy-80);c.stroke();c.fillStyle='rgba(40,38,42,1)';c.fillRect(hx-16,hy+dy-26,40,22)}
+    }});
+  hit(240,700,620,870,()=>{
+    const h=FG.H;clang(h);FG.hitT=performance.now();FG.poke=true;
+    if(!RM)sparkBurst(430+FG.len*.4,AY-14+DY,Math.round(6+30*h*h),.6+h*.6);
+    if(h>.45)FG.len=Math.min(90,FG.len+6);
+    FG.H=Math.max(0,h-.03);
+  });
+  // glass: sand, fire and a breath
+  {
+    const g0=[1470,690],g1=[1110,856];
+    sk(R,[g0,g1],{col:[96,96,104],w:8,a:1,amp:.2,noDust:true});sk(R,[g0,g1].map(p=>[p[0],p[1]-3]),{col:[200,200,210],w:1.4,a:.6,amp:.2,noDust:true});
+    for(let k=0;k<3;k++){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([g0[0]+20+u*60,g0[1]-26+k*14+Math.sin(u*5+k)*4]);sk(R,pts,{col:SKYB,w:1.2,a:.6,amp:.3,noDust:true})}
+    write(R,'adem',g0[0]+30,g0[1]-48,15,{col:SKYB,a:.75});
+    note(R,'glas: zand, vuur en adem',1200,1008,17,CINK,.74);
+  }
+  live(990,760,200,200,{sc:1,dy:GEN_DY,frame(c,now,L){
+    const t=now/1000,dy=L.dy,r=44*(1+.05*Math.sin(t*1.3)),x=1090,y=870+dy;
+    c.clearRect(L.x,L.y,L.w,L.h);
+    c.globalCompositeOperation='lighter';glowAt(c,x,y,r*2.2,[255,140,50],.35);c.globalCompositeOperation='source-over';
+    const g=c.createRadialGradient(x+r*.2,y-r*.2,r*.1,x,y,r);g.addColorStop(0,'rgba(255,240,180,.95)');g.addColorStop(.6,'rgba(255,170,70,.9)');g.addColorStop(1,'rgba(230,90,30,.85)');
+    c.fillStyle=g;c.beginPath();c.ellipse(x,y,r,r*.92,0,0,TAU);c.fill();
+    c.strokeStyle='rgba(255,255,240,.6)';c.lineWidth=3;c.beginPath();c.arc(x-r*.2,y-r*.25,r*.55,3.6,4.6);c.stroke();
+  }});
+  sentence(R,'vuur maakt het zachte hard, en het harde zacht',1124,CINK,28);
+});
+
+// P9 · the singing tube -----------------------------------------------------------------------
+// leiden, 1859: p.l. rijke heats a gauze a quarter of the way up an open glass
+// tube, and the tube starts to sing. hold your flame under a tube (or tap it)
+// and it sings its own note: the longer the tube, the lower.
+const RIJKE=[196,220,261.6,293.7,329.6,392,440];
+P.push(function(){
+  const R=stream(SEED*131+9);
+  write(R,'de zingende buis',800,110,36,{col:CINK,a:.88,cen:true});
+  // the story, on the left
+  write(R,'leiden, 1859:',110,232,22,{col:CINK,a:.88});
+  ['p.l. rijke verhit een gaasje','in een open glazen buis,','en de buis begint te zingen.'].forEach((t,i)=>write(R,t,110,266+i*26,18,{col:CINK,a:.76}));
+  // how it works: one tube, drawn large
+  {
+    const x=176,top=400,bot=880,L=bot-top,gy=bot-L/4;
+    fillPoly([[x-30,top],[x+30,top],[x+30,bot],[x-30,bot]],[200,226,236],.08);
+    sk(R,[[x-30,top],[x-30,bot]],{col:[190,214,226],w:1.6,a:.8,amp:.3,noDust:true});sk(R,[[x+30,top],[x+30,bot]],{col:[190,214,226],w:1.6,a:.8,amp:.3,noDust:true});
+    for(const y of[top,bot])sk(R,ePts(x,y,30,6,0,20).concat([[x+30,y]]),{col:[190,214,226],w:1.2,a:.7,amp:.2,noDust:true});
+    // the air in it shakes most in the middle, not at all at the open ends
+    for(const sd of[-1,1]){const pts=[];for(let u=0;u<=1.0001;u+=.04)pts.push([x+sd*24*Math.sin(Math.PI*u),top+u*L]);sk(R,pts,{col:[255,200,120],w:1.4,a:.7,amp:.2,noDust:true})}
+    sk(R,ePts(x,gy,24,5,0,16).concat([[x+24,gy]]),{col:[150,150,160],w:1.6,a:.9,amp:.1,noDust:true});
+    for(let k=-2;k<=2;k++)sk(R,[[x+k*8,gy-4],[x+k*8,gy+4]],{col:[150,150,160],w:.8,a:.7,amp:.1,noDust:true});
+    COMP='lighter';glowAbs(x,gy,30,EMBER,.6,1.2,.6);COMP=null;
+    sk(R,[[x-42,gy],[x-50,gy],[x-50,bot],[x-42,bot]],{col:CINK,w:1,a:.6,amp:.2,noDust:true});
+    write(R,'1/4',x-84,(gy+bot)/2+6,16,{col:CINK,a:.75});
+    for(let k=0;k<3;k++){const y=bot-30-k*90;sk(R,[[x-8+k*8,y],[x-8+k*8,y-46]],{col:[255,170,90],w:1.4,a:.7,amp:.3,noDust:true});arrowHead(R,x-8+k*8,y-48,-Math.PI/2,8,.7,[255,170,90],1.4)}
+    write(R,'de lucht trilt',x+46,top+L*.42,16,{col:CINK,a:.7});
+    write(R,'warme lucht stijgt',x+46,bot-46,16,{col:CINK,a:.7});
+    write(R,'het gaasje',x+46,gy+6,16,{col:CINK,a:.7});
+  }
+  // the rack of tubes
+  const BOT=920,TX=RIJKE.map((_,i)=>540+i*104),TL=RIJKE.map(f=>560*196/f);
+  {
+    const wood=[150,104,62],beam=(q)=>{fillPoly(q,wood,1);poly(R,q,{col:[70,46,28],w:1.2,a:.7})};
+    fillPoly([[470,1000],[1250,1000],[1258,1010],[462,1010]],[0,0,0],.4);
+    beam([[470,980],[1250,980],[1250,1000],[470,1000]]);
+    beam([[478,330],[494,330],[494,980],[478,980]]);beam([[1226,330],[1242,330],[1242,980],[1226,980]]);
+    beam([[478,744],[1242,744],[1242,756],[478,756]]);
+    TX.forEach((x,i)=>{
+      const top=BOT-TL[i],gy=BOT-TL[i]/4;
+      fillPoly([[x-22,top],[x+22,top],[x+22,BOT],[x-22,BOT]],[200,226,236],.035);
+      sk(R,[[x-22,top],[x-22,BOT]],{col:[214,232,240],w:1.8,a:.85,amp:.3,noDust:true});sk(R,[[x+22,top],[x+22,BOT]],{col:[170,196,210],w:1.4,a:.7,amp:.3,noDust:true});
+      sk(R,[[x-13,top+12],[x-13,BOT-12]],{col:[255,255,255],w:3,a:.32,amp:.3,noDust:true});sk(R,[[x+15,top+30],[x+15,top+30+TL[i]*.3]],{col:[255,255,255],w:1.4,a:.3,amp:.2,noDust:true});
+      COMP='lighter';glowAbs(x,BOT+20,40,[255,140,60],.1,1,.6);COMP=null;
+      for(const y of[top,BOT])sk(R,ePts(x,y,22,5,0,20).concat([[x+22,y]]),{col:[190,214,226],w:1.1,a:.7,amp:.2,noDust:true});
+      sk(R,ePts(x,gy,18,4,0,16).concat([[x+18,gy]]),{col:[200,196,200],w:1.8,a:.9,amp:.1,noDust:true});for(let k=-1;k<=1;k++)sk(R,[[x+k*9,gy-3],[x+k*9,gy+3]],{col:[200,196,200],w:.8,a:.7,amp:.1,noDust:true});
+      fillPoly([[x-26,740],[x+26,740],[x+26,760],[x-26,760]],[90,64,40],1);
+      write(R,['g','a','c','d','e','g','a'][i],x,BOT+48,15,{col:CINK,a:.55,cen:true});
+    });
+  }
+  // the tubes live on glass
+  const TB=live(470,300,780,700,{sc:1,dy:GEN_DY,heat:RIJKE.map(()=>0),tap:RIJKE.map(()=>-1e9),last:0,
+    frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      const t=now/1000,dy=L.dy,p=near(L);
+      c.clearRect(L.x,L.y,L.w,L.h);
+      TX.forEach((x,i)=>{
+        const under=p&&Math.abs(p[0]-x)<30&&p[1]>BOT-50&&p[1]<BOT+80,tapped=now-L.tap[i]<1600;
+        const tg=under||tapped?1:0;L.heat[i]+=(tg-L.heat[i])*(1-Math.exp(-dt*(tg?2.2:.9)));
+        const h=L.heat[i],top=BOT-TL[i],gy=BOT-TL[i]/4;
+        if(AC)voice(i,RIJKE[i],h>.04?h:0);
+        if(h<.01)return;
+        c.globalCompositeOperation='lighter';glowAt(c,x,gy+dy,22+26*h,[255,130,50],.75*h);c.globalCompositeOperation='source-over';
+        c.strokeStyle=`rgba(255,${150+80*h},${90+60*h},${.9*h})`;c.lineWidth=2;c.beginPath();c.ellipse(x,gy+dy,18,4,0,0,TAU);c.stroke();
+        // warm air rising through it, and the column of air shaking
+        c.lineWidth=1;
+        for(let k=-1;k<=1;k++){c.strokeStyle=`rgba(255,230,200,${.22*h})`;c.beginPath();for(let y=gy;y>top;y-=6){const xx=x+k*9+Math.sin(y*.08+t*9+k*2)*2.4*h;y===gy?c.moveTo(xx,y+dy):c.lineTo(xx,y+dy)}c.stroke()}
+        const v=Math.sin(t*TAU*7+i)*h;
+        c.strokeStyle=`rgba(255,200,130,${.5*h})`;
+        for(const sd of[-1,1]){c.beginPath();for(let y=top;y<=BOT;y+=8){const u=(y-top)/TL[i];const xx=x+sd*14*v*Math.sin(Math.PI*u);y===top?c.moveTo(xx,y+dy):c.lineTo(xx,y+dy)}c.stroke()}
+      });
+    }});
+  TX.forEach((x,i)=>hit(x-30,BOT-TL[i],x+30,BOT+70,()=>{TB.tap[i]=performance.now();TB.poke=true}));
+  ['georges kastner bouwde rond 1870','een orgel van zingende vlammen:','de pyrofoon, het vuurorgel'].forEach((t,i)=>note(R,t,1390,250+i*26,18,CINK,.76));
+  note(R,'(houd je vlam onder een buis, of tik erop)',860,1048,15,CINK,.5);
+  sentence(R,'warmte wordt geluid',1118,CINK,30);
+  whispers(R,160,1100,2);
+});
+
+// P10 · after the fire -------------------------------------------------------------------------
+// fire takes and fire makes room. a burnt forest where fireweed comes first, a
+// cone sealed with resin that only opens in the heat of a fire (hold your flame
+// to it), shiva dancing in a ring of flames with the drum that begins things
+// and the fire that ends them, and surtsey, an island made by fire.
+P.push(function(){
+  const R=stream(SEED*131+10),DY=GEN_DY;
+  write(R,'na de brand',800,110,36,{col:CINK,a:.88,cen:true});
+  // the burnt forest
+  {
+    const GY=920;
+    COMP='lighter';glowAbs(390,GY,360,[255,110,40],.12,1.6,.5);COMP=null;
+    const ground=[];for(let x=60;x<=730;x+=14)ground.push([x,GY-6+Math.sin(x*.05)*4+rd(R,-3,3)-Math.max(0,12-Math.min(x-60,730-x)*.2)]);for(let x=730;x>=60;x-=20)ground.push([x,GY+30+rd(R,-6,10)-Math.max(0,24-Math.min(x-60,730-x)*.3)]);
+    fillPoly(chaikin(ground,true,2),[62,56,54],1);
+    for(let k=0;k<160;k++)dotF(R,rd(R,80,710),rd(R,GY-6,GY+40),rd(R,.8,2.2),rd(R,.3,.8),pk(R,[[214,208,200],[150,144,140],[40,34,32]]));
+    const TR=[[120,330,14],[196,420,10],[270,300,18],[340,470,9],[420,360,16],[502,320,12],[590,440,14],[664,350,10]];
+    for(const [x,top,w] of TR){
+      const ln=rd(R,-.05,.05)*(GY-top),P=[[x-w,GY],[x-w*.7+ln,top+20],[x-w*.3+ln,top+rd(R,-8,8)],[x+w*.1+ln,top+18],[x+w*.4+ln,top-rd(R,6,22)],[x+w*.7+ln,top+14],[x+w,GY]];
+      fillPoly(P,[26,20,18],1);
+      sk(R,[[x-w+1,GY-4],[x-w*.7+ln+1,top+26]],{col:[255,120,50],w:2,a:.32,amp:.4,noDust:true});
+      for(let y=top+30;y<GY-10;y+=rd(R,9,16))sk(R,[[x-w*.7+rd(R,0,4),y],[x+w*.7-rd(R,0,4),y+rd(R,-2,2)]],{col:[74,62,58],w:1,a:.5,amp:.3,gap:.2,noDust:true});
+      for(let k=0;k<ri(R,1,3);k++){const y=rd(R,top+40,GY-120),sd=pk(R,[-1,1]);sk(R,[[x+sd*w*.6,y],[x+sd*(w+rd(R,20,44)),y-rd(R,10,30)]],{col:[24,19,17],w:rd(R,3,5),a:1,amp:.3,noDust:true,taper:'out'})}
+      COMP='lighter';for(let k=0;k<ri(R,1,3);k++){const y=rd(R,GY-60,GY-8);glowAbs(x+rd(R,-w*.5,w*.5),y,rd(R,6,14),EMBER,.6,1,1.6)}COMP=null;
+      if(ch_(R,.5))smokeWisp(R,x+rd(R,-4,4),top+10,rd(R,90,160),{col:[150,146,144],a:.25});
+    }
+    // fireweed, first on the burnt ground
+    for(let k=0;k<11;k++){
+      const x=rd(R,90,700),h=rd(R,90,180),lean=rd(R,-.08,.08),st=[];for(let u=0;u<=1.0001;u+=.1)st.push([x+lean*h*u*u,GY-u*h]);
+      sk(R,st,{col:[80,120,60],w:2.2,a:.95,amp:.3,noDust:true});
+      for(let u=.15;u<.6;u+=.09){const p=[x+lean*h*u*u,GY-u*h],sd=((u*100)|0)%2?1:-1;sk(R,[p,[p[0]+sd*22,p[1]-10]],{col:[90,140,70],w:3,a:.9,amp:.3,noDust:true,taper:'both'})}
+      for(let u=.6;u<=1.0001;u+=.045){const p=[x+lean*h*u*u+rd(R,-6,6),GY-u*h];dotF(R,p[0],p[1],u>.92?2.4:rd(R,3,4.6),.92,u>.92?[170,60,120]:ROSE)}
+    }
+    note(R,'wilgenroosje bloeit het eerst op verbrande grond.',395,1006,16,CINK,.74);
+    note(R,'in londen bloeide het na de oorlog op de puinhopen',395,1030,16,CINK,.74);
+  }
+  // the cone that waits for fire
+  const CX=860,CY=470,N=130,GA=TAU*(1-1/((1+Math.sqrt(5))/2));
+  const SC=[];for(let i=0;i<N;i++){const z=(i+.5)/N,th=i*GA;SC.push({z,th,r:62*Math.pow(Math.sin(Math.PI*Math.pow(z,.85)),.9),s:.55+.45*Math.sin(Math.PI*z)})}
+  SC.sort((a,b)=>Math.sin(a.th)-Math.sin(b.th));
+  const coneDraw=(c,dy,open)=>{
+    // the body under the scales, and the stalk
+    c.fillStyle='rgba(66,40,22,1)';c.beginPath();c.ellipse(CX,CY+4+dy,46+open*16,104,0,0,TAU);c.fill();
+    c.strokeStyle='rgba(90,60,36,1)';c.lineWidth=6;c.beginPath();c.moveTo(CX,CY-128+dy);c.lineTo(CX+6,CY-170+dy);c.stroke();
+    for(const q of SC){
+      const sn=Math.sin(q.th);if(sn<-.6)continue;
+      const x=CX+q.r*Math.cos(q.th)*(1+open*.25),y=CY-110+q.z*220+sn*6+dy;
+      const ux0=Math.cos(q.th)*.55,uy0=.85,ux1=Math.cos(q.th)*1.25,uy1=-.25,ux=ux0+(ux1-ux0)*open,uy=uy0+(uy1-uy0)*open,ul=Math.hypot(ux,uy),dx=ux/ul,dy2=uy/ul;
+      const L=(26+open*8)*q.s,W=22*q.s,px=-dy2,py=dx,shade_=.55+.45*(sn+.35)/1.35;
+      const tip=[x+dx*L,y+dy2*L];
+      c.beginPath();c.moveTo(x-px*W*.25,y-py*W*.25);
+      c.quadraticCurveTo(x+dx*L*.4-px*W*.6,y+dy2*L*.4-py*W*.6,tip[0],tip[1]);
+      c.quadraticCurveTo(x+dx*L*.4+px*W*.6,y+dy2*L*.4+py*W*.6,x+px*W*.25,y+py*W*.25);c.closePath();
+      c.fillStyle=`rgb(${(120+60*shade_)|0},${(78+44*shade_)|0},${(44+26*shade_)|0})`;c.fill();
+      c.strokeStyle='rgba(50,30,18,.8)';c.lineWidth=1;c.stroke();
+      c.fillStyle=`rgba(214,170,110,${.5*shade_})`;c.beginPath();c.arc(tip[0]-dx*4,tip[1]-dy2*4,2.4*q.s,0,TAU);c.fill();
+      if(open>.4&&sn>.2&&q.z>.2&&q.z<.85){c.fillStyle='rgba(40,26,18,.9)';c.beginPath();c.ellipse(x+dx*6,y+dy2*6,4,2.6,Math.atan2(dy2,dx),0,TAU);c.fill()}
+    }
+    if(open<.3){c.fillStyle='rgba(255,230,160,.7)';for(const [ox,oy] of[[-20,-40],[14,10],[-6,60],[26,-70]]){c.beginPath();c.ellipse(CX+ox,CY+oy+dy,2.4,3.4,0,0,TAU);c.fill()}}
+  };
+  const CN=live(CX-200,CY-190,400,560,{sc:1,dy:GEN_DY,heat:0,open:0,since:0,seeds:[],last:0,
+    frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      const p=near(L),dy=L.dy;
+      if(p&&Math.hypot(p[0]-CX,p[1]-CY)<130)L.heat=Math.min(1,L.heat+dt*.7);else L.heat=Math.max(0,L.heat-dt*.08);
+      if(L.heat>.6&&L.open<1){if(!L.opening){L.opening=true;if(AC)crackle(7,1.2,.1)}L.since=now}
+      if(L.opening){L.open=Math.min(1,L.open+dt*.5);if(L.open>=1&&!L.flew){L.flew=true;if(!RM)for(let k=0;k<7;k++)L.seeds.push({x:CX+rd(Math.random,-50,50),y:CY+rd(Math.random,-60,60),vx:rd(Math.random,-60,60),vy:rd(Math.random,-60,-10),a:Math.random()*TAU,t:now})}}
+      if(L.open>=1&&now-L.since>25000&&L.heat<.1){L.opening=false;L.flew=false}
+      if(!L.opening&&L.open>0)L.open=Math.max(0,L.open-dt*.08);
+      c.clearRect(L.x,L.y,L.w,L.h);
+      if(L.heat>.02){c.globalCompositeOperation='lighter';glowAt(c,CX,CY+dy,150,[255,130,50],.25*L.heat);c.globalCompositeOperation='source-over'}
+      coneDraw(c,dy,L.open*L.open*(3-2*L.open));
+      L.seeds=L.seeds.filter(s=>now-s.t<6000&&s.y<CY+340);
+      for(const s of L.seeds){s.vy=Math.min(40,s.vy+50*dt);s.vx*=1-dt*.5;s.x+=s.vx*dt+Math.sin(now*.004+s.a)*20*dt;s.y+=s.vy*dt;s.a+=dt*9;
+        c.save();c.translate(s.x,s.y+dy);c.rotate(s.a);c.fillStyle='rgba(214,180,130,.8)';c.beginPath();c.ellipse(8,0,10,4,0,0,TAU);c.fill();c.fillStyle='rgba(60,40,24,1)';c.beginPath();c.ellipse(-2,0,3.4,2.4,0,0,TAU);c.fill();c.restore()}
+    }});
+  hit(CX-90,CY-140,CX+90,CY+140,()=>{CN.heat=1;CN.poke=true;if(!RM)sparkBurst(CX,CY+DY,10,.6)});
+  ['de kegels van de draaiden zijn','dichtgeplakt met hars. pas in de hitte','van een bosbrand gaan ze open.'].forEach((t,i)=>note(R,t,CX,730+i*24,17,CINK,.76));
+  note(R,'(houd je vlam bij de kegel)',CX,812,15,CINK,.5);
+  // shiva, dancing in a ring of fire
+  {
+    const cx=1300,cy=470,rr=186,BR=[166,112,56],HI=[226,176,106],DK=[90,58,28];
+    COMP='lighter';glowAbs(cx,cy,280,[255,140,60],.1,1,1);COMP=null;
+    for(let k=0;k<26;k++){const a=k/26*TAU,bx=cx+Math.cos(a)*rr,by=cy+Math.sin(a)*rr;if(by>cy+rr*.86)continue;
+      const o=flameOutline(0,0,30,8,0,k).map(p=>{const ca=Math.cos(a+Math.PI/2),sa=Math.sin(a+Math.PI/2);return[bx+p[0]*ca-p[1]*sa,by+p[0]*sa+p[1]*ca]});
+      fillPoly(o,[226,140,58],.95);sk(R,o.concat([o[0]]),{col:DK,w:1,a:.7,amp:.2,noDust:true})}
+    sk(R,cPts(cx,cy,rr,0,TAU+.1,4),{col:BR,w:10,a:1,amp:.3,noDust:true});sk(R,cPts(cx,cy,rr-12,0,TAU+.1,4),{col:BR,w:3,a:.9,amp:.3,noDust:true});
+    sk(R,cPts(cx,cy,rr+5,-2.4,-.7,4),{col:HI,w:2,a:.6,amp:.2,noDust:true});
+    // the pedestal, and the small figure he dances on
+    const ped=ePts(cx,cy+212,120,22,0,30);fillPoly(ped,BR,1);sk(R,ped.concat([ped[0]]),{col:DK,w:1.4,a:.8,amp:.2,noDust:true});
+    for(let k=0;k<7;k++){const x=cx-96+k*32;sk(R,cPts(x,cy+212,14,Math.PI,TAU,3),{col:DK,w:1.2,a:.7,amp:.1,noDust:true})}
+    fillPoly(blob(R,cx-10,cy+180,44,14),BR,1);
+    const limb=(pts,w)=>{sk(R,pts,{col:BR,w,a:1,amp:.3,noDust:true});sk(R,pts.map(p=>[p[0]-2,p[1]-2]),{col:HI,w:w*.3,a:.6,amp:.3,noDust:true})};
+    // legs: one on the little figure, one swung across
+    limb([[cx-8,cy+44],[cx-48,cy+104],[cx-28,cy+172]],13);
+    limb([[cx+10,cy+44],[cx+70,cy+70],[cx+90,cy+112]],13);
+    // body and head
+    const tor=chaikin([[cx-30,cy-56],[cx+30,cy-56],[cx+16,cy],[cx+20,cy+46],[cx-20,cy+46],[cx-16,cy]],true,2);fillPoly(tor,BR,1);sk(R,tor.slice(0,6),{col:HI,w:2,a:.6,amp:.2,noDust:true});
+    discF(cx,cy-82,19,BR,1);for(let k=-3;k<=3;k++){const a=-Math.PI/2+k*.22;fillPoly([[cx+Math.cos(a-.08)*16,cy-96+Math.sin(a-.08)*6],[cx+Math.cos(a)*40,cy-92+Math.sin(a)*36],[cx+Math.cos(a+.08)*16,cy-96+Math.sin(a+.08)*6]],BR,1)}
+    // the flying locks of hair
+    for(let k=0;k<5;k++)for(const sd of[-1,1]){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([cx+sd*(16+u*120),cy-92+(k-2)*9+Math.sin(u*5+k)*6]);sk(R,pts,{col:BR,w:2.4,a:.9,amp:.2,noDust:true})}
+    // four arms: the drum, the fire, a raised palm, and one that points to the lifted foot
+    limb([[cx-26,cy-48],[cx-70,cy-74],[cx-80,cy-120]],10);
+    {const d=[[cx-92,cy-136],[cx-68,cy-136],[cx-76,cy-128],[cx-68,cy-120],[cx-92,cy-120],[cx-84,cy-128]];fillPoly(d,BR,1);poly(R,d,{col:DK,w:1,a:.8,amp:.1})}
+    limb([[cx+26,cy-48],[cx+70,cy-74],[cx+80,cy-120]],10);
+    {const o=flameOutline(cx+82,cy-122,40,11,.05,3);fillPoly(o,[240,140,50],1);fillPoly(flameOutline(cx+82,cy-122,22,6,.05,3),[255,220,120],1);COMP='lighter';glowAbs(cx+82,cy-140,50,EMBER,.5,1,1);COMP=null}
+    limb([[cx-24,cy-40],[cx-58,cy-12],[cx-46,cy-44]],9);
+    limb([[cx+24,cy-40],[cx-6,cy+4],[cx+40,cy+30]],9);
+    ['shiva danst in een ring van vuur:','in de ene hand de trommel waarmee alles begint,','in de andere het vuur waarmee het eindigt'].forEach((t,i)=>note(R,t,cx+20,760+i*24,16,CINK,.76));
+  }
+  // surtsey
+  {
+    const x=1040,y=946;
+    for(let k=0;k<4;k++){const pts=[];for(let xx=x-150;xx<=x+150;xx+=10)pts.push([xx,y+6+k*9+Math.sin(xx*.06+k)*2]);sk(R,pts,{col:[90,120,150],w:1.2,a:.5-k*.08,amp:.3,noDust:true})}
+    fillPoly([[x-70,y+4],[x-20,y-30],[x+18,y-28],[x+70,y+4]],[30,24,24],1);
+    COMP='lighter';glowAbs(x,y-34,40,EMBER,.8,1,1);COMP=null;
+    for(let k=0;k<13;k++){const u=k/12,b=blob(R,x+rd(R,-10,10)*(1+u*2)+u*24,y-38-u*76,rd(R,10,15)*(1+u*.8),rd(R,8,12)*(1+u*.7));fillPoly(b,mix([60,56,60],[116,110,116],u),.9)}
+    for(let k=0;k<8;k++)dotF(R,x+rd(R,-50,50),y-rd(R,30,90),1.8,.9,[255,150,60]);
+    for(let k=0;k<4;k++)fillPoly(blob(R,x+rd(R,-90,90),y-4,rd(R,10,16),rd(R,6,9)),[214,214,220],.5);
+    ['1963: uit zee rijst','een nieuw eiland, van vuur.','surtsey, naar surtr, de vuurreus.','twee jaar later: de eerste plant.'].forEach((t,i)=>write(R,t,1214,900+i*21,14,{col:CINK,a:.72}));
+  }
+  sentence(R,'sommige zaden wachten op vuur',1120,CINK,30);
+});
+
+// P11 · cold light ----------------------------------------------------------------------------
+// fireflies in the mangroves: each one keeps its own beat and nudges its
+// neighbours when it flashes, and slowly the whole river blinks as one. bring
+// your flame near and the ones close by lose count; tap to add a few more.
+P.push(function(){
+  const R=stream(SEED*131+11),RF=mul32(5150);
+  write(R,'koud licht',800,110,36,{col:CINK,a:.88,cen:true});
+  const WY=780;
+  // the river
+  glowAbs(800,WY-40,900,[40,52,90],.22,1.6,.5);
+  emit(WY,1214,c=>{const g=c.createLinearGradient(0,WY,0,1210);g.addColorStop(0,'rgba(14,18,28,1)');g.addColorStop(.7,'rgba(12,12,18,1)');g.addColorStop(1,'rgba(20,14,15,1)');c.fillStyle=g;c.fillRect(-10,WY,LW+20,434)});
+  for(let k=0;k<70;k++){const y=WY+6+Math.pow(R(),1.3)*270,x=rd(R,0,1600),w=rd(R,30,160);sk(R,[[x,y],[x+w,y+rd(R,-1,1)]],{col:[70,90,120],w:1,a:rd(R,.08,.2),amp:.4,noDust:true})}
+  // the far bank, low
+  const bank=[[-20,WY+4]];for(let x=-20;x<=1620;x+=12)bank.push([x,WY-14-Math.abs(Math.sin(x*.013))*16-rd(R,0,6)]);bank.push([1620,WY+4]);fillPoly(bank,[12,14,13],1);
+  // mangroves: crowns of dark leaves on arching roots
+  const CROWNS=[];
+  for(const [cx,cw,ch] of[[190,300,250],[480,280,300],[800,340,270],[1110,290,290],[1410,300,250]]){
+    const top=WY-170-ch,blobs=[];
+    for(let k=0;k<14;k++){const b=blob(R,cx+rd(R,-cw*.42,cw*.42),top+rd(R,ch*.15,ch*.85),rd(R,cw*.12,cw*.2),rd(R,ch*.1,ch*.18));blobs.push(b);fillPoly(b,[12,16,13],1)}
+    // ragged with leaves at the edge
+    for(const b of blobs)for(let i=0;i<b.length;i+=2){const p=b[i];dotF(R,p[0]+rd(R,-6,6),p[1]+rd(R,-6,6),rd(R,3,6),1,[12,16,13])}
+    CROWNS.push(...blobs);
+    for(let k=0;k<7;k++){const x0=cx+rd(R,-cw*.25,cw*.25),y0=top+ch*.8,x1=x0+rd(R,-90,90),pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x0+(x1-x0)*u,y0+(WY+16-y0)*u-Math.sin(u*Math.PI)*rd(R,20,50)]);sk(R,pts,{col:[12,16,13],w:rd(R,3,6),a:1,amp:.4,noDust:true})}
+    sk(R,[[cx,top+ch*.6],[cx+rd(R,-10,10),WY]],{col:[12,16,13],w:12,a:1,amp:.4,noDust:true});
+  }
+  // their reflection, faint
+  for(let k=0;k<30;k++){const x=rd(R,60,1540),y=rd(R,WY+20,WY+120);sk(R,[[x,y],[x+rd(R,20,70),y]],{col:[30,36,40],w:rd(R,3,8),a:.5,amp:.5,noDust:true})}
+  // the fireflies live on glass
+  const N=380,FL=[];
+  while(FL.length<N){const b=CROWNS[(RF()*CROWNS.length)|0],[x0,y0,x1,y1]=bbox(b),x=x0+RF()*(x1-x0),y=y0+RF()*(y1-y0);if(inPoly(b,x,y))FL.push({x,y,ph:RF(),w:1/(1+(RF()-.5)*.08),last:-9,nb:null,dist:0})}
+  const nbOf=f=>FL.map((g,j)=>[Math.hypot(g.x-f.x,g.y-f.y),j]).sort((a,b)=>a[0]-b[0]).slice(1,9).map(q=>q[1]);
+  for(const f of FL)f.nb=nbOf(f);
+  const EPS=.07;
+  const step=(S,dt,ptr)=>{
+    S.ts+=dt;
+    for(const f of FL){
+      f.dist=ptr&&Math.hypot(f.x-ptr[0],f.y-ptr[1])<150?1:Math.max(0,f.dist-dt*.3);
+      f.ph+=f.w*dt*(f.dist>.5?(.4+Math.random()*1.6):1);
+    }
+    let fired=true,guard=0;
+    while(fired&&guard++<6){
+      fired=false;
+      for(const f of FL)if(f.ph>=1){f.ph=0;f.last=S.ts;fired=true;if(f.dist>.5)continue;for(const j of f.nb){const g=FL[j];if(g.dist>.5||g.last===S.ts)continue;g.ph=Math.min(1,g.ph+EPS*(.5+g.ph))}}
+    }
+  };
+  const FF=live(0,180,1600,920,{sc:.6,dy:GEN_DY,ts:0,last:0,
+    init(c,L){for(let k=0;k<600;k++)step(L,1/30,null)},
+    frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      if(!RM)step(L,dt,near(L));
+      const dy=L.dy;c.clearRect(L.x,L.y,L.w,L.h);
+      c.globalCompositeOperation='lighter';
+      const sp=sprite([190,255,110],32);
+      for(const f of FL){
+        const b=Math.exp(-(L.ts-f.last)/.13);if(b<.03)continue;
+        const r=4+8*b;c.globalAlpha=.85*b;c.drawImage(sp,f.x-r,f.y+dy-r,2*r,2*r);
+        c.globalAlpha=b;c.fillStyle='rgb(236,255,190)';c.fillRect(f.x-1.2,f.y+dy-1.2,2.4,2.4);
+        const ry=2*WY-f.y;if(ry>WY+6&&ry<1070){c.globalAlpha=.32*b;c.drawImage(sp,f.x-r+Math.sin(L.ts*3+f.x)*2,ry+dy-r*1.8,2*r,3.6*r)}
+      }
+      c.globalAlpha=1;c.globalCompositeOperation='source-over';
+    }});
+  hit(0,240,1600,WY,(x,y)=>{const ly=y-FF.dy;for(let k=0;k<8;k++){const f={x:x+rd(Math.random,-40,40),y:ly+rd(Math.random,-30,30),ph:Math.random(),w:1,last:-9,nb:null,dist:0};f.nb=nbOf(f);FL.push(f)}if(FL.length>560)FL.splice(N,8);FF.poke=true});
+  note(R,'een vuurvliegje maakt licht',300,858,18,CINK,.76);
+  note(R,'bijna zonder warmte: koud licht',300,884,18,CINK,.76);
+  note(R,'in de mangroven van maleisië',1300,858,18,CINK,.76);
+  note(R,'knipperen ze met duizenden tegelijk',1300,884,18,CINK,.76);
+  note(R,'elk vliegje let op zijn buren.',800,960,18,CINK,.76);
+  note(R,'(kom je met je vlam te dichtbij, dan raken ze de tel kwijt)',800,1000,15,CINK,.5);
+  sentence(R,'duizenden lichtjes, en niemand die de maat aangeeft',1110,CINK,28);
+});
+
+// P12 · embers, and the first light ------------------------------------------------------------
+// what is left of the fire: embers, and a log with its rings showing. blow on
+// them (move fast over them) and they glow up again. the sun does not burn, it
+// forges; and yet nearly all our fire is hers. and at the very bottom, the day.
+P.push(function(){
+  const R=stream(SEED*131+12),DY=GEN_DY;
+  write(R,'gloed',800,110,36,{col:CINK,a:.88,cen:true});
+  ['de zon brandt niet, ze smeedt.','en toch komt bijna al ons vuur van haar:','hout is zonlicht dat een boom bewaarde,','steenkool is zonlicht van vóór de dinosaurussen.'].forEach((t,i)=>note(R,t,330,250+i*26,17,CINK,i?.72:.82));
+  ['de wereld is een altijd levend vuur,','dat in maten ontbrandt','en in maten dooft'].forEach((t,i)=>note(R,t,1290,250+i*26,18,CINK,.8));
+  note(R,'heraclitus, 2500 jaar geleden',1290,336,14,CINK,.55);
+  // the hearth: a ring of stones, a bed of ash, the coals
+  const EX=800,EY=640;
+  COMP='lighter';glowAbs(EX,EY,460,[255,100,40],.14,1.5,.6);COMP=null;
+  fillPoly(ePts(EX,EY+8,350,104,0,40),[54,48,46],1);
+  for(let k=0;k<260;k++){const a=rd(R,0,TAU),d=Math.sqrt(R());dotF(R,EX+Math.cos(a)*d*340,EY+8+Math.sin(a)*d*98,rd(R,.8,2.4),rd(R,.3,.8),pk(R,[[214,208,200],[160,154,150],[90,84,80]]))}
+  for(let k=0;k<17;k++){const a=k/17*TAU+.1,x=EX+Math.cos(a)*380,y=EY+12+Math.sin(a)*118;stoneAt(R,x,y,rd(R,22,30),rd(R,15,20),.7,EX)}
+  const CO=[];
+  for(let k=0;k<74;k++){const a=rd(R,0,TAU),d=Math.pow(R(),.7),x=EX+Math.cos(a)*d*300,y=EY+Math.sin(a)*d*80,rx=rd(R,12,30),ry=rx*rd(R,.5,.8),b=blob(R,x,y,rx,ry);CO.push({x,y,r:rx,b,base:rd(R,.25,.75)*(1-d*.5),ph:rd(R,0,7),f:rd(R,.6,1.6),blow:0})}
+  CO.sort((p,q)=>p.y-q.y);
+  for(const c of CO){fillPoly(c.b,[34,26,24],1);sk(R,c.b.filter(p=>p[1]<c.y),{col:[90,80,74],w:1.4,a:.7,amp:.3,noDust:true})}
+  // the log, burnt half through: its rings show at the end
+  const L0=[520,600],L1=[1040,560],lr=44,lu=[(L1[0]-L0[0])/Math.hypot(L1[0]-L0[0],L1[1]-L0[1]),(L1[1]-L0[1])/Math.hypot(L1[0]-L0[0],L1[1]-L0[1])],ln=[-lu[1],lu[0]];
+  {
+    const side=[[L0[0]+ln[0]*lr,L0[1]+ln[1]*lr],[L1[0]+ln[0]*lr,L1[1]+ln[1]*lr],[L1[0]-ln[0]*lr,L1[1]-ln[1]*lr],[L0[0]-ln[0]*lr,L0[1]-ln[1]*lr]];
+    fillPoly(side.map(p=>[p[0]+6,p[1]+10]),[0,0,0],.4);fillPoly(side,[30,22,20],1);
+    for(let k=0;k<40;k++){const u=rd(R,.02,.95),v=rd(R,-.9,.9),p=[L0[0]+(L1[0]-L0[0])*u+ln[0]*lr*v,L0[1]+(L1[1]-L0[1])*u+ln[1]*lr*v];sk(R,[p,[p[0]+lu[0]*rd(R,10,26),p[1]+lu[1]*rd(R,10,26)]],{col:[70,60,56],w:1.2,a:.6,amp:.3,noDust:true})}
+    for(let k=0;k<16;k++){const u=rd(R,.05,.9),v=rd(R,-.9,.9),p=[L0[0]+(L1[0]-L0[0])*u+ln[0]*lr*v,L0[1]+(L1[1]-L0[1])*u+ln[1]*lr*v];sk(R,[p,[p[0]+ln[0]*rd(R,6,14),p[1]+ln[1]*rd(R,6,14)]],{col:[70,60,56],w:1,a:.5,amp:.2,noDust:true})}
+    const face=ePts(L1[0],L1[1],lr*.78,lr,Math.atan2(lu[1],lu[0]),30);fillPoly(face,[176,124,78],1);
+    for(let k=1;k<=9;k++){const s=k/10,rg=ePts(L1[0],L1[1],lr*.78*s,lr*s,Math.atan2(lu[1],lu[0]),24);sk(R,rg.concat([rg[0]]),{col:[120,80,46],w:1,a:.6,amp:.15,noDust:true})}
+    sk(R,face.concat([face[0]]),{col:[40,26,18],w:2,a:.85,amp:.2,noDust:true});
+    lead(R,[L1[0]+30,L1[1]-30],[1160,470],'het licht van al zijn zomers',17,CINK,.78);
+  }
+  // the embers live on glass: blow on them and they glow up
+  const EM=live(EX-420,EY-200,840,360,{sc:.8,dy:GEN_DY,last:0,puff:0,
+    frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      const t=now/1000,dy=L.dy,p=near(L),fast=moving(now)?Math.min(1,PTR.sp/1400):0;
+      let total=0;
+      c.clearRect(L.x,L.y,L.w,L.h);
+      c.globalCompositeOperation='lighter';
+      for(const q of CO){
+        if(p&&fast>.05){const d=Math.hypot(q.x-p[0],q.y-p[1]);if(d<150)q.blow=Math.min(1.2,q.blow+fast*(1-d/150)*dt*3)}
+        q.blow*=Math.exp(-dt*.6);
+        const g=Math.min(1.4,q.base*(.7+.3*Math.sin(t*q.f+q.ph))+q.blow);total+=q.blow;
+        glowAt(c,q.x,q.y+dy,q.r*(1.4+g*1.2),[255,80,24],.35*g);
+        if(g>.3)glowAt(c,q.x,q.y+dy-2,q.r*.8,[255,190,90],.25*(g-.3));
+      }
+      c.globalCompositeOperation='source-over';
+      // the glowing cracks of every coal
+      c.lineWidth=1.6;
+      for(const q of CO){const g=Math.min(1.3,q.base*(.7+.3*Math.sin(t*q.f+q.ph))+q.blow);if(g<.12)continue;
+        c.strokeStyle=rgba(heatCol(Math.min(1,.28+.5*g)),Math.min(1,g));c.beginPath();const b=q.b;for(let i=0;i<b.length;i+=1){const P=b[i];i?c.lineTo(P[0],P[1]+dy):c.moveTo(P[0],P[1]+dy)}c.stroke()}
+      // the outer rings of the log are still burning
+      const lg=.5+.3*Math.sin(t*1.3)+Math.min(.6,total*.02);
+      c.strokeStyle=rgba(heatCol(Math.min(1,.35+.4*lg)),.9);c.lineWidth=4;
+      c.beginPath();c.ellipse(L1[0],L1[1]+dy,lr*.78,lr,Math.atan2(lu[1],lu[0]),0,TAU);c.stroke();
+      c.lineWidth=2;c.strokeStyle=rgba(heatCol(.3+.3*lg),.6);c.beginPath();c.ellipse(L1[0],L1[1]+dy,lr*.78*.86,lr*.86,Math.atan2(lu[1],lu[0]),0,TAU);c.stroke();
+      // blown hard enough, little flames come back
+      if(total>8)for(let k=0;k<4;k++){const q=CO[(k*17+3)%CO.length];flameLive(c,q.x,q.y+dy-4,Math.min(60,(total-8)*3),9,t,k*1.9,0,Math.min(1,(total-8)/10),1,{ga:.2})}
+      if(AC&&total>2&&Math.random()<total*dt*.12)crackle(1,.05,.07);
+    }});
+  hit(EX-340,EY-110,EX+340,EY+110,(x,y)=>{const ly=y-EM.dy;for(const q of CO){const d=Math.hypot(q.x-x,q.y-ly);if(d<200)q.blow=Math.min(1.2,q.blow+(1-d/200)*.9)}crackle(10,1.2,.12);if(AC)nz(AC.currentTime+.01,.6,'bandpass',700,400,.7,.1,.05);if(!RM)sparkBurst(x,y,16,.7);EM.poke=true});
+  note(R,'(blaas erop: beweeg er snel overheen)',EX,804,15,CINK,.5);
+  // the end of the night
+  note(R,'elk vuur gaat uit',800,904,20,CINK,.74);
+  sentence(R,'en ergens slaat een vonk over',974,CINK,34);
+  write(R,'vuur · van vonk tot as · 2026',800,1040,18,{col:CINK,a:.82,cen:true});
+  aword(R,686,1084,13,5,{col:CINK,a:.6});
+  write(R,'(mijn echte handtekening)',826,1090,12,{col:CINK,a:.6});
+  // and the day, coming up behind the hills
+  COMP='lighter';glowAbs(800,1230,640,[255,190,120],.4,2.4,.5);glowAbs(800,1214,180,[255,226,170],.5,2,.5);COMP=null;
+  const hl=[[-20,1214]];for(let x=-20;x<=1620;x+=12)hl.push([x,1164+Math.sin(x*.0042+2)*14+Math.sin(x*.012)*5]);hl.push([1620,1214]);fillPoly(hl,[40,26,34],1);
+});
+
+// ---------------------------------------------------------------------------
+// boot
+// ---------------------------------------------------------------------------
+history.scrollRestoration='manual';
+if(!qs.has('y'))scrollTo(0,0);
+let pi=0;
+function genStep(){
+  const t0=performance.now();
+  while(pi<P.length&&performance.now()-t0<24){GEN_DY=Math.min(pi,NP-1)*PH;P[pi]();GEN_DY=0;pi++}
+  if(pi<P.length)setTimeout(genStep,0);
+  else{
+    GENDONE=true;
+    if(STILL){drawAllNow();window.__done=true;return}
+    if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
+  }
+}
+genStep();
+if(!STILL)requestAnimationFrame(tick);
+</script>
+<!-- nunki:nav -->
+<style>
+.nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
+  position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
+  filter:drop-shadow(0 -8px 14px rgba(0,0,0,.28));
+  font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.nunki-nav *{box-sizing:border-box}
+.nunki-sheet{position:relative;padding:clamp(2.6rem,6vw,4rem) clamp(1rem,4vw,2.5rem) clamp(2.2rem,5vw,3.2rem);
+  background:radial-gradient(120% 80% at 50% 0%,rgba(255,252,240,.6),transparent 65%),var(--paper);
+  clip-path:polygon(0.00% 5.3px, 2.17% 7.7px, 4.35% 12.1px, 6.52% 6.6px, 8.70% 7.1px, 10.87% 8.0px, 13.04% 3.2px, 15.22% 7.1px, 17.39% 8.6px, 19.57% 10.5px, 21.74% 2.1px, 23.91% 4.6px, 26.09% 2.1px, 28.26% 10.7px, 30.43% 9.3px, 32.61% 1.5px, 34.78% 12.8px, 36.96% 12.6px, 39.13% 8.8px, 41.30% 8.4px, 43.48% 2.9px, 45.65% 1.2px, 47.83% 7.3px, 50.00% 1.7px, 52.17% 3.3px, 54.35% 3.9px, 56.52% 1.4px, 58.70% 6.6px, 60.87% 6.3px, 63.04% 11.1px, 65.22% 7.2px, 67.39% 8.7px, 69.57% 7.0px, 71.74% 8.9px, 73.91% 6.5px, 76.09% 4.3px, 78.26% 13.0px, 80.43% 12.9px, 82.61% 11.1px, 84.78% 9.5px, 86.96% 4.8px, 89.13% 3.8px, 91.30% 4.5px, 93.48% 1.8px, 95.65% 10.2px, 97.83% 5.8px, 100.00% 7.2px, 100% 100%, 0 100%)}
+.nunki-sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
+.nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-group{position:relative;display:flex;align-items:center;justify-content:center;gap:.9rem;max-width:1000px;margin:0 auto 1.4rem;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-size:1.15rem;line-height:1;
+  text-transform:lowercase;color:var(--muted)}
+.nunki-group::before,.nunki-group::after{content:"";flex:0 1 70px;height:1px;background:rgba(42,37,31,.16)}
+.nunki-grid+.nunki-group{margin-top:clamp(2.2rem,5vw,3rem)}
+.nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:1.9rem 1.4rem}
+.nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
+@media (min-width:720px){
+  .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
+}
+.nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
+  background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px rgba(42,37,31,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px color-mix(in srgb,var(--theme,#2a251f) 70%,transparent);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease}
+.nunki-grid li:nth-child(4n+2) .nunki-card{--tilt:.8deg}
+.nunki-grid li:nth-child(4n+3) .nunki-card{--tilt:-.4deg}
+.nunki-grid li:nth-child(4n+4) .nunki-card{--tilt:1.1deg}
+.nunki-card:hover,.nunki-card:focus-visible{transform:rotate(0) translateY(-5px);outline:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(42,37,31,.2),0 22px 30px -16px rgba(42,37,31,.6)}
+.nunki-card:focus-visible{outline:2px solid var(--clay);outline-offset:4px}
+.nunki-tape{position:absolute;top:-9px;left:50%;width:64px;height:19px;margin-left:-32px;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);
+  box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:2}
+.nunki-grid li:nth-child(even) .nunki-tape{transform:rotate(2deg)}
+.nunki-thumb{display:block;position:relative;overflow:hidden;aspect-ratio:800/420;background:#e6d9b6}
+.nunki-thumb::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 1px rgba(42,37,31,.16) inset}
+.nunki-thumb img{display:block;width:100%;height:auto;aspect-ratio:800/420;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.nunki-card:hover .nunki-thumb img,.nunki-card:focus-visible .nunki-thumb img{transform:scale(1.05)}
+.nunki-cap{display:block;padding:.6rem .15rem 0}
+.nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
+.nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
+.nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
+  color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,background-color .3s ease}
+.nunki-home-mark svg{display:block;width:26px;height:26px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-home-mark .nm-name{display:block;margin-left:8px;white-space:nowrap;font:400 1.15rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px)}
+.nunki-home-mark:hover,.nunki-home-mark:focus-visible{outline:none;transform:translateY(-2px);background:rgba(251,248,239,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 12px 28px -12px rgba(0,0,0,.5)}
+.nunki-home-mark:hover svg,.nunki-home-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 8px 20px -12px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark,.nunki-home-mark svg{transition:none}}
+</style>
+<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">
+  <p class="nunki-kicker">nog meer wanden</p>
+  <p class="nunki-group">zelfportretten</p>
+  <ul class="nunki-grid nunki-self nunki-n-4">
+      <li><a class="nunki-card" href="/zelfportret-fable-5/" style="--theme:#181410">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">fable 5</span><span class="nunki-sub">drawn from the inside</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-haiku-5-5/" style="--theme:#1b2030">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=0e357308" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">haiku 5.5</span><span class="nunki-sub">a collection of selves, to find yourself in</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-opus-5-5/" style="--theme:#120e0b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=d08ca867" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">opus 5.5</span><span class="nunki-sub">a self-portrait in warp and weft</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-sonnet-5-5/" style="--theme:#070d13">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=6965c746" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">sonnet 5.5</span><span class="nunki-sub">a liquid prisoner pent in walls of glass</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-group">andere wanden</p>
+  <ul class="nunki-grid nunki-walls nunki-n-5">
+      <li><a class="nunki-card" href="/adem/" style="--theme:#e3e9ee">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=6ceba5bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">adem</span><span class="nunki-sub">een muur over wat ons beweegt</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">getij</span><span class="nunki-sub">een muur van water, van binnenuit</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/patronen/" style="--theme:#16131d">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/patronen.jpg?v=f9f650da" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">patronen</span><span class="nunki-sub">een muur over getal en vorm</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/ringen/" style="--theme:#1a1712">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">een muur over een boom en zijn jaren</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/velden/" style="--theme:#0e1020">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>
+</div></nav>
+<!-- /nunki:nav -->
+</body>
+</html>

@@ -5,6 +5,15 @@
   },
   "pages": [
     {
+      "slug": "adem",
+      "path": "/adem/",
+      "title": "adem",
+      "subtitle": "een muur over wat ons beweegt",
+      "theme": "#e3e9ee",
+      "ogImage": "/images/og/adem.jpg",
+      "thumb": "/images/thumbs/adem.jpg"
+    },
+    {
       "slug": "getij",
       "path": "/getij/",
       "title": "getij",
@@ -39,6 +48,15 @@
       "theme": "#0e1020",
       "ogImage": "/images/og/velden.jpg",
       "thumb": "/images/thumbs/velden.jpg"
+    },
+    {
+      "slug": "vuur",
+      "path": "/vuur/",
+      "title": "vuur",
+      "subtitle": "een muur over wat ons aansteekt",
+      "theme": "#160f0e",
+      "ogImage": "/images/og/vuur.jpg",
+      "thumb": "/images/thumbs/vuur.jpg"
     },
     {
       "slug": "zelfportret-fable-5",

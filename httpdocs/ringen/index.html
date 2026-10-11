@@ -694,48 +694,209 @@ function runRestless(now){
 }
 
 // ---------------- the visitor ----------------
-// where you move, you leave graphite on the wall. it fades, like a
-// breath on cold glass.
+// where you move, the line you leave grows: twigs sprout from it, leaves open,
+// turn and fall. underground the line becomes root, in the fire it throws off
+// sparks. stand still for a moment and rings grow round you, a year a second:
+// wie stilstaat, groeit. tap, and you knock on wood. sound only after a tap.
 const trailCv=document.getElementById('trail');
 const trailCx=trailCv.getContext('2d');
-let TP=[];
+let TRD=1,trailDirty=false;
 function sizeTrail(){
-  const d=Math.min(2,devicePixelRatio||1);
-  trailCv.width=innerWidth*d;trailCv.height=innerHeight*d;
+  TRD=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*TRD;trailCv.height=innerHeight*TRD;
   trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
-  trailCx.setTransform(d,0,0,d,0,0);
-  trailCx.lineCap='round';
 }
 sizeTrail();
+// what grows on each sheet: leaves in the light, roots in the soil, sparks in the fire
+const GROW=['leaf','root','leaf','leaf','leaf','root','dry','ember','leaf','leaf','glow'];
+const growAt=y=>GROW[clamp(Math.floor(y/TILEH),0,GROW.length-1)];
+const BARKC=[96,70,48],ROOTC=[232,220,192],GLOWC=[236,214,150];
+const VR=mul32(SEED*991+5);
+let TP=[],TW=[],FX=[],RINGS=[],step=null,lastMove=0,PTR={x:0,y:0,cx:0,cy:0,in:false,touch:false};
+let AC=null;
+function audio(){
+  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}
+  if(AC&&AC.state==='suspended')AC.resume();
+  return AC;
+}
+// a soft wooden note, like a marimba bar
+function woodTone(f,vol=.05){
+  if(!AC)return;
+  const t=AC.currentTime+.01;
+  for(const [m,v,d] of[[1,1,1.2],[4,.16,.28],[9.8,.05,.09]]){
+    const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f*m;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol*v,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05);
+  }
+}
+// knuckles on a trunk
+function knock(){
+  const ac=audio();if(!ac)return;
+  const t=ac.currentTime+.01,len=Math.floor(ac.sampleRate*.06),b=ac.createBuffer(1,len,ac.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,4);
+  const n=ac.createBufferSource(),bp=ac.createBiquadFilter(),g=ac.createGain();
+  n.buffer=b;bp.type='bandpass';bp.frequency.value=900;bp.Q.value=1.4;g.gain.value=.5;
+  n.connect(bp);bp.connect(g);g.connect(ac.destination);n.start(t);
+  woodTone(140+Math.random()*30,.14);
+}
+const PENTA=[392,330,294,262,220,196,165,147,131,110,98,82,73,65];
+const wallXY=e=>[e.clientX/CSSK,(e.clientY+scrollY)/CSSK];
 addEventListener('pointermove',e=>{
-  const t=performance.now();
+  if(e.pointerType==='touch'){PTR.touch=true;return}
+  const [x,y]=wallXY(e),t=performance.now();
+  PTR.x=x;PTR.y=y;PTR.cx=e.clientX;PTR.cy=e.clientY;PTR.in=true;lastMove=t;
+  for(const R0 of RINGS)if(!R0.done&&Math.hypot(x-R0.x,y-R0.y)>12){R0.done=true;R0.end=t}
   const L=TP[TP.length-1];
-  if(L&&Math.hypot(e.clientX-L.x,e.clientY-L.y)<3)return;
-  TP.push({x:e.clientX,y:e.clientY,t});
-  if(TP.length>400)TP.shift();
+  if(L&&Math.hypot(x-L.x,y-L.y)*CSSK<3)return;
+  TP.push({x,y,t});if(TP.length>320)TP.shift();
+  trailDirty=true;
+  if(!step)step={x,y,d:0,side:1};
+  step.d+=Math.hypot(x-step.x,y-step.y);step.x=x;step.y=y;
+  const mode=growAt(y);
+  if(mode==='ember'){
+    while(step.d>5){step.d-=5;FX.push({k:'ember',x:x+rd(VR,-7,7),y:y+rd(VR,-5,5),t,vx:rd(VR,-18,18),vy:-rd(VR,45,110),life:rd(VR,1200,2600),s:rd(VR,1.4,3.4)})}
+  }else if(step.d>32){
+    step.d=0;step.side*=-1;
+    const P0=TP[Math.max(0,TP.length-5)],dir=Math.atan2(y-P0.y,x-P0.x);
+    const ang=mode==='root'?dir+step.side*rd(VR,.5,1.3)+(Math.PI/2-dir)*.25:dir+step.side*rd(VR,.6,1.2);
+    twig(x,y,ang,mode,t);
+  }
 },{passive:true});
-const DARKP=new Set([1,5,7,10]);
+document.addEventListener('mouseout',e=>{if(!e.relatedTarget){PTR.in=false;for(const R0 of RINGS)if(!R0.done){R0.done=true;R0.end=performance.now()}}});
+addEventListener('scroll',()=>{lastMove=performance.now();PTR.y=(PTR.cy+scrollY)/CSSK;for(const R0 of RINGS)if(!R0.done){R0.done=true;R0.end=lastMove}},{passive:true});
+addEventListener('click',e=>{
+  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
+  const [x,y]=wallXY(e),t=performance.now();
+  if(y>TOTALH)return;
+  knock();
+  const mode=growAt(y);
+  if(mode==='ember')for(let i=0;i<46;i++){const a=rd(VR,0,TAU),v=rd(VR,30,140);FX.push({k:'ember',x,y,t,vx:Math.cos(a)*v,vy:Math.sin(a)*v-60,life:rd(VR,900,2200),s:rd(VR,1.2,2.8)})}
+  else if(mode==='root')for(let i=0;i<7;i++)twig(x,y,Math.PI/2+rd(VR,-1.1,1.1),'root',t+i*60,rd(VR,40,90));
+  else FX.push({k:'sapling',x,y,t,mode,h:rd(VR,90,140),lean:rd(VR,-.22,.22),sd:VR()*99});
+  trailDirty=true;
+});
+function twig(x,y,ang,mode,t,len){
+  len=len??(mode==='root'?rd(VR,24,50):rd(VR,18,40));
+  const tw={x,y,ang,len,t,mode,bend:rd(VR,-.55,.55),kids:[],leaf:null,node:false};
+  const nk=mode==='root'?ri(VR,1,2):ch_(VR,.45)?1:0;
+  for(let i=0;i<nk;i++)tw.kids.push({at:rd(VR,.4,.75),ang:rd(VR,-1,1),len:len*rd(VR,.4,.65),bend:rd(VR,-.6,.6)});
+  if(mode==='leaf'||mode==='dry'||mode==='glow')tw.leaf={s:rd(VR,6,11),rot:rd(VR,-.5,.5),fall:mode==='dry'?rd(VR,1300,2000):rd(VR,2600,3800),vx:rd(VR,-12,12),sw:rd(VR,0,7)};
+  if(mode==='root')tw.node=ch_(VR,.6);
+  TW.push(tw);if(TW.length>180)TW.shift();
+}
+// a bent line, grown to a fraction g of its length
+function bentPts(x,y,ang,len,bend,g){
+  const pts=[[x,y]],n=6;let px=x,py=y;
+  for(let i=1;i<=n;i++){const u=i/n*g,a=ang+bend*u;px+=Math.cos(a)*len*g/n;py+=Math.sin(a)*len*g/n;pts.push([px,py])}
+  return pts;
+}
+const easeO=u=>1-Math.pow(1-clamp(u,0,1),3);
+function leafPath(c,x,y,rot,s){
+  const co=Math.cos(rot),sn=Math.sin(rot),T=(u,v)=>[x+u*co-v*sn,y+u*sn+v*co];
+  const a=T(0,0),b=T(s*2,0),l=T(s,-s*.55),r=T(s,s*.55);
+  c.beginPath();c.moveTo(a[0],a[1]);c.quadraticCurveTo(l[0],l[1],b[0],b[1]);c.quadraticCurveTo(r[0],r[1],a[0],a[1]);c.closePath();
+}
+function leafCol(mode,age,fall){
+  if(mode==='dry')return mix([196,170,112],[150,96,52],clamp(age/fall,0,1));
+  const u=clamp((age-(fall-1000))/1000,0,1);
+  return u<.5?mix([112,148,70],[218,178,62],u*2):mix([218,178,62],[200,104,44],(u-.5)*2);
+}
 function drawTrail(now){
-  if(RM){trailCx.clearRect(0,0,innerWidth,innerHeight);return}
-  trailCx.clearRect(0,0,innerWidth,innerHeight);
-  if(TP.length<2)return;
-  const pidx=Math.floor((scrollY+innerHeight/2)/CSSK/TILEH);
-  const col=DARKP.has(pidx)?CINK:INK;
-  const LIFE=3800;
-  while(TP.length&&now-TP[0].t>LIFE)TP.shift();
+  const c=trailCx;
+  // stand still, and a year grows round you
+  if(!RM&&PTR.in&&!PTR.touch&&now-lastMove>650&&!RINGS.some(R0=>!R0.done)&&PTR.y<TOTALH){
+    RINGS.push({x:PTR.x,y:PTR.y,t:now,years:[],next:now,done:false,end:0,sd:VR()*99,mode:growAt(PTR.y)});
+    if(RINGS.length>4)RINGS.shift();
+  }
+  for(const R0 of RINGS){
+    if(!R0.done&&now>=R0.next&&R0.years.length<14){
+      const k=R0.years.length,w=ch_(VR,.18)?rd(VR,2.5,4):rd(VR,6,13);
+      R0.years.push({w,t:now});R0.next=now+(k?820:300);
+      woodTone(PENTA[k],.045);
+    }
+  }
+  RINGS=RINGS.filter(R0=>!R0.done||now-R0.end<3600);
+  TP=TP.filter(p=>now-p.t<3000);
+  TW=TW.filter(tw=>now-tw.t<(tw.leaf?tw.leaf.fall+2600:6000));
+  FX=FX.filter(f=>f.k==='ember'?now-f.t<f.life:now-f.t<11000);
+  if(RM||(!TP.length&&!TW.length&&!FX.length&&!RINGS.length)){
+    if(trailDirty){c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);trailDirty=false}
+    return;
+  }
+  trailDirty=true;
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);
+  const K=TRD*CSSK;c.setTransform(K,0,0,K,0,-scrollY*TRD);
+  c.lineCap='round';c.lineJoin='round';
+  const px=1/CSSK;
+  // rings first, under everything
+  for(const R0 of RINGS){
+    const fade=R0.done?1-(now-R0.end)/3600:1,dark=R0.mode==='root'||R0.mode==='glow'||R0.mode==='ember';
+    const col=dark?GLOWC:[150,104,60];
+    let r=5;
+    R0.years.forEach((yr,k)=>{
+      const grow=easeO((now-yr.t)/520),rr=r+yr.w*grow;
+      c.beginPath();
+      for(let a=0;a<=TAU+.01;a+=.12){const m=1+.07*(fbm(Math.cos(a)*1.6+k*.4,Math.sin(a)*1.6,R0.sd,2)-.5)*2;const q=[R0.x+Math.cos(a)*rr*m,R0.y+Math.sin(a)*rr*m*.96];a?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])}
+      c.strokeStyle=rgba(col,(yr.w<4?.85:.62)*fade);c.lineWidth=(yr.w<4?2.2:1.4)*px*1.2;c.stroke();
+      r+=yr.w;
+    });
+    if(R0.years.length){c.fillStyle=rgba(dark?[214,170,80]:[236,208,150],.12*fade);c.beginPath();c.arc(R0.x,R0.y,r,0,TAU);c.fill()}
+    const sp=.6+.4*Math.sin(now/220);c.fillStyle=rgba([228,164,62],.9*fade);c.beginPath();c.arc(R0.x,R0.y,(2+sp)*px*1.4,0,TAU);c.fill();
+  }
+  // the line itself
   for(let i=1;i<TP.length;i++){
-    const a=TP[i-1],b=TP[i];
-    if(b.t-a.t>110)continue;
-    const age=(now-b.t)/LIFE;
-    const k=1-age;
-    if(k<=0)continue;
-    const wobx=Math.sin(now*.0011+i*.7)*1.3*age, woby=Math.cos(now*.0009+i*1.1)*1.3*age;
-    trailCx.strokeStyle=rgba(col,.2*k*k);
-    trailCx.lineWidth=.8+1.6*k;
-    trailCx.beginPath();
-    trailCx.moveTo(a.x+wobx,a.y+woby);
-    trailCx.lineTo(b.x+wobx,b.y+woby);
-    trailCx.stroke();
+    const a=TP[i-1],b=TP[i];if(b.t-a.t>110)continue;
+    const k=1-(now-b.t)/3000,mode=growAt(b.y);
+    const col=mode==='root'?ROOTC:mode==='glow'?GLOWC:mode==='ember'?mix([255,170,70],[110,104,100],1-k):BARKC;
+    c.strokeStyle=rgba(col,(mode==='leaf'||mode==='dry'?.42:.5)*k*k);c.lineWidth=(.9+2.2*k)*px;
+    c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
+  }
+  // twigs, roots, leaves
+  for(const tw of TW){
+    const age=now-tw.t;if(age<0)continue;
+    const g=easeO(age/560),life=tw.leaf?tw.leaf.fall+2600:6000,fade=clamp((life-age)/1600,0,1);
+    const col=tw.mode==='root'?ROOTC:tw.mode==='glow'?GLOWC:BARKC;
+    const pts=bentPts(tw.x,tw.y,tw.ang,tw.len,tw.bend,g);
+    c.strokeStyle=rgba(col,(tw.mode==='root'?.7:.75)*fade);c.lineWidth=(tw.mode==='root'?1.1:1.5)*px*1.2;
+    c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+    for(const kd of tw.kids){
+      if(g<kd.at)continue;
+      const base=bentPts(tw.x,tw.y,tw.ang,tw.len,tw.bend,kd.at),bp=base[base.length-1],gk=easeO((age-560*kd.at)/480);
+      const kp=bentPts(bp[0],bp[1],tw.ang+tw.bend*kd.at+kd.ang,kd.len,kd.bend,gk);
+      c.lineWidth=(tw.mode==='root'?.8:1.1)*px*1.2;c.beginPath();kp.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+    }
+    const tip=pts[pts.length-1];
+    if(tw.node&&g>.95){const s=.55+.45*Math.sin(age/170+tw.x);c.fillStyle=rgba([232,170,70],.85*fade*s);c.beginPath();c.arc(tip[0],tip[1],2.6*px*1.3,0,TAU);c.fill()}
+    if(tw.leaf&&age>480){
+      const L=tw.leaf,open=easeO((age-480)/380),rot=tw.ang+tw.bend+L.rot;
+      if(tw.mode==='glow'){c.fillStyle=rgba(GLOWC,.8*fade*open);c.beginPath();c.arc(tip[0],tip[1],L.s*.32,0,TAU);c.fill();continue}
+      let lx=tip[0],ly=tip[1],lr=rot,la=1;
+      if(age>L.fall){const dt=(age-L.fall)/1000;lx+=L.vx*dt+Math.sin(dt*3+L.sw)*9;ly+=28*dt+9*dt*dt;lr+=dt*2.2;la=clamp(1-dt/2.5,0,1)}
+      const lc=leafCol(tw.mode,age,L.fall);
+      leafPath(c,lx,ly,lr,L.s*open);c.fillStyle=rgba(lc,.85*la);c.fill();
+      c.strokeStyle=rgba(shade(lc,.4),.6*la);c.lineWidth=.8*px;c.stroke();
+    }
+  }
+  // saplings and sparks
+  for(const f of FX){
+    const age=now-f.t;
+    if(f.k==='ember'){
+      const dt=age/1000,u=age/f.life,x=f.x+f.vx*dt,y=f.y+f.vy*dt+14*dt*dt,fl=.6+.4*Math.sin(age/38+f.x);
+      const ec=mix([255,226,130],[200,60,30],u),rr=f.s*(1-u*.6)*px*1.4;
+      c.save();c.globalCompositeOperation='lighter';c.fillStyle=rgba(ec,.22*(1-u)*fl);c.beginPath();c.arc(x,y,rr*3.2,0,TAU);c.fill();c.fillStyle=rgba(ec,(1-u)*fl);c.beginPath();c.arc(x,y,rr,0,TAU);c.fill();c.restore();
+      continue;
+    }
+    const g=easeO(age/1700),fade=clamp((11000-age)/2000,0,1),dark=f.mode==='glow';
+    const stemC=dark?GLOWC:[110,84,52];
+    const top=[f.x+Math.sin(f.lean)*f.h*g,f.y-f.h*g];
+    c.strokeStyle=rgba(stemC,.85*fade);c.lineWidth=2.2*px*1.2;
+    c.beginPath();c.moveTo(f.x,f.y);c.quadraticCurveTo(f.x,f.y-f.h*g*.5,top[0],top[1]);c.stroke();
+    c.fillStyle=rgba([150,110,60],.9*fade);c.beginPath();c.ellipse(f.x,f.y+2,5*px*1.4,3.4*px*1.4,0,0,TAU);c.fill();
+    for(let i=1;i<=4;i++){
+      const u=i/4.4;if(g<u)break;
+      const lx=f.x+Math.sin(f.lean)*f.h*u,ly=f.y-f.h*u,op=easeO((g-u)/.18),s=(9+i*1.6)*op;
+      for(const sd of[-1,1]){leafPath(c,lx,ly,-Math.PI/2+sd*(1.05+.15*i)+f.lean,s);c.fillStyle=rgba(dark?GLOWC:[132,170,82],.85*fade);c.fill()}
+    }
   }
 }
 
@@ -931,6 +1092,8 @@ P.push(function(){
   drip(R,330,-6,rd(R,40,70),shade(PAPER,.25),.5,2);
   for(let k=0;k<4;k++)leaf(R,rd(R,200,1400),rd(R,120,300),rd(R,26,40),rd(R,0,TAU),LEAFG,.5);
   whispers(R,500,1100,false,3);
+  // a hint, in pencil, for whoever reads this far
+  write(stream(SEED*101+77),'wie stilstaat, groeit',800,472,19,{a:.55,cen:true});
 });
 
 // P1 · the first direction is down ----------------------------------------
@@ -1270,6 +1433,9 @@ requestAnimationFrame(tick);
 @media (min-width:720px){
   .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
   .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
 }
 .nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
   background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
@@ -1333,7 +1499,12 @@ requestAnimationFrame(tick);
       </a></li>
   </ul>
   <p class="nunki-group">andere wanden</p>
-  <ul class="nunki-grid nunki-walls">
+  <ul class="nunki-grid nunki-walls nunki-n-5">
+      <li><a class="nunki-card" href="/adem/" style="--theme:#e3e9ee">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=6ceba5bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">adem</span><span class="nunki-sub">een muur over wat ons beweegt</span></span>
+      </a></li>
       <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
@@ -1348,6 +1519,11 @@ requestAnimationFrame(tick);
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
         <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/vuur/" style="--theme:#160f0e">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/vuur.jpg?v=57a0e731" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">vuur</span><span class="nunki-sub">een muur over wat ons aansteekt</span></span>
       </a></li>
   </ul>
   <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>

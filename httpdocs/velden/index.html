@@ -510,46 +510,176 @@ function runRestless(now){
 }
 
 // ---------------- the visitor ----------------
-// where you move, you leave graphite on the wall. it fades, like iron
-// filings that fall back when the magnet moves on.
+// you are a field too. move, and iron filings turn to follow you, as round a
+// magnet drawn under a sheet of paper. press and draw, and your line becomes a
+// wave you can hear, like a theremin, played without touching: high up it
+// sings high, low down it hums. tap, and a signal goes out. sound only after
+// you press or tap.
 const trailCv=document.getElementById('trail');
 const trailCx=trailCv.getContext('2d');
-let TP=[];
+let TRD=1,trailDirty=false;
 function sizeTrail(){
-  const d=Math.min(2,devicePixelRatio||1);
-  trailCv.width=innerWidth*d;trailCv.height=innerHeight*d;
+  TRD=Math.min(2,devicePixelRatio||1);
+  trailCv.width=innerWidth*TRD;trailCv.height=innerHeight*TRD;
   trailCv.style.width=innerWidth+'px';trailCv.style.height=innerHeight+'px';
-  trailCx.setTransform(d,0,0,d,0,0);
-  trailCx.lineCap='round';
 }
 sizeTrail();
+const VR=mul32(SEED*991+11);
+let FL=[],WV=[],PG=[],MAG={x:0,y:0,dx:1,dy:0,t:-1e9},lastPt=null,down=null,TH=null,justDragged=false;
+let AC=null;
+function audio(){
+  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}
+  if(AC&&AC.state==='suspended')AC.resume();
+  return AC;
+}
+const FLO=165,FHI=1046;
+const pitchAt=cy=>FLO*Math.pow(FHI/FLO,1-clamp(cy/innerHeight,0,1));
+const specAt=f=>{const u=clamp(Math.log(f/FLO)/Math.log(FHI/FLO),0,1)*6,i=Math.min(5,Math.floor(u));return mix(VIS[i],VIS[i+1],u-i)};
+function thereminOn(cy){
+  const ac=audio();if(!ac)return;
+  const t=ac.currentTime,f=pitchAt(cy);
+  const o=ac.createOscillator(),o2=ac.createOscillator(),lfo=ac.createOscillator(),lg=ac.createGain(),g=ac.createGain(),g2=ac.createGain(),lp=ac.createBiquadFilter();
+  o.type='sine';o2.type='triangle';o.frequency.value=f;o2.frequency.value=f;
+  lfo.frequency.value=5.3;lg.gain.value=f*.011;lfo.connect(lg);lg.connect(o.frequency);lg.connect(o2.frequency);
+  lp.type='lowpass';lp.frequency.value=2400;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.075,t+.08);g2.gain.value=.18;
+  o.connect(g);o2.connect(g2);g2.connect(g);g.connect(lp);lp.connect(ac.destination);
+  o.start(t);o2.start(t);lfo.start(t);
+  TH={o,o2,lg,g};
+}
+function thereminTo(cy){
+  if(!TH||!AC)return;
+  const f=pitchAt(cy),t=AC.currentTime;
+  TH.o.frequency.setTargetAtTime(f,t,.03);TH.o2.frequency.setTargetAtTime(f,t,.03);TH.lg.gain.setTargetAtTime(f*.011,t,.05);
+}
+function thereminOff(){
+  if(!TH||!AC)return;
+  const t=AC.currentTime,v=TH;
+  v.g.gain.cancelScheduledValues(t);v.g.gain.setTargetAtTime(0,t,.09);
+  setTimeout(()=>{try{v.o.stop();v.o2.stop()}catch(e){}},700);
+  TH=null;
+}
+// a signal going out: a clear note and its echo
+function ping(cy){
+  const ac=audio();if(!ac)return;
+  const t=ac.currentTime+.01,f=pitchAt(cy);
+  for(const [dl,v] of[[0,.11],[.24,.04],[.48,.015]]){
+    const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(0,t+dl);g.gain.linearRampToValueAtTime(v,t+dl+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dl+.7);
+    o.connect(g);g.connect(ac.destination);o.start(t+dl);o.stop(t+dl+.75);
+  }
+}
+const wallXY=e=>[e.clientX/CSSK,(e.clientY+scrollY)/CSSK];
+const darkAt=y=>lumAt(y)<.45;
+addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'||e.button!==0)return;
+  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
+  down={cx:e.clientX,cy:e.clientY,t:performance.now(),drag:false};justDragged=false;
+});
 addEventListener('pointermove',e=>{
-  const t=performance.now();
-  const L=TP[TP.length-1];
-  if(L&&Math.hypot(e.clientX-L.x,e.clientY-L.y)<3)return;
-  TP.push({x:e.clientX,y:e.clientY,t});
-  if(TP.length>400)TP.shift();
+  if(e.pointerType==='touch')return;
+  const [x,y]=wallXY(e),t=performance.now();
+  if(lastPt){const dx=x-lastPt.x,dy=y-lastPt.y,d=Math.hypot(dx,dy);
+    if(d>.5){MAG.dx=MAG.dx*.8+dx/d*.2;MAG.dy=MAG.dy*.8+dy/d*.2;const l=Math.hypot(MAG.dx,MAG.dy)||1;MAG.dx/=l;MAG.dy/=l}
+    // filings settle round you as you go
+    const n=Math.min(16,Math.floor(d*.5+VR()));
+    for(let i=0;i<n;i++){const a=rd(VR,0,TAU),r=rd(VR,24,128);FL.push({x:x+Math.cos(a)*r,y:y+Math.sin(a)*r,ang:null,t,len:rd(VR,6,11),w:rd(VR,1,1.6)})}
+    if(FL.length>900)FL.splice(0,FL.length-900);
+  }
+  lastPt={x,y};MAG.x=x;MAG.y=y;MAG.t=t;
+  if(down&&(e.buttons&1)){
+    if(!down.drag&&Math.hypot(e.clientX-down.cx,e.clientY-down.cy)>6){down.drag=true;thereminOn(e.clientY);WV.push({pts:[],end:0})}
+    if(down.drag){thereminTo(e.clientY);const w=WV[WV.length-1];w.pts.push({x,y,f:pitchAt(e.clientY)});if(w.pts.length>900)w.pts.shift()}
+  }
+  trailDirty=true;
 },{passive:true});
+const endPress=()=>{if(down&&down.drag){thereminOff();const w=WV[WV.length-1];if(w)w.end=performance.now();justDragged=true}down=null};
+addEventListener('pointerup',endPress);addEventListener('pointercancel',endPress);addEventListener('blur',endPress);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)endPress()});
+addEventListener('click',e=>{
+  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
+  const [x,y]=wallXY(e);
+  if(y>TOTALH)return;
+  if(justDragged){justDragged=false;return}
+  ping(e.clientY);
+  PG.push({x,y,t:performance.now(),col:specAt(pitchAt(e.clientY)),dark:darkAt(y)});
+  trailDirty=true;
+});
+// the field of a small magnet at m, pointing along d
+function fieldAng(px,py){
+  const rx=px-MAG.x,ry=py-MAG.y,d=Math.hypot(rx,ry)||1,ux=rx/d,uy=ry/d,md=MAG.dx*ux+MAG.dy*uy;
+  return Math.atan2(3*md*uy-MAG.dy,3*md*ux-MAG.dx);
+}
 function drawTrail(now){
-  if(RM){trailCx.clearRect(0,0,innerWidth,innerHeight);return}
-  trailCx.clearRect(0,0,innerWidth,innerHeight);
-  if(TP.length<2)return;
-  const col=lumAt((scrollY+innerHeight/2)/CSSK)<.45?CINK:INK;
-  const LIFE=3800;
-  while(TP.length&&now-TP[0].t>LIFE)TP.shift();
-  for(let i=1;i<TP.length;i++){
-    const a=TP[i-1],b=TP[i];
-    if(b.t-a.t>110)continue;
-    const age=(now-b.t)/LIFE;
-    const k=1-age;
-    if(k<=0)continue;
-    const wobx=Math.sin(now*.0011+i*.7)*1.3*age, woby=Math.cos(now*.0009+i*1.1)*1.3*age;
-    trailCx.strokeStyle=rgba(col,.2*k*k);
-    trailCx.lineWidth=.8+1.6*k;
-    trailCx.beginPath();
-    trailCx.moveTo(a.x+wobx,a.y+woby);
-    trailCx.lineTo(b.x+wobx,b.y+woby);
-    trailCx.stroke();
+  const c=trailCx;
+  FL=FL.filter(f=>now-f.t<3400);
+  WV=WV.filter(w=>!w.end||now-w.end<3200);
+  PG=PG.filter(p=>now-p.t<2400);
+  const near=now-MAG.t<900;
+  if(RM||(!FL.length&&!WV.length&&!PG.length&&!near)){
+    if(trailDirty){c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);trailDirty=false}
+    return;
+  }
+  trailDirty=true;
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);
+  const K=TRD*CSSK;c.setTransform(K,0,0,K,0,-scrollY*TRD);
+  c.lineCap='round';
+  const px=1/CSSK,dark=darkAt(MAG.y);
+  // the lines of force round the moving magnet
+  if(near){
+    const k=1-(now-MAG.t)/900,tilt=Math.atan2(MAG.dy,MAG.dx)+Math.PI/2;
+    c.save();if(dark)c.globalCompositeOperation='lighter';
+    [46,74,110].forEach((L,i)=>{for(const sd of[-1,1]){
+      const pts=dipLine(MAG.x,MAG.y,L,tilt,sd,10);
+      c.strokeStyle=rgba(dark?mix(ELEC,MAGR,i/2):[60,56,80],(dark?.22:.2)*k);c.lineWidth=(1.2-i*.2)*px*1.3;
+      c.beginPath();pts.forEach((p,j)=>j?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+    }});
+    c.restore();
+  }
+  // the filings, turning towards the field while you are near
+  const fc=dark?[214,210,232]:[40,36,32];
+  for(const f of FL){
+    const age=now-f.t,u=age/3400;
+    const d=Math.hypot(f.x-MAG.x,f.y-MAG.y);
+    if(f.ang===null)f.ang=fieldAng(f.x,f.y);
+    else if(near&&d<170){let df=fieldAng(f.x,f.y)-f.ang;df=((df%Math.PI)+Math.PI*1.5)%Math.PI-Math.PI/2;f.ang+=df*.22}
+    const cs=Math.cos(f.ang)*f.len/2,sn=Math.sin(f.ang)*f.len/2,fd=darkAt(f.y);
+    c.strokeStyle=rgba(fd?[236,232,250]:[40,36,32],(fd?.92:.75)*Math.pow(1-u,1.3));c.lineWidth=f.w*px*1.35;
+    c.beginPath();c.moveTo(f.x-cs,f.y-sn);c.lineTo(f.x+cs,f.y+sn);c.stroke();
+  }
+  // the wave you drew while pressing: its length follows the note
+  for(const w of WV){
+    if(w.pts.length<2)continue;
+    const fade=w.end?clamp(1-(now-w.end)/3200,0,1):1,pts=w.pts;
+    let ph=now/120,acc=[];
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i],q=pts[Math.min(pts.length-1,i+1)],o=pts[Math.max(0,i-1)];
+      const tx=q.x-o.x,ty=q.y-o.y,tl=Math.hypot(tx,ty)||1,nx=-ty/tl,ny=tx/tl;
+      if(i)ph+=Math.hypot(p.x-pts[i-1].x,p.y-pts[i-1].y)*TAU/(15000/p.f);
+      const A=7*fade;acc.push([p.x+nx*A*Math.sin(ph),p.y+ny*A*Math.sin(ph),p.f]);
+    }
+    const dk=darkAt(pts[pts.length-1].y);
+    c.save();if(dk)c.globalCompositeOperation='lighter';
+    for(let i=1;i<acc.length;i++){
+      const col=specAt(acc[i][2]);
+      c.strokeStyle=rgba(dk?col:shade(col,.25),.85*fade);c.lineWidth=2*px*1.2;
+      c.beginPath();c.moveTo(acc[i-1][0],acc[i-1][1]);c.lineTo(acc[i][0],acc[i][1]);c.stroke();
+    }
+    if(dk){c.globalAlpha=.25*fade;c.lineWidth=7*px;for(let i=4;i<acc.length;i+=4){c.strokeStyle=rgba(specAt(acc[i][2]),1);c.beginPath();c.moveTo(acc[i-4][0],acc[i-4][1]);c.lineTo(acc[i][0],acc[i][1]);c.stroke()}}
+    c.restore();
+  }
+  // a signal going out, ring after ring
+  for(const p of PG){
+    c.save();if(p.dark)c.globalCompositeOperation='lighter';
+    {const a0=now-p.t;if(a0<400){c.fillStyle=rgba(p.col,.5*(1-a0/400));c.beginPath();c.arc(p.x,p.y,6+a0*.03,0,TAU);c.fill()}}
+    for(let k=0;k<3;k++){
+      const age=now-p.t-k*200;if(age<0)continue;
+      const u=age/2000,r=10+age*.2;if(u>1)continue;
+      c.strokeStyle=rgba(p.dark?p.col:shade(p.col,.3),.95*(1-u)*(1-u));c.lineWidth=(3-k*.6)*px*1.3;
+      c.beginPath();c.arc(p.x,p.y,r,-Math.PI*.95,-Math.PI*.05);c.stroke();
+      c.beginPath();c.arc(p.x,p.y,r,Math.PI*.05,Math.PI*.95);c.stroke();
+    }
+    c.restore();
   }
 }
 
@@ -1153,6 +1283,8 @@ P.push(function(){
   spine(R,0,700,1230);
   motes(R,0,1020,1280,26,60);
   whispers(R,330,1000,true,2);
+  // a hint, in pencil, for whoever reads this far
+  {const RH=stream(SEED*101+77);write(RH,'ook jij bent een veld',800,330,19,{col:CINK,a:.74,cen:true});write(RH,'(houd ingedrukt en teken)',800,356,14,{col:CINK,a:.55,cen:true})}
 });
 
 // P1 · light ---------------------------------------------------------------------
@@ -1641,6 +1773,9 @@ requestAnimationFrame(tick);
 @media (min-width:720px){
   .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
   .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
 }
 .nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
   background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
@@ -1704,7 +1839,12 @@ requestAnimationFrame(tick);
       </a></li>
   </ul>
   <p class="nunki-group">andere wanden</p>
-  <ul class="nunki-grid nunki-walls">
+  <ul class="nunki-grid nunki-walls nunki-n-5">
+      <li><a class="nunki-card" href="/adem/" style="--theme:#e3e9ee">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=6ceba5bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">adem</span><span class="nunki-sub">een muur over wat ons beweegt</span></span>
+      </a></li>
       <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
@@ -1719,6 +1859,11 @@ requestAnimationFrame(tick);
         <span class="nunki-tape" aria-hidden="true"></span>
         <span class="nunki-thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
         <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">een muur over een boom en zijn jaren</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/vuur/" style="--theme:#160f0e">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/vuur.jpg?v=57a0e731" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">vuur</span><span class="nunki-sub">een muur over wat ons aansteekt</span></span>
       </a></li>
   </ul>
   <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>
