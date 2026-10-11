@@ -1747,6 +1747,28 @@ function genStep(){
 genStep();
 requestAnimationFrame(tick);
 </script>
+<script>
+// a tap with a finger counts as a click. a phone does not always send a click
+// for a tap on a canvas when only the window is listening (safari on the iphone
+// does not), so the tap is read from the touch itself. a real click that follows
+// is the same tap, and is let go.
+(function(){
+  let down=null,last=-1e9;
+  const skip=el=>el&&el.closest&&el.closest('a,button,nav,input,label,select,textarea,summary');
+  addEventListener('touchstart',e=>{down=e.touches.length===1?{x:e.touches[0].clientX,y:e.touches[0].clientY,t:performance.now()}:null},{passive:true});
+  addEventListener('touchmove',e=>{if(down&&Math.hypot(e.touches[0].clientX-down.x,e.touches[0].clientY-down.y)>12)down=null},{passive:true});
+  addEventListener('touchcancel',()=>{down=null},{passive:true});
+  addEventListener('touchend',e=>{
+    const d=down,t=e.changedTouches[0];down=null;
+    if(!d||!t||e.touches.length||performance.now()-d.t>600||Math.hypot(t.clientX-d.x,t.clientY-d.y)>12)return;
+    const el=document.elementFromPoint(t.clientX,t.clientY)||e.target;
+    if(skip(el)){last=-1e9;return}
+    last=performance.now();
+    el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window,clientX:t.clientX,clientY:t.clientY,screenX:t.screenX,screenY:t.screenY}));
+  },{passive:true});
+  addEventListener('click',e=>{if(e.isTrusted&&performance.now()-last<800&&!skip(e.target)){e.stopImmediatePropagation();e.preventDefault()}},true);
+})();
+</script>
 <!-- nunki:nav -->
 <style>
 .nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
@@ -1842,7 +1864,7 @@ requestAnimationFrame(tick);
   <ul class="nunki-grid nunki-walls nunki-n-5">
       <li><a class="nunki-card" href="/adem/" style="--theme:#e3e9ee">
         <span class="nunki-tape" aria-hidden="true"></span>
-        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=6ceba5bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=146e1a24" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
         <span class="nunki-cap"><span class="nunki-name">adem</span><span class="nunki-sub">een muur over wat ons beweegt</span></span>
       </a></li>
       <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
