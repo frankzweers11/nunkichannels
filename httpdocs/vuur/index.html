@@ -37,8 +37,10 @@
   #wall canvas.live.on{opacity:1}
   #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
   #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
-  /* on this wall your pointer is a small flame, drawn by the wall itself */
+  /* on this wall your pointer is a glowing coal, drawn by the wall itself */
   @media (hover:hover) and (pointer:fine){#wall{cursor:none}}
+  /* a finger held still on the wall lights a fuse, so no callouts or selections */
+  #wall{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style>
 </head>
 <body>
@@ -82,9 +84,13 @@
 // fireflies that find one beat, and the embers at dawn.
 // with this the series has its elements: water (getij), wood (ringen), fields
 // of light (velden), form (patronen), air (adem), and fire.
-// you carry a small flame here: sparks fly up from it when you move, it settles
-// into a candle flame when you rest, and a tap strikes a match. sound only ever
-// after a tap.
+// you carry a glowing coal here. wherever there is something to light, a match
+// is struck from it. a tap sends up a spark that bursts; hold it down and a
+// fuse burns, and the longer it burns the bigger the firework. the blast blows
+// candles out, wakes the embers, startles the fireflies. a fourteenth sheet is
+// all fireworks: rockets in bottles, a sparkler to write with, salts that
+// colour your flame. sound only ever after a tap, and then the night has its
+// own: crickets at dusk, water in the cave, the campfire, the river, birds at dawn.
 // the engine (tiles, queued strokes, paper, pencil lettering) follows the
 // technique of the fable wall that inspired it, as adem does.
 // ?fast draws at full speed (the build's stills), ?still draws everything at
@@ -135,15 +141,15 @@ function ramp(st,t){
 // the sky of one night: the last light of the day at the top of the wall, deep
 // night through the middle, and the first light again at the very bottom
 const SKY=[[0,[44,34,60]],[260,[60,42,68]],[560,[104,58,72]],[800,[164,86,66]],[960,[214,126,76]],[1040,[232,150,86]],
-           [1090,[150,80,60]],[1150,[46,27,28]],[1214,[28,17,19]],[1600,[24,16,16]],[2600,[22,15,15]],[14000,[20,14,15]],[14800,[26,19,26]],
-           [15150,[48,34,54]],[15400,[110,72,86]],[15600,[222,152,110]]];
+           [1090,[150,80,60]],[1150,[46,27,28]],[1214,[28,17,19]],[1600,[24,16,16]],[2600,[22,15,15]],[15200,[20,14,15]],[16000,[26,19,26]],
+           [16350,[48,34,54]],[16600,[110,72,86]],[16800,[222,152,110]]];
 const skyAt=y=>ramp(SKY,y);
 const lumOf=c=>(.299*c[0]+.587*c[1]+.114*c[2])/255;
 const lumAt=y=>lumOf(skyAt(y));
 const inkAt=y=>lumAt(y)<.5?CINK:INK;
 // ---------------- the wall ----------------
 // ---------------- the wall ----------------
-const LW=1600, TILEH=1200, PH=1200, NP=13, TOTALH=NP*PH;
+const LW=1600, TILEH=1200, PH=1200, NP=14, TOTALH=NP*PH;
 const NT=Math.ceil(TOTALH/TILEH);
 let S=Math.min(1.35, Math.max(1, window.devicePixelRatio||1));
 if(navigator.deviceMemory && navigator.deviceMemory<8) S=1.1;
@@ -703,6 +709,7 @@ function tick(now){
     if(L.frame&&(!RM||!L.drawn||L.poke)&&L.y+L.h>sy-60&&L.y<sy+vh+60){L.frame(L.cx,now,L);L.drawn=true;L.poke=false}
   }
   drawTrail(now);
+  runAmbient(now,Math.min(.05,(now-(tick.last||now))/1000));tick.last=now;
   if(HUD){
     const busy=performance.now()-tb;hudBusy+=busy;hudMax=Math.max(hudMax,busy);hudN++;
     if(now-hudT>1000){HUD.textContent=`${(hudN*1000/(now-hudT)).toFixed(0)} fps\n${(hudBusy/hudN).toFixed(1)} ms busy\n${hudMax.toFixed(1)} ms max`;hudN=0;hudBusy=0;hudMax=0;hudT=now}
@@ -867,16 +874,19 @@ function flameLive(c,x,y,h,w,t,ph=0,lean=0,a=1,fl=1,o={}){
   const f=(Math.sin(t*7.3+ph)*.5+Math.sin(t*12.9+ph*1.7)*.3+Math.sin(t*21.1+ph*.6)*.2)*fl;
   const H=h*(1+.08*f),sw=lean*h+(Math.sin(t*3.3+ph)*.05+Math.sin(t*9.1+ph*2.3)*.03)*h*fl;
   const P=flamePts(x,y,H,w*(1-.04*f),sw,t,ph,fl);
+  // o.col: a salt in the flame gives it its own colour
+  const C=o.col;
   if(o.glow!==false){
     c.globalCompositeOperation='lighter';
-    glowAt(c,x+sw*.35,y-H*.4,H*(o.gr??1.35),o.gcol||[255,128,40],(o.ga??.34)*a);
-    glowAt(c,x+sw*.2,y-H*.3,H*.55,[255,200,120],.26*a);
+    glowAt(c,x+sw*.35,y-H*.4,H*(o.gr??1.35),C||o.gcol||[255,128,40],(o.ga??.34)*a);
+    glowAt(c,x+sw*.2,y-H*.3,H*.55,C?tint(C,.4):[255,200,120],.26*a);
     c.globalCompositeOperation='source-over';
   }
   pathOf(c,P);
   const g=c.createLinearGradient(x,y+w*.3,x+sw,y-H);
-  g.addColorStop(0,`rgba(80,110,255,${.6*a})`);g.addColorStop(.1,`rgba(255,238,200,${.96*a})`);
-  g.addColorStop(.4,`rgba(255,196,86,${.94*a})`);g.addColorStop(.74,`rgba(255,118,36,${.68*a})`);g.addColorStop(1,'rgba(230,60,20,0)');
+  g.addColorStop(0,`rgba(80,110,255,${.6*a})`);
+  if(C){g.addColorStop(.1,rgba(tint(C,.75),.96*a));g.addColorStop(.4,rgba(tint(C,.3),.94*a));g.addColorStop(.74,rgba(C,.72*a));g.addColorStop(1,rgba(shade(C,.2),0))}
+  else{g.addColorStop(.1,`rgba(255,238,200,${.96*a})`);g.addColorStop(.4,`rgba(255,196,86,${.94*a})`);g.addColorStop(.74,`rgba(255,118,36,${.68*a})`);g.addColorStop(1,'rgba(230,60,20,0)')}
   c.fillStyle=g;c.fill();
   // the bright core; or, for a candle seen close by, the dark heart of wax vapour that has not burnt yet
   const k=.5,kh=.6,Q=P.map(p=>[x+(p[0]-x)*k,y+(p[1]-y)*kh]);
@@ -893,11 +903,11 @@ function flameLive(c,x,y,h,w,t,ph=0,lean=0,a=1,fl=1,o={}){
   return[x+sw,y-H];
 }
 
-// ---------------- the visitor: a small flame ----------------
-// here you carry a flame. sparks fly up from it when you move it, and when you
-// hold still it settles into the quiet flame of a candle. a tap strikes a
-// match. sound only ever after a tap: the rush of a flame through the air, the
-// match, and whatever the sheets have to say.
+// ---------------- the visitor: a glowing coal ----------------
+// here you carry a coal. it breathes on its own and glows up when you move it
+// through the air, and a thread of smoke trails behind it. wherever there is
+// something to light, a match is struck from it, and shaken out again when you
+// go on. a tap sends up a spark that bursts; hold it down and a fuse burns.
 const trailCv=document.getElementById('trail');
 const trailCx=trailCv.getContext('2d');
 let TRD=1;
@@ -910,7 +920,7 @@ sizeTrail();
 const FR=mul32(SEED*991+17);
 const FINE=matchMedia('(hover:hover) and (pointer:fine)').matches;
 const PTR={cx:-999,cy:-999,on:false,t:0,vx:0,vy:0,sp:0,lean:0,calm:1};
-let SPARKS=[],lastPt=null,lastMove=0;
+let SPARKS=[],SMOKE=[],lastPt=null,lastMove=0;
 const ptrWall=()=>[PTR.cx/CSSK,(PTR.cy+scrollY)/CSSK];
 const moving=now=>now-PTR.t<140;
 // the pointer in a sheet's own coordinates, if it is anywhere near that sheet's glass
@@ -921,7 +931,7 @@ function near(L,m=80){
   return[p[0],p[1]-L.dy];
 }
 addEventListener('pointermove',e=>{
-  if(e.pointerType==='touch')return;
+  if(e.pointerType==='touch'){if(touchTap&&Math.hypot(e.clientX-touchTap.x,e.clientY-touchTap.y)>12){touchTap=null;if(CHARGE&&CHARGE.touch)chargeEnd(false)}return}
   const t=performance.now(),inWall=!!(e.target&&e.target.closest&&e.target.closest('#wall'));
   if(PTR.on&&inWall){const dt=Math.max(8,t-PTR.t)/1000;PTR.vx=PTR.vx*.55+(e.clientX-PTR.cx)/dt*.45;PTR.vy=PTR.vy*.55+(e.clientY-PTR.cy)/dt*.45}
   else{PTR.vx=0;PTR.vy=0}
@@ -929,64 +939,280 @@ addEventListener('pointermove',e=>{
   if(inWall){lastPt=ptrWall();lastMove=t}
 },{passive:true});
 document.documentElement.addEventListener('pointerleave',()=>{PTR.on=false});
-addEventListener('blur',()=>{PTR.on=false});
+addEventListener('blur',()=>{PTR.on=false;if(CHARGE)chargeEnd(false)});
+// what is in your hand. fire: the flame of a struck match (0 = only the coal).
+// col: the colour a salt gave your flame, for a while
+const HAND={fire:0,stick:0,since:-1e9,struck:-1e9,col:null,colT:-1e9,ls:0};
+const handCol=now=>HAND.col&&now-HAND.colT<24000?HAND.col:null;
+const flameOn=()=>HAND.fire>.4;
+// places where your flame would light something without a tap: the match is struck there too
+const ZONES=[];
+function zone(x0,y0,x1,y1){ZONES.push({x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY})}
+const zoneAt=(x,y)=>ZONES.some(h=>x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1);
+// a sparkler, once lit and picked up, is carried in place of the coal
+const SPK={held:false,t0:0,dur:30000,trail:[],voice:null};
+function capSparks(){if(SPARKS.length>520)SPARKS.splice(0,SPARKS.length-520)}
 // sparks live on the wall; their size and speed are reckoned in screen pixels
-function sparkBurst(x,y,n,pow=1){
+function sparkBurst(x,y,n,pow=1,col){
   const k=1/CSSK,t=performance.now();
-  for(let i=0;i<n;i++){const a=rd(FR,0,TAU),v=rd(FR,60,320)*pow;SPARKS.push({x,y,vx:Math.cos(a)*v*k,vy:(Math.sin(a)*v-rd(FR,40,160)*pow)*k,t,life:rd(FR,450,1500),s:rd(FR,.8,1.9),tw:rd(FR,0,7)})}
-  if(SPARKS.length>360)SPARKS.splice(0,SPARKS.length-360);
+  for(let i=0;i<n;i++){const a=rd(FR,0,TAU),v=rd(FR,60,320)*pow;SPARKS.push({x,y,vx:Math.cos(a)*v*k,vy:(Math.sin(a)*v-rd(FR,40,160)*pow)*k,t,life:rd(FR,450,1500),s:rd(FR,.8,1.9),tw:rd(FR,0,7),col})}
+  capSparks();
 }
 // one lazy spark, let go by a fire on the wall
 function sparkUp(x,y,life=1,s=1){
   const k=1/CSSK;
   SPARKS.push({x,y,vx:rd(FR,-20,20)*k,vy:-rd(FR,40,110)*k,t:performance.now(),life:rd(FR,900,2400)*life,s:rd(FR,.7,1.4)*s,tw:rd(FR,0,7)});
-  if(SPARKS.length>360)SPARKS.shift();
+  capSparks();
 }
+// a jet of hot iron: it falls, and the carbon in each spark bursts it into forks
+// (a smith tells steel from iron by how its sparks branch)
+function sparkJet(x,y,ang,spread,n,v=1,o={}){
+  const k=1/CSSK,t=performance.now();
+  for(let i=0;i<n;i++){const a=ang+rd(FR,-spread,spread),s=rd(FR,220,640)*v;SPARKS.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,t,life:rd(FR,260,760)*(o.life??1),s:rd(FR,.55,1.15)*(o.s??1),tw:rd(FR,0,7),g:(o.g??900)*k,fork:ch_(FR,o.forks??.6)?rd(FR,.3,.75):0,col:o.col})}
+  capSparks();
+}
+// smoke, in wall coordinates: it rises, wanders, spreads and thins
+function smokeAt(x,y,n=1,o={}){
+  const k=1/CSSK,t=performance.now();
+  for(let i=0;i<n;i++)SMOKE.push({x:x+rd(FR,-2,2)*k,y,vx:(o.vx??0)+rd(FR,-8,8)*k,vy:-rd(FR,14,30)*k*(o.up??1),t,life:rd(FR,1500,2700)*(o.life??1),r:rd(FR,1.6,2.8)*k*(o.r??1),ph:rd(FR,0,7),a:o.a??.11,col:o.col});
+  if(SMOKE.length>90)SMOKE.splice(0,SMOKE.length-90);
+}
+
+// ---------------- fireworks ----------------
+// a shell bursts: a flash, then stars thrown out on every side of a ball, so
+// that seen from here they crowd at the rim. they slow in the air and fall.
+let BURSTS=[],FLASH=[],ROCKETS=[];
+const FWCOL=[[255,206,110],[255,150,70],[255,104,64],[255,232,170]];
+function firework(x,y,pow=.3,col=null,kind=null,o={}){
+  // sized in screen pixels, but smaller on a small screen, where one would fill it
+  const now=performance.now(),k=clamp(CSSK*1.1,.5,1)/CSSK,big=o.big||1;
+  col=col||handCol(now)||pk(FR,FWCOL);
+  if(!kind)kind=pow<.45?'pop':pk(FR,['peony','peony','willow','ring','crackle']);
+  const B={t:now,col,kind,k,st:[],life:kind==='willow'?2700:kind==='pop'?650:1250+950*pow,drag:kind==='willow'?2.3:kind==='pop'?2.4:1.45,g:(kind==='willow'?80:125)*k,w:kind==='pop'?1.1:1.3+.9*pow};
+  if(!o.silent){if(kind==='pop')sPop(pow);else sBoom(pow,o.delay||0,kind,B.life/1000)}
+  if(!o.inner)blast(x,y,pow,o.src);
+  if(RM)return;
+  if(pow>.45&&!o.inner)setTimeout(()=>smokeAt(x,y,7,{a:.045,r:7,up:.25,life:1.6}),B.life*.5);
+  FLASH.push({x,y,t:now,r:(80+420*pow)*k*big,col});
+  const n=Math.round((kind==='pop'?14:44)+84*pow*big),V=(kind==='pop'?170:210+360*pow)*k*big;
+  for(let i=0;i<n;i++){
+    let vx,vy;
+    if(kind==='ring'){const a=i/n*TAU+rd(FR,-.03,.03);vx=Math.cos(a)*V;vy=Math.sin(a)*V*.46}
+    else{const z=rd(FR,-1,1),a=rd(FR,0,TAU),r=Math.sqrt(1-z*z);vx=Math.cos(a)*r*V;vy=Math.sin(a)*r*V}
+    const j=rd(FR,.86,1.06);
+    B.st.push({x,y,vx:vx*j,vy:vy*j-(kind==='pop'?40*k:0),life:B.life*rd(FR,.78,1.08),gl:kind==='crackle'?rd(FR,.5,.72):kind==='willow'?rd(FR,.45,.7):2,popd:false});
+  }
+  BURSTS.push(B);if(BURSTS.length>16)BURSTS.shift();
+  // the biggest shells break twice: a ring of another colour inside the ball
+  if(pow>.95&&!o.inner){const c2=pk(FR,[[255,250,232],[150,255,120],[120,170,255],[255,84,84],[255,214,90]].filter(c=>c.join()!==col.join()));setTimeout(()=>firework(x,y,.55,c2,'ring',{silent:true,inner:true,big:.85}),110)}
+}
+// a rocket: up on its tail of sparks, and at the top of its climb it bursts.
+// the bang comes a moment after the light, as from far away.
+function rocket(x,y,tx,ty,col,kind,o={}){
+  const dur=o.dur||1150;
+  ROCKETS.push({x0:x,y0:y,tx,ty,x,y,t:performance.now(),dur,col,kind,pow:o.pow??.8,ph:rd(FR,0,7)});
+  if(AC)sLaunch(o.whistle,dur/1000);
+}
+// a blast pushes on everything near it: the living drawings may answer
+function blast(x,y,pow,src){
+  const reach=240+560*pow;
+  for(const L of LIVE){
+    if(!L.on||!L.boom)continue;
+    const dx=Math.max(L.x-x,0,x-(L.x+L.w)),dy=Math.max(L.y-y,0,y-(L.y+L.h));
+    if(Math.hypot(dx,dy)<reach){L.boom(x,y-(L.dy||0),pow,reach,src);L.poke=true}
+  }
+}
+// the fuse in your hand: press, and it burns until you let go (or it is all burnt)
+let CHARGE=null,swallowClick=-1e9;
+const chargeOf=now=>CHARGE?clamp((now-CHARGE.t0-140)/1600,0,1):0;
+function chargeStart(cx,cy,touch){CHARGE={t0:performance.now(),cx,cy,touch};if(AC&&AC.state==='running')fizzOn()}
+function chargeEnd(fire){
+  if(!CHARGE)return;
+  const now=performance.now(),ch=chargeOf(now),C=CHARGE;CHARGE=null;fizzOff();
+  if(!fire){if(AC)nz(AC.currentTime+.01,.18,'bandpass',1800,700,.8,.05,.01);return}
+  const sx=C.touch?C.cx:PTR.cx,sy=C.touch?C.cy:PTR.cy;
+  firework(sx/CSSK,(sy+scrollY)/CSSK-8/CSSK,ch<.05?.3:.42+.58*ch);
+}
+
 function drawTrail(now){
   const c=trailCx,dt=Math.min(.05,(now-(drawTrail.last||now))/1000);drawTrail.last=now;
   const mv=moving(now),sp=mv?Math.hypot(PTR.vx,PTR.vy):0;
   PTR.sp=PTR.sp*.8+sp*.2;
-  if(AC&&MOV){MOV.g.gain.setTargetAtTime(PTR.on&&mv?clamp(PTR.sp/2600,0,1)*.05:0,AC.currentTime,.1);MOV.lp.frequency.setTargetAtTime(220+clamp(PTR.sp/2200,0,1)*620,AC.currentTime,.12)}
+  if(AC&&MOV){MOV.g.gain.setTargetAtTime(PTR.on&&mv&&HAND.fire>.3?clamp(PTR.sp/2600,0,1)*.05*HAND.fire:0,AC.currentTime,.1);MOV.lp.frequency.setTargetAtTime(220+clamp(PTR.sp/2200,0,1)*620,AC.currentTime,.12)}
   for(const i in VOICES){const v=VOICES[i];if(now-v.seen>250){v.g.gain.setTargetAtTime(0,AC.currentTime,.3);if(now-v.seen>3000){v.stop();delete VOICES[i]}}}
   c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,trailCv.width,trailCv.height);
-  const k=1/CSSK;
-  // sparks fly from the flame as you move it
-  if(!RM&&PTR.on&&FINE&&mv&&PTR.sp>50){
-    const [wx,wy]=ptrWall(),n=PTR.sp*dt/22;
-    let m=Math.floor(n);if(FR()<n-m)m++;
-    for(let i=0;i<m;i++)SPARKS.push({x:wx+rd(FR,-5,5)*k,y:wy-rd(FR,12,30)*k,vx:(-PTR.vx*rd(FR,.04,.16)+rd(FR,-30,30))*k,vy:(-PTR.vy*rd(FR,.04,.16)-rd(FR,30,100))*k,t:now,life:rd(FR,450,1400),s:rd(FR,.7,1.5),tw:rd(FR,0,7)});
-    if(SPARKS.length>360)SPARKS.splice(0,SPARKS.length-360);
+  const k=1/CSSK,K=TRD*CSSK,vy0=scrollY/CSSK-80,vy1=(scrollY+innerHeight)/CSSK+80;
+  const fine=PTR.on&&FINE,[wx,wy]=ptrWall();
+  // a finger held still lights a fuse
+  if(touchTap&&!CHARGE&&now-touchTap.t>320){audio();chargeStart(touchTap.x,touchTap.y,true)}
+  // the mouse held down on a place that answers taps: after a moment it is a fuse too
+  if(HOLD&&!CHARGE&&now-HOLD.t>350){chargeStart(HOLD.cx,HOLD.cy,false);CHARGE.t0=HOLD.t;HOLD=null}
+  const ch=chargeOf(now);
+  if(CHARGE){
+    if(FIZZ){FIZZ.g.gain.setTargetAtTime((.025+.085*ch)*(.55+.45*Math.random()),AC.currentTime,.02);FIZZ.f.frequency.setTargetAtTime(2200+3800*ch,AC.currentTime,.05)}
+    else if(AC&&AC.state==='running')fizzOn();
+    const fx=CHARGE.touch?CHARGE.cx:PTR.cx,fy=CHARGE.touch?CHARGE.cy:PTR.cy;
+    if(!RM){const n=(10+80*ch)*dt;let m=Math.floor(n);if(FR()<n-m)m++;if(m)sparkJet(fx*k,(fy+scrollY)*k,-Math.PI/2,Math.PI,m,.25+.5*ch,{g:420,life:.5,s:.8,forks:.25})}
+    if(ch>=1&&now-CHARGE.t0>1740+260)chargeEnd(true);
+  }
+  // what you carry: the coal, or a match struck from it where there is something to light
+  const free=fine&&!CHARGE&&!SPK.held;
+  if(free&&(hitAt(wx,wy)||zoneAt(wx,wy)))HAND.since=now;
+  const want=free&&now-HAND.since<700;
+  if(want&&HAND.fire<.02&&now-HAND.struck>420){HAND.struck=now;if(AC)sStrike(.5);if(!RM)sparkBurst(wx+3*k,wy-6*k,6,.4)}
+  const f0=HAND.fire;
+  HAND.fire=want&&now-HAND.struck>90?Math.min(1,HAND.fire+dt*5):Math.max(0,HAND.fire-dt*2.2);
+  if(f0>.3&&HAND.fire<=.3&&!RM)smokeAt(wx,wy-14*k,6,{a:.16,r:1.4});
+  HAND.stick=fine&&(want||HAND.fire>0)?Math.min(1,HAND.stick+dt*9):Math.max(0,HAND.stick-dt*1.6);
+  // the coal smokes a little, more when you swing it
+  if(fine&&!SPK.held&&HAND.stick<.5&&!RM&&now-HAND.ls>(mv?45:110)){HAND.ls=now;smokeAt(wx,wy-3*k,1,{vx:-PTR.vx*.015*k})}
+  // and sheds a spark now and then when you swing it hard
+  if(!RM&&fine&&!SPK.held&&HAND.stick<.5&&mv&&PTR.sp>420){const n=PTR.sp*dt/150;let m=Math.floor(n);if(FR()<n-m)m++;
+    for(let i=0;i<m;i++)SPARKS.push({x:wx+rd(FR,-2,2)*k,y:wy-rd(FR,2,6)*k,vx:(-PTR.vx*rd(FR,.04,.14)+rd(FR,-30,30))*k,vy:(-PTR.vy*rd(FR,.04,.14)-rd(FR,30,90))*k,t:now,life:rd(FR,350,1000),s:rd(FR,.6,1.2),tw:rd(FR,0,7)});capSparks()}
+  // the sparkler in your hand
+  if(SPK.held)drawSparkler(c,now,dt,wx,wy);
+  // smoke under everything else
+  if(SMOKE.length){
+    SMOKE=SMOKE.filter(s=>now-s.t<s.life);
+    c.setTransform(K,0,0,K,0,-scrollY*TRD);
+    const spr=sprite([196,190,192],32),dk=sprite([84,78,78],32);
+    for(const s of SMOKE){
+      const u=(now-s.t)/s.life;
+      s.vx+=Math.sin(now*.0021+s.ph)*10*k*dt;s.vx*=1-dt*.9;s.x+=s.vx*dt;s.y+=s.vy*dt;s.r+=dt*7*k;
+      if(s.y<vy0||s.y>vy1)continue;
+      c.globalAlpha=s.a*(1-u)*Math.min(1,u*8);c.drawImage(s.col?dk:spr,s.x-s.r*3,s.y-s.r*3,s.r*6,s.r*6);
+    }
+    c.globalAlpha=1;
   }
   if(SPARKS.length){
     SPARKS=SPARKS.filter(s=>now-s.t<s.life);
-    const K=TRD*CSSK,vy0=scrollY/CSSK-60,vy1=(scrollY+innerHeight)/CSSK+60,spr=sprite([255,140,50],32);
+    const spr=sprite([255,140,50],32),born=[];
     c.setTransform(K,0,0,K,0,-scrollY*TRD);
     c.globalCompositeOperation='lighter';
     for(const s of SPARKS){
       const u=(now-s.t)/s.life;
+      if(s.g!==undefined){s.vy+=s.g*dt;s.vx*=1-dt*.7;s.vy*=1-dt*.3}
       // warm air carries it up, and a little sideways
-      s.vy-=110*k*dt;s.vx+=Math.sin(now*.0042+s.tw)*60*k*dt;s.vx*=1-dt*1.1;s.vy*=1-dt*.8;
+      else{s.vy-=110*k*dt;s.vx+=Math.sin(now*.0042+s.tw)*60*k*dt;s.vx*=1-dt*1.1;s.vy*=1-dt*.8}
       s.x+=s.vx*dt;s.y+=s.vy*dt;
+      if(s.fork&&u>s.fork){s.fork=0;for(let j=0;j<3;j++){const a=rd(FR,0,TAU),v=rd(FR,50,170)*k;born.push({x:s.x,y:s.y,vx:s.vx*.35+Math.cos(a)*v,vy:s.vy*.35+Math.sin(a)*v,t:now,life:rd(FR,110,260),s:s.s*.75,tw:0,g:s.g,col:s.col})}}
       if(s.y<vy0||s.y>vy1)continue;
       const a=Math.pow(1-u,1.2),r=s.s*(1-.45*u)*k;
-      c.globalAlpha=a*.5;c.drawImage(spr,s.x-r*5,s.y-r*5,r*10,r*10);
-      const col=u<.25?mix(FLAMEW,[255,190,90],u/.25):mix([255,190,90],[220,64,26],(u-.25)/.75);
-      c.globalAlpha=a;c.fillStyle=rgba(col,1);c.fillRect(s.x-r*.8,s.y-r*.8,r*1.6,r*1.6);
+      c.globalAlpha=a*.5;c.drawImage(s.col?sprite(s.col,32):spr,s.x-r*5,s.y-r*5,r*10,r*10);
+      const col=s.col?mix(tint(s.col,.6),s.col,u):u<.25?mix(FLAMEW,[255,190,90],u/.25):mix([255,190,90],[220,64,26],(u-.25)/.75);
+      c.globalAlpha=a;c.fillStyle=rgba(col,1);
+      if(s.g!==undefined){c.strokeStyle=c.fillStyle;c.lineWidth=r*1.3;c.beginPath();c.moveTo(s.x-s.vx*.03,s.y-s.vy*.03);c.lineTo(s.x,s.y);c.stroke()}
+      else c.fillRect(s.x-r*.8,s.y-r*.8,r*1.6,r*1.6);
     }
+    if(born.length){SPARKS.push(...born);capSparks()}
     c.globalAlpha=1;c.globalCompositeOperation='source-over';
   }
-  // the flame you carry, on the head of a match
-  if(PTR.on&&FINE){
+  // fireworks
+  if(BURSTS.length||FLASH.length||ROCKETS.length)drawFireworks(c,now,dt,K,k,vy0,vy1);
+  // the coal (and the fuse, when you hold it down)
+  const tch=CHARGE&&CHARGE.touch;
+  if((fine&&!SPK.held||tch)&&(HAND.stick<1||tch)){
+    const x=tch?CHARGE.cx:PTR.cx,y=tch?CHARGE.cy:PTR.cy,ea=tch?1:1-HAND.stick,hc=handCol(now);
+    const air=mv?clamp(PTR.sp/1800,0,.7):0,br=.74+.15*Math.sin(now*.0029)+.09*Math.sin(now*.0083+2)+air+ch*.9;
+    const jx=ch?rd(FR,-1,1)*ch*1.2:0,jy=ch?rd(FR,-1,1)*ch*1.2:0;
+    c.setTransform(TRD,0,0,TRD,0,0);
+    c.globalCompositeOperation='lighter';
+    glowAt(c,x+jx,y+jy,(12+8*br)*(1+ch*1.8),hc||[255,90,28],(.24+.12*air+.2*ch)*ea*br);
+    glowAt(c,x+jx,y+jy,(4.5+2.5*br)*(1+ch*1.2),hc?tint(hc,.5):[255,196,100],(.5+.3*ch)*ea);
+    c.globalCompositeOperation='source-over';
+    c.fillStyle=rgba([52,30,22],.9*ea);c.beginPath();c.arc(x+jx,y+jy,2.5+ch*1.3,0,TAU);c.fill();
+    c.fillStyle=rgba(heatCol(clamp(.56+.16*br+.25*ch,0,1)),ea);c.beginPath();c.arc(x+jx-.4,y+jy-.4,1.6+ch*1.5,0,TAU);c.fill();
+  }
+  // the match, struck where there is something to light
+  if(fine&&HAND.stick>.01&&!SPK.held){
     c.setTransform(TRD,0,0,TRD,0,0);
     const x=PTR.cx,y=PTR.cy;
     const tl=mv?clamp(-PTR.vx/900,-1,1):0;PTR.lean+=(tl-PTR.lean)*(1-Math.exp(-dt*7));
     PTR.calm=mv?Math.max(0,PTR.calm-dt*3):Math.min(1,PTR.calm+dt*.5);
-    const hv=hitAt(...ptrWall())?1:0,h=22+Math.min(14,PTR.sp/110)+hv*5;
-    c.lineCap='round';
+    const h=26+Math.min(14,PTR.sp/110);
+    c.globalAlpha=HAND.stick;c.lineCap='round';
     c.strokeStyle='rgba(222,186,132,.95)';c.lineWidth=2.4;c.beginPath();c.moveTo(x+1.5,y+4);c.lineTo(x+8,y+28);c.stroke();
     c.strokeStyle='rgba(30,20,16,.9)';c.lineWidth=2.8;c.beginPath();c.moveTo(x+.4,y+.4);c.lineTo(x+2.6,y+8);c.stroke();
-    flameLive(c,x,y-2,h,h*.3,now/1000,0,PTR.lean*.55,1,1-PTR.calm*.7,{ga:.3+hv*.14});
+    c.globalAlpha=1;
+    const f=HAND.fire;
+    if(f>.01)flameLive(c,x,y-2,h*(.35+.65*f),h*.3*(.5+.5*f),now/1000,0,PTR.lean*.55,Math.min(1,f*1.5),1-PTR.calm*.7,{ga:.42,col:handCol(now)});
   }
+}
+function drawFireworks(c,now,dt,K,k,vy0,vy1){
+  c.setTransform(K,0,0,K,0,-scrollY*TRD);
+  c.globalCompositeOperation='lighter';c.lineCap='round';
+  for(const f of FLASH){const u=(now-f.t)/280;if(u>=1)continue;glowAt(c,f.x,f.y,f.r*(.6+.4*u),f.col,.6*(1-u)*(1-u));glowAt(c,f.x,f.y,f.r*.22,[255,250,236],.9*(1-u))}
+  FLASH=FLASH.filter(f=>now-f.t<280);
+  // rockets on their way up
+  ROCKETS=ROCKETS.filter(R=>{
+    const u=Math.min(1,(now-R.t)/R.dur),e=1-(1-u)*(1-u);
+    const x=R.x0+(R.tx-R.x0)*e+Math.sin(u*7+R.ph)*6*(1-u),y=R.y0+(R.ty-R.y0)*e;
+    if(!RM){const n=Math.max(1,Math.round(dt*90*(1-u*.6)));for(let i=0;i<n;i++)SPARKS.push({x:x+rd(FR,-2,2),y:y+rd(FR,0,6),vx:(R.x-x)/Math.max(dt,.008)*.1+rd(FR,-30,30)*k,vy:rd(FR,20,90)*k,t:now,life:rd(FR,250,700),s:rd(FR,.6,1.2),tw:0,g:260*k})}
+    R.x=x;R.y=y;
+    glowAt(c,x,y,22*k*3,[255,180,90],.5);c.fillStyle='rgba(255,246,220,1)';c.fillRect(x-1.6*k,y-1.6*k,3.2*k,3.2*k);
+    if(u>=1){firework(x,y,R.pow,R.col,R.kind,{delay:.22,src:'rocket'});return false}
+    return true});
+  for(const B of BURSTS){
+    const age=now-B.t;if(age>B.life*1.15){B.dead=true;continue}
+    const fd=Math.exp(-B.drag*dt),spr=sprite(B.col,32),hot=tint(B.col,.45),A=clamp(1-Math.pow(age/B.life,2.2),0,1);
+    const tail=B.kind==='willow'?.2:.09;
+    const heads=[],glows=[];
+    const k=B.k;
+    c.strokeStyle=rgba(B.col,1);c.lineWidth=B.w*.8*k;c.globalAlpha=A*.4;c.beginPath();
+    for(const s of B.st){
+      const u=age/s.life;if(u>=1)continue;
+      s.vx*=fd;s.vy=s.vy*fd+B.g*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;
+      if(s.y<vy0||s.y>vy1)continue;
+      if(u>s.gl){
+        // the end of a crackling star: it pops; the end of a willow: it glitters
+        if(B.kind==='crackle'){if(!s.popd&&FR()<dt*6){s.popd=true;glows.push([s.x,s.y,7*k,1.4])}continue}
+        if(FR()<.45)continue;
+      }
+      c.moveTo(s.x-s.vx*tail,s.y-s.vy*tail);c.lineTo(s.x,s.y);heads.push(s);
+      if(FR()<.6)glows.push([s.x,s.y,(5+4*(1-u))*k,.36]);
+    }
+    c.stroke();
+    // the burning heads
+    c.strokeStyle=rgba(hot,1);c.lineWidth=B.w*1.5*k;c.globalAlpha=A;c.beginPath();
+    for(const s of heads){c.moveTo(s.x-s.vx*.025,s.y-s.vy*.025);c.lineTo(s.x,s.y)}
+    c.stroke();
+    for(const g of glows){c.globalAlpha=Math.min(1,A*g[3]);c.drawImage(g[3]>1?sprite([255,250,240],32):spr,g[0]-g[2],g[1]-g[2],2*g[2],2*g[2])}
+  }
+  BURSTS=BURSTS.filter(B=>!B.dead);
+  c.globalAlpha=1;c.globalCompositeOperation='source-over';
+}
+// a sparkler carried as your pointer: it spits forked sparks and, like a long
+// exposure, leaves its light in the air for a moment
+function drawSparkler(c,now,dt,wx,wy){
+  const k=1/CSSK,age=now-SPK.t0,left=SPK.dur-age;
+  if(left<=0){SPK.held=false;SPK.trail=[];if(SPK.voice){SPK.voice.stop();SPK.voice=null}return}
+  if(!PTR.on){if(SPK.voice)SPK.voice.level(0);return}
+  const burning=left>1600,heat=burning?1:left/1600;
+  const tr=SPK.trail;
+  if(burning){const l=tr[tr.length-1];if(!l||Math.hypot(l.x-wx,l.y-wy)>1.2*k)tr.push({x:wx,y:wy,t:now})}
+  while(tr.length&&now-tr[0].t>1300)tr.shift();
+  c.setTransform(TRD*CSSK,0,0,TRD*CSSK,0,-scrollY*TRD);
+  c.globalCompositeOperation='lighter';c.lineCap='round';c.lineJoin='round';
+  // the light it left in the air: older parts first, thinner and dimmer
+  for(let band=0;band<4;band++){
+    const a0=band*325,a1=a0+340;c.beginPath();let on=false;
+    for(const p of tr){const a=now-p.t;if(a<a0||a>a1){on=false;continue}on?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y);on=true}
+    const f=1-band/4;
+    c.strokeStyle=`rgba(255,200,120,${.16*f})`;c.lineWidth=8*k*f;c.stroke();
+    c.strokeStyle=`rgba(255,244,214,${.7*f})`;c.lineWidth=2.2*k*f;c.stroke();
+  }
+  c.globalCompositeOperation='source-over';
+  // the wire and what is left of the coating
+  c.setTransform(TRD,0,0,TRD,0,0);
+  const x=PTR.cx,y=PTR.cy,used=clamp(age/SPK.dur,0,1);
+  c.strokeStyle='rgba(120,116,120,.95)';c.lineWidth=1.6;c.beginPath();c.moveTo(x,y);c.lineTo(x+16,y+46);c.stroke();
+  c.strokeStyle='rgba(70,64,62,.95)';c.lineWidth=4;c.beginPath();c.moveTo(x+1,y+3);c.lineTo(x+1+12*(1-used),y+3+34*(1-used));c.stroke();
+  c.globalCompositeOperation='lighter';
+  glowAt(c,x,y,(40+10*Math.random())*heat,[255,180,90],.42*heat);glowAt(c,x,y,9*heat+2,[255,246,226],.95*heat);
+  c.globalCompositeOperation='source-over';
+  if(burning&&!RM){const n=dt*70;let m=Math.floor(n);if(FR()<n-m)m++;if(m)sparkJet(wx,wy,0,Math.PI,m,.55,{g:240,life:.6,s:.8,forks:.85})}
+  if(SPK.voice)SPK.voice.level(burning?.05+.03*Math.random():0);
+  if(AC&&burning&&Math.random()<dt*16)crackleAt(AC.currentTime+.01,1,.02,.05);
 }
 
 // ---------------- sound ----------------
@@ -997,7 +1223,10 @@ function audio(){
   if(!AC){
     try{
       AC=new (window.AudioContext||window.webkitAudioContext)();
-      MASTER=AC.createGain();MASTER.gain.value=.9;MASTER.connect(AC.destination);
+      MASTER=AC.createGain();MASTER.gain.value=.9;
+      // a soft limiter, so that a big bang never cracks the speakers
+      const comp=AC.createDynamicsCompressor();comp.threshold.value=-16;comp.knee.value=12;comp.ratio.value=5;comp.attack.value=.003;comp.release.value=.3;
+      MASTER.connect(comp);comp.connect(AC.destination);
       const len=AC.sampleRate*3,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);
       let b0=0,b1=0,b2=0;
       for(let i=0;i<len;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0526;d[i]=(b0+b1+b2+w*.1848)*.12}
@@ -1010,20 +1239,32 @@ function audio(){
       MOV={g,lp};
     }catch(e){AC=null}
   }
-  if(AC&&AC.state==='suspended')AC.resume();
+  if(AC&&AC.state==='suspended'&&!document.hidden)AC.resume();
   return AC;
 }
+// a page you cannot see makes no sound
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
 // a short breath of noise through a filter
-function nz(t,dur,type,f0,f1,q,vol,att=.005){
+function nz(t,dur,type,f0,f1,q,vol,att=.005,out=MASTER){
   const n=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
   n.buffer=NB;f.type=type;f.Q.value=q;f.frequency.setValueAtTime(f0,t);if(f1!==f0)f.frequency.exponentialRampToValueAtTime(f1,t+dur);
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0004,t+dur);
-  n.connect(f);f.connect(g);g.connect(MASTER);n.start(t,Math.random()*2.5);n.stop(t+dur+.03);
+  n.connect(f);f.connect(g);g.connect(out);n.start(t,Math.random()*2.5);n.stop(t+dur+.03);
 }
-function crackle(n=8,spread=1.2,vol=.12){
-  const ac=audio();if(!ac)return;const t0=ac.currentTime+.01;
-  for(let i=0;i<n;i++){const t=t0+Math.pow(Math.random(),1.5)*spread,f=1300+Math.random()*3200;nz(t,.006+Math.random()*.022,'highpass',f,f,.7,vol*(.3+Math.random()*.7),.001)}
+// a noise that holds, for as long as something keeps it going
+function noiseVoice(type,f,q,out=MASTER){
+  const n=AC.createBufferSource();n.buffer=NB;n.loop=true;
+  const fl=AC.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;
+  const g=AC.createGain();g.gain.value=0;n.connect(fl);fl.connect(g);g.connect(out);n.start(0,Math.random()*2.5);
+  return{n,f:fl,g,level(v,tc=.04){g.gain.setTargetAtTime(v,AC.currentTime,tc)},stop(){g.gain.setTargetAtTime(0,AC.currentTime,.05);setTimeout(()=>{try{n.stop()}catch(e){}},400)}};
 }
+let FIZZ=null;
+function fizzOn(){if(!AC||FIZZ)return;FIZZ=noiseVoice('bandpass',2400,.8)}
+function fizzOff(){if(!FIZZ)return;FIZZ.stop();FIZZ=null}
+function crackleAt(t0,n=8,spread=1.2,vol=.12,out=MASTER){
+  for(let i=0;i<n;i++){const t=t0+Math.pow(Math.random(),1.5)*spread,f=1300+Math.random()*3200;nz(t,.006+Math.random()*.022,'highpass',f,f,.7,vol*(.3+Math.random()*.7),.001,out)}
+}
+function crackle(n=8,spread=1.2,vol=.12){const ac=audio();if(!ac)return;crackleAt(ac.currentTime+.01,n,spread,vol)}
 function whump(vol=.14){const ac=audio();if(!ac)return;nz(ac.currentTime+.01,.75,'lowpass',140,560,.7,vol,.04)}
 function strike(){
   const ac=audio();if(!ac)return;const t=ac.currentTime+.01;
@@ -1032,6 +1273,12 @@ function strike(){
   // and then it catches
   nz(t+.08,.9,'lowpass',260,1400,.9,.15,.06);
   crackle(4,.6,.07);
+}
+// the match struck from your coal: quieter, one quick scratch and the catch
+function sStrike(v=.5){
+  const t=AC.currentTime+.01;
+  for(let i=0;i<2;i++)nz(t+i*.026,.045,'bandpass',2800+i*600,1900,1.1,.11*v,.003);
+  nz(t+.06,.6,'lowpass',300,1300,.9,.1*v,.05);
 }
 function fwip(vol=.1){const ac=audio();if(!ac)return;nz(ac.currentTime+.01,.45,'lowpass',300,1300,.8,vol,.05)}
 function pff(){const ac=audio();if(!ac)return;nz(ac.currentTime+.01,.38,'bandpass',900,480,.8,.12,.03)}
@@ -1043,6 +1290,43 @@ function clang(hot){
   const f=hot>.3?760:380,d=hot>.3?1:.22;
   for(const [r,dd,v] of[[1,1.4,.08],[2.32,.9,.045],[4.25,.5,.03],[6.63,.3,.018]])tone(f*r,0,dd*d,v,'sine');
 }
+// flint on steel: a bright tick that rings for a moment
+function sSteel(){const ac=AC;if(!ac)return;nz(ac.currentTime+.003,.03,'highpass',3000,3000,.7,.32,.001);tone(3150,0,.22,.06,'sine');tone(4870,0,.12,.04,'sine');crackle(5,.35,.09)}
+// a small spark that bursts: a crack, a puff, a few crackles
+function sPop(pow=.3){
+  const ac=AC;if(!ac)return;const t=ac.currentTime+.01;
+  nz(t,.035,'highpass',1700,1700,.7,.34,.001);
+  nz(t+.004,.32,'lowpass',1300,260,.7,.32,.004);
+  crackleAt(t+.12,6,.5,.1);
+}
+// a shell bursting: the crack, the body of the bang, a thump you feel more
+// than hear, the echo off the hills, and whatever the stars do as they fall
+function sBoom(pow=.6,delay=0,kind='peony',life=1.5){
+  const ac=AC;if(!ac)return;const t=ac.currentTime+.01+delay;
+  nz(t,.05,'highpass',1500,1500,.7,.07+.09*pow,.001);
+  nz(t+.003,.45+.9*pow,'lowpass',700+700*pow,110,.7,.08+.14*pow,.004);
+  const o=ac.createOscillator(),g=ac.createGain();o.type='sine';
+  o.frequency.setValueAtTime(64+40*pow,t);o.frequency.exponentialRampToValueAtTime(30,t+.55);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.09+.17*pow,t+.008);g.gain.exponentialRampToValueAtTime(.0005,t+.45+.6*pow);
+  o.connect(g);g.connect(MASTER);o.start(t);o.stop(t+1.2);
+  if(pow>.5){nz(t+.38,.9+.7*pow,'lowpass',420,90,.6,.04*pow,.03);nz(t+.83,.9,'lowpass',300,80,.6,.016*pow,.05)}
+  if(kind==='crackle')crackleAt(t+life*.55,30,.8,.09);
+  else if(kind==='willow')crackleAt(t+life*.45,18,life*.5,.035);
+  else crackleAt(t+.15,4+Math.round(8*pow),.6,.05);
+}
+// a rocket leaving its bottle, and some of them whistle on the way up
+function sLaunch(whistle,dur){
+  const t=AC.currentTime+.01;
+  nz(t,.9,'bandpass',500,2200,.9,.14,.02);
+  nz(t,.05,'highpass',2000,2000,.7,.08,.001);
+  if(whistle){const o=AC.createOscillator(),g=AC.createGain(),v=AC.createOscillator(),vg=AC.createGain();o.type='sine';
+    o.frequency.setValueAtTime(900,t+.05);o.frequency.exponentialRampToValueAtTime(2900,t+dur);
+    v.frequency.value=31;vg.gain.value=26;v.connect(vg);vg.connect(o.frequency);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.035,t+.12);g.gain.setValueAtTime(.035,t+dur-.08);g.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(g);g.connect(MASTER);o.start(t);v.start(t);o.stop(t+dur+.05);v.stop(t+dur+.05)}
+}
+// water on fire
+function sHiss(dur=1.2,vol=.1){const ac=AC;if(!ac)return;nz(ac.currentTime+.01,dur,'highpass',3200,1600,.6,vol,.03)}
 // a voice that holds as long as something keeps it going: the singing tubes
 const VOICES={};
 function voice(i,f,level){
@@ -1065,6 +1349,77 @@ function voice(i,f,level){
   v.g.gain.setTargetAtTime(level*.07,AC.currentTime,level>v.lvl?.12:.35);
   v.lvl=level;
   if(level<=.01){if(++v.off>150){v.stop();delete VOICES[i]}}else v.off=0;
+}
+
+// ---------------- the night's own sounds ----------------
+// each sheet may have a sound of its own, heard while it is in view and fading
+// as you scroll away: crickets at dusk, water in the cave, the campfire, the
+// river at night, birds at dawn. made once, when first heard.
+const AMB=[];
+function ambient(y0,y1,o){AMB.push({y0:y0+GEN_DY,y1:y1+GEN_DY,dy:GEN_DY,vol:1,...o,v:0,g:null})}
+function runAmbient(now,dt){
+  if(!AC||AC.state!=='running'||RM)return;
+  const cy=(scrollY+innerHeight/2)/CSSK,half=innerHeight/2/CSSK;
+  for(const A of AMB){
+    const d=Math.max(A.y0-cy,0,cy-A.y1),v=clamp(1-(d-half*.35)/(half*.65+220),0,1);
+    A.v+=(v-A.v)*Math.min(1,dt*1.6);
+    if(A.v<.005&&!A.g)continue;
+    if(!A.g){A.g=AC.createGain();A.g.gain.value=0;A.g.connect(MASTER);if(A.make)A.make(AC,A.g,A)}
+    A.g.gain.setTargetAtTime(A.v*A.vol,AC.currentTime,.2);
+    if(A.v>.03&&A.step)A.step(now,dt,A.v,A);
+  }
+}
+// a cricket: three or four quick strokes of its wing
+function sChirp(t,f,n,vol,out){
+  for(let i=0;i<n;i++){const o=AC.createOscillator(),g=AC.createGain(),s=t+i*.044;o.type='sine';o.frequency.value=f*(1+(i%2)*.006);
+    g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(vol,s+.005);g.gain.exponentialRampToValueAtTime(.0002,s+.032);o.connect(g);g.connect(out);o.start(s);o.stop(s+.04)}
+}
+// a drop of water: it rises in pitch as its bubble closes
+function sPlink(t,vol,out,f=rd(Math.random,900,1700)){
+  const o=AC.createOscillator(),g=AC.createGain();o.type='sine';
+  o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*2.2,t+.06);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.003);g.gain.exponentialRampToValueAtTime(.0002,t+.17);
+  o.connect(g);g.connect(out);o.start(t);o.stop(t+.2);
+}
+// a frog: a rasp of quick pulses through a hollow throat
+function sCroak(t,vol,out){
+  const o=AC.createOscillator(),bp=AC.createBiquadFilter(),g=AC.createGain(),n=ri(Math.random,7,12),rate=rd(Math.random,26,38);
+  o.type='sawtooth';o.frequency.value=rd(Math.random,150,240);bp.type='bandpass';bp.frequency.value=rd(Math.random,500,800);bp.Q.value=3;
+  g.gain.setValueAtTime(0,t);
+  for(let i=0;i<n;i++){const s=t+i/rate;g.gain.setValueAtTime(vol*(i<2?.6:1),s);g.gain.setTargetAtTime(0,s+.006,.007)}
+  o.connect(bp);bp.connect(g);g.connect(out);o.start(t);o.stop(t+n/rate+.1);
+}
+// a heartbeat: lub, and a softer dub
+function sHeart(v){
+  const t=AC.currentTime+.01;
+  for(const [d,f,a] of[[0,62,1],[.26,76,.6]])for(const [r,ra] of[[1,1],[2,.45]]){
+    const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(f*r,t+d);o.frequency.exponentialRampToValueAtTime(f*r*.62,t+d+.13);
+    g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.065*v*a*ra,t+d+.012);g.gain.exponentialRampToValueAtTime(.0004,t+d+.19);o.connect(g);g.connect(MASTER);o.start(t+d);o.stop(t+d+.22)}
+  nz(t,.09,'lowpass',200,90,.7,.02*v,.008);
+}
+// a voice, humming one long note: three reeds a hair apart through the
+// hollows of a mouth that says 'oh', with a vibrato that comes late
+function sSing(f){
+  const t=AC.currentTime+.02,d=4.8,g=AC.createGain();
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.036,t+.6);g.gain.setValueAtTime(.036,t+2.8);g.gain.linearRampToValueAtTime(0,t+d);g.connect(MASTER);
+  const f1=AC.createBiquadFilter(),f2=AC.createBiquadFilter(),g2=AC.createGain();f1.type='bandpass';f1.frequency.value=430;f1.Q.value=4;f2.type='bandpass';f2.frequency.value=860;f2.Q.value=6;g2.gain.value=.45;
+  f1.connect(g);f2.connect(g2);g2.connect(g);
+  const lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=5.1;lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(f*.007,t+1.4);lfo.connect(lg);lfo.start(t);lfo.stop(t+d+.1);
+  for(const [r,v] of[[1,1],[1.004,.7],[.996,.5]]){const o=AC.createOscillator(),og=AC.createGain();o.type='sawtooth';o.frequency.value=f*r;lg.connect(o.frequency);og.gain.value=v;o.connect(og);og.connect(f1);og.connect(f2);o.start(t);o.stop(t+d+.1)}
+  nz(t,.6,'bandpass',1200,900,.8,.012,.2);
+}
+// a blackbird at first light: a few fluted notes, gliding, and sometimes a trill
+function sBird(t,vol,out){
+  let s=t;const base=rd(Math.random,1500,2100),n=ri(Math.random,4,8);
+  for(let i=0;i<n;i++){
+    const d=rd(Math.random,.07,.2),f0=base*rd(Math.random,.75,1.5),f1=f0*rd(Math.random,.72,1.35);
+    const o=AC.createOscillator(),g=AC.createGain();o.type='sine';
+    o.frequency.setValueAtTime(f0,s);o.frequency.exponentialRampToValueAtTime(f1,s+d);
+    g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(vol*rd(Math.random,.6,1),s+.018);g.gain.setValueAtTime(vol*.8,s+d*.7);g.gain.exponentialRampToValueAtTime(.0002,s+d+.04);
+    o.connect(g);g.connect(out);o.start(s);o.stop(s+d+.06);
+    s+=d+rd(Math.random,.03,.1);
+  }
+  if(Math.random()<.4){const f=base*rd(Math.random,1.4,1.9);for(let i=0;i<7;i++){const o=AC.createOscillator(),g=AC.createGain(),q=s+i*.034;o.type='sine';o.frequency.setValueAtTime(f*(i%2?1.12:1),q);g.gain.setValueAtTime(0,q);g.gain.linearRampToValueAtTime(vol*.5,q+.006);g.gain.exponentialRampToValueAtTime(.0002,q+.03);o.connect(g);g.connect(out);o.start(q);o.stop(q+.04)}}
 }
 // ---------------- more letters ----------------
 // the pencil alphabet learns the rest of the numbers, and a few signs of reckoning
@@ -1185,39 +1540,53 @@ function tape(R,x,y,ang,len=46){
 
 // ---------------- sound ----------------
 // only ever after a tap or a click, and quiet
-function tone(f,t0,dur,vol,type='triangle'){
+function tone(f,t0,dur,vol,type='triangle',out){
   const ac=audio();if(!ac)return;
   const t=ac.currentTime+t0,o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
   o.type=type;o.frequency.value=f;lp.type='lowpass';lp.frequency.value=2600;
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0006,t+dur);
-  o.connect(lp);lp.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.05);
+  o.connect(lp);lp.connect(g);g.connect(out||MASTER);o.start(t);o.stop(t+dur+.05);
 }
 function pluck(f,t0=0,vol=.11){tone(f,t0,2.8,vol,'triangle');tone(f*2,t0,1.5,vol*.22,'sine');tone(f*3,t0,.9,vol*.1,'sine')}
-// places on the wall that answer a tap
+// places on the wall that answer a tap (your flame is a match there)
 const HITS=[];
 function hit(x0,y0,x1,y1,fn){HITS.push({x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,fn})}
 const hitAt=(x,y)=>HITS.find(h=>x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1);
-// a tap on a place that answers does its thing; anywhere else it strikes a match
+// a tap on a place that answers does its thing; anywhere else a spark goes up and bursts
 function tapAt(cx,cy,target){
   if(target&&target.closest&&target.closest('a,nav,button'))return;
   const x=cx/CSSK,y=(cy+scrollY)/CSSK;if(y>TOTALH)return;
   audio();
   const h=hitAt(x,y);if(h){h.fn(x,y);return}
-  strike();if(!RM)sparkBurst(x,y-16/CSSK,28,1);
+  if(SPK.held){if(!RM)sparkJet(x,y,-Math.PI/2,Math.PI,36,.9,{g:300,forks:.9});crackle(10,.5,.08);return}
+  firework(x,y-10/CSSK,.3);
 }
+// the mouse: press on an empty place and a fuse burns until you let go
+let downOn=false,HOLD=null;
+addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'){touchTap={x:e.clientX,y:e.clientY,t:performance.now(),hit:false};return}
+  if(e.button!==0||!(e.target&&e.target.closest&&e.target.closest('#wall')))return;
+  audio();
+  const x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK;
+  if(SPK.held)return;
+  downOn=true;
+  if(hitAt(x,y))HOLD={t:performance.now(),cx:e.clientX,cy:e.clientY};else chargeStart(e.clientX,e.clientY,false);
+},{passive:true});
 // a finger is read from its own pointer events: phones do not always send a
-// click for a tap on a canvas. a finger that moves is scrolling, not tapping.
+// click for a tap on a canvas. a finger that moves is scrolling, not tapping;
+// one held still lights a fuse.
 let touchTap=null,lastTouchTap=-1e9;
-addEventListener('pointerdown',e=>{if(e.pointerType==='touch')touchTap={x:e.clientX,y:e.clientY,t:performance.now()}},{passive:true});
 addEventListener('pointerup',e=>{
-  if(e.pointerType!=='touch'||!touchTap)return;
+  if(e.pointerType!=='touch'){if(downOn){downOn=false;if(HOLD){HOLD=null;return}swallowClick=performance.now();if(CHARGE&&!CHARGE.touch)chargeEnd(true)}return}
+  if(CHARGE&&CHARGE.touch){touchTap=null;lastTouchTap=performance.now();audio();chargeEnd(true);return}
+  if(!touchTap)return;
   const d=Math.hypot(e.clientX-touchTap.x,e.clientY-touchTap.y),dt=performance.now()-touchTap.t;touchTap=null;
   if(d<12&&dt<600){lastTouchTap=performance.now();tapAt(e.clientX,e.clientY,e.target)}
 },{passive:true});
-addEventListener('pointercancel',()=>{touchTap=null},{passive:true});
+addEventListener('pointercancel',e=>{touchTap=null;HOLD=null;if(CHARGE&&(CHARGE.touch||e.pointerType!=='touch'))chargeEnd(false);downOn=false},{passive:true});
 // sound may only start inside the gesture itself: touchend is one
 addEventListener('touchend',()=>{if(performance.now()-lastTouchTap<400)audio()},{passive:true});
-addEventListener('click',e=>{if(performance.now()-lastTouchTap<800)return;tapAt(e.clientX,e.clientY,e.target)});
+addEventListener('click',e=>{const t=performance.now();if(t-lastTouchTap<800||t-swallowClick<600)return;tapAt(e.clientX,e.clientY,e.target)});
 
 // a soft light anywhere on the wall, in wall coordinates, clipped to its own square
 function glowAbs(x,y,r,col,a,sx=1,sy=1){
@@ -1347,7 +1716,7 @@ function groundPaint(R){
     });
   }
   // warmth in the dark: faint washes, as from fires out of sight
-  for(let i=0;i<44;i++){const y=rd(R,1400,14600),x=rd(R,-120,1720),r=rd(R,170,440);glowAbs(x,y,r,pk(R,[[120,52,30],[96,44,40],[70,44,64]]),rd(R,.05,.11),rd(R,1.5,2.6),1)}
+  for(let i=0;i<48;i++){const y=rd(R,1400,15800),x=rd(R,-120,1720),r=rd(R,170,440);glowAbs(x,y,r,pk(R,[[120,52,30],[96,44,40],[70,44,64]]),rd(R,.05,.11),rd(R,1.5,2.6),1)}
   // and stars wherever it is dark enough
   const stars=[];
   for(let i=0;i<2400;i++){const y=rd(R,0,TOTALH),x=rd(R,0,LW),dk=clamp((.3-lumAt(y))/.14,0,1);if(R()>dk*.6)continue;stars.push([x,y,rd(R,.4,1.25),rd(R,.08,.42)*dk])}
@@ -1368,9 +1737,10 @@ function whispers(R,y0,y1,n){
 G('ó',.6,...GL['o'].s,[[.26,.36],[.4,.2]]);
 G('í',.26,[[.13,.5],[.13,.96],[.18,1]],[[.08,.38],[.2,.24]]);
 G('ě',.56,...GL['e'].s,[[.14,.22],[.27,.34],[.4,.22]]);
+G('ï',.26,[[.13,.5],[.13,.96],[.18,1]],[[.04,.3],[.07,.33]],[[.19,.3],[.22,.33]]);
 
 // ===========================================================================
-// vuur — thirteen sheets of one night, top to bottom. every sheet is drawn in
+// vuur — fourteen sheets of one night, top to bottom. every sheet is drawn in
 // local coordinates 0..1600 x 0..1200; GEN_DY lifts it to its place.
 // ===========================================================================
 const P=[];
@@ -1391,7 +1761,7 @@ P.push(function(){
   hill(1160,18,[28,17,19],4.1,.006);
   write(R,'vuur',800,250,140,{col:CINK,a:.92,cen:true});
   write(R,'een muur over wat ons aansteekt',800,318,26,{col:CINK,a:.74,cen:true});
-  write(R,'(beweeg: jij bent het vlammetje · tik: een vonk)',800,358,15,{col:CINK,a:.5,cen:true});
+  write(R,'(je draagt een gloeiend kooltje · tik: een vonk · houd vast: vuurwerk)',800,358,15,{col:CINK,a:.5,cen:true});
   // the match, struck a moment ago
   const A=[476,1190],B=[904,664],len=Math.hypot(B[0]-A[0],B[1]-A[1]),ux=(B[0]-A[0])/len,uy=(B[1]-A[1])/len,nx=-uy,ny=ux;
   COMP='lighter';glowAbs(B[0],B[1]-130,540,[255,140,60],.22,1.15,1.1);glowAbs(B[0],B[1]-40,170,[255,190,110],.32,1,1);COMP=null;
@@ -1428,11 +1798,54 @@ P.push(function(){
   }
   // the flame lives on glass
   const FX=B[0]+ux*2,FY=B[1]-10;
-  live(FX-330,FY-480,660,700,{sc:1,dy:GEN_DY,
+  live(FX-330,FY-480,660,700,{sc:1,dy:GEN_DY,lean:0,last:0,kick:null,
     frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      // the air your hand moves past it bends it, and a bang flattens it for a moment
+      const p=near(L,0);let tl=0;
+      if(p&&moving(now)){const d=Math.hypot(p[0]-FX,p[1]-(FY-100));if(d<380)tl=clamp(PTR.vx/2600,-.45,.45)*(1-d/380)}
+      if(L.kick){const a=(now-L.kick.t)/1000;if(a>2.4)L.kick=null;else tl+=L.kick.v*Math.exp(-a*2.4)*Math.cos(a*8)}
+      L.lean+=(tl-L.lean)*(1-Math.exp(-dt*6));
       c.clearRect(L.x,L.y,L.w,L.h);
-      flameLive(c,FX,FY+L.dy,214,52,now/1000,1.3,0,1,1);
-      if(!RM&&!STILL&&Math.random()<.06)sparkUp(FX+rd(Math.random,-16,16),FY+L.dy-rd(Math.random,110,200));
+      flameLive(c,FX,FY+L.dy,214,52,now/1000,1.3,L.lean,1,1+Math.abs(L.lean)*2.5);
+      if(!RM&&!STILL&&Math.random()<.06+Math.abs(L.lean)*.4)sparkUp(FX+L.lean*150+rd(Math.random,-16,16),FY+L.dy-rd(Math.random,110,200));
+    },
+    boom(x,y,pow){this.kick={t:performance.now(),v:(x<FX?1:-1)*.42*pow}}});
+  // the box flares when your flame comes to it: every head in it catches at
+  // once. and the dud on the hill takes after all.
+  const BX=1268,BY=1104,DX=1412,DYD=1172;
+  const MB=live(1080,780,500,430,{sc:1,dy:GEN_DY,flare:-1e9,dud:-1e9,
+    frame(c,now,L){
+      const t=now/1000,dy=L.dy,p=near(L,0);
+      if(p&&flameOn()){
+        if(now-L.flare>5000&&p[0]>1140&&p[0]<1395&&p[1]>1060&&p[1]<1180)L.fire(now);
+        if(now-L.dud>9000&&Math.hypot(p[0]-DX,p[1]-DYD)<40)L.light(now);
+      }
+      c.clearRect(L.x,L.y,L.w,L.h);
+      const a=(now-L.flare)/1000;
+      if(a<3.4){
+        const h=a<.12?170*a/.12:170*Math.exp(-(a-.12)*1.05),al=Math.min(1,(3.4-a)/.6);
+        c.globalCompositeOperation='lighter';glowAt(c,BX,BY-h*.4+dy,h*2.2+40,[255,120,40],.5*al);c.globalCompositeOperation='source-over';
+        for(const [ox,hh,ph] of[[-46,.62,.3],[-14,1,1.7],[22,.84,2.9],[52,.5,4.1]])flameLive(c,BX+ox,BY+4+dy,h*hh,h*hh*.36,t,ph,ox/220,al,1.6,{ga:.3});
+        if(!RM&&a<1.4&&Math.random()<.5)sparkUp(BX+rd(Math.random,-50,50),BY+dy-h*rd(Math.random,.4,.9),1,1.2);
+        if(!RM&&a>1.2&&Math.random()<.25)smokeAt(BX+rd(Math.random,-30,30),BY+dy-h*.9,1,{a:.14,r:2.4,up:1.6});
+      }
+      const d=(now-L.dud)/1000;
+      if(d<7){const h=d<.2?30*d/.2:30*(d>5.5?(7-d)/1.5:1);flameLive(c,DX-2,DYD+dy,h,h*.3,t,2.2,-.15,1,1,{ga:.28});
+        if(d>6.6&&!RM&&Math.random()<.4)smokeAt(DX,DYD+dy-8,1,{a:.16})}
+    },
+    fire(now){this.flare=now;this.poke=true;if(AC){whump(.2);crackle(16,1.3,.13);fwip(.12)}if(!RM)sparkBurst(BX,BY-30+this.dy,26,1)},
+    light(now){this.dud=now;this.poke=true;if(AC)sStrike(.6)},
+    boom(x,y,pow,reach){const now=performance.now();if(pow>.3&&now-this.flare>3000&&Math.hypot(x-BX,y-BY)<reach)this.fire(now)}});
+  hit(1130,1060,1398,1185,()=>{const n=performance.now();if(n-MB.flare>1500)MB.fire(n)});
+  hit(1400,1145,1525,1195,()=>{const n=performance.now();if(n-MB.dud>1000)MB.light(n)});
+  note(R,'(breng je vlam bij het doosje)',1268,1042,14,INK,.5);
+  // dusk: a little wind over the hills, and two crickets in the grass, out of step
+  ambient(0,1200,{
+    make(ac,out,A){A.w=noiseVoice('lowpass',320,.5,out);A.w.level(.016,.5);A.n=[0,0]},
+    step(now,dt,v,A){
+      A.w.level(.013+.007*Math.sin(now*.0006),.4);
+      for(const [i,f,per] of[[0,4400,.95],[1,5150,1.32]])if(now>A.n[i]){A.n[i]=now+per*1000*rd(Math.random,.85,1.15);sChirp(AC.currentTime+.02,f,ri(Math.random,3,4),.02,A.g)}
     }});
   sentence(R,'alles begint met een vonk',1160,CINK,28);
   whispers(R,440,1000,3);
@@ -1441,7 +1854,7 @@ P.push(function(){
 // P1 · four ways to make fire -------------------------------------------------------------
 // strike, rub, press, gather: and then the match, the light-bearer
 P.push(function(){
-  const R=stream(SEED*131+1);
+  const R=stream(SEED*131+1),DY=GEN_DY;
   write(R,'vier manieren om vuur te maken',800,112,36,{col:CINK,a:.88,cen:true});
   const C=[[430,370],[1170,370],[430,762],[1170,762]],LAB=['slaan','wrijven','persen','bundelen'];
   C.forEach(([cx,cy],i)=>{burnt(R,cx-330,cy-172,cx+330,cy+172,CREAM,{rough:10,rot:rd(R,-.01,.01),light:[cx-60,cy-120]});write(R,LAB[i],cx-290,cy-110,34,{col:INK,a:.86})});
@@ -1550,7 +1963,65 @@ P.push(function(){
     note(R,'lucifer betekent lichtdrager:',1270,y-6,18,CINK,.76);
     note(R,'zo heette ook de morgenster',1270,y+20,18,CINK,.76);
   }
+  // and now try them. the steel throws its sparks again, and one lands on the char cloth
+  {
+    const [cx,cy]=C[0],P0=[cx-26,cy-44],CC=[cx+142,cy+82];
+    const FS=live(cx-330,cy-172,660,344,{sc:.8,dy:GEN_DY,t:-1e9,
+      frame(c,now,L){c.clearRect(L.x,L.y,L.w,L.h);const a=(now-L.t)/1000;if(a>4)return;
+        c.globalCompositeOperation='lighter';glowAt(c,CC[0],CC[1]+L.dy,30+12*Math.sin(now*.02),EMBER,.75*(1-a/4));
+        if(a<.15)glowAt(c,P0[0],P0[1]+L.dy,90,[255,220,150],.8*(1-a/.15));c.globalCompositeOperation='source-over'}});
+    hit(cx-320,cy-160,cx+320,cy+110,()=>{FS.t=performance.now();FS.poke=true;sSteel();if(!RM)sparkJet(P0[0],P0[1]+DY,.35,.75,46,1.1)});
+  }
+  // rub: move fast to and fro over the bow and the notch smokes, glows, and catches
+  {
+    const [cx,cy]=C[1],N0=[cx+16,cy+100];
+    const BD=live(cx-330,cy-200,660,372,{sc:.8,dy:GEN_DY,F:0,lit:-1e9,last:0,ls:0,rub:null,
+      frame(c,now,L){
+        const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+        const p=near(L,0),dy=L.dy;
+        const sp=p&&moving(now)&&Math.abs(p[0]-cx)<270&&p[1]>cy-170&&p[1]<cy+130?clamp(PTR.sp/1500,0,1):0;
+        if(now-L.lit>4500)L.F=clamp(L.F+sp*dt*.34-(sp?0:dt*.05),0,1);
+        if(AC){if(!L.rub&&sp)L.rub=noiseVoice('bandpass',700,2.2);if(L.rub){L.rub.level(sp*.07);L.rub.f.frequency.setTargetAtTime(480+520*sp,AC.currentTime,.05)}}
+        if(L.F>=1){L.F=.35;L.lit=now;if(AC){whump(.14);crackle(8,1,.1)}if(!RM)sparkBurst(N0[0],N0[1]+dy-10,14,.6)}
+        if(!RM&&L.F>.08&&now-L.ls>1000/(2+22*L.F)){L.ls=now;smokeAt(N0[0]+rd(Math.random,-6,6),N0[1]+dy-4,1,{a:.1+.12*L.F,r:1.5,col:1})}
+        c.clearRect(L.x,L.y,L.w,L.h);
+        if(L.F>.01){glowAt(c,N0[0],N0[1]+dy,16+34*L.F,[230,90,30],.12+.5*L.F);glowAt(c,N0[0],N0[1]+dy,5+6*L.F,[255,220,140],.2+.8*L.F)}
+        const a=(now-L.lit)/1000;if(a<4.5)flameLive(c,N0[0],N0[1]+dy,46*Math.min(1,a/.3)*(a>3.5?4.5-a:1),14,now/1000,1.1,-.1,1,1.2,{ga:.3});
+      }});
+    hit(cx-300,cy-160,cx+300,cy+120,()=>{BD.F=Math.min(1,BD.F+.2);BD.poke=true;if(AC)nz(AC.currentTime+.01,.4,'bandpass',600,900,2,.08,.05)});
+  }
+  // the piston: tap and it is rammed home; the air in it flashes and the tinder glows
+  {
+    const [cx,cy]=C[2],x=cx+150,T0=[x,cy+38];
+    const PS=live(x-70,cy-40,140,170,{sc:1,dy:GEN_DY,t:-1e9,
+      frame(c,now,L){c.clearRect(L.x,L.y,L.w,L.h);const a=(now-L.t)/1000;if(a>5)return;
+        c.globalCompositeOperation='lighter';
+        if(a<.25)glowAt(c,x,cy+66+L.dy,50,[255,236,190],.9*(1-a/.25));
+        glowAt(c,T0[0],T0[1]+L.dy,26+10*Math.sin(now*.017),EMBER,.8*(1-a/5));
+        c.globalCompositeOperation='source-over'}});
+    hit(cx-320,cy-160,cx+320,cy+160,()=>{PS.t=performance.now();PS.poke=true;if(AC){nz(AC.currentTime+.005,.14,'lowpass',420,140,.8,.22,.002);tone(150,0,.18,.06,'sine')}if(!RM)sparkBurst(T0[0],T0[1]+DY,8,.4)});
+  }
+  // the lens: tap it, and where the light comes together the grass catches
+  {
+    const [cx,cy]=C[3],F=[cx-120,cy+48];
+    const LN=live(F[0]-80,F[1]-140,160,190,{sc:1,dy:GEN_DY,t:-1e9,
+      frame(c,now,L){c.clearRect(L.x,L.y,L.w,L.h);const a=(now-L.t)/1000;if(a>6)return;
+        const h=a<.4?40*a/.4:40*(a>4.6?(6-a)/1.4:1);flameLive(c,F[0],F[1]+18+L.dy,h,h*.32,now/1000,3.3,.05,1,1.2,{ga:.3});
+        if(!RM&&Math.random()<.2)smokeAt(F[0]+rd(Math.random,-6,6),F[1]+L.dy-h,1,{a:.1,col:1})}});
+    hit(cx-320,cy-160,cx+320,cy+160,()=>{if(performance.now()-LN.t<4000)return;LN.t=performance.now();LN.poke=true;if(AC){fwip(.1);crackle(10,2,.08)}});
+  }
+  // and the match: bring your flame to its head, or tap it
+  {
+    const MT=live(960,880,140,170,{sc:1,dy:GEN_DY,t:-1e9,
+      frame(c,now,L){const p=near(L,0);if(p&&flameOn()&&now-L.t>9000&&Math.hypot(p[0]-1012,p[1]-1012)<36)L.go(now);
+        c.clearRect(L.x,L.y,L.w,L.h);const a=(now-L.t)/1000;if(a>9)return;
+        const h=a<.15?60*a/.15:60*(a>7.5?(9-a)/1.5:1);flameLive(c,1018,1006+L.dy,h,h*.3,now/1000,.9,-.05,1,1,{ga:.3});
+        if(a>8.6&&!RM&&Math.random()<.4)smokeAt(1018,1000+L.dy,1,{a:.16})},
+      go(now){this.t=now;this.poke=true;if(AC)strike();if(!RM)sparkBurst(1016,1004+this.dy,14,.6)}});
+    hit(590,985,1045,1040,()=>{const n=performance.now();if(n-MT.t>1200)MT.go(n)});
+  }
   sentence(R,'de mens is het enige dier dat vuur maakt',1128,CINK,28);
+  note(R,'(tik op een vel om het te proberen · wrijf snel heen en weer over de boog)',800,1166,15,CINK,.48);
   whispers(R,160,1100,3);
 });
 
@@ -1575,7 +2046,7 @@ function tetraFaces(V){
   });
 }
 P.push(function(){
-  const R=stream(SEED*131+2);
+  const R=stream(SEED*131+2),DY=GEN_DY,PV=[];
   const SH=burnt(R,96,58,1504,1150,[244,238,222],{rough:14,rot:-.004,light:[800,320]});
   const lines=[];for(let x=116;x<1500;x+=40)lines.push([x,58,x,1150]);for(let y=78;y<1150;y+=40)lines.push([96,y,1504,y]);
   rule(SH,lines,[120,150,190],.14,1);
@@ -1596,7 +2067,7 @@ P.push(function(){
   };
   // plato's fire: the sharpest of the five, so it pricks
   {
-    const T=drawT(430,470,290,[[230,90,50],[250,150,60],[240,200,90],[220,110,60]]);
+    const T=drawT(430,470,290,[[230,90,50],[250,150,60],[240,200,90],[220,110,60]]);PV.push(...T.V.map(v=>({x:v[0],y:v[1],t:-1e9})));
     for(const v of T.V)if(v[2]<.3){for(let k=0;k<6;k++){const a=k/6*TAU+.3;sk(R,[[v[0]+Math.cos(a)*9,v[1]+Math.sin(a)*9],[v[0]+Math.cos(a)*20,v[1]+Math.sin(a)*20]],{col:[220,90,40],w:1.2,a:.7,amp:.1,noDust:true})}}
     flameStatic(T.V[0][0],T.V[0][1]-6,48,{w:13,ga:.25,gr:1.1});
     write(R,'plato: vuur is gemaakt van viervlakjes,',430-measure('plato: vuur is gemaakt van viervlakjes,',18)/2,700,18,{col:INK,a:.75});
@@ -1632,7 +2103,6 @@ P.push(function(){
     fillPoly(b,[150,160,170],1);poly(R,b,{col:[60,70,80],w:1.4,a:.85});
     sk(R,cPts(x-40,y-80,40,Math.PI*1.1,Math.PI*1.9,3).map(p=>rotPts([p],x-40,y-60,-.6)[0]),{col:[60,70,80],w:1.4,a:.8,amp:.2,noDust:true});
     for(let k=0;k<5;k++){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([x-6+u*60+k*4,y-70+u*u*70+k*3]);sk(R,pts,{col:[90,140,210],w:1.6,a:.7,amp:.3,noDust:true})}
-    smallFlame(x+62,y+8,40);
     for(let k=0;k<3;k++)smokeWisp(R,x+50+k*12,y-30,60,{col:[150,160,180],a:.4});
   }
   // smoren: a snuffer over a candle
@@ -1661,8 +2131,37 @@ P.push(function(){
     sk(R,[[x,y-128],[x+40,y-140],[x+76,y-118]],{col:[40,40,44],w:3,a:.9,amp:.3,noDust:true});
     const nz0=[x+76,y-118],ang0=Math.atan2(y-10-nz0[1],x+150-nz0[0]);
     for(let k=0;k<170;k++){const a=ang0+rd(R,-.3,.3),d=Math.sqrt(R())*120;dotF(R,nz0[0]+Math.cos(a)*d,nz0[1]+Math.sin(a)*d,rd(R,1,2.4),.5,[214,214,222])}
-    smallFlame(x+150,y+4,26);
   }
+  // the two little fires live: water from the bucket, powder from the extinguisher
+  const PUT=[{x:352,y:868,h:40,out:-1e9,lit:true,how:'water',drops:[]},{x:1400,y:884,h:26,out:-1e9,lit:true,how:'powder',drops:[]}];
+  const PF=live(180,700,1300,240,{sc:.8,dy:GEN_DY,last:0,
+    frame(c,now,L){
+      const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+      c.clearRect(L.x,L.y,L.w,L.h);const t=now/1000,dy=L.dy;
+      for(const f of PUT){
+        const a=(now-f.out)/1000,k=a<.45?1-a/.45:a<6?0:a<7?a-6:1;
+        if(!f.lit&&a>=6){f.lit=true;if(AC&&a<7)fwip(.06)}
+        if(k>.02)flameLive(c,f.x,f.y+dy,f.h*k,f.h*.3*Math.max(.4,k),t,f.x*.01,0,Math.min(1,k*1.4),1,{ga:.24});
+        // the water, on its way
+        if(f.drops.length){c.strokeStyle='rgba(80,130,200,.85)';c.lineWidth=2;c.lineCap='round';c.beginPath();
+          f.drops=f.drops.filter(d=>{d.vy+=900*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;if(d.y>f.y+6)return false;c.moveTo(d.x-d.vx*.02,d.y+dy-d.vy*.02);c.lineTo(d.x,d.y+dy);return true});c.stroke()}
+      }
+    },
+    boom(x,y,pow){const n=performance.now();for(const f of PUT)if(f.lit&&Math.hypot(f.x-x,f.y-y)<300+500*pow){f.out=n;f.lit=false}}});
+  const putOut=f=>{
+    const n=performance.now();if(!f.lit)return;f.out=n;f.lit=false;PF.poke=true;
+    if(f.how==='water'){sHiss(1.4,.1);if(AC)nz(AC.currentTime+.01,.3,'lowpass',900,300,.7,.08,.01);for(let i=0;i<26;i++)f.drops.push({x:292+rd(Math.random,-8,8),y:798+rd(Math.random,-6,6),vx:rd(Math.random,100,130),vy:rd(Math.random,-150,-60)});
+      if(!RM)for(let i=0;i<8;i++)setTimeout(()=>smokeAt(f.x+rd(Math.random,-14,14),f.y-10+DY,2,{a:.16,r:2.2,up:1.4,col:1}),380+i*70)}
+    else{if(AC)nz(AC.currentTime+.01,.8,'bandpass',1300,500,.6,.14,.02);if(!RM)for(let i=0;i<7;i++)smokeAt(f.x-80+i*14,f.y-40+i*5+DY,3,{a:.34,r:3.6,up:.35})}
+  };
+  hit(200,760,430,905,()=>putOut(PUT[0]));
+  hit(1220,730,1450,905,()=>putOut(PUT[1]));
+  // plato's fire is made of the sharpest form: touch a corner with your flame and it pricks
+  const PL=live(200,160,460,560,{sc:.1,dy:GEN_DY,
+    frame(c,now,L){const p=near(L,0);if(!p||!flameOn())return;PV.forEach((v,i)=>{if(now-v.t>450&&Math.hypot(p[0]-v.x,p[1]-v.y)<26)L.prick(v,i,now)})},
+    prick(v,i,now){v.t=now;if(!RM)sparkJet(v.x,v.y+this.dy,-Math.PI/2,Math.PI,10,.4,{g:400,forks:.3});if(AC)tone(2400+i*360,0,.08,.035,'sine')}});
+  hit(200,160,660,720,(x,y)=>{let b=null,bd=1e9;PV.forEach((v,i)=>{const d=Math.hypot(v.x-x,v.y-(y-DY));if(d<bd){bd=d;b=i}});if(b!==null)PL.prick(PV[b],b,performance.now())});
+  note(R,'(tik op de emmer of de blusser · raak met je vlam een punt van plato aan)',800,1030,15,INK,.5);
   sentence(R,'haal er één weg, en het vuur gaat uit',1080,INK,28);
 });
 
@@ -1752,7 +2251,8 @@ P.push(function(){
       }
       if(L.lit)flameLive(c,X,WY+dy,250,58,t,.7,0,1,.7,{heart:true});
       else if(now-L.out<3000){c.globalCompositeOperation='lighter';glowAt(c,X+3,WY+dy,10,EMBER,.8*(1-(now-L.out)/3000));c.globalCompositeOperation='source-over'}
-    }});
+    },
+    boom(x,y,pow,reach){if(this.lit&&Math.hypot(x-X,y-WY)<reach*.85){this.lit=false;this.out=performance.now();this.smoke=[];if(AC)pff()}}});
   hit(X-80,240,X+80,WY+10,()=>{
     if(CL.lit){CL.lit=false;CL.out=performance.now();CL.smoke=[];pff();CL.poke=true}
     else if(!CL.run){CL.run={t:performance.now(),x:X,y:WY};CL.poke=true}
@@ -1861,7 +2361,7 @@ function handStencil(R,x,y,s,ang){
   dots.sort((p,q)=>p[1]-q[1]);dustBatch(dots,REDO);
 }
 P.push(function(){
-  const R=stream(SEED*131+4);
+  const R=stream(SEED*131+4),DY=GEN_DY;
   write(R,'de grot',800,98,36,{col:CINK,a:.88,cen:true});
   note(R,"chauvet, zo'n 36.000 jaar geleden",800,138,17,CINK,.6);
   // the rock face
@@ -1922,20 +2422,42 @@ P.push(function(){
     hole(LX-40,LY-170+dy,470*fl,.95);
     const p=near(L,0);if(p)hole(p[0],p[1]+dy,330*(.93+.07*Math.sin(t*11)),1);
     if(L.tap&&now-L.tap.t<14000)hole(L.tap.x,L.tap.y+dy,320,1-Math.max(0,(now-L.tap.t-10000)/4000));
+    // a bang lights the whole cave for a moment: there they all are
+    const fa=L.flash?(now-L.flash.t)/1000:9;
+    if(fa<1.2){const u=fa/1.2;hole(L.flash.x,L.flash.y+dy,(380+700*L.flash.pow)*(1-.3*u),Math.pow(1-u,1.6))}
     c.globalCompositeOperation='lighter';
+    if(fa<.5)glowAt(c,L.flash.x,L.flash.y+dy,500,[255,200,140],.3*(1-fa/.5));
     glowAt(c,LX,LY-60+dy,340*fl,[255,140,60],.13);
     if(p)glowAt(c,p[0],p[1]+dy,240,[255,150,70],.1);
     c.globalCompositeOperation='source-over';
     flameLive(c,LX,LY-2+dy,40,10,t,2.2,0,1,1);
-  }});
-  // on a phone there is no hovering flame: a tap leaves a light where it falls
-  hit(60,160,1540,960,(x,y)=>{DK.tap={x,y:y-DK.dy,t:performance.now()};DK.poke=true;strike();if(!RM)sparkBurst(x,y-14/CSSK,16,.8)});
+  },
+  boom(x,y,pow){this.flash={x,y,t:performance.now(),pow};this.poke=true}});
+  // a tap leaves your own hand on the wall, blown round with red ochre (and, on a
+  // phone, where there is no hovering flame, a light where it falls)
+  let hands=0;
+  const sprayHand=(x,y)=>{
+    const T=TILES[clamp(Math.floor((y+DY)/TILEH),0,NT-1)];if(!T.done)return;
+    const sd=DIRECT,gd=GEN_DY;DIRECT=T;GEN_DY=DY;
+    try{handStencil(stream((Math.random()*1e9)|0),x,y+10,rd(Math.random,.72,.92),rd(Math.random,-.5,.4))}finally{DIRECT=sd;GEN_DY=gd}
+    if(AC){nz(AC.currentTime+.01,.5,'bandpass',1500,900,.6,.12,.03);nz(AC.currentTime+.3,.5,'bandpass',1300,800,.6,.1,.03)}
+  };
+  hit(60,160,1540,960,(x,y)=>{
+    const ly=y-DY;DK.tap={x,y:ly,t:performance.now()};DK.poke=true;
+    if(hands<7&&inPoly(CVc,x,ly)&&ly>200&&ly<900){hands++;sprayHand(x,ly)}else{strike();if(!RM)sparkBurst(x,y-14/CSSK,16,.8)}
+  });
+  // the cave: water dripping somewhere in the dark, and the cave answering every drop
+  ambient(130,990,{
+    make(ac,out,A){A.w=noiseVoice('lowpass',110,.6,out);A.w.level(.026,.5);
+      const d=ac.createDelay(1),fb=ac.createGain(),lp=ac.createBiquadFilter();d.delayTime.value=.27;fb.gain.value=.4;lp.type='lowpass';lp.frequency.value=1700;
+      A.wet=ac.createGain();A.wet.gain.value=.7;A.wet.connect(d);d.connect(lp);lp.connect(fb);fb.connect(d);lp.connect(out);A.n=0},
+    step(now,dt,v,A){if(now>A.n){A.n=now+rd(Math.random,1100,3600);const t=AC.currentTime+.02,f=rd(Math.random,900,1600);sPlink(t,.045,A.g,f);sPlink(t,.045,A.wet,f)}}});
   note(R,'diep in de grot, waar geen daglicht komt,',330,1010,18,CINK,.75);
   note(R,'getekend bij het licht van een vlam.',330,1036,18,CINK,.75);
   note(R,'iemand blies rode oker om een hand: ik was hier',330,1062,16,CINK,.6);
   note(R,'de bizon heeft acht poten:',1270,1010,18,CINK,.75);
   note(R,'in het flakkeren gaat hij rennen',1270,1036,18,CINK,.75);
-  note(R,'(beweeg je vlam langs de wand)',1270,1062,15,CINK,.5);
+  note(R,'(beweeg je vlam langs de wand · tik: laat je hand achter)',1270,1062,15,CINK,.5);
   sentence(R,'wanden vol tekeningen: ooit zag je ze alleen bij vuurlicht',1124,CINK,28);
 });
 
@@ -2030,14 +2552,27 @@ P.push(function(){
       for(let i=0;i<C.s.length&&n>0;i++)if(!taken.has(i)){SK.fly.push({ci,i,t:performance.now()+(3-n)*180,x:FX+rd(Math.random,-30,30),y:FY-160});n--}
     }
   };
-  live(FX-400,560,800,500,{sc:1,dy:GEN_DY,frame(c,now,L){
+  const FIRE=live(FX-400,560,800,500,{sc:1,dy:GEN_DY,fl:-1e9,pop:-1e9,frame(c,now,L){
     const t=now/1000,dy=L.dy;c.clearRect(L.x,L.y,L.w,L.h);
-    const fl=.9+.1*Math.sin(t*6.1)*Math.sin(t*2.3+1);
-    c.globalCompositeOperation='lighter';glowAt(c,FX,FY-90+dy,300*fl,[255,120,40],.16);c.globalCompositeOperation='source-over';
-    [[-40,150,30,0],[-14,206,40,1.3],[10,236,44,2.1],[30,178,36,3.4],[50,120,26,4.2]].forEach(([dx,h,w,ph])=>flameLive(c,FX+dx,FY-10+dy,h,w,t,ph,0,.9,1,{ga:.18}));
+    // a bang makes it roar up; a knot in the wood that bursts makes it jump
+    const fk=1+.75*Math.exp(-(now-L.fl)/650)+.22*Math.exp(-(now-L.pop)/220);
+    const fl=(.9+.1*Math.sin(t*6.1)*Math.sin(t*2.3+1))*fk;
+    c.globalCompositeOperation='lighter';glowAt(c,FX,FY-90+dy,300*fl,[255,120,40],.16*Math.min(1.6,fk));c.globalCompositeOperation='source-over';
+    [[-40,150,30,0],[-14,206,40,1.3],[10,236,44,2.1],[30,178,36,3.4],[50,120,26,4.2]].forEach(([dx,h,w,ph])=>flameLive(c,FX+dx*fk,FY-10+dy,h*fk,w*Math.sqrt(fk),t,ph,0,.9,1,{ga:.18}));
     if(!RM&&!STILL&&Math.random()<.12)sparkUp(FX+rd(Math.random,-40,40),FY-120+dy-rd(Math.random,0,80));
-  }});
-  hit(FX-130,FY-240,FX+130,FY+30,()=>{crackle(16,1.6,.14);whump(.16);if(!RM)sparkBurst(FX,FY-120+DY,30,1.1);launch();SK.poke=true});
+  },
+  boom(x,y,pow){this.fl=performance.now();if(!RM)sparkBurst(FX,FY-140+DY,Math.round(20*pow),1.2);if(pow>.5){launch();SK.poke=true}}});
+  hit(FX-130,FY-240,FX+130,FY+30,()=>{crackle(16,1.6,.14);whump(.16);FIRE.pop=performance.now();if(!RM)sparkBurst(FX,FY-120+DY,30,1.1);launch();SK.poke=true});
+  // the fire talks all night: a low roar, small crackles, and now and then a
+  // knot that bursts and throws up a shower of sparks
+  ambient(150,1200,{
+    make(ac,out,A){A.roar=noiseVoice('lowpass',360,.6,out);A.roar.level(.03,.5);A.hi=noiseVoice('bandpass',1200,.8,out);A.hi.level(.006,.5);A.n=0},
+    step(now,dt,v,A){
+      A.roar.level(.026+.018*Math.random(),.08);
+      if(Math.random()<dt*7)crackleAt(AC.currentTime+.01,1,.02,.07,A.g);
+      if(Math.random()<dt*.3){crackleAt(AC.currentTime+.01,3,.07,.14,A.g);FIRE.pop=now;if(!RM&&v>.3)for(let i=0;i<9;i++)sparkUp(FX+rd(Math.random,-30,30),FY-120+DY-rd(Math.random,0,60),1.2,1.1)}
+      if(now>A.n){A.n=now+rd(Math.random,1400,2200);sChirp(AC.currentTime+.02,4700,3,.01,A.g)}
+    }});
   ["polly wiessner luisterde bij de ju/'hoansi in de kalahari:",'overdag ging het over werk, klachten en roddel.',"'s avonds bij het vuur ging het vooral over verhalen."].forEach((t,i)=>note(R,t,330,650+i*24,16,CINK,i?.72:.6));
   ['overal ter wereld','vertelt men over zeven zusters','aan de hemel'].forEach((t,i)=>note(R,t,1300,650+i*24,16,CINK,.72));
   note(R,'(tik op het vuur)',800,1094,15,CINK,.5);
@@ -2096,11 +2631,13 @@ P.push(function(){
     WICK.push([x,top-12,w]);
   });
   // the flames live on glass
-  const CL=live(120,140,1360,800,{sc:1,dy:GEN_DY,lit:CD.map((_,i)=>i===0?1:0),jump:[],all:0,
+  const CL=live(120,140,1360,800,{sc:1,dy:GEN_DY,lit:CD.map((_,i)=>i===0?1:0),jump:[],all:0,blow:[],
     frame(c,now,L){
       const t=now/1000,dy=L.dy;c.clearRect(L.x,L.y,L.w,L.h);
       const p=near(L);
-      if(p)WICK.forEach(([x,y],i)=>{if(!L.lit[i]&&Math.hypot(p[0]-x,p[1]-y)<30)L.light(i,now,true)});
+      if(p&&flameOn())WICK.forEach(([x,y],i)=>{if(!L.lit[i]&&Math.hypot(p[0]-x,p[1]-y)<30)L.light(i,now,true)});
+      // a bang runs along the shelf and blows them out, one after the other
+      if(L.blow.length){let s=0;L.blow=L.blow.filter(b=>{if(now<b.t)return true;if(L.lit[b.i]){L.lit[b.i]=0;L.jump=L.jump.filter(j=>j.from!==b.i&&j.to!==b.i);if(AC&&s++<2)pff();if(!RM)smokeAt(WICK[b.i][0],WICK[b.i][1]+dy-4,4,{a:.2})}return false})}
       // jumps that land start new ones: keep those apart while the old list is gone through
       const pend=L.jump;L.jump=[];
       const keep=pend.filter(j=>{
@@ -2117,6 +2654,7 @@ P.push(function(){
       if(n<WICK.length)L.all=0;
       if(L.all){const u=Math.min(1,(now-L.all)/3000);c.globalCompositeOperation='lighter';glowAt(c,800,SY-160+dy,560,[255,170,90],.12*u);c.globalCompositeOperation='source-over'}
     },
+    boom(x,y,pow,reach){const now=performance.now();WICK.forEach(([wx,wy],i)=>{const d=Math.hypot(wx-x,wy-y);if(this.lit[i]&&d<reach)this.blow.push({i,t:now+d*1.1})})},
     light(i,now,you,from){
       this.lit[i]=now;this.poke=true;
       if(AC){bell(PENTA[i],.05);fwip(.05)}
@@ -2168,7 +2706,16 @@ P.push(function(){
     // the meltwater, drop by drop
     const sp=[[338,y1+18],[362,y1+18],[354,y1+40],[346,y1+40]];fillPoly(sp,[160,130,90],1);poly(R,sp,{col:SEPIA,w:1.1,a:.8});
     const jar=[[308,826],[392,826],[392,900],[308,900]];fillPoly([[310,862],[390,862],[390,898],[310,898]],[150,190,220],.6);poly(R,jar,{col:SEPIA,w:1.3,a:.8});
-    for(const y of[y1+56,y1+80])fillPoly(ePts(350,y,3,5,0,10),[110,160,210],.9);
+    for(const y of[y1+80])fillPoly(ePts(350,y,3,5,0,10),[110,160,210],.6);
+    // the meltwater, one drop at a time, as long as the guinea pig is warm
+    live(326,790,48,90,{sc:1,dy:GEN_DY,cyc:-1,
+      frame(c,now,L){const dy=L.dy,per=2700,n=Math.floor(now/per),u=(now%per)/per;c.clearRect(L.x,L.y,L.w,L.h);
+        c.fillStyle='rgba(110,160,210,.9)';
+        if(u<.8){const r=1.4+2.6*u/.8;c.beginPath();c.ellipse(350,801+r*.7+dy,r*.8,r,0,0,TAU);c.fill()}
+        else if(u<.88){const v=(u-.8)/.08,y=804+58*v*v;c.beginPath();c.ellipse(350,y+dy,2.6,4.2,0,0,TAU);c.fill()}
+        else{const v=(u-.88)/.12;c.strokeStyle=`rgba(110,160,210,${.8*(1-v)})`;c.lineWidth=1.2;c.beginPath();c.ellipse(350,863+dy,4+16*v,1.4+3*v,0,0,TAU);c.stroke();
+          if(L.cyc!==n){L.cyc=n;if(AC&&AC.state==='running')sPlink(AC.currentTime+.01,.03,MASTER,rd(Math.random,1300,1700))}}
+      }});
     const lb=(t,x,y)=>write(R,t,x,y,16,{col:SEPIA,a:.8});
     lb('ijs',150,420);sk(R,[[176,416],[216,430]],{col:SEPIA,w:1,a:.6,amp:.3,noDust:true});
     lb('ijs',512,300);sk(R,[[510,296],[470,310]],{col:SEPIA,w:1,a:.6,amp:.3,noDust:true});
@@ -2200,13 +2747,83 @@ P.push(function(){
     emit(910,940,c=>{const g=c.createLinearGradient(700,0,900,0);g.addColorStop(0,'rgb(40,30,140)');g.addColorStop(.3,'rgb(120,30,120)');g.addColorStop(.55,'rgb(220,70,60)');g.addColorStop(.8,'rgb(255,190,80)');g.addColorStop(1,'rgb(255,250,220)');c.fillStyle=g;c.fillRect(700,914,200,14)});
     write(R,'24°',664,928,15,{col:CINK,a:.7});write(R,'37°',910,928,15,{col:CINK,a:.7});
     note(R,'in rust geef je',800,966,16,CINK,.72);note(R,"zo'n honderd watt warmte",800,988,16,CINK,.72);
-    // the warmth breathes in and out
-    live(X-130,300,260,420,{sc:.75,dy:GEN_DY,frame(c,now,L){
-      const t=now/1000,dy=L.dy,b=.5-.5*Math.cos(t*TAU/4.6),hb=Math.pow(Math.max(0,Math.sin(t*TAU*1.1)),8);
-      c.clearRect(L.x,L.y,L.w,L.h);c.globalCompositeOperation='lighter';
-      glowAt(c,X,470+dy,80+30*b,[255,200,100],.16+.14*b);glowAt(c,X+18,452+dy,26,[255,236,170],.1+.25*hb);
-      c.globalCompositeOperation='source-over';
-    }});
+    note(R,'je hart maakt het sterkste veld van je lijf',800,1014,15,CINK,.6);
+    note(R,'(blaas je vlam in hart of buik · tik: het zingt)',800,1036,14,CINK,.48);
+    // the warmth breathes in and out. blow your flame into the heart or the belly
+    // (inspire: breathe into) and the body kindles: the heart beats faster and its
+    // field shows, loops that carry every beat outward; warm wisps rise from the
+    // belly round the head; and when it is full it sings, and threads of colour
+    // stream out of heart and belly. then, slowly, it settles again.
+    const HX=X+14,HY=452,BY=600;
+    const LOOPS=[];for(const Lr of[44,70,98,128,160,194])for(const sd of[-1,1])LOOPS.push({Lr,sd,pts:dipLine(0,0,Lr,0,sd,9)});
+    const HCAM=[[0,[255,250,224]],[.25,[255,206,96]],[.5,[240,96,60]],[.75,[196,46,124]],[1,[110,44,190]]];
+    const SONG=[[255,214,110],[255,120,90],[240,80,160],[170,100,255],[90,200,255],[130,240,170]];
+    const NOTES=[196,220,261.6,293.7,329.6,392,440];
+    const strand=(c,pts,col,a,w,fade)=>{
+      const n=pts.length,ch=7;
+      for(let j=0;j<ch;j++){
+        const i0=Math.floor(j*(n-1)/ch),i1=Math.floor((j+1)*(n-1)/ch),u=(j+.5)/ch,al=Math.min(1,a*(fade?Math.pow(Math.sin(Math.PI*u),.6):1));
+        c.beginPath();c.moveTo(pts[i0][0],pts[i0][1]);for(let i=i0+1;i<=i1;i++)c.lineTo(pts[i][0],pts[i][1]);
+        c.strokeStyle=rgba(col,al*.2);c.lineWidth=w*4.5;c.stroke();
+        c.strokeStyle=rgba(tint(col,.3),al);c.lineWidth=w;c.stroke();
+      }
+    };
+    const BODY=live(X-230,180,460,760,{sc:.75,dy:GEN_DY,ph:0,last:0,beat:-1e9,ins:0,sing:-1e9,ni:0,armed:true,
+      frame(c,now,L){
+        const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
+        const t=now/1000,dy=L.dy,b=.5-.5*Math.cos(t*TAU/4.6);
+        // breathing life in: your flame over the heart or the belly, more when it moves
+        const p=near(L,0);let into=0;
+        if(p){const d=Math.min(Math.hypot(p[0]-HX,p[1]-HY),Math.hypot(p[0]-X,p[1]-BY));if(d<120)into=(1-d/120)*(moving(now)?1:.5)*(HAND.fire>.2?1:.6)}
+        L.ins=into?Math.min(1,L.ins+into*dt*.55):Math.max(0,L.ins-dt*.07);
+        if(L.ins>.85&&L.armed){L.armed=false;L.song()}
+        if(L.ins<.25)L.armed=true;
+        const sg=clamp(Math.min(1,(now-L.sing)/400)*(1-(now-L.sing)/5600),0,1),ins=Math.max(L.ins,sg*.9),e=ins*ins*(3-2*ins);
+        // the heart: some sixty-six beats a minute at rest, faster as it kindles
+        const ph0=L.ph;L.ph+=dt*(1.1+.55*e);
+        if(Math.floor(L.ph)>Math.floor(ph0)){L.beat=now;if(AC&&AC.state==='running'&&e>.2)sHeart(e)}
+        const ab=now-L.beat,hb=Math.exp(-ab/130)+(ab>260?.5*Math.exp(-(ab-260)/110):0);
+        c.clearRect(L.x,L.y,L.w,L.h);c.globalCompositeOperation='lighter';
+        glowAt(c,X,470+dy,80+30*b,[255,200,100],.16+.14*b+.1*e);glowAt(c,HX+4,HY+dy,26+12*e,[255,236,170],.1+(.25+.4*e)*hb);
+        if(e>.01){
+          glowAt(c,X,BY+dy,40+30*e,[255,170,90],.3*e*(.7+.3*b));
+          // the field of the heart: loops that breathe, the inner ones first,
+          // and every beat running out along them from both ends
+          const sc=1+.07*b,tl=.12*Math.sin(t*.23),co=Math.cos(tl),sn=Math.sin(tl);
+          const P=q=>[HX+(q[0]*co-q[1]*sn)*sc,HY+(q[0]*sn+q[1]*co)*sc+dy];
+          c.lineCap='round';c.lineJoin='round';
+          for(const lp of LOOPS){
+            const u=lp.Lr/194,vis=clamp(e*1.6-u*.6,0,1);if(vis<.01)continue;
+            const col=ramp(HCAM,.12+.82*u),pts=lp.pts.map(P);
+            strand(c,pts,col,(.2+.42*vis)*(1-.3*u)+.15*sg,1.3,false);
+            const a=ab/(650+lp.Lr*3.2);
+            if(a<1){const n=pts.length,i0=Math.floor(a*(n-1)/2);for(const i of[i0,n-1-i0])glowAt(c,pts[i][0],pts[i][1],7+7*(1-u),tint(col,.35),vis*.85*(1-a))}
+          }
+          // warm wisps from the belly, rising round the body and gathering above the head
+          for(let k=0;k<6;k++){
+            const sd=k%2?1:-1,ph=k*1.7,x0=X+sd*(8+k*7),w=(22+k*9)*(1.2+.35*Math.sin(t*.7+ph)),top=165+24*Math.sin(t*.5+k),vis=clamp(e*1.4-.2-k*.05,0,1);if(vis<.01)continue;
+            const pts=[];for(let s=0;s<=1.0001;s+=.035){const y=BY+12-s*(BY+12-top),x=x0+(X+sd*k*3-x0)*s+sd*w*Math.sin(Math.PI*s*.95)+(7+k*2)*Math.sin(s*7.5-t*1.5+ph)*Math.sqrt(s);pts.push([x,y+dy])}
+            strand(c,pts,ramp(HCAM,.18+.13*k),.4*vis+.15*sg,1.5,true);
+          }
+        }
+        // the song: threads of colour streaming out of heart and belly, in waves
+        if(sg>.01){
+          const un=Math.min(1,(now-L.sing)/1400);
+          for(let k=0;k<8;k++){
+            const fh=k<6,sx=X+(fh?14:0),sy=fh?HY:BY,sd=k%2?1:-1,ang=fh?[-.45,-.1,.25][k>>1]:.1,dx=sd*Math.cos(ang),dv=Math.sin(ang),nx=-dv,ny=dx,Rr=240*un;
+            const pts=[];for(let s=0;s<=1.0001;s+=.025){const d=s*Rr,A=(3+24*s)*Math.sin(s*14-t*6+k),x=sx+dx*d+nx*A,y=sy+dv*d+ny*A;pts.push([x,y+dy])}
+            strand(c,pts,SONG[k%SONG.length],.75*sg,2.2,true);
+            // and on each, a bright note running out
+            const q=pts[Math.floor(((t*.7+k*.13)%1)*(pts.length-1))];glowAt(c,q[0],q[1],9,tint(SONG[k%SONG.length],.5),.8*sg);
+          }
+        }
+        // and your flame, to the camera, is the hottest thing here: white
+        if(p&&HAND.fire>.2){const fy=p[1]-16/CSSK+dy;glowAt(c,p[0],fy,70,[255,120,60],.5*HAND.fire);glowAt(c,p[0],fy,34,[255,236,150],.8*HAND.fire);glowAt(c,p[0],fy,14,[255,255,255],HAND.fire)}
+        c.globalCompositeOperation='source-over';
+      },
+      song(){this.sing=performance.now();this.poke=true;if(AC&&AC.state==='running')sSing(NOTES[this.ni++%NOTES.length])}});
+    hit(X-150,280,X+150,900,()=>BODY.song());
+    zone(X-150,280,X+150,900);
   }
   // right: priestley's bell jar, with mint
   burnt(R,990,190,1510,990,[240,232,212],{rough:10,rot:.008,light:[1250,320]});
@@ -2232,6 +2849,20 @@ P.push(function(){
     const lb=(t,x,y)=>write(R,t,x,y,16,{col:SEPIA,a:.8});
     lb('munt',cx+96,base-250);lb('een kaars, uitgegaan',cx-150,base+56);
     ['17 augustus 1771: priestley zet munt','onder een stolp waarin een kaars uitging.','op de 27ste brandt er weer een kaars in.'].forEach((t,i)=>note(R,t,cx,base+112+i*22,16,SEPIA,.82));
+    note(R,'(tik op de kaars onder de stolp)',cx,base+182,14,SEPIA,.55);
+    // light it: it burns until the air in the jar is used up, and then the mint
+    // slowly makes the air good again
+    const W=[cx-67,base-82];
+    const PR=live(1080,420,360,380,{sc:1,dy:GEN_DY,o2:1,lit:0,last:0,
+      frame(c,now,L){
+        const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;const dy=L.dy,t=now/1000;
+        if(L.lit){L.o2=Math.max(0,L.o2-dt/9);if(L.o2<.14){L.lit=0;if(AC)pff();if(!RM)smokeAt(W[0],W[1]+dy-6,5,{a:.14,col:1})}}
+        else L.o2=Math.min(1,L.o2+dt/16);
+        c.clearRect(L.x,L.y,L.w,L.h);
+        if(L.lit){const k=Math.pow(L.o2,.8);flameLive(c,W[0],W[1]+2+dy,46*k+6,11*k+3,t,1.4,0,Math.min(1,k*1.6),.4+.8*(1-k),{ga:.22*k})}
+        if(!L.lit&&L.o2<.98&&!RM){c.fillStyle='rgba(236,255,224,.9)';for(let i=0;i<10;i++){const ph=(t*.35+i*.37)%1,x=cx+52+Math.sin(i*2.3+t)*28*ph,y=base-120-ph*170;c.globalAlpha=(1-ph)*(1-L.o2)*.9;c.beginPath();c.arc(x,y+dy,1.7,0,TAU);c.fill()}c.globalAlpha=1}
+      }});
+    hit(1100,440,1420,800,()=>{if(PR.lit)return;PR.poke=true;if(PR.o2>.5){PR.lit=1;strike()}else{if(AC)nz(AC.currentTime+.01,.3,'lowpass',400,900,.7,.06,.03);if(!RM)smokeAt(W[0],W[1]+PR.dy-6,3,{a:.14,col:1})}});
   }
   sentence(R,'ademen is een langzaam vuur',1084,CINK,30);
   note(R,'lavoisier: de adem is een langzame verbranding, net als in een lamp of een kaars',800,1128,16,CINK,.62);
@@ -2316,7 +2947,7 @@ P.push(function(){
     frame(c,now,L){
       const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
       const dy=L.dy,p=near(L),x0=336,x1=470+L.len,y=AY-8;
-      const on=p&&p[0]>x0-30&&p[0]<x1+40&&Math.abs(p[1]-y)<60;
+      const on=p&&flameOn()&&p[0]>x0-30&&p[0]<x1+40&&Math.abs(p[1]-y)<60;
       L.H=clamp(L.H+(on?.3:(L.H>.5?-.04:.02))*dt,0,1);
       c.clearRect(L.x,L.y,L.w,L.h);
       const col=heatCol(L.H),tp=Math.min(60,20+L.len*.5);
@@ -2326,13 +2957,17 @@ P.push(function(){
       // the hammer, just as it comes down
       const ha=now-L.hitT;
       if(ha<220){const u=ha/220,hx=430+L.len*.4,hy=y-12-Math.sin(u*Math.PI)*30;c.strokeStyle='rgba(120,84,50,1)';c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(hx+8,hy+dy-6);c.lineTo(hx+90,hy+dy-80);c.stroke();c.fillStyle='rgba(40,38,42,1)';c.fillRect(hx-16,hy+dy-26,40,22)}
-    }});
+      // hot iron ticks and sizzles as it cools
+      if(AC&&L.H>.55&&Math.random()<dt*(L.H-.5)*6)crackle(1,.02,.04);
+    },
+    boom(x,y,pow){this.H=Math.min(1,this.H+.35*pow)}});
   hit(240,700,620,870,()=>{
     const h=FG.H;clang(h);FG.hitT=performance.now();FG.poke=true;
     if(!RM)sparkBurst(430+FG.len*.4,AY-14+DY,Math.round(6+30*h*h),.6+h*.6);
     if(h>.45)FG.len=Math.min(90,FG.len+6);
     FG.H=Math.max(0,h-.03);
   });
+  zone(296,680,640,820);
   // glass: sand, fire and a breath
   {
     const g0=[1470,690],g1=[1110,856];
@@ -2340,19 +2975,166 @@ P.push(function(){
     for(let k=0;k<3;k++){const pts=[];for(let u=0;u<=1.0001;u+=.1)pts.push([g0[0]+20+u*60,g0[1]-26+k*14+Math.sin(u*5+k)*4]);sk(R,pts,{col:SKYB,w:1.2,a:.6,amp:.3,noDust:true})}
     write(R,'adem',g0[0]+30,g0[1]-48,15,{col:SKYB,a:.75});
     note(R,'glas: zand, vuur en adem',1200,1008,17,CINK,.74);
+    note(R,'(tik: blaas)',1200,1034,14,CINK,.48);
   }
-  live(990,760,200,200,{sc:1,dy:GEN_DY,frame(c,now,L){
-    const t=now/1000,dy=L.dy,r=44*(1+.05*Math.sin(t*1.3)),x=1090,y=870+dy;
+  // the glass on the pipe: tap, and a breath blows it into a bubble, thin and
+  // cooling, before it is gathered again
+  const GB=live(880,660,400,420,{sc:1,dy:GEN_DY,b:-1e9,frame(c,now,L){
+    const t=now/1000,dy=L.dy,a=(now-L.b)/1000,bl=a<2.6?sm(a/2.6):a<10?1-sm((a-2.6)/7.4):0;
+    const r=44*(1+.05*Math.sin(t*1.3))+52*bl,x=1090-22*bl,y=870+8*bl+dy;
     c.clearRect(L.x,L.y,L.w,L.h);
-    c.globalCompositeOperation='lighter';glowAt(c,x,y,r*2.2,[255,140,50],.35);c.globalCompositeOperation='source-over';
-    const g=c.createRadialGradient(x+r*.2,y-r*.2,r*.1,x,y,r);g.addColorStop(0,'rgba(255,240,180,.95)');g.addColorStop(.6,'rgba(255,170,70,.9)');g.addColorStop(1,'rgba(230,90,30,.85)');
+    c.globalCompositeOperation='lighter';glowAt(c,x,y,r*2.2,[255,140,50],.35*(1-.55*bl));c.globalCompositeOperation='source-over';
+    const g=c.createRadialGradient(x+r*.2,y-r*.2,r*.1,x,y,r);g.addColorStop(0,`rgba(255,240,180,${.95-.75*bl})`);g.addColorStop(.6,`rgba(255,170,70,${.9-.68*bl})`);g.addColorStop(.9,`rgba(240,110,40,${.85-.35*bl})`);g.addColorStop(1,`rgba(230,90,30,${.85-.1*bl})`);
     c.fillStyle=g;c.beginPath();c.ellipse(x,y,r,r*.92,0,0,TAU);c.fill();
     c.strokeStyle='rgba(255,255,240,.6)';c.lineWidth=3;c.beginPath();c.arc(x-r*.2,y-r*.25,r*.55,3.6,4.6);c.stroke();
+    if(bl>.3){c.strokeStyle=`rgba(190,230,255,${.35*bl})`;c.lineWidth=2;c.beginPath();c.arc(x+r*.25,y+r*.2,r*.62,.2,1.1);c.stroke()}
   }});
+  hit(990,770,1200,970,()=>{const n=performance.now();if(n-GB.b<10000)return;GB.b=n;GB.poke=true;if(AC){nz(AC.currentTime+.01,2.3,'bandpass',520,1000,.8,.11,.5);nz(AC.currentTime+.05,2,'lowpass',260,180,.6,.05,.4)}});
   sentence(R,'vuur maakt het zachte hard, en het harde zacht',1124,CINK,28);
 });
 
-// P9 · the singing tube -----------------------------------------------------------------------
+// P9 · fireworks ---------------------------------------------------------------------------------
+// gunpowder came from chinese alchemists looking for a medicine against death.
+// bring your flame to a fuse and a rocket goes up out of its bottle: every
+// colour is a metal burning, and blue is the hardest. a sparkler you can pick
+// up and write with in the air. hold your flame over a salt and it takes that
+// salt's colour, and so do the fireworks you make with it.
+const ROCK=[{x:660,el:'strontium',cn:'rood',col:[255,64,60],kind:'peony'},{x:776,el:'barium',cn:'groen',col:[120,255,120],kind:'ring',wh:1},
+  {x:892,el:'koper',cn:'blauw',col:[96,140,255],kind:'peony',dim:1},{x:1008,el:'natrium',cn:'geel',col:[255,214,80],kind:'crackle',wh:1},{x:1124,el:'houtskool',cn:'goud',col:[255,176,90],kind:'willow'}];
+const SALTS=[['li',[236,50,96]],['na',[255,204,50]],['k',[196,126,255]],['ca',[255,118,46]],['sr',[255,46,46]],['ba',[150,255,96]],['cu',[60,226,206]]];
+P.push(function(){
+  const R=stream(SEED*131+13),DY=GEN_DY;
+  write(R,'vuurwerk',800,110,36,{col:CINK,a:.88,cen:true});
+  note(R,'(breng je vlam bij een lont, en kijk omhoog)',800,150,15,CINK,.5);
+  // the smoke of other nights still hanging in the sky
+  for(let k=0;k<7;k++)glowAbs(rd(R,300,1300),rd(R,240,520),rd(R,90,200),[90,80,96],.08,rd(R,1.4,2.2),.7);
+  // the ground, dark, and where the bottles stand a faint warmth
+  const land=[[-20,1214]];for(let x=-20;x<=1620;x+=14)land.push([x,996+Math.sin(x*.005+2)*8+Math.sin(x*.017)*3]);land.push([1620,1214]);
+  fillPoly(land,[16,11,11],1);
+  COMP='lighter';glowAbs(892,990,420,[255,120,50],.07,1.6,.5);COMP=null;
+  // fireworks of other nights, drawn in coloured pencil on the dark
+  const drawnBurst=(x,y,r,col,kind)=>{
+    COMP='lighter';glowAbs(x,y,r*1.1,col,.07,1,1);COMP=null;
+    const n=kind==='ring'?40:30;
+    for(let i=0;i<n;i++){
+      const a=i/n*TAU+rd(R,-.05,.05),L=r*rd(R,.8,1.05),pts=[];
+      if(kind==='ring'){const p=[x+Math.cos(a)*L,y+Math.sin(a)*L*.46];dotF(R,p[0],p[1],rd(R,1.6,2.6),.8,tint(col,.3));continue}
+      for(let u=.22;u<=1.0001;u+=.08){const d=kind==='willow'?u*u*r*.55:u*u*r*.12;pts.push([x+Math.cos(a)*L*u,y+Math.sin(a)*L*u+d])}
+      sk(R,pts,{col,w:kind==='willow'?1.3:1.6,a:kind==='willow'?.45:.6,amp:.3,noDust:true,gap:kind==='willow'?.35:.12,taper:'in'});
+      const e=pts[pts.length-1];dotF(R,e[0],e[1],rd(R,1.6,2.6),.85,tint(col,.4));
+    }
+  };
+  drawnBurst(400,330,124,[255,96,80],'peony');drawnBurst(1190,300,150,[255,190,100],'willow');drawnBurst(820,420,96,[140,240,130],'ring');
+  drawnBurst(640,250,44,[255,226,150],'peony');drawnBurst(1010,236,36,[160,180,255],'peony');
+  // huo yao: the fire medicine
+  burnt(R,92,506,570,836,[244,234,212],{rough:9,rot:-.01,light:[330,590]});
+  note(R,'huo yao: vuurmedicijn',331,566,25,SEPIA,.9);
+  ['taoïstische alchemisten in china','zochten een middel tegen de dood.','rond 850 waarschuwt een van hun boeken:','wie zwavel, salpeter en honing verhit,','verbrandt zijn handen en zijn gezicht,','en soms brandt het hele huis af.'].forEach((t,i)=>note(R,t,331,612+i*26,17,SEPIA,.82));
+  note(R,'het eerste buskruit',331,790,14,SEPIA,.6);
+  // flame colours, and two metals found by theirs
+  const FC=burnt(R,1166,560,1526,890,[244,234,212],{rough:9,rot:.012,light:[1340,640]});
+  note(R,'vlamkleuren',1346,612,22,SEPIA,.9);
+  ['elk metaal kleurt een vlam','op zijn eigen manier. zo vonden','bunsen en kirchhoff in 1860 en 1861','twee nieuwe metalen, aan hun kleur:','cesium (hemelsblauw)','en rubidium (dieprood)'].forEach((t,i)=>note(R,t,1346,648+i*23,15,SEPIA,.8));
+  const DSH=SALTS.map((s,i)=>[1208+i*46,822]);
+  DSH.forEach(([x,y],i)=>{
+    const d=ePts(x,y,18,6.5,0,20);fillPoly(d.map(p=>[p[0]+2,p[1]+3]),[60,40,30],.25);fillPoly(d,[250,248,244],1);sk(R,d.concat([d[0]]),{col:[120,110,100],w:1,a:.7,amp:.15,noDust:true});
+    fillPoly(blob(R,x,y-2,9,3.6),SALTS[i][0]==='cu'?[120,200,190]:SALTS[i][0]==='ba'||SALTS[i][0]==='na'||SALTS[i][0]==='k'?[236,232,226]:[226,218,214],1);
+    note(R,SALTS[i][0],x,y+34,14,SEPIA,.78);
+  });
+  note(R,'(houd je vlam boven een schaaltje)',1346,918,15,CINK,.5);
+  // the bottles, waiting
+  for(const r of ROCK){
+    const x=r.x,B=chaikin([[x-18,1000],[x-18,906],[x-13,886],[x-7,868],[x-7,826],[x-9,820],[x+9,820],[x+7,826],[x+7,868],[x+13,886],[x+18,906],[x+18,1000]],false,1);
+    fillPoly(B.map(p=>[p[0]+5,p[1]+6]),[0,0,0],.4);fillPoly(B,[74,40,18],.94);
+    const lab=[[x-16,928],[x+16,928],[x+16,962],[x-16,962]];fillPoly(lab,[226,210,170],.92);aword(R,x-11,950,7,3,{col:[120,60,40],a:.6});
+    sk(R,[[x-12,904],[x-12,996]],{col:[255,206,150],w:2.4,a:.32,amp:.3,noDust:true});sk(R,[[x-4,830],[x-4,866]],{col:[255,206,150],w:1.4,a:.3,amp:.2,noDust:true});
+    sk(R,B,{col:[34,18,10],w:1.3,a:.8,amp:.3,noDust:true});
+    note(R,r.el,x,1032,13,CINK,.7);note(R,r.cn,x,1052,13,CINK,.5);
+  }
+  note(R,'blauw is het moeilijkst: wordt het te heet, dan valt het blauw van koper uiteen',892,1086,15,CINK,.6);
+  // the rockets, drawn once in pencil and then carried on glass, since they leave
+  const IMG=ROCK.map(r=>offscreen(44,240,()=>{
+    const bc=mix(r.col,[70,40,40],.42),hi=tint(r.col,.45);
+    sk(R,[[31,62],[31,226]],{col:WOODD,w:2.8,a:1,amp:.2,noDust:true});
+    const body=[[14,52],[28,52],[28,170],[14,170]];fillPoly(body,bc,1);
+    hatchFill(R,body,9,-.5,.6,{col:hi,w:3});
+    sk(R,[[16,56],[16,166]],{col:[255,255,255],w:1.4,a:.3,amp:.2,noDust:true});
+    poly(R,body,{col:[30,20,18],w:1.1,a:.85,amp:.2});
+    const cone=[[12,52],[30,52],[21,16]];fillPoly(cone,[226,220,210],1);poly(R,cone,{col:[60,50,46],w:1.1,a:.85,amp:.2});
+    sk(R,[[21,170],[20,182],[14,190],[9,192]],{col:[56,48,44],w:1.8,a:1,amp:.3,noDust:true});
+  }));
+  const fusePt=(x,u)=>{const p0=[x+1,770],p1=[x,784],p2=[x-12,792],q=1-u;return[q*q*p0[0]+2*q*u*p1[0]+u*u*p2[0],q*q*p0[1]+2*q*u*p1[1]+u*u*p2[1]]};
+  const RK=live(560,580,680,440,{sc:1,dy:GEN_DY,st:ROCK.map(()=>({s:'ready',t:-1e9})),
+    frame(c,now,L){
+      const dy=L.dy,p=near(L,0);c.clearRect(L.x,L.y,L.w,L.h);
+      ROCK.forEach((r,i)=>{
+        const S=L.st[i],x=r.x;
+        if(S.s==='ready'&&p&&flameOn()&&Math.hypot(p[0]-(x-12),p[1]-792)<26)L.light(i,now);
+        if(S.s==='fuse'&&now-S.t>1100){S.s='gone';S.t=now;
+          rocket(x,700+dy,clamp(x+rd(Math.random,-220,220),260,1340),dy+rd(Math.random,230,430),r.col,r.kind,{whistle:r.wh,pow:r.dim?.68:.86,dur:rd(Math.random,1050,1350)});
+          if(!RM)smokeAt(x,812+dy,8,{a:.24,r:2.4,up:.7})}
+        if(S.s==='gone'&&now-S.t>7000){S.s='ready';S.t=now}
+        if(S.s==='gone')return;
+        c.globalAlpha=S.s==='ready'?Math.min(1,(now-S.t)/900):1;c.drawImage(IMG[i],x-22,600+dy,44,240);c.globalAlpha=1;
+        if(S.s==='fuse'){
+          const u=1-(now-S.t)/1100,fp=fusePt(x,Math.max(0,u));
+          c.globalCompositeOperation='lighter';glowAt(c,fp[0],fp[1]+dy,14+4*Math.random(),[255,200,120],.9);c.globalCompositeOperation='source-over';
+          if(!RM&&Math.random()<.7)sparkJet(fp[0],fp[1]+dy,-Math.PI/2,Math.PI,2,.3,{g:500,life:.4,s:.7,forks:.3});
+        }
+      });
+    },
+    light(i,now){const S=this.st[i];if(S.s!=='ready'||now-S.t<900)return;S.s='fuse';S.t=now;this.poke=true;if(AC)nz(AC.currentTime+.01,1.1,'bandpass',4200,2800,.8,.06,.02)},
+    // a big enough bang near the bottles lights their fuses too (but a rocket's own does not)
+    boom(x,y,pow,reach,src){if(src==='rocket')return;const now=performance.now();ROCK.forEach((r,i)=>{const d=Math.hypot(r.x-x,780-y);if(d<reach*.75&&this.st[i].s==='ready')setTimeout(()=>this.light(i,performance.now()),200+d*1.4)})}});
+  ROCK.forEach((r,i)=>hit(r.x-46,596,r.x+46,1000,()=>RK.light(i,performance.now())));
+  // the sparkler in its jar
+  const JX=150,TIP=[140,858];
+  {
+    const jar=[[JX-26,948],[JX+26,948],[JX+28,1004],[JX-28,1004]];
+    fillPoly(jar.map(p=>[p[0]+4,p[1]+5]),[0,0,0],.4);fillPoly(jar,[200,226,236],.16);
+    sk(R,jar.concat([jar[0]]),{col:[200,226,236],w:1.3,a:.6,amp:.2,noDust:true});sk(R,ePts(JX,948,26,5,0,20).concat([[JX+26,948]]),{col:[220,236,244],w:1.2,a:.6,amp:.1,noDust:true});
+    sk(R,[[JX-18,956],[JX-19,996]],{col:[255,255,255],w:2,a:.3,amp:.2,noDust:true});
+  }
+  ['een sterretje: ijzervijlsel','op een draad. de vonken vertakken','door de koolstof in het ijzer.'].forEach((t,i)=>write(R,t,200,948+i*24,16,{col:CINK,a:.74}));
+  write(R,'(steek het aan, en schrijf in de lucht)',200,1030,14,{col:CINK,a:.5});
+  const SP=live(70,760,180,260,{sc:1,dy:GEN_DY,s:'ready',t:-1e9,voice:null,
+    frame(c,now,L){
+      const dy=L.dy,p=near(L,0);c.clearRect(L.x,L.y,L.w,L.h);
+      if(L.s==='ready'&&p&&flameOn()&&Math.hypot(p[0]-TIP[0],p[1]-TIP[1])<28)L.lightIt(now);
+      let burnt=0;
+      if(L.s==='jar'){const a=(now-L.t)/20000;if(a>=1){L.s='gone';L.t=now;if(L.voice){L.voice.stop();L.voice=null}}else burnt=a}
+      if(L.s==='gone'&&now-L.t>4000&&!SPK.held){L.s='ready';L.t=now}
+      if(L.s==='gone')return;
+      const al=L.s==='ready'?Math.min(1,(now-L.t)/800):1,top=[TIP[0],TIP[1]+dy],bot=[JX+2,996+dy],cut=lerp2([TIP[0],TIP[1]+dy],[JX,950+dy],burnt*.85);
+      c.globalAlpha=al;c.lineCap='round';
+      c.strokeStyle='rgb(150,146,150)';c.lineWidth=1.6;c.beginPath();c.moveTo(top[0],top[1]);c.lineTo(bot[0],bot[1]);c.stroke();
+      c.strokeStyle='rgb(128,120,114)';c.lineWidth=5;c.beginPath();c.moveTo(cut[0],cut[1]+(burnt?0:4));c.lineTo(JX-2,930+dy);c.stroke();
+      c.globalAlpha=1;
+      if(L.s==='jar'){
+        c.globalCompositeOperation='lighter';glowAt(c,cut[0],cut[1],46+8*Math.random(),[255,180,90],.5);glowAt(c,cut[0],cut[1],10,[255,246,226],.95);c.globalCompositeOperation='source-over';
+        if(!RM&&Math.random()<.9)sparkJet(cut[0],cut[1],0,Math.PI,2,.55,{g:240,life:.6,s:.8,forks:.85});
+        if(L.voice)L.voice.level(.04+.03*Math.random());if(AC&&Math.random()<.25)crackleAt(AC.currentTime+.01,1,.02,.04);
+      }
+    },
+    lightIt(now){this.poke=true;if(AC)fwip(.08);
+      if(FINE&&PTR.on){this.s='gone';this.t=now;SPK.held=true;SPK.t0=now;SPK.trail=[];if(AC)SPK.voice=noiseVoice('bandpass',4200,.7)}
+      else{this.s='jar';this.t=now;if(AC)this.voice=noiseVoice('bandpass',4200,.7)}}});
+  hit(90,780,230,1010,()=>{if(SP.s==='ready')SP.lightIt(performance.now())});
+  // the salts: hold your flame over one and it takes that colour
+  const SL=live(1180,700,330,150,{sc:1,dy:GEN_DY,sel:-1,t:-1e9,
+    frame(c,now,L){
+      const dy=L.dy,p=near(L,0);c.clearRect(L.x,L.y,L.w,L.h);
+      if(p&&flameOn())DSH.forEach(([x,y],i)=>{if(Math.abs(p[0]-x)<22&&p[1]<y+8&&p[1]>y-70&&(L.sel!==i||now-L.t>2500))L.pick(i,now)});
+      const a=(now-L.t)/1000;
+      if(L.sel>=0&&a<2.4){const [x,y]=DSH[L.sel],k=a<.2?a/.2:1-(a-.2)/2.2;flameLive(c,x,y-2+dy,52*k,14*k,now/1000,L.sel,0,Math.min(1,k*1.5),1.2,{col:SALTS[L.sel][1],ga:.3})}
+    },
+    pick(i,now){this.sel=i;this.t=now;this.poke=true;HAND.col=SALTS[i][1];HAND.colT=now;if(AC){fwip(.07);bell(PENTA[i+1],.03)}}});
+  DSH.forEach(([x,y],i)=>hit(x-22,y-60,x+22,y+30,()=>SL.pick(i,performance.now())));
+  sentence(R,'ze zochten het eeuwige leven, en vonden buskruit',1136,CINK,28);
+  whispers(R,180,540,2);
+});
+
+// P10 · the singing tube -----------------------------------------------------------------------
 // leiden, 1859: p.l. rijke heats a gauze a quarter of the way up an open glass
 // tube, and the tube starts to sing. hold your flame under a tube (or tap it)
 // and it sings its own note: the longer the tube, the lower.
@@ -2424,13 +3206,15 @@ P.push(function(){
       });
     }});
   TX.forEach((x,i)=>hit(x-30,BOT-TL[i],x+30,BOT+70,()=>{TB.tap[i]=performance.now();TB.poke=true}));
+  // the heat of a bang reaches them too, and they sing together
+  TB.boom=(x,y,pow,reach)=>{const n=performance.now();TX.forEach((tx,i)=>{if(Math.hypot(tx-x,BOT-TL[i]/4-y)<reach)TB.tap[i]=n})};
   ['georges kastner bouwde rond 1870','een orgel van zingende vlammen:','de pyrofoon, het vuurorgel'].forEach((t,i)=>note(R,t,1390,250+i*26,18,CINK,.76));
   note(R,'(houd je vlam onder een buis, of tik erop)',860,1048,15,CINK,.5);
   sentence(R,'warmte wordt geluid',1118,CINK,30);
   whispers(R,160,1100,2);
 });
 
-// P10 · after the fire -------------------------------------------------------------------------
+// P11 · after the fire -------------------------------------------------------------------------
 // fire takes and fire makes room. a burnt forest where fireweed comes first, a
 // cone sealed with resin that only opens in the heat of a fire (hold your flame
 // to it), shiva dancing in a ring of flames with the drum that begins things
@@ -2493,11 +3277,13 @@ P.push(function(){
     frame(c,now,L){
       const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
       const p=near(L),dy=L.dy;
-      if(p&&Math.hypot(p[0]-CX,p[1]-CY)<130)L.heat=Math.min(1,L.heat+dt*.7);else L.heat=Math.max(0,L.heat-dt*.08);
+      if(p&&flameOn()&&Math.hypot(p[0]-CX,p[1]-CY)<130)L.heat=Math.min(1,L.heat+dt*.7);else L.heat=Math.max(0,L.heat-dt*.12);
       if(L.heat>.6&&L.open<1){if(!L.opening){L.opening=true;if(AC)crackle(7,1.2,.1)}L.since=now}
       if(L.opening){L.open=Math.min(1,L.open+dt*.5);if(L.open>=1&&!L.flew){L.flew=true;if(!RM)for(let k=0;k<7;k++)L.seeds.push({x:CX+rd(Math.random,-50,50),y:CY+rd(Math.random,-60,60),vx:rd(Math.random,-60,60),vy:rd(Math.random,-60,-10),a:Math.random()*TAU,t:now})}}
-      if(L.open>=1&&now-L.since>25000&&L.heat<.1){L.opening=false;L.flew=false}
-      if(!L.opening&&L.open>0)L.open=Math.max(0,L.open-dt*.08);
+      // a while after it opened, once it has cooled, it closes up again, ready for the next fire
+      if(L.open>=1&&!L.full)L.full=now;
+      if(L.full&&now-L.full>9000&&L.heat<.4){L.opening=false;L.flew=false;L.full=0;if(AC&&AC.state==='running'){nz(AC.currentTime+.01,1.4,'bandpass',420,240,1.2,.05,.3);crackle(4,1.2,.04)}}
+      if(!L.opening&&L.open>0)L.open=Math.max(0,L.open-dt*.28);
       c.clearRect(L.x,L.y,L.w,L.h);
       if(L.heat>.02){c.globalCompositeOperation='lighter';glowAt(c,CX,CY+dy,150,[255,130,50],.25*L.heat);c.globalCompositeOperation='source-over'}
       coneDraw(c,dy,L.open*L.open*(3-2*L.open));
@@ -2506,6 +3292,8 @@ P.push(function(){
         c.save();c.translate(s.x,s.y+dy);c.rotate(s.a);c.fillStyle='rgba(214,180,130,.8)';c.beginPath();c.ellipse(8,0,10,4,0,0,TAU);c.fill();c.fillStyle='rgba(60,40,24,1)';c.beginPath();c.ellipse(-2,0,3.4,2.4,0,0,TAU);c.fill();c.restore()}
     }});
   hit(CX-90,CY-140,CX+90,CY+140,()=>{CN.heat=1;CN.poke=true;if(!RM)sparkBurst(CX,CY+DY,10,.6)});
+  zone(CX-140,CY-150,CX+140,CY+150);
+  CN.boom=(x,y,pow,reach)=>{if(Math.hypot(x-CX,y-CY)<reach)CN.heat=Math.min(1,CN.heat+.8*pow)};
   ['de kegels van de draaiden zijn','dichtgeplakt met hars. pas in de hitte','van een bosbrand gaan ze open.'].forEach((t,i)=>note(R,t,CX,730+i*24,17,CINK,.76));
   note(R,'(houd je vlam bij de kegel)',CX,812,15,CINK,.5);
   // shiva, dancing in a ring of fire
@@ -2549,11 +3337,30 @@ P.push(function(){
     for(let k=0;k<8;k++)dotF(R,x+rd(R,-50,50),y-rd(R,30,90),1.8,.9,[255,150,60]);
     for(let k=0;k<4;k++)fillPoly(blob(R,x+rd(R,-90,90),y-4,rd(R,10,16),rd(R,6,9)),[214,214,220],.5);
     ['1963: uit zee rijst','een nieuw eiland, van vuur.','surtsey, naar surtr, de vuurreus.','twee jaar later: de eerste plant.'].forEach((t,i)=>write(R,t,1214,900+i*21,14,{col:CINK,a:.72}));
+    write(R,'(tik op de vulkaan)',1214,988,13,{col:CINK,a:.48});
+    // tap it and it erupts: a bang, glowing bombs thrown up, a cloud of ash
+    const SU=live(820,560,440,440,{sc:.7,dy:GEN_DY,t:-1e9,ash:[],last:0,
+      frame(c,now,L){
+        const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;const dy=L.dy,a=(now-L.t)/1000;
+        c.clearRect(L.x,L.y,L.w,L.h);if(a>9&&!L.ash.length)return;
+        if(a<3){c.globalCompositeOperation='lighter';glowAt(c,x,y-34+dy,90*(1-a/3)+30,EMBER,.8*(1-a/3));c.globalCompositeOperation='source-over';
+          if(!RM&&a<1.4&&Math.random()<.8)sparkJet(x,y-36+dy,-Math.PI/2,.55,2,.95,{g:520,life:2.2,s:1.8,forks:0,col:[255,120,40]});
+          if(!RM&&a<2.4&&now-(L.la||0)>90){L.la=now;L.ash.push({x:x+rd(Math.random,-14,14),y:y-50,r:rd(Math.random,12,20),t:now,vx:rd(Math.random,-8,14)})}}
+        const spr=sprite([70,64,66],32);
+        L.ash=L.ash.filter(q=>now-q.t<7000);
+        for(const q of L.ash){const u=(now-q.t)/7000;q.y-=dt*(44-30*u);q.x+=q.vx*dt;q.r+=dt*9;c.globalAlpha=.55*(1-u)*Math.min(1,u*10);c.drawImage(spr,q.x-q.r*1.6,q.y+dy-q.r*1.6,q.r*3.2,q.r*3.2)}
+        c.globalAlpha=1;
+      }});
+    hit(900,820,1180,995,()=>{const n=performance.now();if(n-SU.t<2600)return;SU.t=n;SU.poke=true;if(AC){sBoom(.55,0,'peony',1);nz(AC.currentTime+.05,3.4,'lowpass',240,45,.7,.2,.12)}});
   }
+  // wind through what is left of the trees, and the trunks still ticking with embers
+  ambient(150,1100,{
+    make(ac,out,A){A.w=noiseVoice('bandpass',520,.9,out);A.w.level(.025,.5)},
+    step(now,dt,v,A){A.w.level(.018+.012*Math.sin(now*.0007)+.006*Math.sin(now*.0023),.3);if(Math.random()<dt*2)crackleAt(AC.currentTime+.01,1,.02,.04,A.g)}});
   sentence(R,'sommige zaden wachten op vuur',1120,CINK,30);
 });
 
-// P11 · cold light ----------------------------------------------------------------------------
+// P12 · cold light ----------------------------------------------------------------------------
 // fireflies in the mangroves: each one keeps its own beat and nudges its
 // neighbours when it flashes, and slowly the whole river blinks as one. bring
 // your flame near and the ones close by lose count; tap to add a few more.
@@ -2600,6 +3407,8 @@ P.push(function(){
   };
   const FF=live(0,180,1600,920,{sc:.6,dy:GEN_DY,ts:0,last:0,
     init(c,L){for(let k=0;k<600;k++)step(L,1/30,null)},
+    // a bang startles them: all at once they flash, and lose count
+    boom(x,y,pow,reach){for(const f of FL)if(Math.hypot(f.x-x,f.y-y)<reach){f.last=this.ts;f.dist=1;f.ph=Math.random()}},
     frame(c,now,L){
       const dt=L.last?Math.min(.05,(now-L.last)/1000):.016;L.last=now;
       if(!RM)step(L,dt,near(L));
@@ -2621,10 +3430,21 @@ P.push(function(){
   note(R,'knipperen ze met duizenden tegelijk',1300,884,18,CINK,.76);
   note(R,'elk vliegje let op zijn buren.',800,960,18,CINK,.76);
   note(R,'(kom je met je vlam te dichtbij, dan raken ze de tel kwijt)',800,1000,15,CINK,.5);
+  // the river at night: insects ringing in the mangroves, water against the roots, frogs
+  ambient(180,1200,{
+    make(ac,out,A){
+      const n=ac.createBufferSource();n.buffer=NB;n.loop=true;const bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.value=6200;bp.Q.value=7;
+      const am=ac.createGain();am.gain.value=.5;const lfo=ac.createOscillator();lfo.frequency.value=26;const lg=ac.createGain();lg.gain.value=.5;lfo.connect(lg);lg.connect(am.gain);
+      const g=ac.createGain();g.gain.value=.2;n.connect(bp);bp.connect(am);am.connect(g);g.connect(out);n.start(0,Math.random()*2);lfo.start();
+      A.w=noiseVoice('lowpass',420,.7,out);A.w.level(.014,.5);A.f=0},
+    step(now,dt,v,A){
+      A.w.level(.013+.008*Math.sin(now*.0011)*Math.sin(now*.00037+1),.3);
+      if(now>A.f){A.f=now+rd(Math.random,1800,6000);sCroak(AC.currentTime+.02,.05,A.g);if(Math.random()<.5)sCroak(AC.currentTime+.42,.035,A.g)}
+    }});
   sentence(R,'duizenden lichtjes, en niemand die de maat aangeeft',1110,CINK,28);
 });
 
-// P12 · embers, and the first light ------------------------------------------------------------
+// P13 · embers, and the first light ------------------------------------------------------------
 // what is left of the fire: embers, and a log with its rings showing. blow on
 // them (move fast over them) and they glow up again. the sun does not burn, it
 // forges; and yet nearly all our fire is hers. and at the very bottom, the day.
@@ -2685,6 +3505,13 @@ P.push(function(){
       if(total>8)for(let k=0;k<4;k++){const q=CO[(k*17+3)%CO.length];flameLive(c,q.x,q.y+dy-4,Math.min(60,(total-8)*3),9,t,k*1.9,0,Math.min(1,(total-8)/10),1,{ga:.2})}
       if(AC&&total>2&&Math.random()<total*dt*.12)crackle(1,.05,.07);
     }});
+  EM.boom=(x,y,pow,reach)=>{for(const q of CO){const d=Math.hypot(q.x-x,q.y-y);if(d<reach)q.blow=Math.min(1.2,q.blow+(1-d/reach)*pow*1.3)}};
+  // the embers hiss and tick; and at the very bottom, when the light comes, a blackbird
+  ambient(200,900,{
+    make(ac,out,A){A.h=noiseVoice('highpass',3600,.5,out);A.h.level(.009,.5)},
+    step(now,dt,v,A){if(Math.random()<dt*3)crackleAt(AC.currentTime+.01,1,.02,.09,A.g)}});
+  ambient(1000,1200,{
+    step(now,dt,v,A){if(!A.n)A.n=now+1200;if(now>A.n){A.n=now+rd(Math.random,3200,7500);sBird(AC.currentTime+.02,.024,A.g);if(Math.random()<.3)sBird(AC.currentTime+rd(Math.random,1.2,2),.013,A.g)}}});
   hit(EX-340,EY-110,EX+340,EY+110,(x,y)=>{const ly=y-EM.dy;for(const q of CO){const d=Math.hypot(q.x-x,q.y-ly);if(d<200)q.blow=Math.min(1.2,q.blow+(1-d/200)*.9)}crackle(10,1.2,.12);if(AC)nz(AC.currentTime+.01,.6,'bandpass',700,400,.7,.1,.05);if(!RM)sparkBurst(x,y,16,.7);EM.poke=true});
   note(R,'(blaas erop: beweeg er snel overheen)',EX,804,15,CINK,.5);
   // the end of the night
