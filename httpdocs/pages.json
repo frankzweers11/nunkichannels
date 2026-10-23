@@ -23,6 +23,15 @@
       "thumb": "/images/thumbs/getij.jpg"
     },
     {
+      "slug": "hart",
+      "path": "/hart/",
+      "title": "hart",
+      "subtitle": "een muur over wat ons raakt",
+      "theme": "#1a090f",
+      "ogImage": "/images/og/hart.jpg",
+      "thumb": "/images/thumbs/hart.jpg"
+    },
+    {
       "slug": "patronen",
       "path": "/patronen/",
       "title": "patronen",

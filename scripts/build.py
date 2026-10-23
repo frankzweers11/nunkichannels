@@ -49,10 +49,17 @@ SERIES = [
 ]
 
 
+# wanden die voorop mogen staan, in deze volgorde, vóór de rest (alfabetisch)
+PINNED = ["hart"]
+
+
 def series_of(pages: list[dict]) -> list[tuple[str, str, list[dict]]]:
     out = []
     for key, label, test in SERIES:
-        items = sorted((p for p in pages if test(p)), key=lambda p: p["title"].casefold())
+        items = sorted(
+            (p for p in pages if test(p)),
+            key=lambda p: (PINNED.index(p["slug"]) if p["slug"] in PINNED else len(PINNED), p["title"].casefold()),
+        )
         out.append((key, label, items))
     return out
 
@@ -482,6 +489,8 @@ NAV_CSS = """
   .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
   .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
   .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
+  .nunki-grid.nunki-n-6{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-6 li{flex:none;width:100%;max-width:240px;justify-self:center}
 }
 .nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
   background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
@@ -561,7 +570,7 @@ def nav_block(current: dict, pages: list[dict], site: dict) -> str:
         if not others:
             continue
         n = len(others)
-        count = f" nunki-n-{n}" if n in (4, 5) else ""
+        count = f" nunki-n-{n}" if n in (4, 5, 6) else ""
         groups.append(
             f'  <p class="nunki-group">{esc(label)}</p>\n'
             f'  <ul class="nunki-grid nunki-{key}{count}">\n' + "\n".join(nav_card(p) for p in others) + "\n  </ul>\n"
