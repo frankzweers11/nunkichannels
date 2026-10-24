@@ -1,0 +1,41 @@
+{
+  "id": "heart-intelligence",
+  "inleiding": "HeartMath beschrijft paden van het hart naar de hersenen: het ritme beïnvloedt hoe iemand waarneemt en reageert. Het hart is in die publicaties niet alleen een pomp die bloed omlaag stuurt.",
+  "haak": "HeartMath beschrijft het hart als informatieverwerkend centrum: een functioneel ‘heart brain’ dat via afferente paden de hersenen beïnvloedt. Het ritme verandert hoe waarneming en reactie uitvallen. Neurocardiologie uit hun eigen publicatie, niet een losse metafoor.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-intelligence-heart-brain",
+      "caption": "Hart als informatiecentrum"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-intelligence-mind-of-its-own",
+      "caption": "Hart beïnvloedt waarneming"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-intelligence-energetic-communication",
+      "caption": "Cardio-elektromagnetische communicatie"
+    },
+    {
+      "type": "source",
+      "label": "HeartMath Institute — Science of the Heart",
+      "url": "https://www.heartmath.org/research/science-of-the-heart/",
+      "caption": "HeartMath: het hart is een complex informatieverwerkend centrum met een functioneel ‘heart brain’ dat via meerdere paden de hersenen beïnvloedt — geen mystiek, wel neurocardiologie."
+    },
+    {
+      "type": "source",
+      "label": "HeartMath Institute — Science of the Heart",
+      "url": "https://www.heartmath.org/research/science-of-the-heart/",
+      "caption": "HeartMath: het hart gedraagt zich alsof het een eigen geest heeft en beïnvloedt significant hoe wij waarnemen en reageren — afferente regie, geen uplink."
+    }
+  ],
+  "sourceIds": [
+    "science-of-the-heart",
+    "science-of-the-heart-the-biophysics-of-energetic"
+  ]
+}

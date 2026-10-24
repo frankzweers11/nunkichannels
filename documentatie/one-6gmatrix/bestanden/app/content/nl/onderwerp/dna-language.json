@@ -1,0 +1,42 @@
+{
+  "id": "dna-language",
+  "inleiding": "Gariaev spreekt over genetische teksten: het chromosoom als bron en ontvanger van een taal in veldvorm. De metafoor is van hem; de sequencer is een ander instrument.",
+  "haak": "Searls: linguïstische metaforen zitten sinds het begin in moleculaire biologie; genoom als ‘book of life’ is de populaire extensie van DNA-als-taal. Searls vraagt of taalanalyse-methoden toepasbaar zijn op moleculaire biologie; veel bioinformatica-technieken zijn volgens hem linguïstisch gegrond.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "searls-2002-linguistic-metaphors",
+      "caption": "Linguïstische metaforen in moleculaire biologie"
+    },
+    {
+      "type": "fact",
+      "ref": "searls-2002-linguistics-methods",
+      "caption": "Taalmethoden ↔ bioinformatica"
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-2015-genome-as-text-homonyms",
+      "caption": "Codon-homonymie = taalanalogie"
+    },
+    {
+      "type": "source",
+      "label": "David B. Searls — The language of genes",
+      "url": "https://doi.org/10.1038/nature01255",
+      "caption": "Searls: linguïstische metaforen zitten sinds het begin in moleculaire biologie; genoom als ‘book of life’ is de populaire extensie van DNA-als-taal."
+    },
+    {
+      "type": "source",
+      "label": "Searls 2002, Abstract — ",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/12432405/",
+      "caption": "Searls vraagt of taalanalyse-methoden toepasbaar zijn op moleculaire biologie; veel bioinformatica-technieken zijn volgens hem linguïstisch gegrond."
+    }
+  ],
+  "sourceIds": [
+    "david-b-searls-2002",
+    "searls-2002-abstract-2002",
+    "petr-p-gariaev-2015"
+  ]
+}

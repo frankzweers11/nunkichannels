@@ -1,0 +1,45 @@
+{
+  "id": "water-memory",
+  "inleiding": "Montagnier et al. (2009) rapporteren elektromagnetische signalen uit sterk verdunde DNA-oplossingen. De claim is dat het water het signaal bewaart nadat het molecuul verdwenen is.",
+  "haak": "Die signalen zijn een resonantie-hypothese: geen gedeelde standaard, wel het watergeheugen-dossier. Gerald Pollack meet daarnaast een gel-achtige EZ-laag naast hydrofiele oppervlakken, in peer-reviewed werk aan de rand van het veld. Twee verschillende claims over water dat meer doet dan oplossen.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "montagnier-ems",
+      "caption": "Montagnier — EMS in verdunning"
+    },
+    {
+      "type": "fact",
+      "ref": "pollack-ez",
+      "caption": "Pollack — exclusion zone"
+    },
+    {
+      "type": "fact",
+      "ref": "emoto-crystals",
+      "caption": "Emoto — kristal foto's"
+    },
+    {
+      "type": "source",
+      "label": "Gerald Pollack — The Fourth Phase of Water",
+      "url": "https://www.pollacklab.org/",
+      "caption": "Gerald Pollack meet een gel-achtige EZ-laag naast hydrofiele oppervlakken: water dat zich structureel anders gedraagt dan bulk, in peer-reviewed werk aan de rand van het veld."
+    }
+  ],
+  "curate": {
+    "stemmen": [
+      {
+        "portrait": "emoto",
+        "quote": "emoto:water-is-the-mirror"
+      }
+    ],
+    "spiegel": []
+  },
+  "sourceIds": [
+    "l-montagnier-et-al-2009",
+    "gerald-pollack-2013",
+    "masaru-emoto-2004"
+  ]
+}

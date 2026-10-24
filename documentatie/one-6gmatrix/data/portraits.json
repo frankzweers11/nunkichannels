@@ -1,0 +1,1228 @@
+{
+  "portraits": [
+    {
+      "id": "steiner",
+      "poles": [
+        "matrix",
+        "one"
+      ],
+      "name": "Rudolf Steiner",
+      "role": "Anthroposof · GA 186 (1918) · GA 351 Bijen (1923)",
+      "register": "echo",
+      "image": "images/portraits/steiner.jpg",
+      "photoCredit": "Rudolf Steiner, ca. 1899 — Wikimedia Commons (public domain)",
+      "photoUrl": "https://commons.wikimedia.org/wiki/File:Rudolf_Steiner._.jpg",
+      "issues": [
+        "control-mind",
+        "control-offline",
+        "matrix-human",
+        "one-organism",
+        "one-cymatics"
+      ],
+      "topics": [
+        "mind",
+        "twin-labor",
+        "kill-switch",
+        "versus-one",
+        "bijen"
+      ],
+      "related": [
+        "giordano",
+        "duncan",
+        "magda-havas"
+      ],
+      "slug": "rudolf-steiner",
+      "books": [
+        {
+          "title": "Die soziale Grundforderung unserer Zeit — In geänderter Zeitlage (GA 186)",
+          "authors": "Rudolf Steiner",
+          "year": 1918,
+          "url": "https://rsarchive.org/Lectures/GA186/English/AP1941/19181201p01.html",
+          "note": "Lezingencyclus, Dornach.",
+          "pole": "matrix"
+        },
+        {
+          "title": "Nine Lectures on Bees (GA 351)",
+          "authors": "Rudolf Steiner",
+          "year": 1923,
+          "url": "https://rsarchive.org/Lectures/GA351/English/SGP1975/",
+          "note": "Negen lezingen, Dornach.",
+          "pole": "one"
+        }
+      ],
+      "insight": "In februari 1923 spreekt Rudolf Steiner over bijen. De hele korf is doordrenkt van liefde. Via de bijenkorf, zegt hij, komt de kosmos de mens binnen en maakt hem sterk.",
+      "intro": "In december 1918 beschrijft hij motoren die door een kleine menselijke invloed en de bijbehorende oscillatiekromme in beweging komen. Mechanistische occultisme, zegt hij, maakt negen tiende van de handarbeid overbodig en kan een opstand verlammen.",
+      "quotes": [
+        {
+          "text": "The whole hive is in reality permeated with love.",
+          "source": "GA 351, Nine Lectures on Bees, Lecture I, 3 February 1923",
+          "year": 1923,
+          "url": "https://rsarchive.org/Lectures/NineBees/19230203p01.html",
+          "topics": [
+            "bijen",
+            "versus-one"
+          ],
+          "issues": [
+            "one-cymatics"
+          ],
+          "id": "steiner:the-whole-hive-is"
+        },
+        {
+          "text": "When one stands before a hive of bees one should say quite solemnly to oneself: By way of the bee-hive the whole Cosmos enters man and makes him strong and able.",
+          "source": "GA 351, Nine Lectures on Bees, Lecture I, 3 February 1923",
+          "year": 1923,
+          "url": "https://rsarchive.org/Lectures/NineBees/19230203p01.html",
+          "topics": [
+            "bijen"
+          ],
+          "issues": [
+            "one-cymatics"
+          ],
+          "id": "steiner:when-one-stands-before"
+        },
+        {
+          "text": "This is all in such a tangled mass in the human soul that even those who admit that it is possible to see a spiritual reality … regard as a fantastic person anyone who speaks concretely of such a spiritual reality.",
+          "source": "GA 186, Lecture 3 — Luciferic and Ahrimanic (§12)",
+          "year": 1918,
+          "url": "https://rsarchive.org/Lectures/GA186/English/AP1941/19181201p01.html",
+          "topics": [
+            "versus-one"
+          ],
+          "issues": [
+            "control-mind"
+          ],
+          "id": "steiner:this-is-all-in"
+        },
+        {
+          "text": "For if it were impossible for human beings to sail into the abyss of evil, then what we call love on the one hand and freedom on the other would also be unattainable for human beings, because for the occultist, freedom is inseparably linked to the concept of love.",
+          "source": "GA 104, The Apocalypse of John, Lecture XII, 30 June 1908",
+          "year": 1908,
+          "url": "https://rsarchive.org/Lectures/GA104/English/SOL/19080630p01.html",
+          "topics": [
+            "steiner",
+            "versus-one"
+          ],
+          "issues": [
+            "one-organism"
+          ],
+          "id": "steiner:for-if-it-were"
+        },
+        {
+          "text": "What is important is not just to say: People, love one another — but, comparatively speaking, to bring fuel into people's souls. But these are concepts that arise from a living understanding of spiritual life.",
+          "source": "GA 72, Freedom, Immortality and Social Life, 18 October 1917, Basel",
+          "year": 1917,
+          "url": "https://rsarchive.org/Lectures/GA072/English/eLib2017/19171018p01.html",
+          "topics": [
+            "steiner",
+            "versus-one"
+          ],
+          "issues": [
+            "one-organism"
+          ],
+          "id": "steiner:what-is-important-is"
+        }
+      ],
+      "deel": "alleen de One-citaten; het portret blijft in 6gmatrix"
+    },
+    {
+      "id": "firstenberg",
+      "name": "Arthur Firstenberg",
+      "role": "Auteur · *The Invisible Rainbow* · Cell Phone Task Force",
+      "register": "documented",
+      "image": "images/portraits/firstenberg.jpg",
+      "photoCredit": "Still uit lezing over EMF en biologie",
+      "photoUrl": "https://www.youtube.com/watch?v=e5IbfO09Yqc",
+      "issues": [
+        "emf-health",
+        "control-offline",
+        "emf-masts",
+        "emf-spectrum"
+      ],
+      "topics": [
+        "masts",
+        "thz",
+        "versus-one",
+        "satellites"
+      ],
+      "videos": [
+        {
+          "title": "The Invisible Rainbow — lezing",
+          "url": "https://www.youtube.com/watch?v=e5IbfO09Yqc",
+          "year": 2017,
+          "note": "EMF en biologische geschiedenis."
+        },
+        {
+          "title": "Wireless technology and health",
+          "url": "https://www.youtube.com/watch?v=sSoqCNABgP4",
+          "year": 2019,
+          "note": "Cell Phone Task Force-lijn."
+        },
+        {
+          "title": "5G, birds and bees",
+          "url": "https://www.youtube.com/watch?v=yqxQZZM1K7I",
+          "year": 2018,
+          "note": "Biodiversiteit en spectrum."
+        }
+      ],
+      "slug": "arthur-firstenberg",
+      "books": [
+        {
+          "title": "The Invisible Rainbow: A History of Electricity and Life",
+          "authors": "Arthur Firstenberg",
+          "publisher": "Chelsea Green",
+          "year": 2020,
+          "url": "https://www.chelseagreen.com/product/the-invisible-rainbow/",
+          "note": "Eerste uitgave 2017 AGB Press; ISBN 9781645020097; productpagina geopend (biblio, geen quote uit blurbs)"
+        }
+      ],
+      "insight": "Arthur Firstenberg (1950–2025) leidde de Cellular Phone Task Force vanaf 1996 en administreerde de International Appeal to Stop 5G on Earth and in Space (2018). In The Invisible Rainbow is elektriciteit een eigenschap van leven.",
+      "intro": "Zijn these: wireless is straling die de hele planeet bestraalt; masten en satellieten horen bij één elektromagnetisch milieu — niet alleen een thermische veiligheidsdrempel.",
+      "quotes": [
+        {
+          "text": "The electricity that we use today, the substance that we send through wires and broadcast through the air without a thought, was identified around 1700 as a property of life.",
+          "source": "The Invisible Rainbow — Prologue (Chelsea Green)",
+          "year": 2020,
+          "url": "https://archive.org/stream/the-invisible-rainbow/The%20Invisible%20Rainbow_djvu.txt",
+          "topics": [
+            "versus-one"
+          ],
+          "issues": [
+            "emf-health",
+            "emf-spectrum"
+          ],
+          "id": "firstenberg:property-of-life"
+        }
+      ],
+      "deel": "alleen de One-citaten; het portret blijft in 6gmatrix"
+    },
+    {
+      "id": "magda-havas",
+      "poles": [
+        "matrix",
+        "one"
+      ],
+      "name": "Magda Havas",
+      "role": "Professor Emerita · Trent School of the Environment · EMF & bijen",
+      "register": "documented",
+      "image": "images/drawn/magda-havas.jpg",
+      "photoCredit": "35mm poster — geen talking-head",
+      "issues": [
+        "emf-health",
+        "emf-masts",
+        "one-cymatics"
+      ],
+      "topics": [
+        "masts",
+        "thz",
+        "bijen",
+        "versus-one"
+      ],
+      "related": [
+        "steiner",
+        "firstenberg",
+        "hardell",
+        "johansson",
+        "pall"
+      ],
+      "videos": [
+        {
+          "title": "Live Blood Analysis and Electrosmog",
+          "url": "https://www.youtube.com/watch?v=L7E36zGHxRw",
+          "year": 2009,
+          "note": "Rode bloedcellen die zich als munten stapelen onder electrosmog — clean → computer 70 min → snoerloze telefoon 10 min.",
+          "pole": "matrix",
+          "primary": true
+        },
+        {
+          "title": "WiFi in schools — true or false?",
+          "url": "https://www.youtube.com/watch?v=6v75sKAUFdc",
+          "year": 2011,
+          "note": "Hart + scholen.",
+          "pole": "matrix"
+        },
+        {
+          "title": "Oakville/Bronte cell-tower presentation",
+          "url": "https://www.youtube.com/watch?v=AEOcB7Svhvw",
+          "year": 2012,
+          "note": "Maart 2012 — masten.",
+          "pole": "matrix"
+        },
+        {
+          "title": "Microwave radiation in the home (WiFi/DECT)",
+          "url": "https://www.youtube.com/watch?v=aAnrmJ3un1g",
+          "year": 2012,
+          "note": "Huiselijke RF-bronnen.",
+          "pole": "matrix"
+        },
+        {
+          "title": "Magnetic disc enhances overwinter survival — Electromagnetic Biology and Medicine, 2026",
+          "url": "https://doi.org/10.1080/15368378.2026.2644215",
+          "year": 2026,
+          "note": "Veldproef Ontario · dataset Figshare 2026-04-16.",
+          "pole": "one"
+        },
+        {
+          "title": "Live blood cells and electrosmog — pagina",
+          "url": "https://magdahavas.com/electrosmog-exposure/mobile-phones-electrosmog-exposure/live-blood-cells-and-electrosmog/",
+          "year": 2010,
+          "note": "Timed samples 20 augustus 2009 — geen groot blind klinisch trial.",
+          "pole": "matrix"
+        },
+        {
+          "title": "Effects of EM pollution on pollinators — review PDF",
+          "url": "https://stopsmartmetersbc.com/wp-content/uploads/2021/02/Effects-of-Non-ionizing-Electromagnetic-Pollution-on-Invertebrates-including-Pollinators-such-as-Honey-Bees-What-We-Know-Dont-and-Need-to-by-Margaret-Friesen-and-Magda-Havas-February-09-2021.pdf",
+          "year": 2021,
+          "note": "26 primaire studies 1976–2019.",
+          "pole": "one"
+        },
+        {
+          "title": "5G flora/fauna affidavit — bijensectie",
+          "url": "https://magdahavas.com/wp-content/uploads/2020/04/Havas-5G-health-humans-and-biota-April-15-2020.pdf",
+          "year": 2020,
+          "note": "Harst/Favre alleen zoals zij die citeert.",
+          "pole": "one"
+        }
+      ],
+      "slug": "magda-havas",
+      "gender": "f",
+      "insight": "Magda Havas is emeritus aan de Trent School of the Environment. Ze meet wat straling doet in bloed, hartslag en klaslokaal.",
+      "intro": "In 2013 plakken rode bloedcellen na een snoerloze telefoon of computer aan elkaar als een stapel munten. In 2010 stijgt bij 16 procent van de proefpersonen de hartslag sterk tijdens het actieve deel van de provocatie. In een veldproef in Ontario overwinteren bijenkorven met een magnetische schijf beter dan de controles.",
+      "quotes": [
+        {
+          "text": "Korven met schijf overleefden de winter significant beter, hadden sterkere lentepopulaties, betere hygiëne en minder koninginvervangingen dan controles (p < 0,001).",
+          "source": "Electromagnetic Biology and Medicine, 2026 — vertaling uit abstract",
+          "year": 2026,
+          "url": "https://doi.org/10.1080/15368378.2026.2644215",
+          "pole": "one",
+          "topics": [
+            "bijen"
+          ],
+          "issues": [
+            "emf-health",
+            "one-cymatics"
+          ],
+          "id": "magda-havas:korven-met-schijf-overleefden"
+        },
+        {
+          "text": "We placed a purewave magnetic disc in bee hives and it improved their resilience and their over winter survival. The bee hives with the disc were calmer and required fewer queen replacements.",
+          "source": "Interview, 16 augustus 2026",
+          "year": 2026,
+          "url": "https://www.unbekoming.com/p/interview-with-dr-magda-havas",
+          "pole": "one",
+          "topics": [
+            "bijen"
+          ],
+          "issues": [
+            "emf-health",
+            "one-cymatics"
+          ],
+          "id": "magda-havas:we-placed-a-purewave"
+        },
+        {
+          "text": "Of 26 primary studies reviewed, 7 of 8 ELF studies showed effects and 13 of 18 RFR studies (72%) showed effects on invertebrates including pollinators.",
+          "source": "Friesen & Havas review, 9 februari 2021",
+          "year": 2021,
+          "url": "https://stopsmartmetersbc.com/wp-content/uploads/2021/02/Effects-of-Non-ionizing-Electromagnetic-Pollution-on-Invertebrates-including-Pollinators-such-as-Honey-Bees-What-We-Know-Dont-and-Need-to-by-Margaret-Friesen-and-Magda-Havas-February-09-2021.pdf",
+          "pole": "one",
+          "topics": [
+            "bijen",
+            "masts"
+          ],
+          "issues": [
+            "emf-health",
+            "one-cymatics"
+          ],
+          "id": "magda-havas:of-26-primary-studies"
+        },
+        {
+          "text": "Shepherd et al. (2018) concluded that 50 Hz ELF from powerlines is an environmental stressor for honey bees.",
+          "source": "Friesen & Havas, 2021 — citatie Shepherd et al.",
+          "year": 2021,
+          "url": "https://stopsmartmetersbc.com/wp-content/uploads/2021/02/Effects-of-Non-ionizing-Electromagnetic-Pollution-on-Invertebrates-including-Pollinators-such-as-Honey-Bees-What-We-Know-Dont-and-Need-to-by-Margaret-Friesen-and-Magda-Havas-February-09-2021.pdf",
+          "pole": "one",
+          "topics": [
+            "bijen",
+            "masts"
+          ],
+          "issues": [
+            "emf-health",
+            "one-cymatics"
+          ],
+          "id": "magda-havas:shepherd-et-al-2018"
+        }
+      ],
+      "deel": "alleen de One-citaten; het portret blijft in 6gmatrix"
+    },
+    {
+      "id": "orwell",
+      "name": "George Orwell",
+      "role": "Schrijver · *Nineteen Eighty-Four* (1949)",
+      "register": "mirror",
+      "image": "images/portraits/orwell.jpg",
+      "photoCredit": "George Orwell press photo — Wikimedia Commons (public domain)",
+      "photoUrl": "https://commons.wikimedia.org/wiki/File:George_Orwell_press_photo.jpg",
+      "issues": [
+        "control-id",
+        "control-score",
+        "control-offline",
+        "iot-city"
+      ],
+      "topics": [
+        "narrative",
+        "no-optout",
+        "kill-switch",
+        "versus-one",
+        "precrime"
+      ],
+      "related": [
+        "huxley",
+        "steiner",
+        "fitts",
+        "wood"
+      ],
+      "naastElkaar": {
+        "companionId": "huxley",
+        "videos": [
+          {
+            "title": "Mike Wallace Interview — Huxley zet 1984 naast Brave New World",
+            "url": "https://www.youtube.com/watch?v=9bvS2s-tVP8",
+            "altUrl": "https://www.pbs.org/video/blank-blank-huxley/",
+            "altLabel": "PBS Blank on Blank",
+            "embed": "9bvS2s-tVP8",
+            "primary": true,
+            "year": 1958,
+            "note": "18 mei 1958 — niet in één studio; Huxley noemt Orwells 1984 expliciet."
+          },
+          {
+            "title": "1984 vs Brave New World — latere commentator",
+            "url": "https://www.youtube.com/watch?v=5m0sGAVoQ2s",
+            "year": 0,
+            "note": "Later commentary — niet Huxley of Orwell zelf."
+          }
+        ],
+        "quotes": [
+          {
+            "text": "George Orwell's \"1984\" … he foresaw a dictatorship using entirely the methods of terror, the methods of physical violence.",
+            "source": "Mike Wallace Interview, 18 May 1958 — Huxley over Orwell",
+            "year": 1958,
+            "url": "https://cuttingthroughthematrix.com/articles/Mike_Wallace_interviews_Aldous_Huxley_May_18_1958.html"
+          },
+          {
+            "text": "Dictators will find … that you can do everything with bayonets except sit on them!",
+            "source": "Mike Wallace Interview, 18 May 1958",
+            "year": 1958,
+            "url": "https://cuttingthroughthematrix.com/articles/Mike_Wallace_interviews_Aldous_Huxley_May_18_1958.html"
+          },
+          {
+            "text": "Whether in actual fact the policy of the boot-on-the-face can go on indefinitely seems doubtful. My own belief is that the ruling oligarchy will find less arduous and wasteful ways of governing … and these ways will resemble those which I described in Brave New World.",
+            "source": "Aldous Huxley, brief aan George Orwell, 21 October 1949",
+            "year": 1949,
+            "url": "https://archive.org/details/huxley-aldous-letter-to-george-orwell-page-1"
+          }
+        ]
+      },
+      "slug": "george-orwell",
+      "books": [
+        {
+          "title": "Nineteen Eighty-Four",
+          "authors": "George Orwell",
+          "year": 1949,
+          "url": "https://www.gutenberg.org/ebooks/3268",
+          "note": "Volledige tekst (PD UK/EU)."
+        },
+        {
+          "title": "Animal Farm",
+          "authors": "George Orwell",
+          "year": 1945,
+          "url": "https://www.gutenberg.org/ebooks/11640"
+        }
+      ],
+      "insight": "George Orwell publiceerde in 1949 de roman Nineteen Eighty-Four. Een scherm kijkt mee en praat terug. Het verleden wordt bijgewerkt tot de partij altijd gelijk heeft gehad.",
+      "intro": "De telescreen ontvangt en zendt tegelijk. Wie het verleden beheerst, beheerst de toekomst. Vrijheid is mogen zeggen dat twee plus twee vier is. Het beeld van de toekomst is een laars op een gezicht. Huxley schreef hem op 21 oktober 1949 dat die laars het niet zou uithouden.",
+      "quotes": [
+        {
+          "text": "If you want a picture of the future, imagine a boot stamping on a human face—for ever.",
+          "source": "Nineteen Eighty-Four, Part III, ch. 3",
+          "year": 1949,
+          "url": "https://www.gutenberg.org/ebooks/3268",
+          "topics": [
+            "versus-one"
+          ],
+          "issues": [
+            "control-score",
+            "control-offline"
+          ],
+          "id": "orwell:if-you-want-a"
+        }
+      ],
+      "deel": "alleen de One-citaten; het portret blijft in 6gmatrix"
+    },
+    {
+      "id": "tesla",
+      "pool": "one",
+      "name": "Nikola Tesla",
+      "role": "Uitvinder · draaiend magneetveld",
+      "register": "echo",
+      "image": "images/drawn/nikola-tesla.jpg",
+      "issues": [
+        "one-eu"
+      ],
+      "topics": [
+        "electric-universe"
+      ],
+      "quotes": [
+        {
+          "text": "As I uttered these inspiring words the idea came like a flash of lightning and in an instant the truth was revealed. I drew with a stick on the sand the diagrams shown six years later in my address before the American Institute of Electrical Engineers, and my companion understood them perfectly.",
+          "source": "My Inventions — Electrical Experimenter",
+          "year": 1919,
+          "url": "https://archive.org/details/my-inventions-and-other-works-jan.-oct.-1919-nikola-tesla",
+          "topics": [
+            "electric-universe"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "tesla:flash-of-lightning-sand"
+        },
+        {
+          "text": "See my motor here; watch me reverse it.",
+          "source": "My Inventions — Electrical Experimenter",
+          "year": 1919,
+          "url": "https://archive.org/details/my-inventions-and-other-works-jan.-oct.-1919-nikola-tesla",
+          "topics": [
+            "electric-universe"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "tesla:see-my-motor"
+        }
+      ],
+      "slug": "nikola-tesla",
+      "books": [
+        {
+          "title": "My Inventions",
+          "authors": "Nikola Tesla",
+          "year": 1919,
+          "url": "https://archive.org/details/my-inventions-and-other-works-jan.-oct.-1919-nikola-tesla",
+          "note": "Electrical Experimenter, 1919."
+        }
+      ],
+      "insight": "In My Inventions (Electrical Experimenter, 1919) wandelt Nikola Tesla met een vriend door het stadspark en reciteert Goethe’s Faust. Terwijl de zon zakt, ziet hij de motor.",
+      "intro": "Het idee kwam als een bliksemflits. Met een stok tekende hij in het zand de schema’s die hij zes jaar later voor het American Institute of Electrical Engineers liet zien, en hij zei: zie mijn motor, kijk hoe ik hem omkeer. Dat is zijn verslag van het draaiende magneetveld."
+    },
+    {
+      "id": "emoto",
+      "pool": "one",
+      "name": "Masaru Emoto",
+      "role": "Auteur · Messages from Water",
+      "register": "mirror",
+      "image": "images/drawn/masaru-emoto.jpg",
+      "issues": [
+        "one-water"
+      ],
+      "topics": [
+        "water-memory",
+        "living-water",
+        "crystals"
+      ],
+      "quotes": [
+        {
+          "text": "It was 1994 when the idea to freeze water and observe it with microscope came upon me. With this method, I was convinced that I should be able to see something like snow crystals. After two months of trial and error, this idea bore fruit. The beautifully shining hexagonal crystals were created from the invisible world.",
+          "source": "Message from Water",
+          "year": 1999,
+          "url": "https://masaru-emoto.net/en/mfw/",
+          "topics": [
+            "crystals",
+            "living-water"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "emoto:hexagonal-crystals-1994"
+        },
+        {
+          "text": "The result was that we always observed beautiful crystals after giving good words, playing good music, and showing, playing, or offering pure prayer to water. On the other hand, we observed disfigured crystals in the opposite situation.",
+          "source": "Message from Water",
+          "year": 1999,
+          "url": "https://masaru-emoto.net/en/mfw/",
+          "topics": [
+            "water-memory",
+            "crystals"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "emoto:words-music-prayer"
+        },
+        {
+          "text": "Therefore, the photograph of crystals is neither science nor religion. I hope it is enjoyed as a new type of art.",
+          "source": "Message from Water",
+          "year": 1999,
+          "url": "https://masaru-emoto.net/en/mfw/",
+          "topics": [
+            "crystals"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "emoto:neither-science-nor-religion"
+        },
+        {
+          "text": "Water is the mirror that has the ability to show us what we cannot see.",
+          "source": "Messages from Water",
+          "year": 2004,
+          "url": "https://www.masaru-emoto.net/en/",
+          "topics": [
+            "water-memory",
+            "living-water"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "emoto:water-is-the-mirror"
+        }
+      ],
+      "slug": "masaru-emoto",
+      "books": [
+        {
+          "title": "The Hidden Messages in Water",
+          "authors": "Masaru Emoto",
+          "year": 2004,
+          "url": "https://www.masaru-emoto.net/en/",
+          "note": "Engelse uitgave van Messages from Water."
+        }
+      ],
+      "insight": "In 1994 bevriest Masaru Emoto water en bekijkt het onder de microscoop, op zoek naar iets als sneeuwkristallen. Na twee maanden trial and error verschijnen glanzende hexagonale kristallen.",
+      "intro": "Goede woorden, goede muziek en gebed geven in zijn proeven telkens mooie kristallen; het tegendeel geeft misvormde. Hij noemt die foto’s geen wetenschap en geen religie, maar een nieuwe kunst. Messages from Water is dat corpus."
+    },
+    {
+      "id": "rife",
+      "pool": "one",
+      "name": "Royal Rife",
+      "role": "Uitvinder · microscoop & frequentie",
+      "register": "mirror",
+      "image": "images/drawn/royal-rife.jpg",
+      "issues": [
+        "one-light"
+      ],
+      "topics": [
+        "rife",
+        "sound"
+      ],
+      "quotes": [
+        {
+          "text": "The writer has over a period of thirty years has designed and built in his own laboratory 5 microscopes of power and resolution far beyond the so-called law of optical physics.",
+          "source": "Presenting a Brief History of the Evolution of the Microscope (Aerohrcrafter)",
+          "year": 1954,
+          "url": "https://rife.org/s/Aerocrafter-Rife-microscope-1954-article-transcribed.pdf",
+          "topics": [
+            "rife"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "rife:beyond-optical-physics-1954"
+        },
+        {
+          "text": "A monochromatic beam of light, corresponding exactly to the frequency of the organism (for the writer has found that each disease organism responds to and has a definite and distinct wavelength, a fact confirmed by British medical research workers) is then set up through the specimen",
+          "source": "Presenting a Brief History of the Evolution of the Microscope (Aerohrcrafter)",
+          "year": 1954,
+          "url": "https://rife.org/s/Aerocrafter-Rife-microscope-1954-article-transcribed.pdf",
+          "topics": [
+            "rife",
+            "sound"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "rife:frequency-of-the-organism-1954"
+        },
+        {
+          "text": "A living organism is composed of cells capable of being selectively destroyed by specific frequencies.",
+          "source": "Rife research (secundaire bron)",
+          "year": 1930,
+          "url": "https://www.rife.org/",
+          "topics": [
+            "sound",
+            "dna-harmonics"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "rife:a-living-organism-is"
+        }
+      ],
+      "slug": "royal-rife",
+      "insight": "Royal Rife schrijft in 1954 dat hij in dertig jaar vijf microscopen bouwde, met een vermogen en een oplossend vermogen ver voorbij wat hij de wet van de optische fysica noemt. Hun vergroting loopt van 17 tot 50.000 maal voorbij het gewone onderzoeksinstrument.",
+      "intro": "De Universal Microscope van 1933 telt 5.682 delen. Kwartsprisma’s lopen het spectrum af van infrarood tot ultraviolet. Hij schrijft dat elk ziekteorganisme een eigen golflengte heeft, en dat een monochrome bundel op díe frequentie het organisme in zijn eigen chemische kleur toont. Bij Bacillus typhosus is dat een blauw spectrum."
+    },
+    {
+      "id": "jenny",
+      "pool": "one",
+      "name": "Hans Jenny",
+      "role": "Arts · Cymatics",
+      "register": "documented",
+      "image": "images/drawn/hans-jenny.jpg",
+      "issues": [
+        "one-cymatics"
+      ],
+      "topics": [
+        "cymatics",
+        "sound"
+      ],
+      "quotes": [
+        {
+          "text": "Sound is the creative principle. It must be regarded as primordial.",
+          "source": "Cymatics Vol. I",
+          "year": 1967,
+          "url": "https://www.cymaticsource.com/",
+          "topics": [
+            "cymatics",
+            "sound"
+          ],
+          "issues": [
+            "one-cymatics"
+          ],
+          "id": "jenny:sound-is-the-creative"
+        }
+      ],
+      "slug": "hans-jenny",
+      "books": [
+        {
+          "title": "Cymatics: A Study of Wave Phenomena and Vibration",
+          "authors": "Hans Jenny",
+          "year": 1967,
+          "url": "https://www.cymaticsource.com/",
+          "note": "Volume I; Volume II 1974."
+        }
+      ],
+      "insight": "Hans Jenny was arts. Hij filmde wat een zuivere toon doet met vloeistof en poeder.",
+      "intro": "Cymatics verscheen in 1967. Daarin noemt hij geluid het scheppende beginsel, en oer. Amplitude, frequentie en het medium bepalen welke figuur blijft liggen."
+    },
+    {
+      "id": "schauberger",
+      "pool": "one",
+      "name": "Viktor Schauberger",
+      "role": "Boswachter · vlotgoten en water",
+      "register": "echo",
+      "image": "images/drawn/viktor-schauberger.jpg",
+      "issues": [
+        "one-water"
+      ],
+      "topics": [
+        "living-water",
+        "water-flow",
+        "vortex",
+        "forel"
+      ],
+      "quotes": [
+        {
+          "text": "humanity constantly does the most idiotic thing imaginable by trying to regulate these waterways by means of their banks - by influencing the flow mechanically, instead of taking into account the fact that water is itself a living entity.",
+          "source": "Our Senseless Toil — The Cause of the World Crisis",
+          "year": 1933,
+          "url": "https://svpwiki.com/pdffiles/SCHAUBERGER_-_OUR_SENSELESS_TOIL.pdf",
+          "topics": [
+            "living-water",
+            "water-flow"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "schauberger:water-is-itself-a-living-entity"
+        },
+        {
+          "text": "Water is no lifeless mass, but the blood of the Earth, which comes into being and disappears through energetic interactions.",
+          "source": "The Water Wizard — The Extraordinary Properties of Natural Water (Callum Coats ed./trans.)",
+          "year": 1997,
+          "url": "https://alkimist.net/wp-content/uploads/2015/11/Coats-Schauberger-The-water-wizard-The-extraordinary-properties-of-natural-water-1997.pdf",
+          "topics": [
+            "living-water",
+            "vortex"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "schauberger:blood-of-the-earth"
+        },
+        {
+          "text": "Science views the blood-building and character-influencing ur-organism - 'water' merely as a chemical compound and provides millions of people with a liquid prepared from this point of view, which is everything but healthy water.",
+          "source": "The Water Wizard — The Extraordinary Properties of Natural Water (Callum Coats ed./trans.)",
+          "year": 1997,
+          "url": "https://alkimist.net/wp-content/uploads/2015/11/Coats-Schauberger-The-water-wizard-The-extraordinary-properties-of-natural-water-1997.pdf",
+          "topics": [
+            "living-water"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "schauberger:science-views-water-chemical"
+        },
+        {
+          "text": "Why does a trout stand still in a raging torrent, as if by magic ?",
+          "source": "Our Senseless Toil — The Cause of the World Crisis",
+          "year": 1933,
+          "url": "https://svpwiki.com/pdffiles/SCHAUBERGER_-_OUR_SENSELESS_TOIL.pdf",
+          "topics": [
+            "forel",
+            "water-flow",
+            "vortex"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "schauberger:trout-stand-still"
+        },
+        {
+          "text": "It is possible to regulate watercourses over any given distance without embankment works; to transport timber and other materials, even when heavier than water, for example ore, stones, etc., down the centre of such water-courses; to raise the height of the water table in the surrounding countryside and to endow the water with all those elements necessary for the prevailing vegetation.",
+          "source": "Our Senseless Toil — The Cause of the World Crisis",
+          "year": 1933,
+          "url": "https://svpwiki.com/pdffiles/SCHAUBERGER_-_OUR_SENSELESS_TOIL.pdf",
+          "topics": [
+            "water-flow",
+            "vortex"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "schauberger:regulate-without-embankment"
+        },
+        {
+          "text": "Even in earliest youth my fondest desire was to understand Nature and through such understanding to come closer to truth; a truth I was unable to discover either at school or in church. In this quest I was thus drawn time and time again into the forest. I could sit for hours on end and watch the water flowing by without ever becoming tired or bored.",
+          "source": "Nature as Teacher (Callum Coats ed./trans.) — Implosion Magazine No. 67, Wenen, november 1933",
+          "year": 1933,
+          "url": "https://archive.org/download/NatureAsTeacher/ViktorSchauberger-NatureAsTeacher.pdf",
+          "topics": [
+            "living-water",
+            "water-flow"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "schauberger:fondest-desire-forest"
+        }
+      ],
+      "slug": "viktor-schauberger",
+      "books": [
+        {
+          "title": "Our Senseless Toil",
+          "authors": "Viktor Schauberger",
+          "year": 1933,
+          "url": "https://svpwiki.com/pdffiles/SCHAUBERGER_-_OUR_SENSELESS_TOIL.pdf",
+          "note": "De claim over waterlopen, hout en de grondwaterspiegel."
+        },
+        {
+          "title": "The Water Wizard",
+          "authors": "Viktor Schauberger",
+          "publisher": "Gateway",
+          "year": 1998,
+          "url": "https://alkimist.net/wp-content/uploads/2015/11/Coats-Schauberger-The-water-wizard-The-extraordinary-properties-of-natural-water-1997.pdf",
+          "note": "Engelse compilatie van zijn waterteksten, Callum Coats."
+        },
+        {
+          "title": "Viktor Schauberger: A Life of Learning from Nature",
+          "authors": "Jane Cobbald",
+          "publisher": "Floris Books",
+          "year": 2016,
+          "url": "https://www.florisbooks.co.uk/book/Jane-Cobbald/Viktor+Schauberger/9781782503453",
+          "note": "Biografie. Boswachter, vlotgoot 1924, octrooi 1927, repulsine. Gelezen in de pdf op schijf."
+        }
+      ],
+      "insight": "Viktor Schauberger (1885–1958) kwam uit een familie van bosmensen in Opper-Oostenrijk. Op zijn achttiende weigerde hij de universiteit, tegen de wil van zijn vader en met steun van zijn moeder: zijn twee oudere broers waren gegaan, en hij had gezien wat dat met hun denken deed. Hij wilde door zijn eigen ogen kijken, en werd opgeleid tot staatsboswachter. Na de Eerste Wereldoorlog beheerde hij 21.000 hectare voor prins Adolf von Schaumburg-Lippe, als boswachter en jachtopziener.",
+      "intro": "In 1924 bouwde hij voor de prins een houten vlotgoot die de berg om slingerde, met het profiel van een ei, eerst op eigen kosten. Daarna volgden zulke goten in Midden-Europa. In 1927 kreeg hij octrooi op rivierregeling van binnenuit. Jane Cobbald toont een tekening voor octrooi 146141, een zuigturbine die zij repulsine noemt, en voor octrooi 138296, leischoepen in een houten waterleiding die Wenen niet overnam."
+    },
+    {
+      "id": "pollack",
+      "pool": "one",
+      "name": "Gerald Pollack",
+      "role": "Biofysicus · University of Washington",
+      "register": "documented",
+      "image": "images/drawn/gerald-pollack.jpg",
+      "issues": [
+        "one-water"
+      ],
+      "topics": [
+        "living-water",
+        "water-memory"
+      ],
+      "quotes": [
+        {
+          "text": "We found a fourth phase of water that is not H2O.",
+          "source": "The Fourth Phase of Water",
+          "year": 2013,
+          "url": "https://www.pollacklab.org/",
+          "topics": [
+            "living-water"
+          ],
+          "issues": [
+            "one-water"
+          ],
+          "id": "pollack:we-found-a-fourth"
+        }
+      ],
+      "slug": "gerald-pollack",
+      "books": [
+        {
+          "title": "Cells, Gels and the Engines of Life",
+          "authors": "Gerald H. Pollack",
+          "publisher": "Ebner & Sons",
+          "year": 2001,
+          "url": "https://www.pollacklab.org/"
+        },
+        {
+          "title": "The Fourth Phase of Water",
+          "authors": "Gerald H. Pollack",
+          "publisher": "Ebner & Sons",
+          "year": 2013,
+          "url": "https://www.pollacklab.org/"
+        }
+      ],
+      "insight": "Gerald Pollack is biofysicus aan de University of Washington en leidt het Pollacklab. Zijn boeken zijn Cells, Gels and the Engines of Life (2001) en The Fourth Phase of Water (2013).",
+      "intro": "In The Fourth Phase of Water schrijft hij dat zijn lab een vierde fase van water vond die geen H2O is. Die laag aan hydrofiele oppervlakken heet daar exclusion zone. Dat is de labtaal naast de historische waterteksten in dit archief."
+    },
+    {
+      "id": "popp",
+      "pool": "one",
+      "name": "Fritz-Albert Popp",
+      "role": "Biophysicus · biophotonen",
+      "register": "documented",
+      "image": "images/drawn/fritz-albert-popp.jpg",
+      "issues": [
+        "one-light"
+      ],
+      "topics": [
+        "biophotons"
+      ],
+      "quotes": [
+        {
+          "text": "The word \"biophotons\" is used to denote a permanent spontaneous photon emission from all living systems. It displays a few up to some hundred photons /(s·cm²) within the spectral range from at least 260 to 800 nm.",
+          "source": "Properties of biophotons and their theoretical implications",
+          "year": 2003,
+          "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf",
+          "topics": [
+            "biophotons"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "popp:biophoton-definition-2003"
+        },
+        {
+          "text": "It is closely linked to delayed luminescence (DL) of biological tissues which describes the long term and ultra weak reemission of photons after exposure to light illumination. During relaxation DL turns continuously into the steady state biophoton emission",
+          "source": "Properties of biophotons and their theoretical implications",
+          "year": 2003,
+          "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf",
+          "topics": [
+            "biophotons"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "popp:delayed-luminescence-2003"
+        },
+        {
+          "text": "The physical properties indicate that biophotons originate from fully coherent and sometimes even squeezed states.",
+          "source": "Properties of biophotons and their theoretical implications",
+          "year": 2003,
+          "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf",
+          "topics": [
+            "biophotons"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "popp:coherence-2003"
+        }
+      ],
+      "slug": "fritz-albert-popp",
+      "books": [
+        {
+          "title": "Biophotonics",
+          "authors": "Fritz-Albert Popp e.a.",
+          "year": 2003,
+          "url": "https://www.lifescientists.de/publications/books/biophotonics/"
+        },
+        {
+          "title": "Properties of biophotons and their theoretical implications",
+          "authors": "Fritz-Albert Popp",
+          "year": 2003,
+          "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf",
+          "note": "Definitie, delayed luminescence en de coherentieclaim."
+        }
+      ],
+      "insight": "Fritz-Albert Popp is biofysicus. In 2003 definieert hij biophotonen als een permanente, spontane fotonemissie uit alle levende systemen.",
+      "intro": "De intensiteit die hij noemt loopt van enkele tot enkele honderden fotonen per seconde per vierkante centimeter, tussen minstens 260 en 800 nanometer. Hij koppelt die emissie aan delayed luminescence: na belichting zakt de heruitzending door naar die stabiele emissie. Dat de fotonen uit een volledig coherent veld komen, is zijn lezing van de meting."
+    },
+    {
+      "id": "lakhovsky",
+      "pool": "one",
+      "name": "Georges Lakhovsky",
+      "role": "Celoscillatie · multiple wave oscillator",
+      "register": "mirror",
+      "image": "images/drawn/georges-lakhovsky.jpg",
+      "issues": [
+        "one-light"
+      ],
+      "topics": [
+        "electric-universe",
+        "multiwave"
+      ],
+      "quotes": [
+        {
+          "text": "Every living cell is essentially dependent upon its nucleus for the continuance of its life.",
+          "source": "The Secret of Life",
+          "year": 1939,
+          "url": "https://archive.org/details/in.ernet.dli.2015.223742",
+          "topics": [
+            "multiwave"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "lakhovsky:every-living-cell-is"
+        },
+        {
+          "text": "I have demonstrated in my works that these cellular oscillating circuits, chromosomes and chondromes, vibrate electrically under the stimulus of electromagnetic waves: cosmic, atmospheric and telluric.",
+          "source": "Radiations and Waves: Sources of Our Life",
+          "year": 1941,
+          "url": "https://rexresearch1.com/Books/LakhovskyRadiationsWavesSourcesOurLife.pdf",
+          "topics": [
+            "electric-universe",
+            "multiwave"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "lakhovsky:cellular-oscillation-cosmic"
+        },
+        {
+          "text": "In 1930 I set up my first multiple wave-length oscillator, an appreciable improvement over the short wave oscillator with which I had cured cancer in pelargoniums inoculated with Bacterium tumefaciens in 1924.",
+          "source": "Radiations and Waves: Sources of Our Life",
+          "year": 1941,
+          "url": "https://rexresearch1.com/Books/LakhovskyRadiationsWavesSourcesOurLife.pdf",
+          "topics": [
+            "multiwave"
+          ],
+          "issues": [
+            "one-light"
+          ],
+          "id": "lakhovsky:mwo-1930"
+        }
+      ],
+      "slug": "georges-lakhovsky",
+      "books": [
+        {
+          "title": "The Secret of Life",
+          "authors": "Georges Lakhovsky",
+          "year": 1939,
+          "url": "https://archive.org/details/in.ernet.dli.2015.223742"
+        },
+        {
+          "title": "Radiations and Waves: Sources of Our Life",
+          "authors": "Georges Lakhovsky",
+          "year": 1941,
+          "url": "https://rexresearch1.com/Books/LakhovskyRadiationsWavesSourcesOurLife.pdf",
+          "note": "Cellulaire oscillatie en de multiple wave oscillator van 1930, in zijn eigen tekst."
+        }
+      ],
+      "insight": "Georges Lakhovsky werkte een theorie van cellulaire oscillatie uit en vatte die in 1941 samen in Radiations and Waves. Chromosomen en chondromen zijn daarin ultramicroscopische circuits.",
+      "intro": "Die circuits, schrijft hij, trillen elektrisch onder kosmische, atmosferische en tellurische golven. In 1930 zette hij zijn eerste multiple wave oscillator op, als verbetering van de kortegolf waarmee hij in 1924 pelargoniums behandelde die met Bacterium tumefaciens waren geïnoculeerd. Nature vatte in 1940 The Secret of Life samen als de cel als elektromagnetische resonator. Dat is zijn claim, geen huidige medische registratie."
+    },
+    {
+      "id": "russell",
+      "pool": "one",
+      "name": "Walter Russell",
+      "role": "Kunstenaar · universum in dualiteit",
+      "register": "echo",
+      "image": "images/drawn/walter-russell.jpg",
+      "issues": [
+        "one-eu"
+      ],
+      "topics": [
+        "electric-universe",
+        "russell-wave"
+      ],
+      "quotes": [
+        {
+          "text": "Truth is simple. Balance is simple. Rhythmic balanced interchange between all pairs of opposite expressions in Natural phenomena, and in human relations, is the consummate art of God's universe of Light. It is also the Law.",
+          "source": "The Secret of Light",
+          "year": 1947,
+          "url": "https://files.spiritmaji.com/books/spiritual-science/The_Secret_of_Light_by_Walter_Russell.pdf",
+          "topics": [
+            "electric-universe",
+            "russell-wave"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "russell:rhythmic-balanced-interchange-between"
+        },
+        {
+          "text": "In this one fundamental Universal Law lies the balanced continuity of all creative expression in God's electric wave universe of two conditioned lights in seeming motion which record God's One Whole Idea of Creation into countless seemingly separate parts of that Whole Idea.",
+          "source": "The Secret of Light",
+          "year": 1947,
+          "url": "https://files.spiritmaji.com/books/spiritual-science/The_Secret_of_Light_by_Walter_Russell.pdf",
+          "topics": [
+            "russell-wave",
+            "electric-universe"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "russell:electric-wave-universe"
+        },
+        {
+          "text": "IN THE WAVE LIES THE SECRET OF CREATION",
+          "source": "The Secret of Light",
+          "year": 1947,
+          "url": "https://files.spiritmaji.com/books/spiritual-science/The_Secret_of_Light_by_Walter_Russell.pdf",
+          "topics": [
+            "russell-wave"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "russell:secret-of-creation"
+        }
+      ],
+      "slug": "walter-russell",
+      "books": [
+        {
+          "title": "The Universal One",
+          "authors": "Walter Russell",
+          "year": 1926,
+          "url": "https://philosophy.org/walter-russell/"
+        },
+        {
+          "title": "The Secret of Light",
+          "authors": "Walter Russell",
+          "year": 1947,
+          "url": "https://files.spiritmaji.com/books/spiritual-science/The_Secret_of_Light_by_Walter_Russell.pdf"
+        }
+      ],
+      "insight": "Walter Russell publiceerde The Secret of Light in 1947. Hij noemt ritmische uitwisseling tussen paren van tegengestelden de wet van zijn lichtuniversum.",
+      "intro": "In die wet, schrijft hij, ligt de continuïteit van schepping in een elektrisch golfuniversum van twee geconditioneerde lichten. De zin die hij in kapitalen zet: in de golf ligt het geheim van de schepping."
+    },
+    {
+      "id": "thornhill",
+      "name": "Wallace W. Thornhill (Wal Thornhill)",
+      "role": "Electric Universe · plasma-kosmologie · Open Astronomy Journal / NPA",
+      "register": "documented",
+      "image": "images/portraits/thornhill.jpg",
+      "issues": [
+        "one-eu"
+      ],
+      "topics": [
+        "electric-universe",
+        "versus-one"
+      ],
+      "quotes": [
+        {
+          "text": "Despite the media hoopla, there is no real cosmology at the beginning of the 21st century.",
+          "source": "Toward a Real Cosmology in the 21st Century, The Open Astronomy Journal / Thunderbolts",
+          "year": 2011,
+          "url": "https://www.thunderbolts.info/wp/2011/10/27/toward-a-real-cosmology-in-the-21st-century/",
+          "topics": [
+            "electric-universe",
+            "versus-one"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "thornhill:despite-the-media-hoopla"
+        },
+        {
+          "text": "The Electric Universe is a cosmology that argues the powerful electromagnetic force plays a dominant role in the birth and life of stars. This new paradigm is an extension of well-established plasma cosmology. The Electric Universe has unequalled success in predicting and simply explaining many new discoveries in the space age without requiring ad hoc modifications and the introduction of unobservable entities and non physical concepts.",
+          "source": "The Electric Universe Illuminates Recent Discoveries, Proceedings of the NPA Vol. 9",
+          "year": 2012,
+          "url": "https://cosmology.info/models/non-expanding-cosmologies/eu-20120711.pdf",
+          "topics": [
+            "electric-universe"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "thornhill:the-electric-universe-is"
+        },
+        {
+          "text": "A real cosmology must be a broad and coherent natural philosophy. […] The Electric Universe is a convergent, interdisciplinary cosmology that attempts, in the words of E. O. Wilson, \"consilience,\" or \"the unity of knowledge.\"",
+          "source": "Toward a Real Cosmology in the 21st Century, The Open Astronomy Journal",
+          "year": 2011,
+          "url": "https://benthamopen.com/contents/pdf/TOAAJ/TOAAJ-4-191.pdf",
+          "topics": [
+            "electric-universe",
+            "versus-one"
+          ],
+          "issues": [
+            "one-eu"
+          ],
+          "id": "thornhill:a-real-cosmology-must"
+        }
+      ],
+      "slug": "wal-thornhill",
+      "insight": "Wallace Thornhill schrijft in 2011 dat er aan het begin van de eenentwintigste eeuw geen echte kosmologie is, ondanks de aandacht in de media.",
+      "intro": "Het Electric Universe, schrijft hij in 2012, is een kosmologie waarin de elektromagnetische kracht een dominante rol speelt in de geboorte en het leven van sterren. Hij noemt het een uitbreiding van de plasmakosmologie."
+    },
+    {
+      "id": "sheldrake",
+      "name": "Rupert Sheldrake",
+      "role": "Morphic resonance · A New Science of Life · sheldrake.org",
+      "register": "documented",
+      "image": "images/portraits/sheldrake.jpg",
+      "issues": [
+        "one-organism"
+      ],
+      "topics": [
+        "versus-one",
+        "mind"
+      ],
+      "quotes": [
+        {
+          "text": "In the hypothesis of formative causation, discussed in detail in my books A New Science of Life and The Presence of the Past, I propose that memory is inherent in nature. Most of the so-called laws of nature are more like habits.",
+          "source": "Morphic Resonance and Morphic Fields – an Introduction, sheldrake.org",
+          "year": 1988,
+          "url": "https://www.sheldrake.org/research/morphic-resonance/introduction",
+          "topics": [
+            "versus-one",
+            "mind"
+          ],
+          "issues": [
+            "one-organism"
+          ],
+          "id": "sheldrake:in-the-hypothesis-of"
+        },
+        {
+          "text": "Morphogenetic fields are not fixed forever, but evolve. The fields of Afghan hounds and poodles have become different from those of their common ancestors, wolves. How are these fields inherited? I propose that that they are transmitted from past members of the species through a kind of non-local resonance, called morphic resonance.",
+          "source": "Morphic Resonance and Morphic Fields – an Introduction, sheldrake.org",
+          "year": 1988,
+          "url": "https://www.sheldrake.org/research/morphic-resonance/introduction",
+          "topics": [
+            "versus-one",
+            "mind"
+          ],
+          "issues": [
+            "one-organism"
+          ],
+          "id": "sheldrake:morphogenetic-fields-are-not"
+        },
+        {
+          "text": "Morphic resonance is a process whereby self-organising systems inherit a memory from previous similar systems. […] Memory need not be stored in material traces inside brains, which are more like TV receivers than video recorders, tuning into influences from the past.",
+          "source": "Morphic Resonance: Research and Papers, sheldrake.org",
+          "year": 1988,
+          "url": "https://www.sheldrake.org/research/morphic-resonance",
+          "topics": [
+            "mind",
+            "versus-one"
+          ],
+          "issues": [
+            "one-organism"
+          ],
+          "id": "sheldrake:morphic-resonance-is-a"
+        }
+      ],
+      "slug": "rupert-sheldrake",
+      "insight": "Rupert Sheldrake is bioloog. In A New Science of Life en The Presence of the Past stelt hij dat geheugen in de natuur zelf zit, en dat de meeste zogenaamde natuurwetten meer op gewoonten lijken.",
+      "intro": "Morfische resonantie noemt hij het proces waarbij een zelforganiserend systeem een geheugen erft van eerdere soortgelijke systemen. De velden van Afghaanse windhonden en poedels zijn anders geworden dan die van hun gemeenschappelijke voorouder, de wolf."
+    }
+  ]
+}

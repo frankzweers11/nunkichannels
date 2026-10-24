@@ -1,0 +1,33 @@
+{
+  "id": "dna-resonantie",
+  "inleiding": "Montagniers elektromagnetische signalen uit verdund DNA staan naast Gariaevs golfgenetica. Twee hypothesen over erfelijkheid als trilling; een gedeelde standaard is er niet.",
+  "haak": "Montagnier e.a. (2009) claimen dat bacteriële DNA-sequenties bij hoge verdunning elektromagnetische golven kunnen induceren — controversieel, in-development. Gariaev beschrijft chromosomen als bron/ontvanger van genetische 'texts' en holografisch rooster — echo. Poponin rapporteert het 'DNA Phantom Effect' — geen mainstream consensus. Geen bewijs voor DNA-radio als standaard.",
+  "slides": [
+    { "type": "intro" },
+    {
+      "type": "fact",
+      "ref": "montagnier-2009-dna-ems-abstract",
+      "caption": "Montagnier 2009: DNA induceert EMS bij verdunning — in-development, omstreden."
+    },
+    {
+      "type": "fact",
+      "ref": "montagnier-nanostructures-defined-size",
+      "caption": "EMS gekoppeld aan nanostructuren in water — experimentele claim."
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-dna-wave-biocomputer-claims",
+      "caption": "Gariaev: DNA-wave biocomputer — echo, niet mainstream genetica."
+    },
+    {
+      "type": "fact",
+      "ref": "poponin-dna-phantom-effect",
+      "caption": "DNA Phantom Effect — echo, geen consensus."
+    }
+  ],
+  "sourceIds": [
+    "l-montagnier-et-al-2009",
+    "gariaev-dna-wave-biocomputer",
+    "poponin-dna-phantom"
+  ]
+}

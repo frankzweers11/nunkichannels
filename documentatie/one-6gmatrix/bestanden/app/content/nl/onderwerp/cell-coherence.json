@@ -1,0 +1,41 @@
+{
+  "id": "cell-coherence",
+  "inleiding": "Sommige lezingen behandelen weefsel als resonator: cellen die een gemeenschappelijke frequentie aanhouden. Hypothese, naast de metingen aan biophotonen.",
+  "haak": "Fröhlich (Int. J. Quantum Chem. 1968): biologische systemen zouden een tak van longitudinale elektrische modi hebben tussen 10¹¹ en 10¹² s⁻¹, gebaseerd op dipolaire celmembranen, H-bruggen in macromoleculen, en mogelijk niet-gelokaliseerde elektronen. Zelfde paper: boven een kritieke energie-toevoer bereikt het systeem een steady state waarin één modus zeer sterk is aangeslagen; energie wordt geordend opgeslagen met long-range phase correlations, analoog aan Bose-condensatie.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "frohlich-longitudinal-modes-1968",
+      "caption": "Longitudinale elektrische modi 10¹¹–10¹² s⁻¹"
+    },
+    {
+      "type": "fact",
+      "ref": "frohlich-single-mode-bose-1968",
+      "caption": "Één modus sterk aangeslagen — Bose-analogie"
+    },
+    {
+      "type": "fact",
+      "ref": "frohlich-membrane-field-classic-1988",
+      "caption": "100 mV over membraan → ~10⁵ V/cm"
+    },
+    {
+      "type": "source",
+      "label": "H. Fröhlich — Long-range coherence and energy storage in biological systems",
+      "url": "https://doi.org/10.1002/qua.560020505",
+      "caption": "Fröhlich (Int. J. Quantum Chem. 1968): biologische systemen zouden een tak van longitudinale elektrische modi hebben tussen 10¹¹ en 10¹² s⁻¹, gebaseerd op dipolaire celmembranen, H-bruggen in macromoleculen, en mogelijk niet-gelokaliseerde elektronen."
+    },
+    {
+      "type": "source",
+      "label": "H. Fröhlich — Long-range coherence and energy storage in biological systems",
+      "url": "https://doi.org/10.1002/qua.560020505",
+      "caption": "Zelfde paper: boven een kritieke energie-toevoer bereikt het systeem een steady state waarin één modus zeer sterk is aangeslagen; energie wordt geordend opgeslagen met long-range phase correlations, analoog aan Bose-condensatie."
+    }
+  ],
+  "sourceIds": [
+    "h-fr-hlich-1968",
+    "h-fr-hlich-1988"
+  ]
+}

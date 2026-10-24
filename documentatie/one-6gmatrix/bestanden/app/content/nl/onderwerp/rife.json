@@ -1,0 +1,42 @@
+{
+  "id": "rife",
+  "inleiding": "Royal Rife beschrijft in 1954 vijf microscopen die hij bouwde. De Universal Microscope (1933) heeft volgens zijn tekst 5.682 delen, kwartsoptiek en meerdere belichtingen. Een medisch protocol is deze pagina niet.",
+  "haak": "In zijn Aerohrcrafter-artikel (1954) schrijft Royal R. Rife zelf over vijf microscopen die hij bouwde; de Universal Microscope (1933) heeft 5.682 delen, kwarts-optiek (UV-transparant) en meerdere belichtingsmodi — instrumentclaim uit zijn tekst. *California and Western Medicine* (dec 1931): Kendall & Rife publiceren een preliminary communication over *Bacillus typhosus* in filterbare toestand, waargenomen met de Rife-microscoop (o.a. turquoise-blauwe motile granules bij 5000×) — historisch peer-artikel; geen moderne replicatie hier.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "rife-aerocrafter-universal-microscope-1954",
+      "caption": "Rife beschrijft Universal Microscope (1933)"
+    },
+    {
+      "type": "fact",
+      "ref": "rife-kendall-filterable-typhoid-1931",
+      "caption": "Kendall & Rife 1931: filterbare typhoid onder Rife-scope"
+    },
+    {
+      "type": "fact",
+      "ref": "rife-franklin-institute-universal-1944",
+      "caption": "Franklin Institute 1944 documenteert Universal Microscope"
+    },
+    {
+      "type": "source",
+      "label": "Royal R. Rife — Presenting a Brief History of the Evolution of the Microscope (Aerohrcrafter)",
+      "url": "https://rife.org/s/Aerocrafter-Rife-microscope-1954-article-transcribed.pdf",
+      "caption": "In zijn Aerohrcrafter-artikel (1954) schrijft Royal R. Rife zelf over vijf microscopen die hij bouwde; de Universal Microscope (1933) heeft 5.682 delen, kwarts-optiek (UV-transparant) en meerdere belichtingsmodi — instrumentclaim uit zijn tekst."
+    },
+    {
+      "type": "source",
+      "label": "Arthur I. Kendall & Royal R. Rife — Observations on Bacillus Typhosus in its Filterable State",
+      "url": "https://rife.org/s/California-Western-Kendall-Rife-article-Dec-1931.pdf",
+      "caption": "*California and Western Medicine* (dec 1931): Kendall & Rife publiceren een preliminary communication over *Bacillus typhosus* in filterbare toestand, waargenomen met de Rife-microscoop (o.a. turquoise-blauwe motile granules bij 5000×) — historisch peer-artikel; geen moderne replicatie hier."
+    }
+  ],
+  "sourceIds": [
+    "royal-r-rife-1954",
+    "arthur-i-kendall-royal-r-rife-1931",
+    "r-e-seidel-m-elizabeth-winter-1944"
+  ]
+}

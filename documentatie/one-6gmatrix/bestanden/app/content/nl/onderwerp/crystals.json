@@ -1,0 +1,41 @@
+{
+  "id": "crystals",
+  "inleiding": "Emoto fotografeerde ijskristallen en koppelde hun vorm aan woorden en muziek. Culturele lezing van water; een gecontroleerde replicatie staat niet in dit dossier.",
+  "haak": "Emoto beschrijft vanaf 1994 hoe bevroren water onder microscoop hexagonale kristallen toont; schoon water “mooie” kristallen, stedelijk/tapwater niet. Emoto claimt dat goede woorden/muziek/gebed tot mooie kristallen leiden, het tegendeel tot misvormde — en noemt de fotoselectie zelf “beauty”, noch science noch religion.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "emoto-hexagonal-crystals-1994",
+      "caption": "Emoto ziet hexagonale kristallen"
+    },
+    {
+      "type": "fact",
+      "ref": "emoto-words-music-prayer",
+      "caption": "Woorden en muziek “vormen” kristallen"
+    },
+    {
+      "type": "fact",
+      "ref": "emoto-ions-blind-note",
+      "caption": "IONS-test: bias en esthetiek"
+    },
+    {
+      "type": "source",
+      "label": "Masaru Emoto / Office Masaru Emoto — Message from Water",
+      "url": "https://masaru-emoto.net/en/mfw/",
+      "caption": "Emoto beschrijft vanaf 1994 hoe bevroren water onder microscoop hexagonale kristallen toont; schoon water “mooie” kristallen, stedelijk/tapwater niet."
+    },
+    {
+      "type": "source",
+      "label": "Masaru Emoto — Message from Water",
+      "url": "https://masaru-emoto.net/en/mfw/",
+      "caption": "Emoto claimt dat goede woorden/muziek/gebed tot mooie kristallen leiden, het tegendeel tot misvormde — en noemt de fotoselectie zelf “beauty”, noch science noch religion."
+    }
+  ],
+  "sourceIds": [
+    "masaru-emoto-office-masaru-emoto-1999",
+    "office-masaru-emoto-citing-ions-radin-et-al"
+  ]
+}

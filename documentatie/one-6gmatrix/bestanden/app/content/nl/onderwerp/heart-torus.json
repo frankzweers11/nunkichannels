@@ -1,0 +1,41 @@
+{
+  "id": "heart-torus",
+  "inleiding": "HeartMath schrijft dat het hart het sterkste ritmische biomagnetische veld van het lichaam produceert, tot meters buiten het lichaam. De timing tussen hartslagpulsen in dat veld verandert met de emotionele toestand.",
+  "haak": "HeartMath (Science of the Heart, Energetic Communication): het hart produceert het sterkste ritmische biomagnetische veld van het lichaam; het strekt zich uit rond elke cel en meters buiten het lichaam. HeartMath: timing tussen hartslagpulsen in het magnetische veld wordt gemoduleerd door emotionele staten — informatie zit in patroon, niet alleen in amplitude.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-torus-magnetic-envelops-cells",
+      "caption": "Hartveld omhult elke cel"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-torus-emotional-encoding",
+      "caption": "Emotie in het veldspectrum"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-torus-wikipedia-ring-form",
+      "caption": "Torus als ringvorm"
+    },
+    {
+      "type": "source",
+      "label": "HeartMath Institute — Science of the Heart — The Biophysics of Energetic Communication",
+      "url": "https://www.heartmath.org/research/science-of-the-heart/energetic-communication/",
+      "caption": "HeartMath: timing tussen hartslagpulsen in het magnetische veld wordt gemoduleerd door emotionele staten — informatie zit in patroon, niet alleen in amplitude."
+    },
+    {
+      "type": "source",
+      "label": "HeartMath Institute — Science of the Heart — The Biophysics of Energetic Communication",
+      "url": "https://www.heartmath.org/research/science-of-the-heart/energetic-communication/",
+      "caption": "HeartMath (Science of the Heart, Energetic Communication): het hart produceert het sterkste ritmische biomagnetische veld van het lichaam; het strekt zich uit rond elke cel en meters buiten het lichaam."
+    }
+  ],
+  "sourceIds": [
+    "science-of-the-heart-the-biophysics-of-energetic",
+    "torus"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "biophotons",
+  "inleiding": "Popp meet ultrazwakke fotonenemissie uit levend weefsel: licht dat de cel zelf afgeeft, ver onder zichtbaar daglicht.",
+  "haak": "Popp (IJEB 2003) definieert biophotonen als permanente spontane photon-emissie uit alle levende systemen, met intensiteit van enkele tot enkele honderden fotonen/(s·cm²) in het bereik ≈260–800 nm. Popp koppelt biophoton-emissie aan delayed luminescence (DL): langdurige ultrazwakke heruitzending na belichting; tijdens relaxatie gaat DL continu over in de steady-state biophoton-emissie.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "popp-biophoton-definition-intensity-2003",
+      "caption": "Biophotonen: permanente emissie, paar–honderden fotonen"
+    },
+    {
+      "type": "fact",
+      "ref": "popp-delayed-luminescence-link-2003",
+      "caption": "Biophoton ↔ delayed luminescence"
+    },
+    {
+      "type": "fact",
+      "ref": "popp-coherence-claim-2003",
+      "caption": "Coherent / squeezed states — interpretatie"
+    },
+    {
+      "type": "source",
+      "label": "Fritz-Albert Popp — Properties of biophotons and their theoretical implications",
+      "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf",
+      "caption": "Popp (IJEB 2003) definieert biophotonen als permanente spontane photon-emissie uit alle levende systemen, met intensiteit van enkele tot enkele honderden fotonen/(s·cm²) in het bereik ≈260–800 nm."
+    },
+    {
+      "type": "source",
+      "label": "Fritz-Albert Popp — Properties of biophotons and their theoretical implications",
+      "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf",
+      "caption": "Popp stelt dat de fysische eigenschappen wijzen op volledig coherente en soms squeezed states van het biophoton-veld — theoretische lezing van metingen, geen consensus-medische claim."
+    }
+  ],
+  "sourceIds": [
+    "fritz-albert-popp-2003"
+  ]
+}

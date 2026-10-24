@@ -1,0 +1,40 @@
+{
+  "id": "resonance",
+  "inleiding": "Resonantie is het meetrillen van een snaar of plaat als de aandrijffrequentie bij haar eigen frequentie past. Dat is mechanica, ouder dan de radio, en in een schoollokaal te tellen als staande buiken.",
+  "haak": "Helmholtz toont dat sympathetische resonantie objectieve mechanische effecten heeft, onafhankelijk van het oor: periodieke impulsen met passende periode bouwen grote oscillaties op. Helmholtz noemt het muzikanten-bekende geval: snaren van twee violen in unisono — strijk de ene, de andere begint mee te trillen.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "helmholtz-sympathetic-resonance",
+      "caption": "Helmholtz: meetrilling is mechanisch"
+    },
+    {
+      "type": "fact",
+      "ref": "helmholtz-violin-unison",
+      "caption": "Twee violen, één snaar beweegt mee"
+    },
+    {
+      "type": "fact",
+      "ref": "helmholtz-chladni-sand-nodes",
+      "caption": "Zand verzamelt zich op knopen"
+    },
+    {
+      "type": "source",
+      "label": "Hermann von Helmholtz (trans. A.J. Ellis) — On the Sensations of Tone",
+      "url": "https://sensationsoftone.com/Chapter3.html",
+      "caption": "Helmholtz documenteert Chladni’s methode: strooi zand op een trillende membraan/plaat — zand verzamelt zich op knooplijnen (nodal lines)."
+    },
+    {
+      "type": "source",
+      "label": "Hermann von Helmholtz — On the Sensations of Tone",
+      "url": "https://sensationsoftone.com/Chapter3.html",
+      "caption": "Helmholtz toont dat sympathetische resonantie objectieve mechanische effecten heeft, onafhankelijk van het oor: periodieke impulsen met passende periode bouwen grote oscillaties op."
+    }
+  ],
+  "sourceIds": [
+    "hermann-von-helmholtz-trans-a-j-ellis-1895"
+  ]
+}

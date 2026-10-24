@@ -1,0 +1,41 @@
+{
+  "id": "montagnier-signal",
+  "inleiding": "Montagnier en collega’s rapporteren in 2009 elektromagnetische signalen uit sterk verdunde DNA-oplossingen. Dat is een paper en een hypothese, geen standaard voor hoe erfelijkheid werkt.",
+  "haak": "2009-paper: sommige bacteriële DNA-sequenties induceren elektromagnetische golven bij hoge waterverdunning; resonantie getriggerd door ambient VLF-achtergrond. 2011: bacteriële en virale DNA-sequenties induceren laagfrequente EM-golven in hoge waterverdunningen; getriggerd door ambient VLF.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "montagnier-2009-abstract-ems",
+      "caption": "Bacterieel DNA → EM-golven bij hoge verdunning"
+    },
+    {
+      "type": "fact",
+      "ref": "montagnier-2011-dna-waves-abstract",
+      "caption": "Bacterieel én viraal DNA → laagfrequente EM"
+    },
+    {
+      "type": "fact",
+      "ref": "montagnier-2011-ulf-500-3000",
+      "caption": "ULF 500–3000 Hz in filtraten"
+    },
+    {
+      "type": "source",
+      "label": "Luc Montagnier, Jamal Aïssa, Stéphane Ferris, Jean-Luc Montagnier, Claude Lavallée — Electromagnetic signals are produced by aqueous nanostructures derived from bacterial DNA sequences",
+      "url": "https://doi.org/10.1007/s12539-009-0036-7",
+      "caption": "2009-paper: sommige bacteriële DNA-sequenties induceren elektromagnetische golven bij hoge waterverdunning; resonantie getriggerd door ambient VLF-achtergrond."
+    },
+    {
+      "type": "source",
+      "label": "L. Montagnier et al. — DNA waves and water",
+      "url": "https://iopscience.iop.org/article/10.1088/1742-6596/306/1/012007/pdf",
+      "caption": "2011: bacteriële en virale DNA-sequenties induceren laagfrequente EM-golven in hoge waterverdunningen; getriggerd door ambient VLF."
+    }
+  ],
+  "sourceIds": [
+    "l-montagnier-et-al-2009",
+    "l-montagnier-et-al-2011"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "thunderbolts",
+  "inleiding": "Thornhill leest sterren als elektromagnetische ontladingen: Birkeland-stromen en plasma. Controversieel ten opzichte van het standaardmodel, in zijn eigen papers.",
+  "haak": "Thornhill (Thunderbolts / EU) stelt dat IEEE plasma-kosmologie erkent, terwijl astronomiestudenten die vaak niet kennen; plasma vormt bijna het gehele zichtbare heelal. In EU-definitie is een ster een anode-focus van een plasma glow discharge die energie van een externe bron uitstraalt (Thornhill’s claim).",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "thornhill-2011-plasma-cosmology-ieee",
+      "caption": "IEEE erkent plasma-kosmologie"
+    },
+    {
+      "type": "fact",
+      "ref": "thornhill-2011-electric-star-definition",
+      "caption": "Ster = anode-focus glow discharge"
+    },
+    {
+      "type": "fact",
+      "ref": "scott-electric-sky-99-percent-plasma",
+      "caption": "~99% van het heelal is plasma"
+    },
+    {
+      "type": "source",
+      "label": "Wallace W. Thornhill — Toward a Real Cosmology in the 21st Century",
+      "url": "https://benthamopen.com/contents/pdf/TOAAJ/TOAAJ-4-191.pdf",
+      "caption": "In EU-definitie is een ster een anode-focus van een plasma glow discharge die energie van een externe bron uitstraalt (Thornhill’s claim)."
+    },
+    {
+      "type": "source",
+      "label": "Thornhill 2011, §8 “The Electric Sun” — ",
+      "url": "https://benthamopen.com/contents/pdf/TOAAJ/TOAAJ-4-191.pdf",
+      "caption": "Thornhill (Thunderbolts / EU) stelt dat IEEE plasma-kosmologie erkent, terwijl astronomiestudenten die vaak niet kennen; plasma vormt bijna het gehele zichtbare heelal."
+    }
+  ],
+  "sourceIds": [
+    "wallace-w-thornhill-2011",
+    "donald-e-scott-2006"
+  ]
+}

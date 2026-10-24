@@ -1,0 +1,549 @@
+{
+  "sources": [
+    {
+      "id": "6gmatrix-one-2026",
+      "name": "6gmatrix.nl",
+      "org": "6gmatrix.nl",
+      "title": "Projectpayoff",
+      "year": 2026,
+      "url": "https://6gmatrix.nl"
+    },
+    {
+      "id": "6gmatrix-one-2026-2",
+      "name": "6gmatrix.nl",
+      "org": "6gmatrix.nl",
+      "title": "One-pool",
+      "year": 2026,
+      "url": "https://6gmatrix.nl/one/thema/het-hart-als-vortex"
+    },
+    {
+      "id": "arthur-i-kendall-royal-r-rife-1931",
+      "name": "Arthur I. Kendall & Royal R. Rife",
+      "org": "Arthur I. Kendall & Royal R. Rife",
+      "title": "Observations on Bacillus Typhosus in its Filterable State",
+      "year": 1931,
+      "url": "https://rife.org/s/California-Western-Kendall-Rife-article-Dec-1931.pdf"
+    },
+    {
+      "id": "callum-coats-ed-trans-presenting-viktor-schauberger-1997",
+      "name": "Callum Coats (ed./trans.) presenting Viktor Schauberger",
+      "org": "Callum Coats (ed./trans.) presenting Viktor Schauberger",
+      "title": "The Water Wizard — The Extraordinary Properties of Natural Water",
+      "year": 1997,
+      "url": "https://alkimist.net/wp-content/uploads/2015/11/Coats-Schauberger-The-water-wizard-The-extraordinary-properties-of-natural-water-1997.pdf"
+    },
+    {
+      "id": "daniel-c-elton-peter-d-spencer-james-d",
+      "name": "Daniel C. Elton, Peter D. Spencer, James D. Riches, Elizabeth D. Williams",
+      "org": "Daniel C. Elton, Peter D. Spencer, James D. Riches, Elizabeth D. Williams",
+      "title": "Exclusion Zone Phenomena in Water—A Critical Review of Experimental Findings and Theories",
+      "year": 2020,
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7404113/"
+    },
+    {
+      "id": "david-b-searls-2002",
+      "name": "David B. Searls",
+      "org": "David B. Searls",
+      "title": "The language of genes",
+      "year": 2002,
+      "url": "https://doi.org/10.1038/nature01255"
+    },
+    {
+      "id": "donald-e-scott-2006",
+      "name": "Donald E. Scott",
+      "org": "Donald E. Scott",
+      "title": "The Electric Sky",
+      "year": 2006,
+      "url": "https://www.bibliotecapleyades.net/electric_universe/electric_sky.htm"
+    },
+    {
+      "id": "e-davenas-et-al-1988",
+      "name": "E. Davenas et al.",
+      "org": "E. Davenas et al.",
+      "title": "Human basophil degranulation triggered by very dilute antiserum against IgE",
+      "year": 1988,
+      "url": "https://www.nature.com/articles/333816a0"
+    },
+    {
+      "id": "edward-baxter-perry-1921",
+      "name": "Edward Baxter Perry",
+      "org": "Edward Baxter Perry",
+      "title": "The Art of Music, Vol. V (over Helmholtz)",
+      "year": 1921,
+      "url": "https://www.gutenberg.org/files/74367/74367-h/74367-h.htm"
+    },
+    {
+      "id": "ernst-chladni-via-wikipedia-1787",
+      "name": "Ernst Chladni (via Wikipedia)",
+      "org": "Ernst Chladni (via Wikipedia)",
+      "title": "Entdeckungen über die Theorie des Klanges",
+      "year": 1787,
+      "url": "https://en.wikipedia.org/wiki/Ernst_Chladni"
+    },
+    {
+      "id": "ernst-florens-friedrich-chladni-1787",
+      "name": "Ernst Florens Friedrich Chladni",
+      "org": "Ernst Florens Friedrich Chladni",
+      "title": "Entdeckungen über die Theorie des Klanges",
+      "year": 1787,
+      "url": "https://www.deutschestextarchiv.de/chladni_klang_1787/9"
+    },
+    {
+      "id": "ernst-florens-friedrich-chladni-1787-2",
+      "name": "Ernst Florens Friedrich Chladni",
+      "org": "Ernst Florens Friedrich Chladni",
+      "title": "Entdeckungen über die Theorie des Klanges",
+      "year": 1787,
+      "url": "https://www.deutschestextarchiv.de/chladni_klang_1787/11"
+    },
+    {
+      "id": "ernst-florens-friedrich-chladni-1787-3",
+      "name": "Ernst Florens Friedrich Chladni",
+      "org": "Ernst Florens Friedrich Chladni",
+      "title": "Entdeckungen über die Theorie des Klanges",
+      "year": 1787,
+      "url": "https://www.deutschestextarchiv.de/chladni_klang_1787/28"
+    },
+    {
+      "id": "f-a-popp-et-al-2004",
+      "name": "F. A. Popp et al.",
+      "org": "F. A. Popp et al.",
+      "title": "Properties of biophotons and their theoretical implications",
+      "year": 2004,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/15244259/"
+    },
+    {
+      "id": "fritz-albert-popp-2003",
+      "name": "Fritz-Albert Popp",
+      "org": "Fritz-Albert Popp",
+      "title": "Properties of biophotons and their theoretical implications",
+      "year": 2003,
+      "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf"
+    },
+    {
+      "id": "gariaev-dna-wave-biocomputer",
+      "name": "Peter P. Gariaev et al.",
+      "org": "Peter P. Gariaev et al.",
+      "title": "The DNA-wave Biocomputer (Modern Orgone anthology)",
+      "year": 2001,
+      "url": "https://lust-for-life.org/Lust-For-Life/ModernOrgone5/ModernOrgone5.pdf"
+    },
+    {
+      "id": "gariaev-vladychenskaya-leonova-gariaeva-2016",
+      "name": "Gariaev, Vladychenskaya & Leonova-Gariaeva",
+      "org": "Gariaev, Vladychenskaya & Leonova-Gariaeva",
+      "title": "PCR Amplification of Phantom DNA…",
+      "year": 2016,
+      "url": "https://wavegenetics.org/f/36.pdf"
+    },
+    {
+      "id": "georges-lakhovsky-1941",
+      "name": "Georges Lakhovsky",
+      "org": "Georges Lakhovsky",
+      "title": "Radiations and Waves: Sources of Our Life",
+      "year": 1941,
+      "url": "https://rexresearch1.com/Books/LakhovskyRadiationsWavesSourcesOurLife.pdf"
+    },
+    {
+      "id": "gerald-pollack-2013",
+      "name": "Gerald Pollack",
+      "org": "Gerald Pollack",
+      "title": "The Fourth Phase of Water",
+      "year": 2013,
+      "url": "https://www.pollacklab.org/"
+    },
+    {
+      "id": "gerald-pollack-2013-2",
+      "name": "Gerald Pollack",
+      "org": "Gerald Pollack",
+      "title": "Research — EZ Water",
+      "year": 2013,
+      "url": "https://www.pollacklab.org/research"
+    },
+    {
+      "id": "glen-rein-1998",
+      "name": "Glen Rein",
+      "org": "Glen Rein",
+      "title": "Biological Effects of Quantum Fields and their Role in the Natural Healing Process",
+      "year": 1998,
+      "url": "https://quantum-biology.org/dr-reins-publications-1"
+    },
+    {
+      "id": "h-fr-hlich-1968",
+      "name": "H. Fröhlich",
+      "org": "H. Fröhlich",
+      "title": "Long-range coherence and energy storage in biological systems",
+      "year": 1968,
+      "url": "https://doi.org/10.1002/qua.560020505"
+    },
+    {
+      "id": "h-fr-hlich-1988",
+      "name": "H. Fröhlich",
+      "org": "H. Fröhlich",
+      "title": "Citation Classic — Long-range coherence and energy storage in biological systems",
+      "year": 1988,
+      "url": "https://garfield.library.upenn.edu/classics1988/A1988N102700001.pdf"
+    },
+    {
+      "id": "hannes-alfv-n-nobel-lecture-1970",
+      "name": "Hannes Alfvén — Nobel Lecture",
+      "org": "Hannes Alfvén",
+      "title": "Plasma physics, space research and the origin of the solar system",
+      "year": 1970,
+      "url": "https://www.nobelprize.org/uploads/2018/06/alfven-lecture.pdf"
+    },
+    {
+      "id": "hans-jenny-1967",
+      "name": "Hans Jenny",
+      "org": "Hans Jenny",
+      "title": "Cymatics Vol. I",
+      "year": 1967,
+      "url": "https://www.cymaticsource.com/"
+    },
+    {
+      "id": "hans-jenny-2001",
+      "name": "Hans Jenny",
+      "org": "Hans Jenny",
+      "title": "Cymatics — The structure and dynamics of waves and vibrations",
+      "year": 2001,
+      "url": "https://monoskop.org/images/3/31/Jenny_Hans_Cymatics_A_Study_of_Wave_Phenomena_and_Vibration_Vol_1_2001.pdf"
+    },
+    {
+      "id": "hermann-von-helmholtz-trans-a-j-ellis-1895",
+      "name": "Hermann von Helmholtz (trans. A.J. Ellis)",
+      "org": "Hermann von Helmholtz (trans. A.J. Ellis)",
+      "title": "On the Sensations of Tone",
+      "year": 1895,
+      "url": "https://sensationsoftone.com/Chapter3.html"
+    },
+    {
+      "id": "ilya-volodyaev-lev-v-beloussov-2015",
+      "name": "Ilya Volodyaev & Lev V. Beloussov",
+      "org": "Ilya Volodyaev & Lev V. Beloussov",
+      "title": "Revisiting the mitogenetic effect of ultra-weak photon emission",
+      "year": 2015,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4561347/"
+    },
+    {
+      "id": "jian-ming-zheng-gerald-h-pollack-2003",
+      "name": "Jian-ming Zheng & Gerald H. Pollack",
+      "org": "Jian-ming Zheng & Gerald H. Pollack",
+      "title": "Long-range forces extending from polymer-gel surfaces",
+      "year": 2003,
+      "url": "https://arxiv.org/pdf/cond-mat/0305093"
+    },
+    {
+      "id": "kocica-et-al-2002",
+      "name": "Kocica et al.",
+      "org": "Kocica et al.",
+      "title": "The structure and function of the helical heart and its buttress wrapping. I. The normal macroscopic structure of the heart",
+      "titleShort": "The structure and function of the helical heart",
+      "year": 2002,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11807730/"
+    },
+    {
+      "id": "kristian-birkeland-1908",
+      "name": "Kristian Birkeland",
+      "org": "Kristian Birkeland",
+      "title": "The Norwegian Aurora Polaris Expedition 1902–1903",
+      "year": 1908,
+      "url": "https://archive.org/stream/norwegianaurorap01chririch/norwegianaurorap01chririch_djvu.txt"
+    },
+    {
+      "id": "l-montagnier-et-al-2009",
+      "name": "L. Montagnier et al.",
+      "org": "L. Montagnier et al.",
+      "title": "Electromagnetic signals from aqueous nanostructures",
+      "year": 2009,
+      "url": "https://doi.org/10.1007/s12539-009-0036-7"
+    },
+    {
+      "id": "l-montagnier-et-al-2011",
+      "name": "L. Montagnier et al.",
+      "org": "L. Montagnier et al.",
+      "title": "DNA waves and water",
+      "year": 2011,
+      "url": "https://iopscience.iop.org/article/10.1088/1742-6596/306/1/012007/pdf"
+    },
+    {
+      "id": "maciver-anderson-2017",
+      "name": "MacIver & Anderson",
+      "org": "MacIver & Anderson",
+      "title": "The end of the unique myocardial band: Part I. Anatomical considerations",
+      "year": 2017,
+      "url": "https://doi.org/10.1093/ejcts/ezx290"
+    },
+    {
+      "id": "masaru-emoto-2004",
+      "name": "Masaru Emoto",
+      "org": "Masaru Emoto",
+      "title": "Messages from Water",
+      "year": 2004,
+      "url": "https://www.masaru-emoto.net/en/"
+    },
+    {
+      "id": "masaru-emoto-office-masaru-emoto-1999",
+      "name": "Masaru Emoto / Office Masaru Emoto",
+      "org": "Masaru Emoto / Office Masaru Emoto",
+      "title": "Message from Water",
+      "year": 1999,
+      "url": "https://masaru-emoto.net/en/mfw/"
+    },
+    {
+      "id": "molecular-probes-invitrogen-2006",
+      "name": "Molecular Probes / Invitrogen",
+      "org": "Molecular Probes / Invitrogen",
+      "title": "SYBR® Green I Nucleic Acid Gel Stain",
+      "year": 2006,
+      "url": "https://assets.thermofisher.com/TFS-Assets/LSG/manuals/mp07567.pdf"
+    },
+    {
+      "id": "nasa-st5-fac-2011",
+      "name": "NASA GSFC / Le, Slavin, Strangeway",
+      "org": "NASA GSFC / Le, Slavin, Strangeway",
+      "title": "ST5 observations of the imbalance of Region 1 and 2 field-aligned currents",
+      "year": 2011,
+      "url": "https://ntrs.nasa.gov/api/citations/20110011893/downloads/20110011893.pdf"
+    },
+    {
+      "id": "nature-book-review-1940",
+      "name": "Nature (book review)",
+      "org": "Nature (book review)",
+      "title": "The Secret of Life — Cosmic Rays and Radiations of Living Beings (Lakhovsky)",
+      "year": 1940,
+      "url": "https://www.nature.com/articles/146538a0"
+    },
+    {
+      "id": "nobel-prize-1970",
+      "name": "Nobel Prize",
+      "org": "Nobel Prize",
+      "title": "Hannes Alfvén — Facts",
+      "year": 1970,
+      "url": "https://www.nobelprize.org/prizes/physics/1970/alfven/facts/"
+    },
+    {
+      "id": "office-masaru-emoto-citing-ions-radin-et-al",
+      "name": "Office Masaru Emoto (citing IONS / Radin et al. protocol description)",
+      "org": "Office Masaru Emoto (citing IONS / Radin et al. protocol description)",
+      "title": "Science of Water — Double-Blind Experiment with IONS",
+      "year": 2005,
+      "url": "https://masaru-emoto.net/en/science-of-messages-from-water/"
+    },
+    {
+      "id": "oklahoma-christian-university-physics-laboratory-2026",
+      "name": "Oklahoma Christian University Physics Laboratory",
+      "org": "Oklahoma Christian University Physics Laboratory",
+      "title": "STANDING WAVES IN A STRING: MELDE’S EXPERIMENT",
+      "year": 2026,
+      "url": "https://classes.oc.edu/PhysicsLab/WAVES.htm"
+    },
+    {
+      "id": "p-gariaev-et-al-2011",
+      "name": "P. Gariaev et al.",
+      "org": "P. Gariaev et al.",
+      "title": "DNA as Basis for Quantum Biocomputer",
+      "year": 2011,
+      "url": "https://dnadecipher.com/index.php/ddj/article/view/3/0"
+    },
+    {
+      "id": "paul-pearsall-gary-e-schwartz-linda-g-russek",
+      "name": "Paul Pearsall, Gary E. Schwartz & Linda G. Russek",
+      "org": "Paul Pearsall, Gary E. Schwartz & Linda G. Russek",
+      "title": "Changes in Heart Transplant Recipients That Parallel the Personalities of Their Donors",
+      "year": 2002,
+      "url": "https://doi.org/10.17514/jnds-2002-20-3-p191-206"
+    },
+    {
+      "id": "petr-p-gariaev-2015",
+      "name": "Petr P. Gariaev",
+      "org": "Petr P. Gariaev",
+      "title": "Another Understanding of the Model of Genetic Code Theoretical Analysis",
+      "year": 2015,
+      "url": "https://wavegenetics.org/wp-content/uploads/2014/07/1-ya-v-OJGEN-Angl.-1.pdf"
+    },
+    {
+      "id": "pollack-das-ez-2012",
+      "name": "Ronnie Das / Gerald H. Pollack (UW)",
+      "org": "Ronnie Das / Gerald H. Pollack (UW)",
+      "title": "Interfacial water at hydrophilic surfaces (PhD dissertation)",
+      "year": 2012,
+      "url": "https://digital.lib.washington.edu/bitstreams/5dc3fb9b-497e-488b-accf-8b84a8cfee9a/download"
+    },
+    {
+      "id": "pollack-laboratory-paper-summary-2021",
+      "name": "Pollack Laboratory (paper summary)",
+      "org": "Pollack Laboratory (paper summary)",
+      "title": "Effect of infrared radiation on interfacial water at hydrophilic surfaces",
+      "year": 2021,
+      "url": "https://www.pollacklab.org/single-post/effect-of-infrared-radiation-on-interfacial-water-at-hydrophilic-surfaces"
+    },
+    {
+      "id": "poponin-dna-phantom",
+      "name": "Vladimir Poponin",
+      "org": "Vladimir Poponin",
+      "title": "The DNA Phantom Effect (Modern Orgone anthology)",
+      "year": 1995,
+      "url": "https://lust-for-life.org/Lust-For-Life/ModernOrgone5/ModernOrgone5.pdf"
+    },
+    {
+      "id": "principles-of-nucleic-acid-separation-by-agarose-gel",
+      "name": "InTechOpen",
+      "org": "InTechOpen",
+      "title": "Principles of Nucleic Acid Separation by Agarose Gel Electrophoresis",
+      "year": 0,
+      "url": "https://cdn.intechopen.com/pdfs/35089/InTech-Principles_of_nucleic_acid_separation_by_agarose_gel_electrophoresis.pdf"
+    },
+    {
+      "id": "r-e-seidel-m-elizabeth-winter-1944",
+      "name": "R. E. Seidel & M. Elizabeth Winter",
+      "org": "R. E. Seidel & M. Elizabeth Winter",
+      "title": "The New Microscopes (Journal of the Franklin Institute)",
+      "year": 1944,
+      "url": "https://rife.org/s/Franklin-Institute-The-New-Microscopes-Feb-1944.pdf"
+    },
+    {
+      "id": "royal-r-rife-1954",
+      "name": "Royal R. Rife",
+      "org": "Royal R. Rife",
+      "title": "Presenting a Brief History of the Evolution of the Microscope (Aerohrcrafter)",
+      "year": 1954,
+      "url": "https://rife.org/s/Aerocrafter-Rife-microscope-1954-article-transcribed.pdf"
+    },
+    {
+      "id": "rudolf-steiner-1909",
+      "name": "Rudolf Steiner",
+      "org": "Rudolf Steiner",
+      "title": "The Principle of Spiritual Economy — GA 109, Lecture 15",
+      "year": 1909,
+      "url": "https://rsarchive.org/Lectures/GA109/English/SOL/19090608p01.html"
+    },
+    {
+      "id": "rudolf-steiner-1923",
+      "name": "Rudolf Steiner",
+      "org": "Rudolf Steiner",
+      "title": "Nine Lectures on Bees — GA 351, Lecture I",
+      "year": 1923,
+      "url": "https://rsarchive.org/Lectures/GA351/English/SGP1975/19230203p01.html"
+    },
+    {
+      "id": "russell-universal-one-1926",
+      "name": "Walter Russell",
+      "org": "Walter Russell",
+      "title": "The Universal One (1926) — Internet Archive OCR",
+      "year": 1926,
+      "url": "https://archive.org/stream/the-universal-one-1926-walter-russell/TheUniversalOne1926WalterRussell_djvu.txt"
+    },
+    {
+      "id": "schauberger-nature-as-teacher",
+      "name": "Viktor Schauberger (via Callum Coats ed./trans.)",
+      "org": "Viktor Schauberger (via Callum Coats ed./trans.)",
+      "title": "Nature as Teacher",
+      "year": 1998,
+      "url": "https://archive.org/download/NatureAsTeacher/ViktorSchauberger-NatureAsTeacher.pdf"
+    },
+    {
+      "id": "schauberger-senseless-toil",
+      "name": "Viktor Schauberger",
+      "org": "Viktor Schauberger",
+      "title": "Our Senseless Toil — The Cause of the World Crisis",
+      "year": 1933,
+      "url": "https://svpwiki.com/pdffiles/SCHAUBERGER_-_OUR_SENSELESS_TOIL.pdf"
+    },
+    {
+      "id": "science-of-the-heart",
+      "name": "HeartMath Institute",
+      "org": "HeartMath Institute",
+      "title": "Science of the Heart",
+      "year": 0,
+      "url": "https://www.heartmath.org/research/science-of-the-heart/"
+    },
+    {
+      "id": "science-of-the-heart-the-biophysics-of-energetic",
+      "name": "HeartMath Institute",
+      "org": "HeartMath Institute",
+      "title": "Science of the Heart — The Biophysics of Energetic Communication",
+      "year": 0,
+      "url": "https://www.heartmath.org/research/science-of-the-heart/energetic-communication/"
+    },
+    {
+      "id": "searls-2002-abstract-2002",
+      "name": "Searls 2002, Abstract",
+      "org": "Searls 2002, Abstract",
+      "title": "The language of genes (PubMed abstract)",
+      "year": 2002,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/12432405/"
+    },
+    {
+      "id": "thomas-d-seeley-2010",
+      "name": "Thomas D. Seeley",
+      "org": "Thomas D. Seeley",
+      "title": "Honeybee Democracy",
+      "year": 2010,
+      "url": "https://www.natuurlijkimkeren.org/wp-content/uploads/2018/10/Honeybee_Democracy-Thomas-Seeley-PDF.pdf"
+    },
+    {
+      "id": "thunderbolts-project-2013",
+      "name": "Thunderbolts Project",
+      "org": "Thunderbolts Project",
+      "title": "Chapter 1 — What Is the Electric Universe?",
+      "year": 2013,
+      "url": "https://www.thunderbolts.info/wp/2013/09/16/chapter-1-beginners-guide/"
+    },
+    {
+      "id": "torus",
+      "name": "Wikipedia",
+      "org": "Wikipedia",
+      "title": "Torus",
+      "year": 0,
+      "url": "https://nl.wikipedia.org/wiki/Torus"
+    },
+    {
+      "id": "university-of-iowa-physics-lecture-demonstrations-dale-s",
+      "name": "University of Iowa Physics Lecture Demonstrations (Dale Stille)",
+      "org": "University of Iowa Physics Lecture Demonstrations (Dale Stille)",
+      "title": "3B22.11 Standing Waves in a String — Melde's Experiment",
+      "year": 2026,
+      "url": "https://instructional-resources.physics.uiowa.edu/3b2211-standing-waves-string-meldes-experiment"
+    },
+    {
+      "id": "university-of-minnesota-school-of-physics-and-astronomy",
+      "name": "University of Minnesota School of Physics and Astronomy Lecture Demonstrations",
+      "org": "University of Minnesota School of Physics and Astronomy Lecture Demonstrations",
+      "title": "3B22.10 Melde's Standing Wave Machine",
+      "year": 2026,
+      "url": "https://spademos.umn.edu/3B22.10"
+    },
+    {
+      "id": "upe-application-review-authors-pmc9981976-2023",
+      "name": "UPE application review authors (PMC9981976)",
+      "org": "UPE application review authors (PMC9981976)",
+      "title": "The application and trend of ultra-weak photon emission in biology and medicine",
+      "year": 2023,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9981976/"
+    },
+    {
+      "id": "upe-brief-review-authors-pmc10899412-2024",
+      "name": "UPE brief review authors (PMC10899412)",
+      "org": "UPE brief review authors (PMC10899412)",
+      "title": "Ultra weak photon emission—a brief review",
+      "year": 2024,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10899412/"
+    },
+    {
+      "id": "wallace-w-thornhill-2011",
+      "name": "Wallace W. Thornhill",
+      "org": "Wallace W. Thornhill",
+      "title": "Toward a Real Cosmology in the 21st Century",
+      "year": 2011,
+      "url": "https://benthamopen.com/contents/pdf/TOAAJ/TOAAJ-4-191.pdf"
+    },
+    {
+      "id": "walter-russell-1947",
+      "name": "Walter Russell",
+      "org": "Walter Russell",
+      "title": "The Secret of Light",
+      "year": 1947,
+      "url": "https://files.spiritmaji.com/books/spiritual-science/The_Secret_of_Light_by_Walter_Russell.pdf"
+    }
+  ]
+}

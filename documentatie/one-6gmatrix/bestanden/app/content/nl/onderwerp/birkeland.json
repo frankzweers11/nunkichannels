@@ -1,0 +1,40 @@
+{
+  "id": "birkeland",
+  "inleiding": "Kristian Birkeland stelde vanaf 1896 dat poollicht en magnetische storingen komen van deeltjesstromen vanaf de zon. Hij testte dat met een magnetische terrella in een ontladingsbuis: de neerslag op de bol moest lijken op de storingen die op aarde worden gezien.",
+  "haak": "Birkeland stelt (herhaald sinds 1896) dat magnetische storingen en aurora borealis het gevolg zijn van corpusculaire stralen van de zon. Hij test de theorie met een kleine magnetische terrella in een grote ontladingsbuis: corpusculaire stromen zouden neerslag op aarde geven die overeenkomt met waargenomen verstoringen.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "birkeland-1908-corpuscular-aurora",
+      "caption": "Corpusculaire stralen van de zon"
+    },
+    {
+      "type": "fact",
+      "ref": "birkeland-1908-terrella-discharge",
+      "caption": "Terrella in ontladingsbuis"
+    },
+    {
+      "type": "fact",
+      "ref": "birkeland-cathode-aurora-1896",
+      "caption": "Kathodestralen → noorderlicht"
+    },
+    {
+      "type": "source",
+      "label": "Kristian Birkeland — The Norwegian Aurora Polaris Expedition 1902–1903",
+      "url": "https://archive.org/stream/norwegianaurorap01chririch/norwegianaurorap01chririch_djvu.txt",
+      "caption": "Birkeland stelt (herhaald sinds 1896) dat magnetische storingen en aurora borealis het gevolg zijn van corpusculaire stralen van de zon."
+    },
+    {
+      "type": "source",
+      "label": "Birkeland 1908, Preface — ",
+      "url": "https://archive.org/stream/norwegianaurorap01chririch/norwegianaurorap01chririch_djvu.txt",
+      "caption": "Hij test de theorie met een kleine magnetische terrella in een grote ontladingsbuis: corpusculaire stromen zouden neerslag op aarde geven die overeenkomt met waargenomen verstoringen."
+    }
+  ],
+  "sourceIds": [
+    "kristian-birkeland-1908"
+  ]
+}

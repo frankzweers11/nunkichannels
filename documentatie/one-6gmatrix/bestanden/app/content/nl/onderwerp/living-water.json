@@ -1,0 +1,55 @@
+{
+  "id": "living-water",
+  "inleiding": "Pollack meet een gel-achtige exclusion zone aan hydrofiele oppervlakken. Schauberger leest water als een stroming die zichzelf ordent.",
+  "haak": "De EZ-laag komt uit het Pollack-lab: water dat zich structureel anders gedraagt dan bulk, in peer-reviewed werk aan de rand van het veld. Schauberger noemt water een levende entiteit en keert zich tegen chemische reductie. Laboratorium en historische tekst naast elkaar.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "pollack-ez",
+      "caption": "Pollack — exclusion zone"
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-water-living-entity",
+      "caption": "Schauberger: water is zelf een levende entiteit — echo."
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-science-views-water-chemical",
+      "caption": "Schauberger: water als chemische verbinding vs gezond water — echo."
+    },
+    {
+      "type": "fact",
+      "ref": "pollack-ez-light",
+      "caption": "EZ groeit onder licht"
+    },
+    {
+      "type": "source",
+      "label": "Gerald Pollack — Research — EZ Water",
+      "url": "https://www.pollacklab.org/research",
+      "caption": "Pollacks lab meet dat UV, zichtbaar en infrarood licht de exclusion zone vergroten — water als fotovoltaïsche laag, niet alleen koelmedium."
+    }
+  ],
+  "curate": {
+    "stemmen": [
+      {
+        "portrait": "pollack",
+        "quote": "pollack:we-found-a-fourth"
+      },
+      {
+        "portrait": "schauberger",
+        "quote": "schauberger:water-is-itself-a-living-entity"
+      }
+    ],
+    "spiegel": []
+  },
+  "sourceIds": [
+    "gerald-pollack-2013",
+    "gerald-pollack-2013-2",
+    "schauberger-senseless-toil",
+    "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+  ]
+}

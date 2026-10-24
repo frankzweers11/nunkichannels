@@ -1,0 +1,41 @@
+{
+  "id": "hive",
+  "inleiding": "Seeley meet de kolonie als één levend wezen: besluit, temperatuur en foerage lopen door de kast. Steiner (GA 351, 1923) leest datzelfde geheel als doordrenkt van liefde.",
+  "haak": "Thomas Seeley (*Honeybee Democracy*) noemt de honingbijkolonie een composite being / single living entity die fysiologie als geheel uitvoert. Bij broedzorg houdt de kolonie 34–36 °C terwijl de buitenlucht van −30° tot 50 °C kan lopen. Steiner GA351 (1923): “The whole hive is in reality permeated with love.” Seeley is gedocumenteerde gedragsbiologie; Steiner is historische echo.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "hive-seeley-single-living-entity",
+      "caption": "Seeley: de kolonie is één levend wezen, geen som van bijen."
+    },
+    {
+      "type": "fact",
+      "ref": "hive-seeley-colony-thermoregulation",
+      "caption": "Broednest op 34–36 °C"
+    },
+    {
+      "type": "fact",
+      "ref": "hive-steiner-ga351-permeated-love",
+      "caption": "Steiner: de korf is doortrokken van liefde"
+    },
+    {
+      "type": "source",
+      "label": "Steiner GA351 — 3 februari 1923",
+      "url": "https://rsarchive.org/Lectures/GA351/English/SGP1975/19230203p01.html",
+      "caption": "Steiner GA351 (1923): de bijenkorf is “in reality permeated with love”; individuen verzaken seksuele drift op manieren die liefde door de hele korf ontwikkelen — culturele/spirituele echo, géén biologisch bewijs."
+    },
+    {
+      "type": "source",
+      "label": "Seeley — Honeybee Democracy (PDF)",
+      "url": "https://www.natuurlijkimkeren.org/wp-content/uploads/2018/10/Honeybee_Democracy-Thomas-Seeley-PDF.pdf",
+      "caption": "Seeley: bij broedzorg houdt de kolonie de interne temperatuur tussen 34° en 36 °C terwijl de buitenlucht van −30° tot 50 °C kan lopen — thermoregulatie als koloniaal orgaan."
+    }
+  ],
+  "sourceIds": [
+    "thomas-d-seeley-2010",
+    "rudolf-steiner-1923"
+  ]
+}

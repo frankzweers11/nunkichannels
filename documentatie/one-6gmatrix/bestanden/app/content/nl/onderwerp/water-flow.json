@@ -1,0 +1,28 @@
+{
+  "id": "water-flow",
+  "inleiding": "Schauberger beschrijft water dat in een draaiende stroom draagt in plaats van botst. Pollack meet daarnaast exclusion zones aan hydrofiele oppervlakken: historische tekst en labmeting apart.",
+  "haak": "In Our Senseless Toil (1933) schrijft hij dat waterlopen over elke afstand te regelen zijn zonder oeverwerken, en dat hout en erts in het midden van zo’n stroom mee kunnen. Hij noemt water een levende entiteit. Pollack documenteert exclusion zones bij hydrofiele oppervlakken. Historische tekst en labmeting apart.",
+  "slides": [
+    { "type": "intro" },
+    {
+      "type": "fact",
+      "ref": "pollack-lab-exclusion-zone-definition",
+      "caption": "Pollack-lab: exclusion zones bij hydrofiele oppervlakken — gedocumenteerd meetwerk."
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-water-living-entity",
+      "caption": "Schauberger: water is zelf een levende entiteit — echo."
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-senseless-toil-regulate",
+      "caption": "Waterlopen regelen zonder oeverwerken."
+    }
+  ],
+  "sourceIds": [
+    "pollack-das-ez-2012",
+    "schauberger-senseless-toil",
+    "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+  ]
+}
