@@ -1,6 +1,6 @@
 # One: export uit 6gmatrix
 
-Het tegenbeeld ".one" (water, licht, klank, hart, DNA, levend veld) stond in het archief van 6gmatrix.nl naast de Matrix. Op 24 oktober 2026 is het daar uit gehaald en hierheen verhuisd. Zo blijft 6gmatrix bij 6G, AI en controle, en houdt One een eigen plek.
+Het tegenbeeld ".one" (water, licht, klank, hart, DNA, levend veld) staat in het archief van 6gmatrix.nl naast de Matrix. Deze export is gemaakt op 24 oktober 2026. In 6gmatrix beoordeelt de redactie nu stuk voor stuk wat eruit gaat (`documentatie/one-verhuizing.md` daar). Pas daarna verdwijnt het uit 6gmatrix, en dan staat het hier. Zo blijft 6gmatrix bij 6G, AI en controle, en houdt One een eigen plek.
 
 ## Wat erin zit
 
