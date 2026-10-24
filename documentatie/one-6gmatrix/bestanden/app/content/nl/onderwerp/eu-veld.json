@@ -1,0 +1,32 @@
+{
+  "id": "eu-veld",
+  "inleiding": "NASA/ST5 meet field-aligned currents. Russell schrijft materie als licht in ritmische uitwisseling. Heliophysics en metafysische tekst naast elkaar.",
+  "haak": "NASA/ST5 kwantificeert de onbalans tussen Region-1 en Region-2 field-aligned currents: peer-reviewed heliophysics. Walter Russell schrijft ‘Matter is light’ en noemt positieve elektriciteit een generatieve kracht: metafysische kosmologie uit zijn eigen boeken. Meting en echo staan apart.",
+  "slides": [
+    { "type": "intro" },
+    {
+      "type": "fact",
+      "ref": "nasa-st5-field-aligned-currents-r1-r2",
+      "caption": "NASA: R1/R2 field-aligned currents — gedocumenteerde heliophysics."
+    },
+    {
+      "type": "fact",
+      "ref": "russell-matter-is-light",
+      "caption": "Russell 1926: 'Matter is light' — echo, geen peer-reviewed heliophysics."
+    },
+    {
+      "type": "fact",
+      "ref": "russell-positive-electricity-is-force",
+      "caption": "Positieve elektriciteit als generatieve kracht — echo-register."
+    },
+    {
+      "type": "fact",
+      "ref": "russell-light-living-substance-mind",
+      "caption": "Light as living Mind substance — filosofisch, apart van NASA."
+    }
+  ],
+  "sourceIds": [
+    "nasa-st5-fac-2011",
+    "russell-universal-one-1926"
+  ]
+}

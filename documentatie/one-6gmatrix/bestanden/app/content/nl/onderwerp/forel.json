@@ -1,0 +1,44 @@
+{
+  "id": "forel",
+  "inleiding": "In een strenge winter zette Viktor Schauberger, boswachter in opleiding, zijn staf in een bergbeek en joeg een forel op die daar stil hing. De vis schoot stroomopwaarts. Hoe was ze voorbij een waterval van zestig meter gekomen, een kilometer stroomafwaarts, waar het water tot nevel verstuift? Hoe hangt ze stil terwijl de staf in zijn handen trilt?",
+  "haak": "In helder koud bergwater, schrijft hij in Temperature and the Movement of Water, staat ze in de as van de stroom, waar de waterdraden het dichtst bij +4°C liggen. Haar lijf duwt dat water opzij. Langs de gladde huid glijdt het sneller dan die temperatuur toelaat, en er ontstaat werveling. In de neutrale zone van die tegenstroom hangt ze zonder moeite stil. Ademt ze door de kieuwen, dan wordt de tegenstroom sterker, en schiet ze stroomopwaarts.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-trout-flushed-upstream-nat",
+      "caption": "De winterbeek: zestig meter waterval, en vissen die in de as stilstaan."
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-trout-central-axis-4c-a",
+      "caption": "De as van de stroom, dicht bij +4°C."
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-trout-central-axis-4c-b",
+      "caption": "De neutrale zone van de tegenstroom."
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-trout-breath-stands-still",
+      "caption": "Adem door de kieuwen, en ze staat weer stil."
+    }
+  ],
+  "sourceIds": [
+    "schauberger-senseless-toil",
+    "schauberger-nature-as-teacher",
+    "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+  ],
+  "curate": {
+    "stemmen": [
+      {
+        "portrait": "schauberger",
+        "quote": "schauberger:trout-stand-still"
+      }
+    ],
+    "spiegel": []
+  }
+}

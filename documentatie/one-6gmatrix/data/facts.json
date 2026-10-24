@@ -1,0 +1,2178 @@
+{
+  "facts": [
+    {
+      "id": "versus-one-note",
+      "topics": [
+        "versus-one",
+        "no-optout",
+        "kill-switch"
+      ],
+      "register": "echo",
+      "label": "Matrix versus one",
+      "claim": "De payoff van dit archief: het systeem is collectief, programmeerbaar, altijd aan. One is lichaam, aandacht, weigering, offline. Geen handleiding — wel de pool die de matrix nodig heeft.",
+      "quote": "6G matrix versus one.",
+      "sourceIds": [
+        "6gmatrix-one-2026"
+      ],
+      "datum": "2026",
+      "land": "NL"
+    },
+    {
+      "id": "versus-one-body",
+      "topics": [
+        "versus-one",
+        "no-optout"
+      ],
+      "register": "echo",
+      "label": "One is geen feature",
+      "claim": "Offline, aandacht, weigering, een lichaam dat geen interface is: dat is de pool die de matrix nodig heeft om te bestaan. Geen handleiding. Wel de andere pool.",
+      "quote": "6G matrix versus one.",
+      "sourceIds": [
+        "6gmatrix-one-2026"
+      ],
+      "datum": "2026",
+      "land": "NL"
+    },
+    {
+      "id": "cymatics-chladni",
+      "topics": [
+        "cymatics",
+        "sound"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Chladni-figuren",
+      "claim": "Ernst Chladni strooide zand op trillende platen en liet frequentie fysieke patronen tekenen — cymatics vóór het digitale beeld.",
+      "quote": "Chladni's technique, first published in 1787 in his book Entdeckungen über die Theorie des Klanges, consisted of drawing a bow over a piece of metal whose surface was lightly covered with sand.",
+      "sourceIds": [
+        "ernst-chladni-via-wikipedia-1787"
+      ],
+      "datum": "1787"
+    },
+    {
+      "id": "jenny-tonoscope",
+      "topics": [
+        "cymatics",
+        "sound"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Hans Jenny — tonoscope",
+      "claim": "Hans Jenny filmde vloeistof en poeder onder pure tonen; Cymatics (1967) toont vormen die ontstaan en verdwijnen met frequentie.",
+      "quote": "Sound is the creative principle. It must be regarded as primordial.",
+      "sourceIds": [
+        "hans-jenny-1967"
+      ],
+      "datum": "1967"
+    },
+    {
+      "id": "cymatics-lutherie",
+      "topics": [
+        "cymatics"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Van plaat naar instrument",
+      "claim": "Chladni-figuren zijn geen curiositeit alleen: luthiers gebruiken nog steeds trillende platen om klankborden van violen, gitaren en cello's te vormen — frequentie als vakmanschap.",
+      "quote": "Variations of this technique are still commonly used in the design and construction of acoustic instruments such as violins, guitars, and cellos.",
+      "sourceIds": [
+        "ernst-chladni-via-wikipedia-1787"
+      ],
+      "datum": "1787"
+    },
+    {
+      "id": "sound-helmholtz-vowels",
+      "topics": [
+        "sound"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Helmholtz — klinkers als boventonen",
+      "claim": "Helmholtz brak de stem open in resonantie en boventonen: elke klinker is een andere prominente frequentie — het lichaam als filter, niet als bestand.",
+      "quote": "Each vowel is simply a distinct quality of sound, caused by the special prominence of some one or two overtones.",
+      "sourceIds": [
+        "edward-baxter-perry-1921"
+      ],
+      "datum": "1921"
+    },
+    {
+      "id": "dna-wave-genetics",
+      "topics": [
+        "dna-harmonics"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "in-development",
+      "label": "Wave genetics",
+      "claim": "Gariaev beschrijft het chromosoom als bron én ontvanger van genetische teksten: solitonische elektro-akoestische velden. Controversiële hypothese; replicatie en consensus ontbreken.",
+      "quote": "The DNA action (as theory predicts and experiment confirms) is that of a \"gene-sign\" laser and its solitonic electro-acoustic fields.",
+      "sourceIds": [
+        "p-gariaev-et-al-2011"
+      ],
+      "datum": "2011"
+    },
+    {
+      "id": "montagnier-ems",
+      "topics": [
+        "dna-harmonics",
+        "water-memory"
+      ],
+      "issues": [
+        "one-dna",
+        "one-water"
+      ],
+      "register": "in-development",
+      "label": "Montagnier — EMS in verdunning",
+      "claim": "Montagnier et al. (2009) rapporteren elektromagnetische signalen uit sterk verdunde DNA-oplossingen — resonantie-hypothese, geen bewezen standaard, wel het watergeheugen-dossier.",
+      "quote": "A novel property of DNA is described: the capacity of some bacterial DNA sequences to induce electromagnetic waves at high aqueous dilutions.",
+      "sourceIds": [
+        "l-montagnier-et-al-2009"
+      ],
+      "datum": "2009",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "popp-biophotons",
+      "topics": [
+        "dna-harmonics"
+      ],
+      "issues": [
+        "one-light",
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Popp — biophotonen",
+      "claim": "Fritz-Albert Popp meet permanente ultrazwakke photon-emissie uit levende systemen — licht als celcommunicatie, parallel aan het EMF-dossier maar van binnenuit.",
+      "quote": "The word \"biophotons\" is used to denote a permanent spontaneous photon emission from all living systems.",
+      "sourceIds": [
+        "f-a-popp-et-al-2004"
+      ],
+      "datum": "2004",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "eu-plasma",
+      "topics": [
+        "electric-universe"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "mirror",
+      "label": "Plasma overal",
+      "claim": "Het Electric Universe-model leest de kosmos als geleidend plasma — geladen deeltjes in beweging, geen lege ruimte tussen eilanden.",
+      "quote": "Charged particles fill all of space as electrically conductive plasma.",
+      "sourceIds": [
+        "thunderbolts-project-2013"
+      ],
+      "datum": "2013"
+    },
+    {
+      "id": "eu-currents",
+      "topics": [
+        "electric-universe"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "mirror",
+      "label": "Stromen en magnetische velden",
+      "claim": "In het EU-verhaal zijn bewegende ladingen elektrische stromen; die voeden magnetische velden en hoogenergetische ontladingen — filamente als circuits, geen graviteit-only.",
+      "quote": "The movement of charged particles is an electric current. These currents give rise to pervasive magnetic fields and to high-energy electrical events.",
+      "sourceIds": [
+        "thunderbolts-project-2013"
+      ],
+      "datum": "2013"
+    },
+    {
+      "id": "alfven-mhd",
+      "topics": [
+        "electric-universe"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "Alfvén — plasma-fysica",
+      "claim": "Hannes Alfvén kreeg de Nobelprijs (1970) voor magnetohydrodynamica — aurora's en plasma als peer-reviewed tegenhanger naast EU-speculatie.",
+      "quote": "for fundamental work and discoveries in magnetohydro-dynamics with fruitful applications in different parts of plasma physics",
+      "sourceIds": [
+        "nobel-prize-1970"
+      ],
+      "datum": "1970"
+    },
+    {
+      "id": "pollack-ez",
+      "topics": [
+        "living-water",
+        "water-memory"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "documented",
+      "label": "Pollack — exclusion zone",
+      "claim": "Gerald Pollack meet een gel-achtige EZ-laag naast hydrofiele oppervlakken: water dat zich structureel anders gedraagt dan bulk, in peer-reviewed werk aan de rand van het veld.",
+      "quote": "We found a fourth phase of water that is not H2O.",
+      "sourceIds": [
+        "gerald-pollack-2013"
+      ],
+      "datum": "2013"
+    },
+    {
+      "id": "pollack-ez-light",
+      "topics": [
+        "living-water"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "documented",
+      "label": "EZ groeit onder licht",
+      "claim": "Pollacks lab meet dat UV, zichtbaar en infrarood licht de exclusion zone vergroten — water als fotovoltaïsche laag, niet alleen koelmedium.",
+      "quote": "We found that incident radiant energy including UV, visible, and near-infrared wavelengths induce exclusion-zone growth in a spectrally sensitive manner.",
+      "sourceIds": [
+        "gerald-pollack-2013-2"
+      ],
+      "datum": "2013"
+    },
+    {
+      "id": "emoto-crystals",
+      "topics": [
+        "water-memory",
+        "living-water"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "mirror",
+      "label": "Emoto — kristal foto's",
+      "claim": "Masaru Emoto publiceerde ijs-kristal foto's na blootstelling aan woorden en muziek — culturele spiegel, geen peer review.",
+      "quote": "Water is the mirror that has the ability to show us what we cannot see.",
+      "sourceIds": [
+        "masaru-emoto-2004"
+      ],
+      "datum": "2004"
+    },
+    {
+      "id": "benveniste-dilution",
+      "topics": [
+        "water-memory"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "in-development",
+      "label": "Benveniste — hoge verdunning",
+      "claim": "Benveniste et al. (Nature 1988) rapporteren basofiel-degranulatie bij verdunningen tot 10⁻¹²⁰ — omstreden, later onderzocht door Nature, geen bewezen watergeheugen.",
+      "quote": "Since dilutions need to be accompanied by vigorous shaking for the effects to be observed, transmission of the biological information could be related to the molecular organization of water.",
+      "sourceIds": [
+        "e-davenas-et-al-1988"
+      ],
+      "datum": "1988",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "bees-vs-iot",
+      "topics": [
+        "versus-one"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "echo",
+      "label": "Het hart als vortex, geen sensor",
+      "claim": "Torrent-Guasp beschrijft het ventrikelmyocard als spiraalband; HeartMath meet coherente ritmes en paden van hart naar hersenen. Anatomie en ritmemeting staan los van transplantatie-anekdotes.",
+      "quote": "Het hart draait. Het grid wil MAC-adressen.",
+      "sourceIds": [
+        "6gmatrix-one-2026-2"
+      ],
+      "datum": "2026",
+      "land": "NL"
+    },
+    {
+      "id": "chladni-klang-sichtbar-1787",
+      "topics": [
+        "chladni"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Chladni maakt klank zichtbaar",
+      "claim": "In 1787 publiceert Ernst Chladni een methode om elke klanksoort van vlakke klinkende lichamen niet alleen hoorbaar maar ook zichtbaar te maken.",
+      "quote": "Da es mir gelungen ist, ein Mittel zu entdecken, um jede mögliche Art des Klanges solcher Körper ohne Beymischung anderer nicht nur hörbar, sondern auch sichtbar darzustellen; so hoffe ich, durch Bekanntmachung meiner Beobachtungen wenigstens einige richtige Voraussetzungen zu genauerer Untersuchung dieses noch sehr unbearbeiteten Theiles der Mechanik liefern zu können",
+      "sourceIds": [
+        "ernst-florens-friedrich-chladni-1787"
+      ],
+      "datum": "1787",
+      "land": "DE"
+    },
+    {
+      "id": "chladni-violinbogen-platten-1787",
+      "topics": [
+        "chladni"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Vioolboog op plaat en staaf",
+      "claim": "Chladni onderzoekt niet alleen snaren maar staven, blechstreifen, ringen, schijven en klokken door ze haaks met een vioolboog aan te strijken.",
+      "quote": "An elastischen Stäben und Blechstreifen, wie auch an Ringen, Scheiben, Glocken und dergleichen klingenden Körpern, sind sowohl die Verhältnisse der verschiedenen Töne des nämlichen Körpers, als auch der gleichartigen Töne an verschiedenen Körpern sehr von denen unterschieden, die an Saiten Statt finden. … es wird also zu Untersuchung derselben besser seyn, den klingenden Körper unter einem rechten Winkel mit einem Violinbogen,",
+      "sourceIds": [
+        "ernst-florens-friedrich-chladni-1787-2"
+      ],
+      "datum": "1787",
+      "land": "DE"
+    },
+    {
+      "id": "chladni-feste-linien-figuren-1787",
+      "topics": [
+        "chladni"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Vaste lijnen tekenen de figuur",
+      "claim": "Chladni beschrijft hoe “feste Linien” op klinkende lichamen zich verbinden, kruisen en buigen tot wisselende figuren, terwijl de toon hetzelfde blijft.",
+      "quote": "Manche Figuren werden bisweilen dadurch so sehr verändert, daß man ohne gehöriger Uebung ihre eigenthümliche Gestalt nicht würde daraus beurtheilen können. … Der Ton ist bey einer abgeänderten Figur der nämliche, als wenn sich die Figur ganz regelmäßig zeigt. … öfters werden selbige auch dadurch veranlaßt, wenn man den klingenden Körper nicht genau an den Stellen hält oder berührt, wo eigentlich feste Linien seyn sollten",
+      "sourceIds": [
+        "ernst-florens-friedrich-chladni-1787-3"
+      ],
+      "datum": "1787",
+      "land": "DE"
+    },
+    {
+      "id": "jenny-cymatics-named-1967",
+      "topics": [
+        "jenny"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Jenny noemt het veld cymatics",
+      "claim": "Hans Jenny kiest de naam cymatics (Grieks ta kymatika) voor empirisch onderzoek naar effecten van golven/trillingen, niet voor hypothesen over eindoorzaken.",
+      "quote": "If a name is required for this field of research it might be called cymatics (to kyma, the wave; ta kymatika, matters pertaining to waves, wave matters). This underlines that we are not dealing with vibratory phenomena in the narrow sense, but rather with the effects of vibrations. Our documentation is primarily concerned with the experimental demonstration of phenomena in the acoustic and lower ultrasonic range.",
+      "sourceIds": [
+        "hans-jenny-2001"
+      ],
+      "datum": "2001"
+    },
+    {
+      "id": "jenny-triadic-phenomenon",
+      "topics": [
+        "jenny"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Drie polen, één trilling",
+      "claim": "Jenny formuleert het “basic triadic phenomenon”: figuur/patroon, kinetiek/dynamiek, en periodiciteit die het geheel genereert — altijd samen.",
+      "quote": "Since the various aspects of these phenomena are due to vibration, we are confronted with a spectrum which reveals patterned, figurate formations at one pole and kinetic-dynamic processes at the other, the whole being generated and sustained by its essential periodicity. … The three fields — the periodic as the fundamental field with the two poles of figure and dynamics — invariably appear as one.",
+      "sourceIds": [
+        "hans-jenny-2001"
+      ],
+      "datum": "2001"
+    },
+    {
+      "id": "jenny-tonoscope-vowels",
+      "topics": [
+        "jenny"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Tonoscoop maakt klinkers zichtbaar",
+      "claim": "Jenny’s tonoscoop laat zonder elektroakoestiek gesproken klanken als figuren op een membraan verschijnen; patroon hangt samen met klinker én toonhoogte.",
+      "quote": "For this purpose the tonoscope was developed. This is a simple apparatus into which the experimentor can speak with out any intermediate electroacoustic unit. Thus vibrations are imparted to a diaphragm on which sand, powder, or a liquid are placed as indicators. Speaking actually produces on this diaphragm figures which correspond, as it were, to the sound spectrum of a vowel. … The pattern is characteristic not only of the sound but also the pitch of the speech or song.",
+      "sourceIds": [
+        "hans-jenny-2001"
+      ],
+      "datum": "2001"
+    },
+    {
+      "id": "helmholtz-sympathetic-resonance",
+      "topics": [
+        "resonance"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Helmholtz: meetrilling is mechanisch",
+      "claim": "Helmholtz toont dat sympathetische resonantie objectieve mechanische effecten heeft, onafhankelijk van het oor: periodieke impulsen met passende periode bouwen grote oscillaties op.",
+      "quote": "Such an effect occurs in the phenomenon of sympathetic resonance. This phenomenon is always found in those bodies which when once set in motion by any impulse, continue to perform a long series of vibrations before they come to rest. When these bodies are struck gently, but periodically, although each blow may be separately quite insufficient to produce a sensible motion in the vibratory body, yet, provided the periodic time of the gentle blows is precisely the same as the periodic time of the body's own vibrations, very large and powerful oscillations may result.",
+      "sourceIds": [
+        "hermann-von-helmholtz-trans-a-j-ellis-1895"
+      ],
+      "datum": "1895"
+    },
+    {
+      "id": "helmholtz-violin-unison",
+      "topics": [
+        "resonance"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Twee violen, één snaar beweegt mee",
+      "claim": "Helmholtz noemt het muzikanten-bekende geval: snaren van twee violen in unisono — strijk de ene, de andere begint mee te trillen.",
+      "quote": "Musicians are well acquainted with sympathetic resonance. When, for example, the strings of two violins are in exact unison, and one string is bowed, the other will begin to vibrate.",
+      "sourceIds": [
+        "hermann-von-helmholtz-trans-a-j-ellis-1895"
+      ],
+      "datum": "1895"
+    },
+    {
+      "id": "helmholtz-chladni-sand-nodes",
+      "topics": [
+        "resonance"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Zand verzamelt zich op knopen",
+      "claim": "Helmholtz documenteert Chladni’s methode: strooi zand op een trillende membraan/plaat — zand verzamelt zich op knooplijnen (nodal lines).",
+      "quote": "By strewing sand on the membrane the figures are easily rendered visible, for as soon as it begins to vibrate the particles of sand collect on the nodal lines. … In the same way it is possible to render visible the nodal lines and forms of vibration of oval and square membranes, and of differently-shaped plane elastic plates, bars, and so on. These form a series of very interesting phenomena discovered by Chladni",
+      "sourceIds": [
+        "hermann-von-helmholtz-trans-a-j-ellis-1895"
+      ],
+      "datum": "1895"
+    },
+    {
+      "id": "melde-iowa-tension-loops",
+      "topics": [
+        "standing-waves"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Melde: spanning maakt staande golven",
+      "claim": "University of Iowa-demo Melde’s experiment: door massa/spanning te variëren ontstaan 2 tot 11–13 staande golven op een aangedreven snaar.",
+      "quote": "By varying the amount of mass or tension on the string you can get from 2 to 11 or 13 standing waves. In the constant diameter string these waves are all the same size.",
+      "sourceIds": [
+        "university-of-iowa-physics-lecture-demonstrations-dale-s"
+      ],
+      "datum": "2026"
+    },
+    {
+      "id": "melde-umn-frequency-antinodes",
+      "topics": [
+        "standing-waves"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Hogere frequentie, meer buiken",
+      "claim": "UMN-demo: mechanische oscillator drijft een gespannen snaar; verhoog de frequentie en het aantal antinodes neemt toe.",
+      "quote": "A mechanical oscillator drives a string held under tension by a mass hanging over a pulley. As the frequency of the driver is increased, the number of antinodes increases.",
+      "sourceIds": [
+        "university-of-minnesota-school-of-physics-and-astronomy"
+      ],
+      "datum": "2026"
+    },
+    {
+      "id": "melde-oc-nodes-resonance",
+      "topics": [
+        "standing-waves"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Knopen ontstaan bij resonantie",
+      "claim": "OC Physics lab: staande golf = interferentie van heen-en-weer lopende golf; knopen blijven in rust; resonantie wanneer snaarlengte een geheel aantal halve golflengtes is.",
+      "quote": "Note that there are points on the string where the instantaneous displacement of the string is always zero. These points are called nodal points. … This type of wave is called a standing wave or a stationary wave. Standing waves will form in the string only if certain \"boundary conditions\" are satisfied. Specifically, the length of the string must be some integral number of half-wavelengths for the initial running wave. … the system is said to be in resonance",
+      "sourceIds": [
+        "oklahoma-christian-university-physics-laboratory-2026"
+      ],
+      "datum": "2026"
+    },
+    {
+      "id": "zheng-pollack-100um-2003",
+      "topics": [
+        "exclusion-zone"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "documented",
+      "label": "Microsferen weg tot ~100 µm",
+      "claim": "Zheng & Pollack (2003) meten dat microsferen worden uitgesloten tot zones in de orde van 100 µm vanaf hydrofiele geloppervlakken — verder dan conventionele theorie voorspelt.",
+      "quote": "Aqueous suspensions of microspheres were infused around gels of varying composition. The solutes were excluded from zones on the order of 100 µm from the gel surface. We present evidence that this finding is not an artifact, and that solute-repulsion forces exist at distances far greater than conventional theory predicts.",
+      "sourceIds": [
+        "jian-ming-zheng-gerald-h-pollack-2003"
+      ],
+      "datum": "2003",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "pollacklab-fourth-phase-claim",
+      "topics": [
+        "exclusion-zone"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "in-development",
+      "label": "Pollack: vierde fase aan interfaces",
+      "claim": "Pollack Lab claimt dat EZ-water een fysisch onderscheiden, geordende “vierde fase” is (vloeibaar-kristal-achtig), gevoed door licht/IR — mechanisme blijft onder studie.",
+      "quote": "Water has three phases – gas, liquid, and solid; but findings from our laboratory imply the presence of a surprisingly extensive fourth phase that occurs at interfaces. The formal name for this fourth phase is exclusion-zone water, aka EZ water. … NMR, infrared, and birefringence imaging, as well as measurements of electrical potential, viscosity, and UV-VIS and infrared-absorption spectra, collectively reveal that the solute-free zone is a physically distinct, ordered phase of water. It is much like a liquid crystal.",
+      "sourceIds": [
+        "gerald-pollack-2013-2"
+      ],
+      "datum": "2013"
+    },
+    {
+      "id": "pollack-ir-ez-expansion-2021",
+      "topics": [
+        "exclusion-zone"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "documented",
+      "label": "Mid-IR vergroot de EZ",
+      "claim": "Pollack-groep (2021): 5 min mid-IR vergroot EZ bij Nafion met expansieratio ~1,41 en drijft tegelijk protonen naar bulk (PZ).",
+      "quote": "After irradiation for 5 min by mid-IR light, EZ size increased with an expansion ratio of 1.41. A significant expansion was also found in the size of PZ, equivalent to an increment of about 1.39 × 10¹⁶ molecules of hydronium ions. Thus, IR radiation not only builds EZ, but at the same time drives release of protons from the growing EZ to bulk water.",
+      "sourceIds": [
+        "pollack-laboratory-paper-summary-2021"
+      ],
+      "datum": "2021"
+    },
+    {
+      "id": "schauberger-vortex-nature-geometry",
+      "topics": [
+        "vortex"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Vortex als natuurvorm",
+      "claim": "In Coats’ presentatie van Schauberger is de vortex het embleem van open, veranderlijke natuurlijke beweging — tegenover rechte lijn/cirkel/punt van mechanische technologie.",
+      "quote": "As a natural organism, water is formed and functions according to Nature's laws and geometry, the latter exhibiting none of the elements of the straight line, circle and point, the basis of modern mechanical and technological artefacts. Reflecting Nature's principal constant, namely that of continuous change and transformation, the vortex epitomises this form of open, fluid and flexible motion. Through his study of the vortices occurring naturally in flowing water and in the air in the form of cyclones and tornadoes, Viktor Schauberger developed his theories of implosion.",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-blood-of-earth",
+      "topics": [
+        "vortex"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Water als bloed van de aarde",
+      "claim": "Schauberger (via Coats) noemt water geen levenloze massa maar “blood of the Earth”, ontstaan en verdwijnend door energetische wisselwerking.",
+      "quote": "Water is no lifeless mass, but the blood of the Earth, which comes into being and disappears through energetic interactions.",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-senseless-toil-regulate",
+      "topics": [
+        "vortex",
+        "water-flow"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Rivieren reguleren zonder dijken",
+      "claim": "In *Our Senseless Toil* (1933), geciteerd in Water Wizard, claimt Schauberger waterlopen te kunnen reguleren zonder oeverwerken, via natuurlijke stromingswetten.",
+      "quote": "It is possible to regulate watercourses over any given distance without embankment works; to transport timber and other materials, even when heavier than water, for example ore, stones, etc., down the centre of such water-courses; to raise the height of the water table in the surrounding countryside and to endow the water with all those elements necessary for the prevailing vegetation.",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "elton-ez-replicated-not-phase",
+      "topics": [
+        "structured-water"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "documented",
+      "label": "EZ bestaat — fase-claim betwist",
+      "claim": "Elton et al. (2020) bevestigen dat EZ-uitsluiting door meerdere groepen is gerepliceerd, maar beargumenteren dat Pollacks faseveranderingsmodel zwak is; Schurrs diffusiophorese is een sterke alternatieve verklaring.",
+      "quote": "The existence of the exclusion zone (EZ), a layer of water in which plastic microspheres are repelled from hydrophilic surfaces, has now been independently demonstrated by several groups. … Pollack theorizes that water in the EZ exists has a different structure than bulk water, and that this accounts for the EZ. We present several alternative explanations for EZs and argue that Schurr’s theory based on diffusiophoresis presents a compelling alternative explanation for the core EZ phenomenon.",
+      "sourceIds": [
+        "daniel-c-elton-peter-d-spencer-james-d"
+      ],
+      "datum": "2020",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "elton-open-questions-laser-salt",
+      "topics": [
+        "structured-water"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "documented",
+      "label": "Open vragen blijven open",
+      "claim": "De review stelt expliciet dat veel Pollack-bevindingen (o.a. EZ-groei onder laser, zoutuitsluiting) nog onafhankelijke replicatie nodig hebben.",
+      "quote": "Many findings from Pollack’s lab still need to be replicated by independent groups, in particular the growth of the EZ with laser irritation and the exclusion of salt. Both of these phenomena, if genuine, are in need of further explanation.",
+      "sourceIds": [
+        "daniel-c-elton-peter-d-spencer-james-d"
+      ],
+      "datum": "2020",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "pollack-ordered-vs-bulk",
+      "topics": [
+        "structured-water"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "in-development",
+      "label": "Lab: solute-free zone ≠ bulk",
+      "claim": "Pollack Lab rapporteert dat meerdere meetmethoden de solute-free zone als fysisch anders dan bulk tonen; noemt dit kandidaat “fourth phase” — nog niet consensus.",
+      "quote": "To test whether the physical properties of the exclusion zone differ from those of bulk water, multiple methods have been applied. … collectively reveal that the solute-free zone is a physically distinct, ordered phase of water. … Indeed, this unexpectedly extensive zone may be a candidate for the long-postulated “fourth phase” of water considered by earlier scientists.",
+      "sourceIds": [
+        "gerald-pollack-2013-2"
+      ],
+      "datum": "2013"
+    },
+    {
+      "id": "emoto-hexagonal-crystals-1994",
+      "topics": [
+        "crystals"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "mirror",
+      "label": "Emoto ziet hexagonale kristallen",
+      "claim": "Emoto beschrijft vanaf 1994 hoe bevroren water onder microscoop hexagonale kristallen toont; schoon water “mooie” kristallen, stedelijk/tapwater niet.",
+      "quote": "It was 1994 when the idea to freeze water and observe it with microscope came upon me. With this method, I was convinced that I should be able to see something like snow crystals. After two months of trial and error, this idea bore fruit. The beautifully shining hexagonal crystals were created from the invisible world. … From the tap water we could not get any beautiful crystals. … However, from the water from rivers and lakes where water is kept pristine from development, we could observe beautiful crystals",
+      "sourceIds": [
+        "masaru-emoto-office-masaru-emoto-1999"
+      ],
+      "datum": "1999"
+    },
+    {
+      "id": "emoto-words-music-prayer",
+      "topics": [
+        "crystals"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "mirror",
+      "label": "Woorden en muziek “vormen” kristallen",
+      "claim": "Emoto claimt dat goede woorden/muziek/gebed tot mooie kristallen leiden, het tegendeel tot misvormde — en noemt de fotoselectie zelf “beauty”, noch science noch religion.",
+      "quote": "The result was that we always observed beautiful crystals after giving good words, playing good music, and showing, playing, or offering pure prayer to water. On the other hand, we observed disfigured crystals in the opposite situation. … It is “beauty” if I were asked about the selection criteria of crystals. … Therefore, the photograph of crystals is neither science nor religion. I hope it is enjoyed as a new type of art.",
+      "sourceIds": [
+        "masaru-emoto-office-masaru-emoto-1999"
+      ],
+      "datum": "1999"
+    },
+    {
+      "id": "emoto-ions-blind-note",
+      "topics": [
+        "crystals"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "mirror",
+      "label": "IONS-test: bias en esthetiek",
+      "claim": "Emoto’s site citeert een IONS double-blind: analist zag iets meer “esthetische” kristallen bij treated (24 vs 16, p=0.13); onafhankelijke blind beoordeling gaf p=0.003 — site erkent selectiebias als de analist de conditie kent.",
+      "quote": "This test indicates that the analyst in Emoto’s laboratory blindly identified slightly more aesthetic crystals in the intentionally treated condition than in the control condition (24 vs. 16, p = 0.13 by exact binomial). It is noteworthy that 40% of the identified crystals came from the control water, making it clear that if the analyst knows anything about the condition of the water being analyzed then perceptual and selective reporting biases would likely influence which crystals are ultimately selected.",
+      "sourceIds": [
+        "office-masaru-emoto-citing-ions-radin-et-al"
+      ],
+      "datum": "2005"
+    },
+    {
+      "id": "popp-biophoton-definition-intensity-2003",
+      "topics": [
+        "biophotons"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Biophotonen: permanente emissie, paar–honderden fotonen",
+      "claim": "Popp (IJEB 2003) definieert biophotonen als permanente spontane photon-emissie uit alle levende systemen, met intensiteit van enkele tot enkele honderden fotonen/(s·cm²) in het bereik ≈260–800 nm.",
+      "quote": "The word \"biophotons\" is used to denote a permanent spontaneous photon emission from all living systems. It displays a few up to some hundred photons /(s·cm²) within the spectral range from at least 260 to 800 nm.",
+      "sourceIds": [
+        "fritz-albert-popp-2003"
+      ],
+      "datum": "2003"
+    },
+    {
+      "id": "popp-delayed-luminescence-link-2003",
+      "topics": [
+        "biophotons"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Biophoton ↔ delayed luminescence",
+      "claim": "Popp koppelt biophoton-emissie aan delayed luminescence (DL): langdurige ultrazwakke heruitzending na belichting; tijdens relaxatie gaat DL continu over in de steady-state biophoton-emissie.",
+      "quote": "It is closely linked to delayed luminescence (DL) of biological tissues which describes the long term and ultra weak reemission of photons after exposure to light illumination. During relaxation DL turns continuously into the steady state biophoton emission",
+      "sourceIds": [
+        "fritz-albert-popp-2003"
+      ],
+      "datum": "2003"
+    },
+    {
+      "id": "popp-coherence-claim-2003",
+      "topics": [
+        "biophotons"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "in-development",
+      "label": "Coherent / squeezed states — interpretatie",
+      "claim": "Popp stelt dat de fysische eigenschappen wijzen op volledig coherente en soms squeezed states van het biophoton-veld — theoretische lezing van metingen, geen consensus-medische claim.",
+      "quote": "The physical properties indicate that biophotons originate from fully coherent and sometimes even squeezed states.",
+      "sourceIds": [
+        "fritz-albert-popp-2003"
+      ],
+      "datum": "2003"
+    },
+    {
+      "id": "gurwitsch-onion-root-grundversuch",
+      "topics": [
+        "mitogenetic"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Uienwortel: inductor → detector mitose",
+      "claim": "Popp (2003) herhaalt Gurwitsch’s Grundversuch: tip van één uienwortel (inductor) gericht op de delingszone van een tweede (detector); bij kwarts tussenbeide steeg het aantal mitosen in de detector significant. Historische claim, hier als dossierfeit uit peer-herlezing.",
+      "quote": "Gurwitsch took the stem of an onion root as a 'detector' and the tip of another onion root as an 'inductor' of cell divisions (mitosis). … As soon as a quartz glass plate was inserted between detector and inductor (which is transparent for UV light of about 260 nm), the number of mitoses in the detector increased significantly.",
+      "sourceIds": [
+        "fritz-albert-popp-2003"
+      ],
+      "datum": "2003"
+    },
+    {
+      "id": "gurwitsch-quartz-vs-glass-uv",
+      "topics": [
+        "mitogenetic"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Kwarts wél, glas niet — ultrazwak UV",
+      "claim": "Volodyaev & Beloussov (2015, PMC): mitogenetisch effect bleef met kwartsplaat tussen wortels; viel weg met glas of ondoorzichtig materiaal; chemische isolatie veranderde niets — factor geconcludeerd als ultrazwak UV (“mitogenetic radiation”).",
+      "quote": "MGE was also detected, if a quartz plate was fixed between the two roots, and was not detected, if the roots were separated with glass or nontransparent materials (Gurwitsch, 1924; Reiter and Gabor, 1928a). Chemical isolation of the roots did not affect the results. … the acting factor was concluded to be UV light of very low intensity, and was called “mitogenetic radiation.”",
+      "sourceIds": [
+        "ilya-volodyaev-lev-v-beloussov-2015"
+      ],
+      "datum": "2015",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "gurwitsch-700-papers-then-vanished",
+      "topics": [
+        "mitogenetic"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": ">700 papers, daarna verdwenen golf",
+      "claim": "Zelfde review: na Gurwitsch 1923 volgde wereldwijd >700 publicaties over mitogenetische straling; de golf verdween na ogenschijnlijk weerleggende werken eind jaren 1930 — historiografie van een open/controversieel dossier.",
+      "quote": "In the following 20 years this phenomenon attracted enormous interest of the scientific community, and gave rise to more than 700 publications around the world. Yet, this wave of research vanished after several ostensibly disproving works in late 1930-s, and was not resumed later, regardless of quite serious grounds for that.",
+      "sourceIds": [
+        "ilya-volodyaev-lev-v-beloussov-2015"
+      ],
+      "datum": "2015",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "lakhovsky-cellular-oscillation-theory",
+      "topics": [
+        "multiwave"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Cel = chromosomen + chondromen als oscillator",
+      "claim": "In *Radiations and Waves* (1941) stelt Lakhovsky: elke levende cel heeft nucleus (chromosomen) en cytoplasma (chondromen) als ultramicroscopische oscillerende circuits die elektrisch vibreren onder kosmische/atmosferische/tellurische golven — zijn theorie, gedocumenteerd als auteurclaim.",
+      "quote": "All living cells are composed of two essential elements; the nucleus and the protoplasm in which it is bathed. This nucleus is itself composed of many tubular filaments: the chromosomes. In addition, hundreds of such smaller filaments or chondromes are present in the cytoplasm. … these filaments constitute ultramicroscopic oscillating circuits capable of oscillating electrically over a wide scale of very short wave lengths.",
+      "sourceIds": [
+        "georges-lakhovsky-1941"
+      ],
+      "datum": "1941"
+    },
+    {
+      "id": "lakhovsky-mwo-all-wavelengths-1930",
+      "topics": [
+        "multiwave"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Multiple-wave oscillator: 3 m tot infra-rood",
+      "claim": "Lakhovsky (via Presner-preface in hetzelfde boek + eigen tekst): in 1930 voltooide hij de multiple wave oscillator die golven produceert “of all lengths from 3 metres to the infra-red” — apparaatbeschrijving als historische claim, geen hedendaags medisch bewijs.",
+      "quote": "succeeded, in 1930, in satisfactorily completing his multiple wave oscillator, which produces waves of all lengths from 3 metres to the infra-red - hundreds of quintillions of different wave lengths.",
+      "sourceIds": [
+        "georges-lakhovsky-1941"
+      ],
+      "datum": "1941"
+    },
+    {
+      "id": "lakhovsky-nature-review-resonator-1940",
+      "topics": [
+        "multiwave"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Nature 1940: cel als elektromagnetische resonator",
+      "claim": "Contemporaine Nature-boekrecensie vat Lakhovsky’s *Secret of Life* samen: de cel is een elektromagnetische resonator; leven = harmonie van meervoudige stralingen; ziekte = disequilibrium van buitenaf — register van zijn claims in peer-tijdschrift, géén validatie van therapie.",
+      "quote": "Reduced to its simplest terms his theory is that the cell, as the unit of life, is an electromagnetic resonator, capable of emitting and absorbing radiations of very high frequency, that life is the harmony of multiple radiations of all the cells in a body reacting upon one another, and that disease is a disequilibrium introduced from outside into the cell-harmony.",
+      "sourceIds": [
+        "nature-book-review-1940"
+      ],
+      "datum": "1940",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "rife-aerocrafter-universal-microscope-1954",
+      "topics": [
+        "rife"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Rife beschrijft Universal Microscope (1933)",
+      "claim": "In zijn Aerohrcrafter-artikel (1954) schrijft Royal R. Rife zelf over vijf microscopen die hij bouwde; de Universal Microscope (1933) heeft 5.682 delen, kwarts-optiek (UV-transparant) en meerdere belichtingsmodi — instrumentclaim uit zijn tekst.",
+      "quote": "The writer has over a period of thirty years has designed and built in his own laboratory 5 microscopes of power and resolution far beyond the so-called law of optical physics. … The universal microscope, which is the largest and most powerful of the light microscopes developed in 1933, consists of 5,682 parts … The entire optical system of lenses and prisms as well as the illuminating units are made of block-crystal quartz, quartz being especially transparent to ultraviolet radiations.",
+      "sourceIds": [
+        "royal-r-rife-1954"
+      ],
+      "datum": "1954"
+    },
+    {
+      "id": "rife-kendall-filterable-typhoid-1931",
+      "topics": [
+        "rife"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Kendall & Rife 1931: filterbare typhoid onder Rife-scope",
+      "claim": "*California and Western Medicine* (dec 1931): Kendall & Rife publiceren een preliminary communication over *Bacillus typhosus* in filterbare toestand, waargenomen met de Rife-microscoop (o.a. turquoise-blauwe motile granules bij 5000×) — historisch peer-artikel; geen moderne replicatie hier.",
+      "quote": "OBSERVATIONS ON BACILLUS TYPHOSUS IN ITS FILTERABLE STATE … A PRELIMINARY COMMUNICATION By ARTHUR ISAAC KENDALL, PH.D. … AND ROYAL RAYMOND RIFE, PH.D. … Examined in this polarized light, this thrice filtered culture of B. typhosus cultivated in K (protein) Medium showed small, oval granules, many of them quite actively motile. These motile granules when in true focus appeared as bright turquoise-blue bodies",
+      "sourceIds": [
+        "arthur-i-kendall-royal-r-rife-1931"
+      ],
+      "datum": "1931"
+    },
+    {
+      "id": "rife-franklin-institute-universal-1944",
+      "topics": [
+        "rife"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Franklin Institute 1944 documenteert Universal Microscope",
+      "claim": "Seidel & Winter (*Journal of the Franklin Institute*, 1944) beschrijven Rife’s Universal Microscope (1933, 5.682 delen, kwarts, meervoudige belichting) als instrument dat theoretische limieten van gewone lichtmicroscopie zou overtreffen — contemporaine technische reportage.",
+      "quote": "the Universal Microscope, developed in 1933, consists of 5,682 parts and is so-called because of its adaptability in all fields of microscopical work, being fully equipped with separate substage condenser units for transmitted and monochromatic beam, dark-field, polarized, and slit-ultra illumination … The entire optical system of lenses and prisms as well as the illuminating units are made of block-crystal quartz, quartz being especially transparent to ultra-violet radiations.",
+      "sourceIds": [
+        "r-e-seidel-m-elizabeth-winter-1944"
+      ],
+      "datum": "1944"
+    },
+    {
+      "id": "frohlich-longitudinal-modes-1968",
+      "topics": [
+        "cell-coherence"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Longitudinale elektrische modi 10¹¹–10¹² s⁻¹",
+      "claim": "Fröhlich (Int. J. Quantum Chem. 1968): biologische systemen zouden een tak van longitudinale elektrische modi hebben tussen 10¹¹ en 10¹² s⁻¹, gebaseerd op dipolaire celmembranen, H-bruggen in macromoleculen, en mogelijk niet-gelokaliseerde elektronen.",
+      "quote": "Biological systems are expected to have a branch of longitudinal electric modes in a frequency region between 10 11 and 10 12 sec −1 . They are based on the dipolar properties of cell membranes; of certain bonds recurring in giant molecules (such as H bonds) and possibly on pockets of non‐localized electrons.",
+      "sourceIds": [
+        "h-fr-hlich-1968"
+      ],
+      "datum": "1968",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "frohlich-single-mode-bose-1968",
+      "topics": [
+        "cell-coherence"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Één modus sterk aangeslagen — Bose-analogie",
+      "claim": "Zelfde paper: boven een kritieke energie-toevoer bereikt het systeem een steady state waarin één modus zeer sterk is aangeslagen; energie wordt geordend opgeslagen met long-range phase correlations, analoog aan Bose-condensatie.",
+      "quote": "if energy is supplied above a certain mean rate to such a branch, then a steady state will be reached in which a single mode of this branch is very strongly excited. The supplied energy is thus not completely thermalized but stored in a highly ordered fashion. This order expresses itself in long-range phase correlations; the phenomenon has considerable similarity with the low-temperature condensation of a Bose gas.",
+      "sourceIds": [
+        "h-fr-hlich-1968"
+      ],
+      "datum": "1968",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "frohlich-membrane-field-classic-1988",
+      "topics": [
+        "cell-coherence"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "100 mV over membraan → ~10⁵ V/cm",
+      "claim": "In zijn Citation Classic (1988) herinnert Fröhlich hoe Max Reiss hem wees op ~100 mV membraanpotentiaal over ~10⁻⁶ cm dikte → veld ~10⁵ V/cm en verwachte dipolaire vibraties in het 10¹¹–10¹² Hz-gebied — herkomst van de coherentie-hypothese.",
+      "quote": "The history of this paper goes back to about 1938 when my late friend Max Reiss informed me of the very small electric potential difference of 100 mV that has been found to be maintained by biological membranes. Their thickness on the order of 10^{-6} cm I found yielded the extraordinarily high electric field of 10^5 V/cm. … Also, one can then expect dipolar vibrations in the frequency range of 10^{11}-10^{12} Hz corresponding to mm electromagnetic waves",
+      "sourceIds": [
+        "h-fr-hlich-1988"
+      ],
+      "datum": "1988"
+    },
+    {
+      "id": "upe-cells-emit-ultralow-2024",
+      "topics": [
+        "ultraweak-light"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Cellen zenden ultrazwak licht uit (UPE)",
+      "claim": "Peer review (PMC 2024): cellen zenden licht uit bij ultralage intensiteit — fotonen als bijproduct van celmetabolisme, onderscheiden van delayed luminescence, bioluminescentie en chemiluminescentie; synoniemen o.a. biophotons / UPE.",
+      "quote": "Cells emit light at ultra-low intensities: photons which are produced as by-products of cellular metabolism, distinct from other light emission processes such as delayed luminescence, bioluminescence, and chemiluminescence. The phenomenon is known by a large range of names, including, but not limited to, biophotons, biological autoluminescence, metabolic photon emission and ultraweak photon emission (UPE)",
+      "sourceIds": [
+        "upe-brief-review-authors-pmc10899412-2024"
+      ],
+      "datum": "2024",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "upe-intensity-tens-to-hundreds",
+      "topics": [
+        "ultraweak-light"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "Tientallen tot honderden fotonen s⁻¹ cm⁻¹",
+      "claim": "Zelfde review: onder normale omstandigheden is gedetecteerde UPE-intensiteit extreem laag (orde tientallen fotonen s⁻¹ cm⁻¹); bij stress/ROS kan dit oplopen tot honderden — kwantitatieve bandbreedte van ultrazwak licht.",
+      "quote": "under normal conditions the intensity of this emission detected is still extremely low, on the order of tens of photons s −1 cm −1 (Bókkon et al., 2010). However, as the production of ROS increases with stress, this can be enhanced to hundreds of photons s −1 cm −1 (Pospíšil et al., 2014).",
+      "sourceIds": [
+        "upe-brief-review-authors-pmc10899412-2024"
+      ],
+      "datum": "2024",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "upe-noninvasive-oxidative-monitor-2023",
+      "topics": [
+        "ultraweak-light"
+      ],
+      "issues": [
+        "one-light"
+      ],
+      "register": "documented",
+      "label": "UPE als non-invasieve oxidatie-monitor",
+      "claim": "Application-review (PMC 2023): UPE (“ultra-weak bioluminescence”) is een functioneel kenmerk van organismen. De review verschuift de focus naar toepassing: een non-invasief hulpmiddel in onderzoek naar diagnose en oxidatief metabolisme, nog geen klinische standaard.",
+      "quote": "Ultra-weak bioluminescence, also known as ultra-weak photon emission (UPE), is one of the functional characteristics of biological organisms, characterized by specialized, low-energy level luminescence. … primarily focused on UPE as a promising non-invasive tool for diagnosis and oxidative metabolism monitoring",
+      "sourceIds": [
+        "upe-application-review-authors-pmc9981976-2023"
+      ],
+      "datum": "2023",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "alfven-nobel-plasma-space",
+      "topics": [
+        "plasma"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "Ruimte nabij Aarde = plasma + stromen",
+      "claim": "In zijn Nobel-lezing stelt Alfvén dat ruimte nabij de Aarde gevuld is met plasma, doorsneden door sheaths en een complex patroon van elektrische stromen en velden.",
+      "quote": "These regions earlier were supposed to be void and structureless but we now know that they are filled with plasmas, intersected by sheathlike discontinuities, and permeated by a complicated pattern of electric currents and electric and magnetic fields.",
+      "sourceIds": [
+        "hannes-alfv-n-nobel-lecture-1970"
+      ],
+      "datum": "1970"
+    },
+    {
+      "id": "alfven-nobel-second-approach-currents",
+      "topics": [
+        "plasma"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "Tweede aanpak: stroomlijnen & double layers",
+      "claim": "Alfvén eist een ‘tweede aanpak’ van kosmisch plasma: niet alleen magnetische veldlijnen, maar ook stroomlijnen, circuits en elektrostatische double layers.",
+      "quote": "It is equally important to draw the current lines and discuss the electric circuit. Electrostatic double layers are of decisive importance in low density plasmas. … Currents produce filaments or flow in thin sheets.",
+      "sourceIds": [
+        "hannes-alfv-n-nobel-lecture-1970"
+      ],
+      "datum": "1970"
+    },
+    {
+      "id": "alfven-nobel-in-the-beginning-plasma",
+      "topics": [
+        "plasma"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "In the beginning was the plasma",
+      "claim": "Alfvén sluit met de empirische herinnering dat aurora een kosmisch plasma is — ‘in the beginning was the plasma’.",
+      "quote": "And if the night sky on which we observe them is at a high latitude, outside this lecture hall — perhaps over a small island in the archipelago of Stockholm — we may also see in the sky an aurora, which is a cosmic plasma, reminding us of the time when our world was born out of plasma. Because in the beginning was the plasma.",
+      "sourceIds": [
+        "hannes-alfv-n-nobel-lecture-1970"
+      ],
+      "datum": "1970"
+    },
+    {
+      "id": "birkeland-1908-corpuscular-aurora",
+      "topics": [
+        "birkeland"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "Corpusculaire stralen van de zon",
+      "claim": "Birkeland stelt (herhaald sinds 1896) dat magnetische storingen en aurora borealis het gevolg zijn van corpusculaire stralen van de zon.",
+      "quote": "The knowledge gained, since 1896, in radio-activity has favoured the view to which I gave expression in that year, namely, that magnetic disturbances on the earth, and aurora borealis, are due to corpuscular rays emitted by the sun.",
+      "sourceIds": [
+        "kristian-birkeland-1908"
+      ],
+      "datum": "1908"
+    },
+    {
+      "id": "birkeland-1908-terrella-discharge",
+      "topics": [
+        "birkeland"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "Terrella in ontladingsbuis",
+      "claim": "Hij test de theorie met een kleine magnetische terrella in een grote ontladingsbuis: corpusculaire stromen zouden neerslag op aarde geven die overeenkomt met waargenomen verstoringen.",
+      "quote": "On the other hand, by experimental investigations with a little magnetic terrella in a large discharge-tube, and by mathematical analysis, we have endeavoured to prove that a current of electric corpuscles from the sun would give rise to precipitation upon the earth, the magnetic effect of which agrees well with the magnetic field of force that was found by the observations on the earth.",
+      "sourceIds": [
+        "kristian-birkeland-1908"
+      ],
+      "datum": "1908"
+    },
+    {
+      "id": "birkeland-cathode-aurora-1896",
+      "topics": [
+        "birkeland"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "Kathodestralen → noorderlicht",
+      "claim": "Birkeland’s aurorale hypothese: noorderlicht door kathodestralen (of soortgelijke stralen) van de zon, aangetrokken door aardmagnetisme.",
+      "quote": "…the hypothesis put forward by me in 1896 regarding the origin of the aurora, namely that the northern lights are due to cathode rays or similar rays emitted by the sun, these rays being drawn in from space towards the earth by the terrestrial-magnetic forces.",
+      "sourceIds": [
+        "kristian-birkeland-1908"
+      ],
+      "datum": "1908"
+    },
+    {
+      "id": "thornhill-2011-plasma-cosmology-ieee",
+      "topics": [
+        "thunderbolts"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "IEEE erkent plasma-kosmologie",
+      "claim": "Thornhill (Thunderbolts / EU) stelt dat IEEE plasma-kosmologie erkent, terwijl astronomiestudenten die vaak niet kennen; plasma vormt bijna het gehele zichtbare heelal.",
+      "quote": "For example, the world’s largest professional body, the Institute for Electrical and Electronic Engineers (IEEE), recognizes plasma cosmology while it remains unheard of by students of astronomy. Plasma cosmology receives no publicity although it deals empirically with the electromagnetic behavior of plasma, which constitutes almost the entire visible universe.",
+      "sourceIds": [
+        "wallace-w-thornhill-2011"
+      ],
+      "datum": "2011",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "thornhill-2011-electric-star-definition",
+      "topics": [
+        "thunderbolts"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "Ster = anode-focus glow discharge",
+      "claim": "In EU-definitie is een ster een anode-focus van een plasma glow discharge die energie van een externe bron uitstraalt (Thornhill’s claim).",
+      "quote": "A star can be defined as a body that satisfies two conditions: (a) it forms the anode focus of a plasma glow discharge; (b) it radiates energy supplied by an external source.",
+      "sourceIds": [
+        "wallace-w-thornhill-2011"
+      ],
+      "datum": "2011",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "scott-electric-sky-99-percent-plasma",
+      "topics": [
+        "thunderbolts"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "documented",
+      "label": "~99% van het heelal is plasma",
+      "claim": "Donald E. Scott (*The Electric Sky*, Thunderbolts-circuit) claimt dat ~99% van het heelal plasma is, niet ‘onzichtbare materie’.",
+      "quote": "This revolution is based on the growing realization that the cosmos is highly electrical in nature. It is becoming clear that 99% of the universe is made up not of \"invisible matter\", but rather, of matter in the plasma state.",
+      "sourceIds": [
+        "donald-e-scott-2006"
+      ],
+      "datum": "2006"
+    },
+    {
+      "id": "russell-secret-light-rhythmic-balanced-interchange",
+      "topics": [
+        "russell-wave"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "echo",
+      "label": "Rhythmic balanced interchange",
+      "claim": "Russell noemt ‘rhythmic balanced interchange’ tussen tegenpolen de wet van Gods lichtuniversum — én de wet.",
+      "quote": "Truth is simple. Balance is simple. Rhythmic balanced interchange between all pairs of opposite expressions in Natural phenomena, and in human relations, is the consummate art of God's universe of Light. It is also the Law.",
+      "sourceIds": [
+        "walter-russell-1947"
+      ],
+      "datum": "1947"
+    },
+    {
+      "id": "russell-secret-light-electric-wave-universe",
+      "topics": [
+        "russell-wave"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "echo",
+      "label": "Electric wave universe",
+      "claim": "In dezelfde wet ligt volgens Russell de continuïteit van creatie in Gods ‘electric wave universe’ van twee geconditioneerde lichten.",
+      "quote": "In this one fundamental Universal Law lies the balanced continuity of all creative expression in God's electric wave universe of two conditioned lights in seeming motion which record God's One Whole Idea of Creation into countless seemingly separate parts of that Whole Idea.",
+      "sourceIds": [
+        "walter-russell-1947"
+      ],
+      "datum": "1947"
+    },
+    {
+      "id": "russell-secret-light-in-the-wave",
+      "topics": [
+        "russell-wave"
+      ],
+      "issues": [
+        "one-eu"
+      ],
+      "register": "echo",
+      "label": "IN THE WAVE LIES THE SECRET OF CREATION",
+      "claim": "Russell zet expliciet: ‘IN THE WAVE LIES THE SECRET OF CREATION’.",
+      "quote": "IN THE WAVE LIES THE SECRET OF CREATION",
+      "sourceIds": [
+        "walter-russell-1947"
+      ],
+      "datum": "1947"
+    },
+    {
+      "id": "gariaev-2015-wave-level-genome",
+      "topics": [
+        "wave-genome"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Genoom als quantum-biocomputer op golf-niveau",
+      "claim": "Gariaev stelt dat chromosoomwerk als quantum-biocomputer op golf-niveau gebeurt, via coherente foton-DNA-straling en niet-lineaire vibraties (geluid).",
+      "quote": "In this plane, the work of the genome, as a quantum biocomputer, occurs on the wave level. Here the main function is regulatory quantum broadcasting of genetic-metabolic information on the intercellular, tissue and organism levels using a coherent photon DNA radiation and its nonlinear vibrational states (sound).",
+      "sourceIds": [
+        "petr-p-gariaev-2015"
+      ],
+      "datum": "2015"
+    },
+    {
+      "id": "gariaev-2015-holograms-phantom",
+      "topics": [
+        "wave-genome"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "DNA als hologram + phantom-structuren",
+      "claim": "DNA-informatie manifesteert zich volgens Gariaev als dynamisch gepolariseerde hologrammen én phantom-DNA-structuren.",
+      "quote": "DNA information presents itself in the form of dynamically polarized holograms as well as phantom DNA structures.",
+      "sourceIds": [
+        "petr-p-gariaev-2015"
+      ],
+      "datum": "2015"
+    },
+    {
+      "id": "gariaev-2015-lwg-basis",
+      "topics": [
+        "wave-genome"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Linguistic Wave Genetics (LWG)",
+      "claim": "Hij noemt Linguistic Wave Genetics (LWG) de basis van deze lijn; claimt lasertechniek die ‘sign wave’-toestanden van het genoom simuleert.",
+      "quote": "These data are the basis of Linguistic Wave Genetics (LWG). … Nevertheless, we have created a laser technology, to some extent simulating \"sign wave\" states of the genome, and are able to transmit genetic and genetic-metabolic information.",
+      "sourceIds": [
+        "petr-p-gariaev-2015"
+      ],
+      "datum": "2015"
+    },
+    {
+      "id": "gariaev-2016-phantom-discovered-1984",
+      "topics": [
+        "phantom-dna"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Phantom Effect ontdekt 1984",
+      "claim": "Gariaev: DNA Phantom Effect ontdekt 1984 (correlatie-laserspectroscopie); eerste publicatie 1991.",
+      "quote": "DNA Phantom Effect was discovered in our laboratory led by the author in 1984 using the method of correlation laser spectroscopy. The first publication about this was in 1991 [1].",
+      "sourceIds": [
+        "gariaev-vladychenskaya-leonova-gariaeva-2016"
+      ],
+      "datum": "2016"
+    },
+    {
+      "id": "gariaev-2016-pcr-without-template-claim",
+      "topics": [
+        "phantom-dna"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "PCR zonder DNA-template na laser/MBER",
+      "claim": "Claim: water behandeld met gemoduleerde secundaire breedbandstraling (MBER) van laser-gelezen DNA, daarna PCR *zonder* DNA-template, zou product van voorafbepaalde lengte geven.",
+      "quote": "After laser exposure, water treated by the modulated broadband electromagnetic spectrum, was used for execution of standard PCR reactions, 25µL of this water was used without addition of DNA-template material.",
+      "sourceIds": [
+        "gariaev-vladychenskaya-leonova-gariaeva-2016"
+      ],
+      "datum": "2016"
+    },
+    {
+      "id": "gariaev-2016-independent-verification",
+      "topics": [
+        "phantom-dna"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Auteurs vragen onafhankelijke verificatie",
+      "claim": "Auteurs zelf: phantom-DNA als equivalent van materieel DNA vereist onafhankelijke verificatie; zij nodigen labs uit.",
+      "quote": "However, phantom DNA data as equivalents of ordinary material DNA requires independent verification. Therefore, we appeal to and invite molecular biologists, geneticists and other scientists to conduct independent experiments.",
+      "sourceIds": [
+        "gariaev-vladychenskaya-leonova-gariaeva-2016"
+      ],
+      "datum": "2016"
+    },
+    {
+      "id": "montagnier-2009-abstract-ems",
+      "topics": [
+        "montagnier-signal"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Bacterieel DNA → EM-golven bij hoge verdunning",
+      "claim": "2009-paper: sommige bacteriële DNA-sequenties induceren elektromagnetische golven bij hoge waterverdunning; resonantie getriggerd door ambient VLF-achtergrond.",
+      "quote": "A novel property of DNA is described: the capacity of some bacterial DNA sequences to induce electromagnetic waves at high aqueous dilutions. It appears to be a resonance phenomenon triggered by the ambient electromagnetic background of very low frequency. The genomic DNA of most pathogenic bacteria contains sequences which are able to generate such signals.",
+      "sourceIds": [
+        "l-montagnier-et-al-2009"
+      ],
+      "datum": "2009",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "montagnier-2011-dna-waves-abstract",
+      "topics": [
+        "montagnier-signal"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Bacterieel én viraal DNA → laagfrequente EM",
+      "claim": "2011: bacteriële en virale DNA-sequenties induceren laagfrequente EM-golven in hoge waterverdunningen; getriggerd door ambient VLF.",
+      "quote": "Some bacterial and viral DNA sequences have been found to induce low frequency electromagnetic waves in high aqueous dilutions. This phenomenon appears to be triggered by the ambient electromagnetic background of very low frequency.",
+      "sourceIds": [
+        "l-montagnier-et-al-2011"
+      ],
+      "datum": "2011",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "montagnier-2011-ulf-500-3000",
+      "topics": [
+        "montagnier-signal"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "ULF 500–3000 Hz in filtraten",
+      "claim": "Laboratoriumclaim: ULF 500–3000 Hz gedetecteerd in bepaalde verdunningen van filtraten (100 nm / 20 nm) of geëxtraheerd DNA.",
+      "quote": "Ultra Low Frequency Electromagnetic Waves (ULF 500−3000 Hz) were detected in certain dilutions of filtrates (100 nm, 20 nm) from cultures of micro-organisms (virus, bacteria) or from the plasma of humans infected with the same agents (Fig. 2). Same results are obtained from their extracted DNA.",
+      "sourceIds": [
+        "l-montagnier-et-al-2011"
+      ],
+      "datum": "2011",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "searls-2002-linguistic-metaphors",
+      "topics": [
+        "dna-language"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Linguïstische metaforen in moleculaire biologie",
+      "claim": "Searls: linguïstische metaforen zitten sinds het begin in moleculaire biologie; genoom als ‘book of life’ is de populaire extensie van DNA-als-taal.",
+      "quote": "Linguistic metaphors have been woven into the fabric of molecular biology since its inception. The determination of the human genome sequence has brought these metaphors to the forefront of the popular imagination, with the natural extension of the notion of DNA as language to that of the genome as the 'book of life'.",
+      "sourceIds": [
+        "david-b-searls-2002"
+      ],
+      "datum": "2002",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "searls-2002-linguistics-methods",
+      "topics": [
+        "dna-language"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Taalmethoden ↔ bioinformatica",
+      "claim": "Searls vraagt of taalanalyse-methoden toepasbaar zijn op moleculaire biologie; veel bioinformatica-technieken zijn volgens hem linguïstisch gegrond.",
+      "quote": "But do these analogies go deeper and, if so, can the methods developed for analysing languages be applied to molecular biology? In fact, many techniques used in bioinformatics, even if developed independently, may be seen to be grounded in linguistics. Further interweaving of these fields will be instrumental in extending our understanding of the language of life.",
+      "sourceIds": [
+        "searls-2002-abstract-2002"
+      ],
+      "datum": "2002",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "gariaev-2015-genome-as-text-homonyms",
+      "topics": [
+        "dna-language"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Codon-homonymie = taalanalogie",
+      "claim": "Gariaev: codon-homonymie analogie met menselijke taal; genoom als quasi-intelligent biocomputer — basis voor Linguistic Wave Genetics.",
+      "quote": "This is the way the semantics of the codon-homonyms occur, as an exact analogy of the consciousness work in the human languages, abounding with homonyms. This turn in the understanding of the protein code, as actual text formation, leads to a strong idea of the genome as a quasi-intelligent biocomputer structure of living cells.",
+      "sourceIds": [
+        "petr-p-gariaev-2015"
+      ],
+      "datum": "2015"
+    },
+    {
+      "id": "sybr-green-fluorescence-enhancement",
+      "topics": [
+        "fluorescence"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "SYBR Green: grote fluorescentietoename",
+      "claim": "SYBR Green I toont grote fluorescentietoename bij DNA-binding — minstens een orde van grootte groter dan ethidiumbromide (fabrikant/Molecular Probes).",
+      "quote": "SYBR® Green I stain exhibits exceptional affinity for DNA and a large fluorescence enhancement upon DNA binding—at least an order-of-magnitude greater than that of ethidium bromide. Also, the fluorescence quantum yield of the DNA/SYBR® Green I complex (~0.8) is over five times greater than that of DNA/ethidium bromide (~0.15).",
+      "sourceIds": [
+        "molecular-probes-invitrogen-2006"
+      ],
+      "datum": "2006",
+      "land": "VS"
+    },
+    {
+      "id": "sybr-green-detection-limit",
+      "topics": [
+        "fluorescence"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Detectie tot ~60 pg dsDNA",
+      "claim": "Met 300 nm transilluminatie detecteert SYBR Green I tot ~60 pg dsDNA per band; ≥25× gevoeliger dan ethidiumbromide onder standaard 300 nm.",
+      "quote": "With 300 nm transillumination, as little as 60 pg dsDNA per band can be detected with SYBR® Green I stain. … This sensitivity is at least 25 times greater than can be achieved with ethidium bromide using standard 300 nm transillumination.",
+      "sourceIds": [
+        "molecular-probes-invitrogen-2006"
+      ],
+      "datum": "2006",
+      "land": "VS"
+    },
+    {
+      "id": "intech-etbr-sybr-visualization",
+      "topics": [
+        "fluorescence"
+      ],
+      "issues": [
+        "one-dna"
+      ],
+      "register": "documented",
+      "label": "Standaard: EtBr of SYBR onder UV",
+      "claim": "Standaard gel-protocol: DNA zichtbaar maken door kleuring met ethidiumbromide of SYBR Green en visualisatie onder ~300 nm UV.",
+      "quote": "Nucleic acids running on an electrophoresis can be detected by staining with a dye and visualized under 300-nm UV light. Staining and visualization of DNA are conducted by using either ethidium bromide or SYBR Green. The most convenient and commonly used method to visualize DNA in agarose a gel is ethidium bromide.",
+      "sourceIds": [
+        "principles-of-nucleic-acid-separation-by-agarose-gel"
+      ],
+      "soort": "onderzoek"
+    },
+    {
+      "id": "hive-seeley-single-living-entity",
+      "topics": [
+        "hive"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Korf als één levend wezen",
+      "claim": "Thomas Seeley (*Honeybee Democracy*): een honingbijkolonie is meer dan een aggregaat — een composite being / single living entity die fysiologie als geheel uitvoert (voeding, temperatuur, ademhaling, beslissen, locomotoriek).",
+      "quote": "A colony of honeybees is, then, far more than an aggregation of individuals, it is a composite being that functions as an integrated whole. Indeed, one can accurately think of a honeybee colony as a single living entity, weighing as much as 5 kilograms (10 pounds) and performing all of the basic physiological processes that support life: ingesting and digesting food, maintaining nutritional balance, circulating resources, exchanging respiratory gases, regulating water content, controlling body temperature, sensing the environment, deciding how to behave, and achieving locomotion.",
+      "sourceIds": [
+        "thomas-d-seeley-2010"
+      ],
+      "datum": "2010"
+    },
+    {
+      "id": "hive-seeley-colony-thermoregulation",
+      "topics": [
+        "hive"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "documented",
+      "label": "Broednest op 34–36 °C",
+      "claim": "Seeley: bij broedzorg houdt de kolonie de interne temperatuur tussen 34° en 36 °C terwijl de buitenlucht van −30° tot 50 °C kan lopen — thermoregulatie als koloniaal orgaan.",
+      "quote": "From late winter to early fall, when the workers are rearing brood, a colony’s internal temperature is kept between 34° and 36°C (93° and 96°F)—just below the core body temperature of humans—even as the ambient air temperature ranges from -30° to 50°C (-20° to 120°F).",
+      "sourceIds": [
+        "thomas-d-seeley-2010"
+      ],
+      "datum": "2010"
+    },
+    {
+      "id": "hive-steiner-ga351-permeated-love",
+      "topics": [
+        "hive"
+      ],
+      "issues": [
+        "one-cymatics"
+      ],
+      "register": "echo",
+      "label": "Steiner: de korf is doortrokken van liefde",
+      "claim": "Steiner GA351 (1923): de bijenkorf is “in reality permeated with love”; individuen verzaken seksuele drift op manieren die liefde door de hele korf ontwikkelen — culturele/spirituele echo, géén biologisch bewijs.",
+      "quote": "The whole hive is in reality permeated with love. The individual bees renounce love in manifold ways, and thus develop love throughout the whole hive. One only begins to understand the life of the bees when one knows that the bee lives in an atmosphere completely pervaded by love.",
+      "sourceIds": [
+        "rudolf-steiner-1923"
+      ],
+      "datum": "1923",
+      "soort": "overig"
+    },
+    {
+      "id": "helical-heart-torrent-guasp-band",
+      "topics": [
+        "helical-heart"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Spiraalband van pulmonalis naar aorta",
+      "claim": "Torrent-Guasp (PubMed-review): ventriculair myocardium is geen simpele pompwand maar twee spiralen — horizontale basale loop en bijna verticale helix — die ejectie én zuiging sturen.",
+      "quote": "The description of Francisco Torrent-Guasp's model of the helical heart is presented, which includes the cardiac structures that produce 2 simple loops that start at the pulmonary artery and end in the aorta. An unscrolled ventricular band is shown, achieved by blunt dissection that extends between the points of origin of the right ventricle, at the pulmonary artery root, to termination at the aortic root, in the left ventricle.",
+      "sourceIds": [
+        "kocica-et-al-2002"
+      ],
+      "datum": "2002",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "helical-heart-suction-fill-sequence",
+      "topics": [
+        "helical-heart"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Zuigen vult, wrikken wringt uit",
+      "claim": "Dezelfde review beschrijft peristaltische activatie: vernauwing, verkorting, verlenging en verbreding regelen leegpompen én vullen — zuiging is geen bijproduct maar sequentie.",
+      "quote": "These sequences control the ventricular events responsible for ejection to empty and suction to fill.",
+      "sourceIds": [
+        "kocica-et-al-2002"
+      ],
+      "datum": "2002",
+      "land": "VS",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "helical-heart-maciver-mesh-counter",
+      "topics": [
+        "helical-heart"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "MacIver: band bestaat niet als entiteit",
+      "claim": "MacIver & Anderson (EJCTS 2017): Torrent-Guasps dissectie schept een band zonder anatomische grenzen; cardiomyocyten vormen een verweven meshwork — HVMB blijft nuttige functionele analogie, geen bewezen anatomie.",
+      "quote": "In this review, we show that the band does not exist as an anatomical entity with defined borders. On the contrary, the ventricular cardiomyocytes are aggregated end to end and by their branching produce an intricate meshwork.",
+      "sourceIds": [
+        "maciver-anderson-2017"
+      ],
+      "datum": "2017",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "heart-torus-magnetic-envelops-cells",
+      "topics": [
+        "heart-torus"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Hartveld omhult elke cel",
+      "claim": "HeartMath (Science of the Heart, Energetic Communication): het hart produceert het sterkste ritmische biomagnetische veld van het lichaam; het strekt zich uit rond elke cel en meters buiten het lichaam.",
+      "quote": "The heart's magnetic field, which is the strongest rhythmic field produced by the human body, not only envelops every cell of the body, but also extends out in all directions into the space around us. The heart's magnetic field can be measured several feet away from the body by sensitive magnetometers.",
+      "sourceIds": [
+        "science-of-the-heart-the-biophysics-of-energetic"
+      ]
+    },
+    {
+      "id": "heart-torus-emotional-encoding",
+      "topics": [
+        "heart-torus"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Emotie in het veldspectrum",
+      "claim": "HeartMath: timing tussen hartslagpulsen in het magnetische veld wordt gemoduleerd door emotionele staten — informatie zit in patroon, niet alleen in amplitude.",
+      "quote": "We have found there is a direct relationship between the heart-rhythm patterns and the spectral information encoded in the frequency spectra of the magnetic field radiated by the heart. Thus, information about a person's emotional state is encoded in the heart's magnetic field and is communicated throughout the body and into the external environment.",
+      "sourceIds": [
+        "science-of-the-heart-the-biophysics-of-energetic"
+      ]
+    },
+    {
+      "id": "heart-torus-wikipedia-ring-form",
+      "topics": [
+        "heart-torus"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Torus als ringvorm",
+      "claim": "Secundaire vormanker: een open torus ontstaat wanneer een cirkel rond een lijn wentelt zonder te snijden — ringvorm zoals een binnenband; metafoor voor het hartveld, geen anatomisch bewijs.",
+      "quote": "Een torus (meervoud: tori of torussen) is een driedimensionaal omwentelingslichaam, dat ontstaat door een cirkel te wentelen om een lijn die zich in het vlak van de cirkel bevindt. Als deze lijn de cirkel niet snijdt of raakt, is het resultaat een open torus welke ringvormig is, of vergelijkbaar met de binnenband van een fiets.",
+      "sourceIds": [
+        "torus"
+      ]
+    },
+    {
+      "id": "heart-coherence-optimal-state",
+      "topics": [
+        "heart-coherence"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Coherentie = optimale fysiologie",
+      "claim": "HeartMath (Science of the Heart): hartcoherentie is een optimale fysiologische toestand gekoppeld aan cognitie, zelfregulatie, emotionele stabiliteit en veerkracht.",
+      "quote": "Numerous studies have since shown that heart coherence is an optimal physiological state associated with increased cognitive function, self-regulatory capacity, emotional stability and resilience.",
+      "sourceIds": [
+        "science-of-the-heart"
+      ]
+    },
+    {
+      "id": "heart-coherence-hrv-emotions",
+      "topics": [
+        "heart-coherence"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "HRV-spiegel van emotie",
+      "claim": "HeartMath: hartslagvariabiliteit bleek de meest dynamische indicator van emotionele toestanden; stressvolle emoties verhogen disordere in hersenen en autonoom systeem — weerspiegeld in hartritmes.",
+      "quote": "Consistently, however, it was heart rate variability, or heart rhythms that stood out as the most dynamic and reflective indicator of one's emotional states and, therefore, current stress and cognitive processes. It became clear that stressful or depleting emotions such as frustration and overwhelm lead to increased disorder in the higher-level brain centers and autonomic nervous system and which are reflected in the heart rhythms and adversely affects the functioning of virtually all bodily systems.",
+      "sourceIds": [
+        "science-of-the-heart"
+      ]
+    },
+    {
+      "id": "heart-coherence-rein-biofield-layers",
+      "topics": [
+        "heart-coherence"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "in-development",
+      "label": "Rein: bioveld in lagen",
+      "claim": "Glen Rein (Frontier Perspectives 1998): biologische systemen vertonen non-locale eigenschappen. Hij modelleert een bioveld van kracht-, potential- en quantumvelden — een model naast HeartMath, geen meting van het hartritme zelf.",
+      "quote": "This new expeimental evidence is used as the basis for a model which introduces the concept of a bio-field composed of layers comprising force fields, potential fields and quantum fields embeded within one another.",
+      "sourceIds": [
+        "glen-rein-1998"
+      ],
+      "datum": "1998"
+    },
+    {
+      "id": "heart-memory-pearsall-cellular-threshold",
+      "topics": [
+        "heart-memory"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "mirror",
+      "label": "Immuno-suppressiva als drempel",
+      "claim": "Pearsall (J Near-Death Stud 2002): immunosuppressiva kunnen de drempel verlagen om cellular memories in getransplanteerde organen te registreren — auteurshypothese, geen medische waarheid.",
+      "quote": "Paul Pearsall proposed that the immunosuppressant drugs could conceivably lower the threshold for patients to potentially register cellular memories stored in the transplanted organs",
+      "sourceIds": [
+        "paul-pearsall-gary-e-schwartz-linda-g-russek"
+      ],
+      "datum": "2002",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "heart-memory-systemic-prediction",
+      "topics": [
+        "heart-memory"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "mirror",
+      "label": "Systemic memory-voorspelling",
+      "claim": "Schwartz & Russek (zelfde paper): dynamische systemen met feedbackslagen slaan informatie op — voorspelling dat gevoelige transplantatieontvangers aspecten van donorhistorie kunnen ervaren. Spiegel, geen bewijs.",
+      "quote": "One prediction is that sensitive recipients of organ transplant can experience aspects of the donor's personal history stored in the transplanted tissues.",
+      "sourceIds": [
+        "paul-pearsall-gary-e-schwartz-linda-g-russek"
+      ],
+      "datum": "2002",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "heart-memory-not-only-nervous",
+      "topics": [
+        "heart-memory"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "mirror",
+      "label": "Geheugen niet alleen zenuwstelsel",
+      "claim": "Opening van het Pearsall-paper: als geheugen uitsluitend in zenuw- en immuunsysteem zit, mogen transplantatieontvangers geen donor-parallellen tonen — zij rapporteren dat wel. Controversieel dossier.",
+      "quote": "It is generally assumed that learning involves primarily the nervous system and, secondarily, the immune system. But if those systems were the sole repository of memory, then patients receiving peripheral organ transplants should not experience personality changes that parallel those of donors they have never met.",
+      "sourceIds": [
+        "paul-pearsall-gary-e-schwartz-linda-g-russek"
+      ],
+      "datum": "2002",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "heart-intelligence-heart-brain",
+      "topics": [
+        "heart-intelligence"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Hart als informatiecentrum",
+      "claim": "HeartMath: het hart is een complex informatieverwerkend centrum met een functioneel ‘heart brain’ dat via meerdere paden de hersenen beïnvloedt — geen mystiek, wel neurocardiologie.",
+      "quote": "We now have a much deeper scientific understanding of many of our original questions that explains how and why heart activity affects mental clarity, creativity, emotional balance, intuition and personal effectiveness. Our and others' research indicates the heart is far more than a simple pump. The heart is, in fact, a highly complex information-processing center with its own functional brain, commonly called the heart brain, that communicates with and influences the cranial brain via the nervous system, hormonal system and other pathways.",
+      "sourceIds": [
+        "science-of-the-heart"
+      ]
+    },
+    {
+      "id": "heart-intelligence-mind-of-its-own",
+      "topics": [
+        "heart-intelligence"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Hart beïnvloedt waarneming",
+      "claim": "HeartMath: het hart gedraagt zich alsof het een eigen geest heeft en beïnvloedt significant hoe wij waarnemen en reageren — afferente regie, geen uplink.",
+      "quote": "We also observed that the heart acted as though it had a mind of its own and could significantly influence the way we perceive and respond in our daily interactions. In essence, it appeared that the heart could affect our awareness, perceptions and intelligence.",
+      "sourceIds": [
+        "science-of-the-heart"
+      ]
+    },
+    {
+      "id": "heart-intelligence-energetic-communication",
+      "topics": [
+        "heart-intelligence"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "documented",
+      "label": "Cardio-elektromagnetische communicatie",
+      "claim": "HeartMath benoemt cardioelectromagnetic communication: het zenuwstelsel als antenne op magnetische hartvelden van anderen — researchclaim, geen grid-sensing.",
+      "quote": "The results of these experiments have led us to conclude that the nervous system acts as an antenna, which is tuned to and responds to the magnetic fields produced by the hearts of other individuals. My colleagues and I call this energetic information exchange energetic communication and believe it to be an innate ability that heightens awareness and mediates important aspects of true empathy and sensitivity to others.",
+      "sourceIds": [
+        "science-of-the-heart-the-biophysics-of-energetic"
+      ]
+    },
+    {
+      "id": "steiner-heart-wonderful-structure",
+      "topics": [
+        "steiner-heart"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "echo",
+      "label": "Fysiek hart als wonder",
+      "claim": "Steiner GA109 (1909): het fysieke lichaam is het meest perfecte lid — wisdom speaks from the organs; het hart is een wonderlijke structuur die aanvallen weerstaat. Echo, geen anatomie.",
+      "quote": "Consider the human physical heart. What a miraculous structure it is, that it can withstand all attacks throughout its entire life!",
+      "sourceIds": [
+        "rudolf-steiner-1909"
+      ],
+      "datum": "1909",
+      "soort": "overig"
+    },
+    {
+      "id": "steiner-heart-oldest-member",
+      "topics": [
+        "steiner-heart"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "echo",
+      "label": "Fysiek lichaam het oudst",
+      "claim": "Steiner: niet het I of astrale lichaam zijn het meest perfect — het fysieke lichaam is het oudste en meest perfecte lid; een host perfecte wezens werkte eraan.",
+      "quote": "It is not the I or the astral body that are the most perfect members of the human being because they are spiritually higher, but rather the physical body. It is the most perfect member of the human being, a structure, a composition of the most wonderful details.",
+      "sourceIds": [
+        "rudolf-steiner-1909"
+      ],
+      "datum": "1909",
+      "soort": "overig"
+    },
+    {
+      "id": "steiner-heart-astral-attacks",
+      "topics": [
+        "steiner-heart"
+      ],
+      "issues": [
+        "one-organism"
+      ],
+      "register": "echo",
+      "label": "Astraal lichaam vs fysiek hart",
+      "claim": "Steiner: het astrale lichaam behandelt het fysieke hart voortdurend onwijs via genot — het hart weerstaat. Culturele echo, geen medische claim.",
+      "quote": "The astral body needs means of enjoyment out of its longing for enjoyment and thus continually mistreats the physical body; it continually attacks the physical heart, and the latter resists it.",
+      "sourceIds": [
+        "rudolf-steiner-1909"
+      ],
+      "datum": "1909",
+      "soort": "overig"
+    },
+    {
+      "id": "schauberger-water-living-entity",
+      "topics": [
+        "living-water",
+        "water-flow"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Schauberger: water is zelf een levend wezen",
+      "claim": "In Our Senseless Toil bekritiseert Viktor Schauberger mechanische rivierregulering en stelt letterlijk dat water zelf een levende entiteit is. Echo-register: historische natuuropvatting, géén 6G-bewijs.",
+      "quote": "“humanity constantly does the most idiotic thing imaginable by trying to regulate these waterways by means of their banks - by influencing the flow mechanically, instead of taking into account the fact that water is itself a living entity.”",
+      "sourceIds": [
+        "schauberger-senseless-toil"
+      ],
+      "datum": "1933"
+    },
+    {
+      "id": "schauberger-double-spiral-vortex",
+      "topics": [
+        "water-flow"
+      ],
+      "register": "echo",
+      "label": "Schauberger: dubbele spiraal / vortex in stroming",
+      "claim": "Schauberger beschrijft dubbel-spiraalvormige (vortex) beweging van bloed/vloeistof — spiraal in een spiraal — als kwalitatieve stroming. Echo; niet als empirisch 6G-argument gebruiken.",
+      "quote": "“This is because the latter must describe a path roughly corresponding to a double-helical motion - a spiral motion within a spiral - whereas in the main the inner blood particles appear to perform a simple spiral motion.”",
+      "sourceIds": [
+        "schauberger-senseless-toil"
+      ],
+      "datum": "1933"
+    },
+    {
+      "id": "water-wizard-spiral-vortices-axis",
+      "topics": [
+        "water-flow"
+      ],
+      "register": "echo",
+      "label": "Water Wizard: spiraalvortexen in stroomas",
+      "claim": "In de Coats-editie The Water Wizard (Schauberger-materiaal) wordt natuurlijke stroming beschreven met afwisselende spiraalvortexen langs de centrale as. Echo-register.",
+      "quote": "“anti-clockwise alternating spiral vortices down the central axis of the current, [...] leading to a faster, more laminar, spiral flow.”",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-science-views-water-chemical",
+      "topics": [
+        "living-water"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Wetenschap ziet water als chemische verbinding",
+      "claim": "In The Water Wizard bekritiseert Schauberger dat de wetenschap ‘water’ reduceert tot chemische samenstelling en miljoenen mensen vloeistof voorschrijft die allesbehalve gezond water is. Echo-register.",
+      "quote": "Science views the blood-building and character-influencing ur-organism - 'water' merely as a chemical compound and provides millions of people with a liquid prepared from this point of view, which is everything but healthy water.",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-trout-question-st",
+      "topics": [
+        "forel",
+        "water-flow",
+        "vortex"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Forel in raasende stroom",
+      "claim": "In Our Senseless Toil (1933) formuleert Schauberger de kernvraag van het forelverhaal: hoe kan een forel stilstaan in een razende stroom? Echo-register.",
+      "quote": "Why does a trout stand still in a raging torrent, as if by magic ?",
+      "sourceIds": [
+        "schauberger-senseless-toil"
+      ],
+      "datum": "1933"
+    },
+    {
+      "id": "schauberger-trout-motionless-upstream-ww",
+      "topics": [
+        "forel",
+        "water-flow",
+        "vortex"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Forel stil in snelle stroming",
+      "claim": "In The Water Wizard beschrijft Schauberger dat een forel zonder noemenswaardige inspanning stil kan hangen in water waar een mens nauwelijks overeind blijft. Echo-register.",
+      "quote": "While it is quite remarkable that trout can move so rapidly upstream, in view of its relatively modest energies, at first view it is equally baffling that the trout is able to remain motionless without any appreciable effort in fast-flowing waters in which a human being can barely stand up.",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-trout-central-axis-4c-a",
+      "topics": [
+        "forel",
+        "water-flow",
+        "vortex",
+        "living-water"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Forel in centrale as (+4°C)",
+      "claim": "Schauberger beschrijft dat een stilstaande forel zich in helder bergwater positioneert in de centrale as van de stroming, waar waterfilamenten dicht bij +4°C liggen. Echo-register.",
+      "quote": "In clear, cold, healthy mountain water, a stationary trout positions itself in the central axis of the current, where the water-filaments flow that most closely approximate +4°C.",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-trout-central-axis-4c-b",
+      "topics": [
+        "forel",
+        "vortex",
+        "water-flow"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Neutrale zone door tegenstroming",
+      "claim": "In The Water Wizard beschrijft Schauberger dat de forel in een neutrale zone door tegenstroming van het water zonder inspanning stil kan staan. Echo-register.",
+      "quote": "In the neutral zone created in this way by the counter-flow of the water, the trout is able to stand still without effort (see fig. 31).",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-trout-breath-stands-still",
+      "topics": [
+        "forel",
+        "vortex",
+        "water-flow"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Adem en stilstand in torrent",
+      "claim": "Schauberger beschrijft dat de forel bij de eerste uitademing opnieuw stil staat in de heftigste stroming — via nog onbekende wetten van waterbeweging. Echo-register.",
+      "quote": "With the very first expulsion of breath the trout again stands still in the most torrential of flows. The secret lies solely in the exploitation of hitherto-unknown laws of water movement.",
+      "sourceIds": [
+        "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+      ],
+      "datum": "1997"
+    },
+    {
+      "id": "schauberger-trout-flushed-upstream-nat",
+      "topics": [
+        "forel",
+        "water-flow",
+        "vortex"
+      ],
+      "issues": [
+        "one-water"
+      ],
+      "register": "echo",
+      "label": "Forel vlucht stroomopwaarts",
+      "claim": "In Nature as Teacher beschrijft Schauberger eerstepersoons hoe hij een stilstaande forel uit haar schuilplaats joeg — en zich twee vragen stelde over stroomopwaartse vlucht en stilstand in de as van de stroming. Echo-register.",
+      "quote": "In the process I flushed a stationary trout from its lair, which fled upstream like lightning. Two questions shot through my mind. Firstly, how do trout reach this high location, because a kilometre downstream the water plunges 60 metres (180ft) and is atomised into a veil of mist? Secondly, just how was it possible that there, right in the axis of the current, a large number of fish were able to stand so effortlessly motionless.",
+      "sourceIds": [
+        "schauberger-nature-as-teacher"
+      ],
+      "datum": "1998"
+    },
+    {
+      "id": "pollack-lab-exclusion-zone-definition",
+      "topics": [
+        "water-flow"
+      ],
+      "register": "documented",
+      "label": "Pollack-lab: Exclusion Zone naast hydrofiel oppervlak",
+      "claim": "Dissertatie onder Gerald Pollack (UW) documenteert 'exclusion zones': dikke waterlagen bij hydrofiele oppervlakken die colloïden/microsferen uitsluiten. Lab-literatuur over georganiseerd water/stroming nabij surfaces — niet 6G.",
+      "quote": "“Exclusion zones, are exactly what their name implies: they are thick zones of water [...] which exclude colloids, microparticles, low molecular weight dyes and even microorganisms. To observe an exclusion zone, small microspheres, or microparticles were used as an indicator.”",
+      "sourceIds": [
+        "pollack-das-ez-2012"
+      ],
+      "datum": "2012"
+    },
+    {
+      "id": "russell-matter-is-light",
+      "topics": [
+        "eu-veld"
+      ],
+      "register": "echo",
+      "label": "Walter Russell: matter is light",
+      "claim": "In The Universal One stelt Walter Russell: 'Matter is light. Nothing is which is not light.' Echo/metafysische kosmologie; géén IMT-2030 of peer-reviewed heliophysics.",
+      "quote": "“Matter is light. Nothing is which is not light.”",
+      "sourceIds": [
+        "russell-universal-one-1926"
+      ],
+      "datum": "1926"
+    },
+    {
+      "id": "russell-positive-electricity-is-force",
+      "topics": [
+        "eu-veld"
+      ],
+      "register": "echo",
+      "label": "Russell: positive electricity is force",
+      "claim": "Russell formuleert 'wetten' van positieve/negatieve elektriciteit als contractie- vs expansiekracht. Echo-register; niet als bewijs van kosmisch 'eu-veld' in 6G-zin.",
+      "quote": "“Positive electricity is the generative energy of thinking Mind registered in light units which are seeking higher pressures. Positive electricity is that state of motion in which electricity dominates magnetism.”",
+      "sourceIds": [
+        "russell-universal-one-1926"
+      ],
+      "datum": "1926"
+    },
+    {
+      "id": "nasa-st5-field-aligned-currents-r1-r2",
+      "topics": [
+        "eu-veld"
+      ],
+      "register": "documented",
+      "label": "NASA: field-aligned (Birkeland-achtige) stromen R1/R2",
+      "claim": "NASA Goddard/ST5-paper kwantificeert imbalance van Region-1 en Region-2 field-aligned currents en polar-cap Pedersen closure — peer-reviewed heliophysics-taal over elektrische stromen in de magnetosfeer/ionosfeer. Documented; niet 'Electric Universe' als 6G-claim.",
+      "quote": "“We find that the R1 current intensity is consistently stronger than the R2 current intensity both for the dawnside and the duskside large-scale field-aligned current system. [...] Since the net currents due to the imbalance of the R1 and R2 currents require that their closure currents flow across the polar cap from dawn to dusk as Pedersen currents, our results indicate that the total amount of the cross-polar cap Pedersen currents is in the order of ~ 0.1 MA.”",
+      "sourceIds": [
+        "nasa-st5-fac-2011"
+      ],
+      "datum": "2011",
+      "land": "VS",
+      "soort": "rapport"
+    },
+    {
+      "id": "russell-light-living-substance-mind",
+      "topics": [
+        "eu-veld"
+      ],
+      "register": "echo",
+      "label": "Russell: light as living Mind substance",
+      "claim": "Russell schrijft light als 'living substance of Mind in action' — echo/filosofisch; apart houden van NASA-heliophysics.",
+      "quote": "“Light is the living substance of Mind in action. It is the creating principle of the One substance.”",
+      "sourceIds": [
+        "russell-universal-one-1926"
+      ],
+      "datum": "1926"
+    },
+    {
+      "id": "montagnier-2009-dna-ems-abstract",
+      "topics": [
+        "dna-resonantie"
+      ],
+      "register": "in-development",
+      "label": "Montagnier 2009: DNA induceert elektromagnetische signalen",
+      "claim": "Montagnier e.a. claimen in Interdisciplinary Sciences (2009) dat bepaalde bacteriële DNA-sequenties bij hoge waterverdunning elektromagnetische golven kunnen induceren (resonantie met ambient LF-achtergrond). Controversieel; een gedeelde consensus ontbreekt.",
+      "quote": "“A novel property of DNA is described: the capacity of some bacterial DNA sequences to induce electromagnetic waves at high aqueous dilutions. It appears to be a resonance phenomenon triggered by the ambient electromagnetic background of very low frequency waves.”",
+      "sourceIds": [
+        "l-montagnier-et-al-2009"
+      ],
+      "datum": "2009",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "montagnier-nanostructures-defined-size",
+      "topics": [
+        "dna-resonantie"
+      ],
+      "register": "in-development",
+      "label": "Montagnier: EMS gekoppeld aan nanostructuren in water",
+      "claim": "Het paper koppelt de emissie aan polymere nanostructuren van gedefinieerde grootte in waterige verdunningen — experimentele claim, niet mainstream DNA-fysica.",
+      "quote": "“The emission of such waves is likely to represent a resonance phenomenon depending on excitation by the ambient electromagnetic noise. It is associated with the presence in the aqueous dilutions of polymeric nanostructures of defined size.”",
+      "sourceIds": [
+        "l-montagnier-et-al-2009"
+      ],
+      "datum": "2009",
+      "soort": "onderzoek"
+    },
+    {
+      "id": "gariaev-dna-wave-biocomputer-claims",
+      "topics": [
+        "dna-resonantie"
+      ],
+      "register": "echo",
+      "label": "Gariaev: DNA-wave biocomputer / holographic grating",
+      "claim": "Gariaev e.a. presenteren 'wave genetics': chromosomen als bron/ontvanger van genetische 'texts' en als holografisch rooster. Echo/in-development; niet peer-reviewed mainstream genetica, niet 6G.",
+      "quote": "“This work changes the notion about the genetic code essentially. It asserts: - 1) That the evolution of biosystems has created genetic \"texts\", similar to natural context dependent texts in human languages, shaping the text of these speech-like patterns. 2) That the chromosome apparatus acts simultaneously both as a source and receiver of these genetic texts, respectively decoding and encoding them, and 3) That the chromosome continuum of multicellular organisms is analogous to a static-dynamical multiplex time-space holographic grating, which comprises the space-time of an organism in a convoluted form.”",
+      "sourceIds": [
+        "gariaev-dna-wave-biocomputer"
+      ],
+      "datum": "2001"
+    },
+    {
+      "id": "poponin-dna-phantom-effect",
+      "topics": [
+        "dna-resonantie"
+      ],
+      "register": "echo",
+      "label": "Poponin/Gariaev: DNA Phantom Effect",
+      "claim": "Poponin beschrijft het 'DNA Phantom Effect in Vitro': anomalie bij laserfotonen-correlatie waarbij na verwijdering van DNA een 'phantom'-signatuur zou blijven. Echo/subtiele-energie framing; geen consensus.",
+      "quote": "“In this contribution I am going to describe some observations and interpretations of a recently discovered anomalous phenomenon which we are calling the DNA Phantom Effect in Vitro or the DNA Phantom for short. [...] This new phenomenon—the DNA phantom effect—was first observed in Moscow at the Russian Academy of Sciences as a surprise effect during experiments measuring the vibrational modes of DNA in solution using a sophisticated and expensive \"MALVERN\" laser photon”",
+      "sourceIds": [
+        "poponin-dna-phantom"
+      ],
+      "datum": "1995"
+    }
+  ]
+}

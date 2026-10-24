@@ -1,0 +1,41 @@
+{
+  "id": "multiwave",
+  "inleiding": "Lakhovsky beschrijft elke levende cel als oscillator: nucleus en cytoplasma als circuits onder kosmische en atmosferische golven. In 1930 voltooit hij een multiple wave oscillator van 3 meter tot infrarood.",
+  "haak": "In *Radiations and Waves* (1941) stelt Lakhovsky: elke levende cel heeft nucleus (chromosomen) en cytoplasma (chondromen) als ultramicroscopische oscillerende circuits die elektrisch vibreren onder kosmische/atmosferische/tellurische golven — zijn theorie, gedocumenteerd als auteurclaim. Lakhovsky (via Presner-preface in hetzelfde boek + eigen tekst): in 1930 voltooide hij de multiple wave oscillator die golven produceert “of all lengths from 3 metres to the infra-red” — apparaatbeschrijving als historische claim, geen hedendaags medisch bewijs.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "lakhovsky-cellular-oscillation-theory",
+      "caption": "Cel = chromosomen + chondromen als oscillator"
+    },
+    {
+      "type": "fact",
+      "ref": "lakhovsky-mwo-all-wavelengths-1930",
+      "caption": "Multiple-wave oscillator: 3 m tot infra-rood"
+    },
+    {
+      "type": "fact",
+      "ref": "lakhovsky-nature-review-resonator-1940",
+      "caption": "Nature 1940: cel als elektromagnetische resonator"
+    },
+    {
+      "type": "source",
+      "label": "Georges Lakhovsky — Radiations and Waves: Sources of Our Life",
+      "url": "https://rexresearch1.com/Books/LakhovskyRadiationsWavesSourcesOurLife.pdf",
+      "caption": "In *Radiations and Waves* (1941) stelt Lakhovsky: elke levende cel heeft nucleus (chromosomen) en cytoplasma (chondromen) als ultramicroscopische oscillerende circuits die elektrisch vibreren onder kosmische/atmosferische/tellurische golven — zijn theorie, gedocumenteerd als auteurclaim."
+    },
+    {
+      "type": "source",
+      "label": "Georges Lakhovsky (prefaced account in his 1941 volume) — Radiations and Waves: Sources of Our Life",
+      "url": "https://rexresearch1.com/Books/LakhovskyRadiationsWavesSourcesOurLife.pdf",
+      "caption": "Lakhovsky (via Presner-preface in hetzelfde boek + eigen tekst): in 1930 voltooide hij de multiple wave oscillator die golven produceert “of all lengths from 3 metres to the infra-red” — apparaatbeschrijving als historische claim, geen hedendaags medisch bewijs."
+    }
+  ],
+  "sourceIds": [
+    "georges-lakhovsky-1941",
+    "nature-book-review-1940"
+  ]
+}

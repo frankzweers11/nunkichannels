@@ -1,0 +1,40 @@
+{
+  "id": "plasma",
+  "inleiding": "Plasma is geïoniseerd gas: geladen deeltjes, schillen en stromen. De ruimte boven de atmosfeer is in die lezing geen lege achtergrond, maar een elektrisch medium.",
+  "haak": "In zijn Nobel-lezing stelt Alfvén dat ruimte nabij de Aarde gevuld is met plasma, doorsneden door sheaths en een complex patroon van elektrische stromen en velden. Alfvén eist een ‘tweede aanpak’ van kosmisch plasma: niet alleen magnetische veldlijnen, maar ook stroomlijnen, circuits en elektrostatische double layers.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "alfven-nobel-plasma-space",
+      "caption": "Ruimte nabij Aarde = plasma + stromen"
+    },
+    {
+      "type": "fact",
+      "ref": "alfven-nobel-second-approach-currents",
+      "caption": "Tweede aanpak: stroomlijnen & double layers"
+    },
+    {
+      "type": "fact",
+      "ref": "alfven-nobel-in-the-beginning-plasma",
+      "caption": "In the beginning was the plasma"
+    },
+    {
+      "type": "source",
+      "label": "Hannes Alfvén — Nobel Lecture — Plasma physics, space research and the origin of the solar system",
+      "url": "https://www.nobelprize.org/uploads/2018/06/alfven-lecture.pdf",
+      "caption": "Alfvén sluit met de empirische herinnering dat aurora een kosmisch plasma is — ‘in the beginning was the plasma’."
+    },
+    {
+      "type": "source",
+      "label": "Alfvén Nobel Lecture 1970, Table 1 “Cosmical electrodynamics” (second approach) — ",
+      "url": "https://www.nobelprize.org/uploads/2018/06/alfven-lecture.pdf",
+      "caption": "In zijn Nobel-lezing stelt Alfvén dat ruimte nabij de Aarde gevuld is met plasma, doorsneden door sheaths en een complex patroon van elektrische stromen en velden."
+    }
+  ],
+  "sourceIds": [
+    "hannes-alfv-n-nobel-lecture-1970"
+  ]
+}

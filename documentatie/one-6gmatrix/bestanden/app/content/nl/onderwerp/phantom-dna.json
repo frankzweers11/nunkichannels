@@ -1,0 +1,40 @@
+{
+  "id": "phantom-dna",
+  "inleiding": "Gariaev claimt een spoor in water nadat het DNA is verwijderd: het fantoom-DNA-effect. Labclaim binnen zijn golfgenetica; de replicatie is omstreden.",
+  "haak": "Gariaev: DNA Phantom Effect ontdekt 1984 (correlatie-laserspectroscopie); eerste publicatie 1991. Claim: water behandeld met gemoduleerde secundaire breedbandstraling (MBER) van laser-gelezen DNA, daarna PCR *zonder* DNA-template, zou product van voorafbepaalde lengte geven.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-2016-phantom-discovered-1984",
+      "caption": "Phantom Effect ontdekt 1984"
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-2016-pcr-without-template-claim",
+      "caption": "PCR zonder DNA-template na laser/MBER"
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-2016-independent-verification",
+      "caption": "Auteurs vragen onafhankelijke verificatie"
+    },
+    {
+      "type": "source",
+      "label": "Gariaev, Vladychenskaya & Leonova-Gariaeva — PCR Amplification of Phantom DNA…",
+      "url": "https://wavegenetics.org/f/36.pdf",
+      "caption": "Auteurs zelf: phantom-DNA als equivalent van materieel DNA vereist onafhankelijke verificatie; zij nodigen labs uit."
+    },
+    {
+      "type": "source",
+      "label": "Gariaev et al. 2016, §II Step 3 — ",
+      "url": "https://wavegenetics.org/f/36.pdf",
+      "caption": "Claim: water behandeld met gemoduleerde secundaire breedbandstraling (MBER) van laser-gelezen DNA, daarna PCR *zonder* DNA-template, zou product van voorafbepaalde lengte geven."
+    }
+  ],
+  "sourceIds": [
+    "gariaev-vladychenskaya-leonova-gariaeva-2016"
+  ]
+}

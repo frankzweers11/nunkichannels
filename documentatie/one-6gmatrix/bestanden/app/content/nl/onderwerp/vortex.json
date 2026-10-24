@@ -1,0 +1,34 @@
+{
+  "id": "vortex",
+  "inleiding": "Schauberger zet de vortex tegen de rechte buis: water dat draait, stroming die draagt in plaats van botst.",
+  "haak": "In Coats’ presentatie van Schauberger is de vortex het embleem van open, veranderlijke natuurlijke beweging, tegenover rechte lijn, cirkel en punt van mechanische technologie.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-vortex-nature-geometry",
+      "caption": "Vortex als natuurvorm"
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-blood-of-earth",
+      "caption": "Water als bloed van de aarde"
+    },
+    {
+      "type": "fact",
+      "ref": "schauberger-senseless-toil-regulate",
+      "caption": "Rivieren reguleren zonder dijken"
+    },
+    {
+      "type": "source",
+      "label": "Callum Coats (ed./trans.) presenting Viktor Schauberger — The Water Wizard",
+      "url": "https://alkimist.net/wp-content/uploads/2015/11/Coats-Schauberger-The-water-wizard-The-extraordinary-properties-of-natural-water-1997.pdf",
+      "caption": "Schauberger (via Coats) noemt water geen levenloze massa maar “blood of the Earth”, ontstaan en verdwijnend door energetische wisselwerking."
+    }
+  ],
+  "sourceIds": [
+    "callum-coats-ed-trans-presenting-viktor-schauberger-1997"
+  ]
+}

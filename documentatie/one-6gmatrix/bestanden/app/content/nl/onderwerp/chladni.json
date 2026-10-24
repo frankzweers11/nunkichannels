@@ -1,0 +1,42 @@
+{
+  "id": "chladni",
+  "inleiding": "In 1787 publiceert Ernst Chladni een methode om klanken van vlakke lichamen zichtbaar te maken. Hij strooit zand op platen, staven en schijven en strijkt ze aan met een strijkstok. Het zand tekent de toon.",
+  "haak": "In 1787 publiceert Ernst Chladni een methode om elke klanksoort van vlakke klinkende lichamen niet alleen hoorbaar maar ook zichtbaar te maken. Chladni onderzoekt niet alleen snaren maar staven, blechstreifen, ringen, schijven en klokken door ze haaks met een vioolboog aan te strijken.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "chladni-klang-sichtbar-1787",
+      "caption": "Chladni maakt klank zichtbaar"
+    },
+    {
+      "type": "fact",
+      "ref": "chladni-violinbogen-platten-1787",
+      "caption": "Vioolboog op plaat en staaf"
+    },
+    {
+      "type": "fact",
+      "ref": "chladni-feste-linien-figuren-1787",
+      "caption": "Vaste lijnen tekenen de figuur"
+    },
+    {
+      "type": "source",
+      "label": "Ernst Florens Friedrich Chladni — Entdeckungen über die Theorie des Klanges",
+      "url": "https://www.deutschestextarchiv.de/chladni_klang_1787/9",
+      "caption": "In 1787 publiceert Ernst Chladni een methode om elke klanksoort van vlakke klinkende lichamen niet alleen hoorbaar maar ook zichtbaar te maken."
+    },
+    {
+      "type": "source",
+      "label": "Ernst Florens Friedrich Chladni — Entdeckungen über die Theorie des Klanges",
+      "url": "https://www.deutschestextarchiv.de/chladni_klang_1787/11",
+      "caption": "Chladni onderzoekt niet alleen snaren maar staven, blechstreifen, ringen, schijven en klokken door ze haaks met een vioolboog aan te strijken."
+    }
+  ],
+  "sourceIds": [
+    "ernst-florens-friedrich-chladni-1787",
+    "ernst-florens-friedrich-chladni-1787-2",
+    "ernst-florens-friedrich-chladni-1787-3"
+  ]
+}

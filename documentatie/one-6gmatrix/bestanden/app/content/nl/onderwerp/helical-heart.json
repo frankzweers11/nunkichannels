@@ -1,0 +1,41 @@
+{
+  "id": "helical-heart",
+  "inleiding": "Torrent-Guasp: het ventrikelmyocard is twee spiralen, een horizontale basale lus en een bijna verticale helix. Ejectie en zuiging zitten in die winding.",
+  "haak": "Torrent-Guasp (PubMed-review): ventriculair myocardium is geen simpele pompwand maar twee spiralen — horizontale basale loop en bijna verticale helix — die ejectie én zuiging sturen. Dezelfde review beschrijft peristaltische activatie: vernauwing, verkorting, verlenging en verbreding regelen leegpompen én vullen — zuiging is geen bijproduct maar sequentie.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "helical-heart-torrent-guasp-band",
+      "caption": "Spiraalband van pulmonalis naar aorta"
+    },
+    {
+      "type": "fact",
+      "ref": "helical-heart-suction-fill-sequence",
+      "caption": "Zuigen vult, wrikken wringt uit"
+    },
+    {
+      "type": "fact",
+      "ref": "helical-heart-maciver-mesh-counter",
+      "caption": "MacIver: band bestaat niet als entiteit"
+    },
+    {
+      "type": "source",
+      "label": "Kocica et al. — The structure and function of the helical heart and its buttress wrapping. I. The normal macroscopic structure of the heart",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11807730/",
+      "caption": "Dezelfde review beschrijft peristaltische activatie: vernauwing, verkorting, verlenging en verbreding regelen leegpompen én vullen — zuiging is geen bijproduct maar sequentie."
+    },
+    {
+      "type": "source",
+      "label": "Kocica et al. — The structure and function of the helical heart and its buttress wrapping. I. The normal macroscopic structure of the heart",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11807730/",
+      "caption": "Torrent-Guasp (PubMed-review): ventriculair myocardium is geen simpele pompwand maar twee spiralen — horizontale basale loop en bijna verticale helix — die ejectie én zuiging sturen."
+    }
+  ],
+  "sourceIds": [
+    "kocica-et-al-2002",
+    "maciver-anderson-2017"
+  ]
+}

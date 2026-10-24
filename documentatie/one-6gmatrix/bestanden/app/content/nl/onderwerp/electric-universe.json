@@ -1,0 +1,48 @@
+{
+  "id": "electric-universe",
+  "inleiding": "Field-aligned currents, plasma en dubbele lagen: de kosmos als stroomkring. NASA meet de stromen; de Electric Universe-lezing maakt elektromagnetisme tot de kracht tussen sterren.",
+  "haak": "Het Electric Universe-model leest de kosmos als geleidend plasma — geladen deeltjes in beweging, geen lege ruimte tussen eilanden. In het EU-verhaal zijn bewegende ladingen elektrische stromen; die voeden magnetische velden en hoogenergetische ontladingen — filamente als circuits, geen graviteit-only.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "eu-plasma",
+      "caption": "Plasma overal"
+    },
+    {
+      "type": "fact",
+      "ref": "eu-currents",
+      "caption": "Stromen en magnetische velden"
+    },
+    {
+      "type": "fact",
+      "ref": "alfven-mhd",
+      "caption": "Alfvén — plasma-fysica"
+    },
+    {
+      "type": "source",
+      "label": "Thunderbolts Project — Chapter 1 — What Is the Electric Universe?",
+      "url": "https://www.thunderbolts.info/wp/2013/09/16/chapter-1-beginners-guide/",
+      "caption": "In het EU-verhaal zijn bewegende ladingen elektrische stromen; die voeden magnetische velden en hoogenergetische ontladingen — filamente als circuits, geen graviteit-only."
+    }
+  ],
+  "curate": {
+    "stemmen": [
+      {
+        "portrait": "lakhovsky",
+        "quote": "lakhovsky:cellular-oscillation-cosmic"
+      },
+      {
+        "portrait": "russell",
+        "quote": "russell:rhythmic-balanced-interchange-between"
+      }
+    ],
+    "spiegel": []
+  },
+  "sourceIds": [
+    "thunderbolts-project-2013",
+    "nobel-prize-1970"
+  ]
+}

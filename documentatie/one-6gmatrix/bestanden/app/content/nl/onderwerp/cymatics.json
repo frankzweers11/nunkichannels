@@ -1,0 +1,44 @@
+{
+  "id": "cymatics",
+  "inleiding": "Chladni liet frequentie een patroon tekenen in zand op een plaat. Hans Jenny filmde in Cymatics (1967) hoe vloeistof en poeder van vorm veranderen als de toon zuiver en de hoogte anders is.",
+  "haak": "Ernst Chladni strooide zand op trillende platen en liet frequentie fysieke patronen tekenen — cymatics vóór het digitale beeld. Hans Jenny filmde vloeistof en poeder onder pure tonen; Cymatics (1967) toont vormen die ontstaan en verdwijnen met frequentie.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "cymatics-chladni",
+      "caption": "Chladni-figuren"
+    },
+    {
+      "type": "fact",
+      "ref": "jenny-tonoscope",
+      "caption": "Hans Jenny — tonoscope"
+    },
+    {
+      "type": "fact",
+      "ref": "cymatics-lutherie",
+      "caption": "Van plaat naar instrument"
+    },
+    {
+      "type": "source",
+      "label": "Hans Jenny — Cymatics Vol. I",
+      "url": "https://www.cymaticsource.com/",
+      "caption": "Hans Jenny filmde vloeistof en poeder onder pure tonen; Cymatics (1967) toont vormen die ontstaan en verdwijnen met frequentie."
+    }
+  ],
+  "curate": {
+    "stemmen": [
+      {
+        "portrait": "jenny",
+        "quote": "jenny:sound-is-the-creative"
+      }
+    ],
+    "spiegel": []
+  },
+  "sourceIds": [
+    "ernst-chladni-via-wikipedia-1787",
+    "hans-jenny-1967"
+  ]
+}
