@@ -1,0 +1,41 @@
+{
+  "id": "heart-coherence",
+  "inleiding": "HeartMath meet coherentie als een ritme waarin hartslag en adem samenvallen. De meting is een toestand van het hartritme, uitgedrukt in een spectrum.",
+  "haak": "HeartMath (Science of the Heart): hartcoherentie is een optimale fysiologische toestand gekoppeld aan cognitie, zelfregulatie, emotionele stabiliteit en veerkracht. HeartMath: hartslagvariabiliteit bleek de meest dynamische indicator van emotionele toestanden; stressvolle emoties verhogen disordere in hersenen en autonoom systeem — weerspiegeld in hartritmes.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-coherence-optimal-state",
+      "caption": "Coherentie = optimale fysiologie"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-coherence-hrv-emotions",
+      "caption": "HRV-spiegel van emotie"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-coherence-rein-biofield-layers",
+      "caption": "Rein: bioveld in lagen"
+    },
+    {
+      "type": "source",
+      "label": "HeartMath Institute — Science of the Heart",
+      "url": "https://www.heartmath.org/research/science-of-the-heart/",
+      "caption": "HeartMath: hartslagvariabiliteit bleek de meest dynamische indicator van emotionele toestanden; stressvolle emoties verhogen disordere in hersenen en autonoom systeem — weerspiegeld in hartritmes."
+    },
+    {
+      "type": "source",
+      "label": "HeartMath Institute — Science of the Heart",
+      "url": "https://www.heartmath.org/research/science-of-the-heart/",
+      "caption": "HeartMath (Science of the Heart): hartcoherentie is een optimale fysiologische toestand gekoppeld aan cognitie, zelfregulatie, emotionele stabiliteit en veerkracht."
+    }
+  ],
+  "sourceIds": [
+    "science-of-the-heart",
+    "glen-rein-1998"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "russell-wave",
+  "inleiding": "Russell formuleert licht dat tussen twee polen in- en uitademt: rhythmic balanced interchange, in The Universal One (1926) en The Secret of Light (1947).",
+  "haak": "Russell noemt ‘rhythmic balanced interchange’ tussen tegenpolen de wet van Gods lichtuniversum — én de wet. In dezelfde wet ligt volgens Russell de continuïteit van creatie in Gods ‘electric wave universe’ van twee geconditioneerde lichten.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "russell-secret-light-rhythmic-balanced-interchange",
+      "caption": "Rhythmic balanced interchange"
+    },
+    {
+      "type": "fact",
+      "ref": "russell-secret-light-electric-wave-universe",
+      "caption": "Electric wave universe"
+    },
+    {
+      "type": "fact",
+      "ref": "russell-secret-light-in-the-wave",
+      "caption": "IN THE WAVE LIES THE SECRET OF CREATION"
+    },
+    {
+      "type": "source",
+      "label": "Walter Russell — The Secret of Light",
+      "url": "https://files.spiritmaji.com/books/spiritual-science/The_Secret_of_Light_by_Walter_Russell.pdf",
+      "caption": "In dezelfde wet ligt volgens Russell de continuïteit van creatie in Gods ‘electric wave universe’ van twee geconditioneerde lichten."
+    },
+    {
+      "type": "source",
+      "label": "Russell — The Secret of Light",
+      "url": "https://files.spiritmaji.com/books/spiritual-science/The_Secret_of_Light_by_Walter_Russell.pdf",
+      "caption": "Russell zet expliciet: ‘IN THE WAVE LIES THE SECRET OF CREATION’."
+    }
+  ],
+  "sourceIds": [
+    "walter-russell-1947"
+  ]
+}

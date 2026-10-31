@@ -1,0 +1,40 @@
+{
+  "id": "wave-genome",
+  "inleiding": "Gariaev beschrijft het chromosoom als zender én ontvanger: solitonische elektro-akoestische velden naast de basenvolgorde. Controversiële hypothese.",
+  "haak": "Gariaev stelt dat chromosoomwerk als quantum-biocomputer op golf-niveau gebeurt, via coherente foton-DNA-straling en niet-lineaire vibraties (geluid). DNA-informatie manifesteert zich volgens Gariaev als dynamisch gepolariseerde hologrammen én phantom-DNA-structuren.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-2015-wave-level-genome",
+      "caption": "Genoom als quantum-biocomputer op golf-niveau"
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-2015-holograms-phantom",
+      "caption": "DNA als hologram + phantom-structuren"
+    },
+    {
+      "type": "fact",
+      "ref": "gariaev-2015-lwg-basis",
+      "caption": "Linguistic Wave Genetics (LWG)"
+    },
+    {
+      "type": "source",
+      "label": "Petr P. Gariaev — Another Understanding of the Model of Genetic Code Theoretical Analysis",
+      "url": "https://wavegenetics.org/wp-content/uploads/2014/07/1-ya-v-OJGEN-Angl.-1.pdf",
+      "caption": "DNA-informatie manifesteert zich volgens Gariaev als dynamisch gepolariseerde hologrammen én phantom-DNA-structuren."
+    },
+    {
+      "type": "source",
+      "label": "Gariaev 2015, Abstract body — ",
+      "url": "https://wavegenetics.org/wp-content/uploads/2014/07/1-ya-v-OJGEN-Angl.-1.pdf",
+      "caption": "Hij noemt Linguistic Wave Genetics (LWG) de basis van deze lijn; claimt lasertechniek die ‘sign wave’-toestanden van het genoom simuleert."
+    }
+  ],
+  "sourceIds": [
+    "petr-p-gariaev-2015"
+  ]
+}

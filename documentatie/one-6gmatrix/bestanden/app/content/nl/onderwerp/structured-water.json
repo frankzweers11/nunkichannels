@@ -1,0 +1,41 @@
+{
+  "id": "structured-water",
+  "inleiding": "Elton en collega’s (2020) bevestigen dat de exclusion zone door meerdere groepen is nagemaakt. Ze vinden Pollacks uitleg als faseovergang zwak en wijzen op diffusiophorese als alternatief. Het model is dus open: de zone is gemeten, de verklaring niet gesloten.",
+  "haak": "Elton et al. (2020) bevestigen dat EZ-uitsluiting door meerdere groepen is gerepliceerd, maar beargumenteren dat Pollacks faseveranderingsmodel zwak is; Schurrs diffusiophorese is een sterke alternatieve verklaring. De review stelt expliciet dat veel Pollack-bevindingen (o.a. EZ-groei onder laser, zoutuitsluiting) nog onafhankelijke replicatie nodig hebben.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "elton-ez-replicated-not-phase",
+      "caption": "EZ bestaat — fase-claim betwist"
+    },
+    {
+      "type": "fact",
+      "ref": "elton-open-questions-laser-salt",
+      "caption": "Open vragen blijven open"
+    },
+    {
+      "type": "fact",
+      "ref": "pollack-ordered-vs-bulk",
+      "caption": "Lab: solute-free zone ≠ bulk"
+    },
+    {
+      "type": "source",
+      "label": "Daniel C. Elton, Peter D. Spencer, James D. Riches, Elizabeth D. Williams — Exclusion Zone Phenomena in Water—A Critical Review of Experimental Findings and Theories",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7404113/",
+      "caption": "Elton et al. (2020) bevestigen dat EZ-uitsluiting door meerdere groepen is gerepliceerd, maar beargumenteren dat Pollacks faseveranderingsmodel zwak is; Schurrs diffusiophorese is een sterke alternatieve verklaring."
+    },
+    {
+      "type": "source",
+      "label": "Elton et al. — Exclusion Zone Phenomena in Water—A Critical Review…",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7404113/",
+      "caption": "De review stelt expliciet dat veel Pollack-bevindingen (o.a. EZ-groei onder laser, zoutuitsluiting) nog onafhankelijke replicatie nodig hebben."
+    }
+  ],
+  "sourceIds": [
+    "daniel-c-elton-peter-d-spencer-james-d",
+    "gerald-pollack-2013-2"
+  ]
+}

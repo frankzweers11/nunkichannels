@@ -1,0 +1,41 @@
+{
+  "id": "fluorescence",
+  "inleiding": "DNA kan in een buis oplichten onder de juiste belichting. De fluorescentie hoort bij een golflengte en een drempel: een labtechniek die zegt wat er in de oplossing zit.",
+  "haak": "SYBR Green I toont grote fluorescentietoename bij DNA-binding — minstens een orde van grootte groter dan ethidiumbromide (fabrikant/Molecular Probes). Met 300 nm transilluminatie detecteert SYBR Green I tot ~60 pg dsDNA per band; ≥25× gevoeliger dan ethidiumbromide onder standaard 300 nm.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "sybr-green-fluorescence-enhancement",
+      "caption": "SYBR Green: grote fluorescentietoename"
+    },
+    {
+      "type": "fact",
+      "ref": "sybr-green-detection-limit",
+      "caption": "Detectie tot ~60 pg dsDNA"
+    },
+    {
+      "type": "fact",
+      "ref": "intech-etbr-sybr-visualization",
+      "caption": "Standaard: EtBr of SYBR onder UV"
+    },
+    {
+      "type": "source",
+      "label": "Molecular Probes / Invitrogen — SYBR® Green I Nucleic Acid Gel Stain",
+      "url": "https://assets.thermofisher.com/TFS-Assets/LSG/manuals/mp07567.pdf",
+      "caption": "Met 300 nm transilluminatie detecteert SYBR Green I tot ~60 pg dsDNA per band; ≥25× gevoeliger dan ethidiumbromide onder standaard 300 nm."
+    },
+    {
+      "type": "source",
+      "label": "Molecular Probes MP 07567 (2006) — ",
+      "url": "https://assets.thermofisher.com/TFS-Assets/LSG/manuals/mp07567.pdf",
+      "caption": "SYBR Green I toont grote fluorescentietoename bij DNA-binding — minstens een orde van grootte groter dan ethidiumbromide (fabrikant/Molecular Probes)."
+    }
+  ],
+  "sourceIds": [
+    "molecular-probes-invitrogen-2006",
+    "principles-of-nucleic-acid-separation-by-agarose-gel"
+  ]
+}

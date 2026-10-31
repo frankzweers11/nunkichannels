@@ -1,0 +1,40 @@
+{
+  "id": "steiner-heart",
+  "inleiding": "In GA 109 (1909) noemt Steiner het fysieke hart een wonderlijke structuur die aanvallen weerstaat, en het fysieke lichaam het oudste en meest volmaakte lid. Dat is een lezing uit 1909, geen anatomisch onderzoek.",
+  "haak": "Steiner GA109 (1909): het fysieke lichaam is het meest perfecte lid — wisdom speaks from the organs; het hart is een wonderlijke structuur die aanvallen weerstaat. Echo, geen anatomie. Steiner: niet het I of astrale lichaam zijn het meest perfect — het fysieke lichaam is het oudste en meest perfecte lid; een host perfecte wezens werkte eraan.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "steiner-heart-wonderful-structure",
+      "caption": "Fysiek hart als wonder"
+    },
+    {
+      "type": "fact",
+      "ref": "steiner-heart-oldest-member",
+      "caption": "Fysiek lichaam het oudst"
+    },
+    {
+      "type": "fact",
+      "ref": "steiner-heart-astral-attacks",
+      "caption": "Astraal lichaam vs fysiek hart"
+    },
+    {
+      "type": "source",
+      "label": "Rudolf Steiner — The Principle of Spiritual Economy — GA 109, Lecture 15",
+      "url": "https://rsarchive.org/Lectures/GA109/English/SOL/19090608p01.html",
+      "caption": "Steiner: het astrale lichaam behandelt het fysieke hart voortdurend onwijs via genot — het hart weerstaat. Culturele echo, geen medische claim."
+    },
+    {
+      "type": "source",
+      "label": "Rudolf Steiner — The Principle of Spiritual Economy — GA 109, Lecture 15",
+      "url": "https://rsarchive.org/Lectures/GA109/English/SOL/19090608p01.html",
+      "caption": "Steiner: niet het I of astrale lichaam zijn het meest perfect — het fysieke lichaam is het oudste en meest perfecte lid; een host perfecte wezens werkte eraan."
+    }
+  ],
+  "sourceIds": [
+    "rudolf-steiner-1909"
+  ]
+}

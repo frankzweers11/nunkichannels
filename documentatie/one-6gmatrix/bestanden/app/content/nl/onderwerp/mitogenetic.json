@@ -1,0 +1,41 @@
+{
+  "id": "mitogenetic",
+  "inleiding": "Gurwitsch richtte in de jaren twintig één ui op een andere en zag deling aan de kant van de ontvanger. Historisch experiment over straling tussen weefsels; de replicatie is omstreden.",
+  "haak": "Popp (2003) herhaalt Gurwitsch’s Grundversuch: tip van één uienwortel (inductor) gericht op de delingszone van een tweede (detector); bij kwarts tussenbeide steeg het aantal mitosen in de detector significant. Historische claim, hier als dossierfeit uit peer-herlezing. Volodyaev & Beloussov (2015, PMC): mitogenetisch effect bleef met kwartsplaat tussen wortels; viel weg met glas of ondoorzichtig materiaal; chemische isolatie veranderde niets — factor geconcludeerd als ultrazwak UV (“mitogenetic radiation”).",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "gurwitsch-onion-root-grundversuch",
+      "caption": "Uienwortel: inductor → detector mitose"
+    },
+    {
+      "type": "fact",
+      "ref": "gurwitsch-quartz-vs-glass-uv",
+      "caption": "Kwarts wél, glas niet — ultrazwak UV"
+    },
+    {
+      "type": "fact",
+      "ref": "gurwitsch-700-papers-then-vanished",
+      "caption": ">700 papers, daarna verdwenen golf"
+    },
+    {
+      "type": "source",
+      "label": "Fritz-Albert Popp (citing A. Gurwitsch 1923) — Properties of biophotons and their theoretical implications",
+      "url": "https://www.dejanrakovicfund.org/file/Biophotons_&_Theoretical_Implications.pdf",
+      "caption": "Popp (2003) herhaalt Gurwitsch’s Grundversuch: tip van één uienwortel (inductor) gericht op de delingszone van een tweede (detector); bij kwarts tussenbeide steeg het aantal mitosen in de detector significant. Historische claim, hier als dossierfeit uit peer-herlezing."
+    },
+    {
+      "type": "source",
+      "label": "Ilya Volodyaev & Lev V. Beloussov — Revisiting the mitogenetic effect of ultra-weak photon emission",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4561347/",
+      "caption": "Zelfde review: na Gurwitsch 1923 volgde wereldwijd >700 publicaties over mitogenetische straling; de golf verdween na ogenschijnlijk weerleggende werken eind jaren 1930 — historiografie van een open/controversieel dossier."
+    }
+  ],
+  "sourceIds": [
+    "fritz-albert-popp-2003",
+    "ilya-volodyaev-lev-v-beloussov-2015"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "jenny",
+  "inleiding": "Hans Jenny filmde hoe toonhoogte de figuur in vloeistof en poeder verandert. Cymatics is die empirie: amplitude, frequentie, medium.",
+  "haak": "Hans Jenny kiest de naam cymatics (Grieks ta kymatika) voor empirisch onderzoek naar effecten van golven/trillingen, niet voor hypothesen over eindoorzaken. Jenny formuleert het “basic triadic phenomenon”: figuur/patroon, kinetiek/dynamiek, en periodiciteit die het geheel genereert — altijd samen.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "jenny-cymatics-named-1967",
+      "caption": "Jenny noemt het veld cymatics"
+    },
+    {
+      "type": "fact",
+      "ref": "jenny-triadic-phenomenon",
+      "caption": "Drie polen, één trilling"
+    },
+    {
+      "type": "fact",
+      "ref": "jenny-tonoscope-vowels",
+      "caption": "Tonoscoop maakt klinkers zichtbaar"
+    },
+    {
+      "type": "source",
+      "label": "Hans Jenny — Cymatics — The structure and dynamics of waves and vibrations",
+      "url": "https://monoskop.org/images/3/31/Jenny_Hans_Cymatics_A_Study_of_Wave_Phenomena_and_Vibration_Vol_1_2001.pdf",
+      "caption": "Hans Jenny kiest de naam cymatics (Grieks ta kymatika) voor empirisch onderzoek naar effecten van golven/trillingen, niet voor hypothesen over eindoorzaken."
+    },
+    {
+      "type": "source",
+      "label": "Hans Jenny — Cymatics — The Basic Triadic Phenomenon",
+      "url": "https://monoskop.org/images/3/31/Jenny_Hans_Cymatics_A_Study_of_Wave_Phenomena_and_Vibration_Vol_1_2001.pdf",
+      "caption": "Jenny’s tonoscoop laat zonder elektroakoestiek gesproken klanken als figuren op een membraan verschijnen; patroon hangt samen met klinker én toonhoogte."
+    }
+  ],
+  "sourceIds": [
+    "hans-jenny-2001"
+  ]
+}

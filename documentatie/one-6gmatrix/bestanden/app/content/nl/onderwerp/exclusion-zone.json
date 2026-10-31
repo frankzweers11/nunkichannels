@@ -1,0 +1,42 @@
+{
+  "id": "exclusion-zone",
+  "inleiding": "Pollack meet naast hydrofiele oppervlakken een zone die deeltjes weert. Het water gedraagt zich daar als gel, met een andere lading dan het bulkwater ernaast.",
+  "haak": "Zheng & Pollack (2003) meten dat microsferen worden uitgesloten tot zones in de orde van 100 µm vanaf hydrofiele geloppervlakken — verder dan conventionele theorie voorspelt. Pollack Lab claimt dat EZ-water een fysisch onderscheiden, geordende “vierde fase” is (vloeibaar-kristal-achtig), gevoed door licht/IR — mechanisme blijft onder studie.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "zheng-pollack-100um-2003",
+      "caption": "Microsferen weg tot ~100 µm"
+    },
+    {
+      "type": "fact",
+      "ref": "pollacklab-fourth-phase-claim",
+      "caption": "Pollack: vierde fase aan interfaces"
+    },
+    {
+      "type": "fact",
+      "ref": "pollack-ir-ez-expansion-2021",
+      "caption": "Mid-IR vergroot de EZ"
+    },
+    {
+      "type": "source",
+      "label": "Jian-ming Zheng & Gerald H. Pollack — Long-range forces extending from polymer-gel surfaces",
+      "url": "https://arxiv.org/pdf/cond-mat/0305093",
+      "caption": "Zheng & Pollack (2003) meten dat microsferen worden uitgesloten tot zones in de orde van 100 µm vanaf hydrofiele geloppervlakken — verder dan conventionele theorie voorspelt."
+    },
+    {
+      "type": "source",
+      "label": "Gerald H. Pollack / Pollack Laboratory — Research — EZ Water",
+      "url": "https://www.pollacklab.org/research",
+      "caption": "Pollack Lab claimt dat EZ-water een fysisch onderscheiden, geordende “vierde fase” is (vloeibaar-kristal-achtig), gevoed door licht/IR — mechanisme blijft onder studie."
+    }
+  ],
+  "sourceIds": [
+    "jian-ming-zheng-gerald-h-pollack-2003",
+    "gerald-pollack-2013-2",
+    "pollack-laboratory-paper-summary-2021"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "heart-memory",
+  "inleiding": "Na een transplantatie blijft het hart het orgaan van een donor. Verhalen dat herinneringen of voorkeuren meeverhuizen, circuleren als anekdote. Een medisch protocol dat die overdracht meet, staat niet in dit dossier.",
+  "haak": "Pearsall (J Near-Death Stud 2002): immunosuppressiva kunnen de drempel verlagen om cellular memories in getransplanteerde organen te registreren — auteurshypothese, geen medische waarheid. Schwartz & Russek (zelfde paper): dynamische systemen met feedbackslagen slaan informatie op — voorspelling dat gevoelige transplantatieontvangers aspecten van donorhistorie kunnen ervaren. Spiegel, geen bewijs.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-memory-pearsall-cellular-threshold",
+      "caption": "Immuno-suppressiva als drempel"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-memory-systemic-prediction",
+      "caption": "Systemic memory-voorspelling"
+    },
+    {
+      "type": "fact",
+      "ref": "heart-memory-not-only-nervous",
+      "caption": "Geheugen niet alleen zenuwstelsel"
+    },
+    {
+      "type": "source",
+      "label": "Paul Pearsall, Gary E. Schwartz & Linda G. Russek — Changes in Heart Transplant Recipients That Parallel the Personalities of Their Donors",
+      "url": "https://doi.org/10.17514/jnds-2002-20-3-p191-206",
+      "caption": "Opening van het Pearsall-paper: als geheugen uitsluitend in zenuw- en immuunsysteem zit, mogen transplantatieontvangers geen donor-parallellen tonen — zij rapporteren dat wel. Controversieel dossier."
+    },
+    {
+      "type": "source",
+      "label": "Paul Pearsall, Gary E. Schwartz & Linda G. Russek — Changes in Heart Transplant Recipients That Parallel the Personalities of Their Donors",
+      "url": "https://doi.org/10.17514/jnds-2002-20-3-p191-206",
+      "caption": "Pearsall (J Near-Death Stud 2002): immunosuppressiva kunnen de drempel verlagen om cellular memories in getransplanteerde organen te registreren — auteurshypothese, geen medische waarheid."
+    }
+  ],
+  "sourceIds": [
+    "paul-pearsall-gary-e-schwartz-linda-g-russek"
+  ]
+}

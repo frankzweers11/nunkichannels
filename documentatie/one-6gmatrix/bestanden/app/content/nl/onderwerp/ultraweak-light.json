@@ -1,0 +1,41 @@
+{
+  "id": "ultraweak-light",
+  "inleiding": "Een review (PMC 2024) beschrijft ultra-weak photon emission: cellen zenden fotonen uit als bijproduct van hun metabolisme, veel zwakker dan een lamp. Onder normale omstandigheden gaat het om tientallen fotonen per seconde per vierkante centimeter.",
+  "haak": "Peer review (PMC 2024): cellen zenden licht uit bij ultralage intensiteit — fotonen als bijproduct van celmetabolisme, onderscheiden van delayed luminescence, bioluminescentie en chemiluminescentie; synoniemen o.a. biophotons / UPE. Zelfde review: onder normale omstandigheden is gedetecteerde UPE-intensiteit extreem laag (orde tientallen fotonen s⁻¹ cm⁻¹); bij stress/ROS kan dit oplopen tot honderden — kwantitatieve bandbreedte van ultrazwak licht.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "upe-cells-emit-ultralow-2024",
+      "caption": "Cellen zenden ultrazwak licht uit (UPE)"
+    },
+    {
+      "type": "fact",
+      "ref": "upe-intensity-tens-to-hundreds",
+      "caption": "Tientallen tot honderden fotonen s⁻¹ cm⁻¹"
+    },
+    {
+      "type": "fact",
+      "ref": "upe-noninvasive-oxidative-monitor-2023",
+      "caption": "UPE als non-invasieve oxidatie-monitor"
+    },
+    {
+      "type": "source",
+      "label": "UPE brief review authors (PMC10899412) — Ultra weak photon emission—a brief review",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10899412/",
+      "caption": "Peer review (PMC 2024): cellen zenden licht uit bij ultralage intensiteit — fotonen als bijproduct van celmetabolisme, onderscheiden van delayed luminescence, bioluminescentie en chemiluminescentie; synoniemen o.a. biophotons / UPE."
+    },
+    {
+      "type": "source",
+      "label": "UPE brief review authors (PMC10899412) — Ultra weak photon emission—a brief review",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10899412/",
+      "caption": "Zelfde review: onder normale omstandigheden is gedetecteerde UPE-intensiteit extreem laag (orde tientallen fotonen s⁻¹ cm⁻¹); bij stress/ROS kan dit oplopen tot honderden — kwantitatieve bandbreedte van ultrazwak licht."
+    }
+  ],
+  "sourceIds": [
+    "upe-brief-review-authors-pmc10899412-2024",
+    "upe-application-review-authors-pmc9981976-2023"
+  ]
+}

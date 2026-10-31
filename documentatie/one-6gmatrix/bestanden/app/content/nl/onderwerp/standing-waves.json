@@ -1,0 +1,42 @@
+{
+  "id": "standing-waves",
+  "inleiding": "In Melde’s experiment, zoals de University of Iowa het toont, ontstaan door spanning en massa twee tot elf of dertien staande golven op een snaar. Een demo van de University of Minnesota laat zien dat een hogere frequentie meer buiken geeft.",
+  "haak": "University of Iowa-demo Melde’s experiment: door massa/spanning te variëren ontstaan 2 tot 11–13 staande golven op een aangedreven snaar. UMN-demo: mechanische oscillator drijft een gespannen snaar; verhoog de frequentie en het aantal antinodes neemt toe.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "melde-iowa-tension-loops",
+      "caption": "Melde: spanning maakt staande golven"
+    },
+    {
+      "type": "fact",
+      "ref": "melde-umn-frequency-antinodes",
+      "caption": "Hogere frequentie, meer buiken"
+    },
+    {
+      "type": "fact",
+      "ref": "melde-oc-nodes-resonance",
+      "caption": "Knopen ontstaan bij resonantie"
+    },
+    {
+      "type": "source",
+      "label": "University of Iowa Physics Lecture Demonstrations (Dale Stille) — 3B22.11 Standing Waves in a String — Melde's Experiment",
+      "url": "https://instructional-resources.physics.uiowa.edu/3b2211-standing-waves-string-meldes-experiment",
+      "caption": "University of Iowa-demo Melde’s experiment: door massa/spanning te variëren ontstaan 2 tot 11–13 staande golven op een aangedreven snaar."
+    },
+    {
+      "type": "source",
+      "label": "University of Minnesota School of Physics and Astronomy Lecture Demonstrations — 3B22.10 Melde's Standing Wave Machine",
+      "url": "https://spademos.umn.edu/3B22.10",
+      "caption": "UMN-demo: mechanische oscillator drijft een gespannen snaar; verhoog de frequentie en het aantal antinodes neemt toe."
+    }
+  ],
+  "sourceIds": [
+    "university-of-iowa-physics-lecture-demonstrations-dale-s",
+    "university-of-minnesota-school-of-physics-and-astronomy",
+    "oklahoma-christian-university-physics-laboratory-2026"
+  ]
+}

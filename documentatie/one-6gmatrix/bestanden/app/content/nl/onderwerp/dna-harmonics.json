@@ -1,0 +1,49 @@
+{
+  "id": "dna-harmonics",
+  "inleiding": "Gariaev leest het chromosoom als bron en ontvanger van een genetische tekst in veldvorm. Montagnier zoekt het signaal in verdunde DNA-oplossingen.",
+  "haak": "Gariaev beschrijft solitonische elektro-akoestische velden rond het chromosoom — een controversiële hypothese. Montagnier et al. (2009) rapporteren elektromagnetische signalen uit sterk verdunde DNA-oplossingen. De meting hoort bij het watergeheugen-dossier; replicatie en consensus ontbreken.",
+  "slides": [
+    {
+      "type": "intro"
+    },
+    {
+      "type": "fact",
+      "ref": "dna-wave-genetics",
+      "caption": "Wave genetics"
+    },
+    {
+      "type": "fact",
+      "ref": "montagnier-ems",
+      "caption": "Montagnier — EMS in verdunning"
+    },
+    {
+      "type": "fact",
+      "ref": "popp-biophotons",
+      "caption": "Popp — biophotonen"
+    },
+    {
+      "type": "source",
+      "label": "L. Montagnier et al. — Electromagnetic signals from aqueous nanostructures",
+      "url": "https://doi.org/10.1007/s12539-009-0036-7",
+      "caption": "Montagnier et al. (2009) rapporteren elektromagnetische signalen uit sterk verdunde DNA-oplossingen — resonantie-hypothese, geen bewezen standaard, wel het watergeheugen-dossier."
+    }
+  ],
+  "curate": {
+    "stemmen": [
+      {
+        "portrait": "rife",
+        "quote": "rife:a-living-organism-is"
+      },
+      {
+        "portrait": "popp",
+        "quote": "popp:biophoton-definition-2003"
+      }
+    ],
+    "spiegel": []
+  },
+  "sourceIds": [
+    "p-gariaev-et-al-2011",
+    "l-montagnier-et-al-2009",
+    "f-a-popp-et-al-2004"
+  ]
+}
