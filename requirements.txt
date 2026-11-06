@@ -1,1 +1,2 @@
-Pillow>=10.0.0
+# Python 3.13: Pillow 11 heeft officiële wheels; lokaal/VPS: python3.13 -m pip install -r requirements.txt
+Pillow>=11.0.0
