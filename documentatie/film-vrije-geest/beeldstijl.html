@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krijt en spons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Gochi+Hand&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bord: #121313;
+    --krijt: #ece8df;
+    --rood: #e4572e;
+    --geel: #d8d24e;
+    --stof: #8a8780;
+    --pagina: #0b0b0b;
+    --tekst: #d9d5cc;
+    --zacht: #8f8b83;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--pagina); color: var(--tekst); font: 16px/1.55 Inter, system-ui, sans-serif; }
+  main { max-width: 1240px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font: 500 44px/1.1 Caveat, cursive; color: var(--krijt); margin: 8px 0 4px; }
+  .sub { color: var(--zacht); margin: 0 0 20px; }
+
+  .stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--bord); border-radius: 6px; }
+  .cam { position: absolute; inset: 0; transform-origin: 42% 45%; }
+  .cam.push { animation: push var(--dur, 30s) linear forwards; }
+  @keyframes push { from { transform: scale(1); } to { transform: scale(1.045); } }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ondertitel { position: absolute; left: 0; right: 0; bottom: 4.5%; text-align: center; font: 600 clamp(13px, 1.9vw, 22px)/1.3 Inter, sans-serif; color: #fff; text-shadow: 0 1px 6px #000, 0 0 2px #000; padding: 0 8%; opacity: 0; transition: opacity .4s; pointer-events: none; }
+  .ondertitel.aan { opacity: .92; }
+
+  .knoppen { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 32px; }
+  .knoppen button { background: #1b1c1c; color: var(--tekst); border: 1px solid #2c2d2d; border-radius: 999px; padding: 8px 16px; font: 600 14px Inter, sans-serif; cursor: pointer; }
+  .knoppen button[aria-pressed="true"] { border-color: var(--rood); color: #fff; }
+
+  h2 { font: 600 13px Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--zacht); margin: 36px 0 14px; }
+  .palet { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .chip { border-radius: 6px; overflow: hidden; background: #151616; }
+  .chip i { display: block; height: 64px; }
+  .chip div { padding: 10px 12px; font-size: 14px; }
+  .chip b { display: block; color: #fff; }
+  .chip span { color: var(--zacht); }
+  .regels { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .regel { background: #151616; border-radius: 6px; padding: 16px 18px; }
+  .regel h3 { margin: 0 0 6px; font: 500 28px/1.1 Caveat, cursive; color: var(--krijt); }
+  .regel p { margin: 0; color: #bdb9b0; font-size: 15px; }
+  .regel.rood h3 { color: var(--rood); }
+  .hand-j { font: 500 34px Caveat, cursive; color: var(--krijt); }
+  .hand-k { font: 30px "Gochi Hand", cursive; color: var(--rood); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Wat niet uitgeveegd kan worden</h1>
+  <p class="sub">Beeldstijlschets: krijt op zwart, naar Steiners schoolbordtekeningen. Drie proefscènes, getekend terwijl je kijkt.</p>
+
+  <div class="stage" id="stage">
+    <div class="cam" id="cam">
+      <canvas id="bg" width="1920" height="1080"></canvas>
+      <canvas id="ck" width="1920" height="1080"></canvas>
+      <canvas id="fx" width="1920" height="1080"></canvas>
+    </div>
+    <div class="ondertitel" id="ot"></div>
+  </div>
+
+  <div class="knoppen" role="group" aria-label="Proefscènes">
+    <button data-s="gambia" aria-pressed="true">0 · Gambia</button>
+    <button data-s="kring" aria-pressed="false">1 · De kring</button>
+    <button data-s="kachel" aria-pressed="false">6 · De kachel</button>
+    <button id="opnieuw">↺ opnieuw</button>
+  </div>
+
+  <h2>Palet</h2>
+  <div class="palet">
+    <div class="chip"><i style="background:var(--bord)"></i><div><b>Bordzwart</b><span>#121313, Stolles zwarte papier</span></div></div>
+    <div class="chip"><i style="background:var(--krijt)"></i><div><b>Krijtwit</b><span>het denken, de juffrouw, de groep</span></div></div>
+    <div class="chip"><i style="background:var(--rood)"></i><div><b>Gambia-rood</b><span>de enige kleur: de eigen waarheid</span></div></div>
+    <div class="chip"><i style="background:var(--geel)"></i><div><b>Lichtgeel</b><span>alleen bij vuur en slot</span></div></div>
+    <div class="chip"><i style="background:var(--stof)"></i><div><b>Krijtstof</b><span>wat de spons achterlaat</span></div></div>
+  </div>
+
+  <h2>Regels</h2>
+  <div class="regels">
+    <div class="regel rood"><h3>Eén rode lijn</h3><p>Het hele bord is wit, behalve één lijn. Die lijn is Gambia, het rode figuurtje buiten de kring en straks de roos. Rood betekent altijd: wat iemand zelf zag.</p></div>
+    <div class="regel"><h3>Niets verdwijnt helemaal</h3><p>De spons laat altijd een waas achter. Wie goed kijkt, ziet de uitgeveegde lijn nog. Daar draait de hele film om.</p></div>
+    <div class="regel"><h3>Twee handschriften</h3><p><span class="hand-j">de juffrouw: zeker, schuin</span><br><span class="hand-k">het kind: groot, rood</span><br>De verteller schrijft niets. Die is alleen stem.</p></div>
+    <div class="regel"><h3>Zijkant van het krijt</h3><p>Warmte en licht worden niet met lijnen getekend, maar met brede vegen in rood en geel, zoals Steiner deed. Dat zien we pas vanaf de kachel.</p></div>
+    <div class="regel"><h3>Vaste camera</h3><p>Geen montage binnen een scène. Alleen een langzame push-in. Een scène gaat over in de volgende met de spons of met een vel zwart papier.</p></div>
+    <div class="regel"><h3>Geluid</h3><p>Krijtgekras loopt gelijk op met elke lijn, de spons is een droge veeg, en de stilte is net zo belangrijk. Muziek komt pas bij de roos.</p></div>
+  </div>
+</main>
+
+<script>
+(() => {
+  const W = 1920, H = 1080;
+  const KRIJT = '#ece8df', ROOD = '#e4572e', GEEL = '#d8d24e', ORANJE = '#ea7a35';
+  const bg = document.getElementById('bg').getContext('2d');
+  const ck = document.getElementById('ck').getContext('2d');
+  const fx = document.getElementById('fx').getContext('2d');
+  const cam = document.getElementById('cam');
+  const ot = document.getElementById('ot');
+
+  // Vaste toeval, zodat elke afspeelbeurt hetzelfde krijt geeft.
+  function mulberry(seed) {
+    return () => {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  let R = mulberry(11);
+
+  // De afdruk van een spons: zachte randen, strepen van het vilt in de veegrichting.
+  function sponsAfdruk(w, h, blur) {
+    const c = document.createElement('canvas');
+    c.width = w + blur * 4; c.height = h + blur * 4;
+    const g = c.getContext('2d');
+    g.shadowColor = '#fff'; g.shadowBlur = blur; g.shadowOffsetX = c.width;
+    g.fillStyle = '#fff';
+    g.fillRect(blur * 2 - c.width, blur * 2, w, h);
+    g.shadowColor = 'transparent';
+    g.globalCompositeOperation = 'destination-out';
+    const r = mulberry(5);
+    for (let y = 0; y < c.height; y += 2) { g.globalAlpha = r() * 0.7; g.fillRect(0, y, c.width, 1 + r() * 2); }
+    return c;
+  }
+  const AFDRUK = sponsAfdruk(150, 54, 14);
+
+  // ---------- het bord ----------
+  function tekenBord() {
+    const r = mulberry(3);
+    bg.fillStyle = '#121313';
+    bg.fillRect(0, 0, W, H);
+    // oude, half uitgeveegde wolken van eerdere lessen
+    for (let i = 0; i < 14; i++) {
+      const x = r() * W, y = r() * H, rad = 120 + r() * 380;
+      const g = bg.createRadialGradient(x, y, 0, x, y, rad);
+      g.addColorStop(0, `rgba(236,232,223,${0.018 + r() * 0.02})`);
+      g.addColorStop(1, 'rgba(236,232,223,0)');
+      bg.fillStyle = g;
+      bg.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+    }
+    // vegen van een oude spons
+    for (let i = 0; i < 7; i++) {
+      const y = r() * H, x = r() * W * 0.6, len = 300 + r() * 700, ph = r() * 6;
+      bg.globalAlpha = 0.003 + r() * 0.004;
+      for (let k = 0; k < len; k += 10) bg.drawImage(AFDRUK, x + k, y + Math.sin(k * 0.01 + ph) * 30);
+    }
+    bg.globalAlpha = 1;
+    // korrel
+    for (let i = 0; i < 26000; i++) {
+      bg.fillStyle = r() < 0.5 ? `rgba(255,255,255,${r() * 0.035})` : `rgba(0,0,0,${r() * 0.25})`;
+      bg.fillRect(r() * W, r() * H, 1 + r() * 1.5, 1 + r() * 1.5);
+    }
+    const v = bg.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 1.05);
+    v.addColorStop(0, 'rgba(0,0,0,0)');
+    v.addColorStop(1, 'rgba(0,0,0,0.55)');
+    bg.fillStyle = v;
+    bg.fillRect(0, 0, W, H);
+  }
+
+  // ---------- paden ----------
+  function catmull(pts, seg = 10) {
+    const out = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      for (let s = 0; s < seg; s++) {
+        const t = s / seg, t2 = t * t, t3 = t2 * t;
+        out.push([
+          0.5 * (2 * p1[0] + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
+          0.5 * (2 * p1[1] + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3),
+        ]);
+      }
+    }
+    out.push(pts[pts.length - 1]);
+    return out;
+  }
+  // Hand die net niet recht tekent: trage golf langs de normaal.
+  function wiebel(pts, amp) {
+    const a = R() * 6, b = R() * 6;
+    return pts.map((p, i) => {
+      const q = pts[Math.min(i + 1, pts.length - 1)], o = pts[Math.max(i - 1, 0)];
+      let dx = q[0] - o[0], dy = q[1] - o[1];
+      const l = Math.hypot(dx, dy) || 1;
+      const s = amp * (Math.sin(i * 0.11 + a) + 0.5 * Math.sin(i * 0.37 + b));
+      return [p[0] - dy / l * s, p[1] + dx / l * s];
+    });
+  }
+  function cirkel(cx, cy, r, n = 40, start = -Math.PI / 2, sweep = Math.PI * 2.08) {
+    const p = [];
+    for (let i = 0; i <= n; i++) {
+      const a = start + sweep * i / n;
+      p.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+    }
+    return p;
+  }
+
+  // ---------- krijt ----------
+  // Een streek bestaat uit 'tanden' naast elkaar: elk een dun spoor met eigen gaten,
+  // zoals een krijtje dat over korrelig papier sleept.
+  class Streek {
+    constructor(pts, o = {}) {
+      this.o = Object.assign({ kleur: KRIJT, w: 4, tanden: 5, gat: 0.16, alfa: 0.85, stof: 0.25, taper: 0, glad: true }, o);
+      this.pts = this.o.glad ? catmull(pts) : pts;
+      this.cum = [0];
+      for (let i = 1; i < this.pts.length; i++) {
+        const a = this.pts[i - 1], b = this.pts[i];
+        this.cum.push(this.cum[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1]));
+      }
+      this.L = this.cum[this.cum.length - 1];
+      this.d = 0; this.seg = 1;
+      const { w, tanden, alfa, gat } = this.o;
+      this.tanden = [];
+      for (let k = 0; k < tanden; k++) {
+        this.tanden.push({
+          off: (tanden === 1 ? 0 : (k / (tanden - 1) - 0.5) * w) + (R() - 0.5) * w * 0.15,
+          a: alfa * (0.5 + 0.5 * R()),
+          lw: Math.max(0.9, (w / tanden) * (0.8 + 0.7 * R())),
+          gat: gat * (0.5 + R()),
+          px: null, py: null, fase: R() * 9,
+        });
+      }
+    }
+    punt(d) {
+      while (this.seg < this.cum.length - 1 && this.cum[this.seg] < d) this.seg++;
+      const i = this.seg, a = this.pts[i - 1], b = this.pts[i];
+      const span = this.cum[i] - this.cum[i - 1] || 1;
+      const t = Math.min(1, Math.max(0, (d - this.cum[i - 1]) / span));
+      const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+      return { x: a[0] + dx * t, y: a[1] + dy * t, nx: -dy / l, ny: dx / l };
+    }
+    tot(p) {
+      const doel = p * this.L;
+      if (doel <= this.d) return;
+      const stappen = [];
+      for (let d = this.d; d <= doel; d += 2) stappen.push([d, this.punt(d)]);
+      ck.lineCap = 'butt';
+      ck.strokeStyle = this.o.kleur;
+      for (const t of this.tanden) {
+        ck.globalAlpha = t.a;
+        ck.lineWidth = t.lw;
+        ck.beginPath();
+        if (t.px !== null) ck.moveTo(t.px, t.py);
+        for (const [d, q] of stappen) {
+          const f = 1 - this.o.taper * (d / this.L);
+          const ruw = this.o.ruw ? (R() - 0.5) * this.o.ruw : 0;
+          const x = q.x + q.nx * (t.off * f + ruw), y = q.y + q.ny * (t.off * f + ruw);
+          // druk wisselt langs de lijn: soms valt een tand even weg
+          const g = t.gat + 0.22 * Math.max(0, Math.sin(d * 0.012 + t.fase));
+          if (t.px === null || R() < g) ck.moveTo(x, y); else ck.lineTo(x, y);
+          t.px = x; t.py = y;
+        }
+        ck.stroke();
+      }
+      ck.fillStyle = this.o.kleur;
+      for (const [, q] of stappen) {
+        if (R() < this.o.stof) {
+          ck.globalAlpha = 0.15 + R() * 0.3;
+          const s = (R() - 0.5) * this.o.w * 2.2;
+          ck.fillRect(q.x + q.nx * s + (R() - 0.5) * 3, q.y + q.ny * s + (R() - 0.5) * 3, 1.3, 1.3);
+        }
+      }
+      ck.globalAlpha = 1;
+      this.d = doel;
+    }
+  }
+
+  // Handschrift: het lettertype wordt een masker, het masker wordt korrel voor korrel
+  // van links naar rechts in krijt gezet.
+  class Schrift {
+    constructor(tekst, x, y, o = {}) {
+      this.o = Object.assign({ font: '500 64px Caveat', kleur: KRIJT, rot: 0, alfa: 1, dicht: 0.78 }, o);
+      const m = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+      m.font = this.o.font;
+      const br = Math.ceil(m.measureText(tekst).width) + 40;
+      const fs = parseInt(this.o.font.match(/(\d+)px/)[1], 10);
+      const hg = Math.ceil(fs * 1.6);
+      m.canvas.width = br; m.canvas.height = hg;
+      m.font = this.o.font;
+      m.textBaseline = 'alphabetic';
+      m.fillStyle = '#fff';
+      m.fillText(tekst, 20, fs * 1.1);
+      const data = m.getImageData(0, 0, br, hg).data;
+      const c = Math.cos(this.o.rot), s = Math.sin(this.o.rot);
+      this.px = [];
+      for (let yy = 0; yy < hg; yy++) for (let xx = 0; xx < br; xx++) {
+        const a = data[(yy * br + xx) * 4 + 3];
+        if (a > 90) {
+          const lx = xx - 20, ly = yy - fs * 1.1;
+          this.px.push([x + lx * c - ly * s, y + lx * s + ly * c, xx + yy * 0.18 + R() * 3]);
+        }
+      }
+      this.px.sort((a, b) => a[2] - b[2]);
+      this.n = 0;
+    }
+    tot(p) {
+      const doel = Math.floor(p * this.px.length);
+      if (doel <= this.n) return;
+      ck.fillStyle = this.o.kleur;
+      for (let i = this.n; i < doel; i++) {
+        if (R() > this.o.dicht) continue;
+        const q = this.px[i];
+        ck.globalAlpha = this.o.alfa * (0.45 + 0.55 * R());
+        ck.fillRect(q[0], q[1], 1.25, 1.25);
+      }
+      ck.globalAlpha = 1;
+      this.n = doel;
+    }
+  }
+
+  // De spons: veegt zigzag over een vlak, haalt het meeste weg en laat een melkwaas achter.
+  class Spons {
+    constructor(x, y, w, h, o = {}) {
+      this.o = Object.assign({ rijen: 3, sw: 150, sh: 54 }, o);
+      const pts = [];
+      const { rijen, sh } = this.o;
+      for (let i = 0; i < rijen; i++) {
+        const yy = y + sh / 2 + (h - sh) * (rijen === 1 ? 0.5 : i / (rijen - 1));
+        if (i % 2 === 0) pts.push([x, yy], [x + w, yy + 6]); else pts.push([x + w, yy], [x, yy + 6]);
+      }
+      this.pad = new Streek(pts, { glad: false, tanden: 1 });
+      this.d = 0;
+    }
+    tot(p) {
+      const doel = p * this.pad.L;
+      const { sw, sh } = this.o;
+      for (let d = this.d; d <= doel; d += 5) {
+        const q = this.pad.punt(d);
+        const ax = q.x - AFDRUK.width / 2, ay = q.y - AFDRUK.height / 2 + (R() - 0.5) * 6;
+        ck.globalCompositeOperation = 'destination-out';
+        ck.globalAlpha = 0.11;
+        ck.drawImage(AFDRUK, ax, ay);
+        ck.globalCompositeOperation = 'source-over';
+        ck.globalAlpha = 0.0016;
+        ck.drawImage(AFDRUK, ax, ay);
+      }
+      ck.globalAlpha = 1;
+      this.d = Math.max(this.d, doel);
+      const q = this.pad.punt(Math.min(doel, this.pad.L));
+      this.cursor = p < 1 ? q : null;
+    }
+    teken() {
+      if (!this.cursor) return;
+      const { x, y } = this.cursor, { sw, sh } = this.o;
+      fx.save();
+      fx.translate(x, y);
+      fx.rotate(-0.04);
+      fx.fillStyle = 'rgba(0,0,0,0.45)';
+      fx.fillRect(-sw / 2 + 8, -sh / 2 + 10, sw, sh);
+      fx.fillStyle = '#5b4632';
+      fx.fillRect(-sw / 2, -sh / 2, sw, sh * 0.62);
+      fx.fillStyle = '#9d9a92';
+      fx.fillRect(-sw / 2, -sh / 2 + sh * 0.62, sw, sh * 0.38);
+      fx.fillStyle = 'rgba(255,255,255,0.12)';
+      fx.fillRect(-sw / 2, -sh / 2, sw, 3);
+      fx.restore();
+    }
+  }
+
+  // Zijkant van het krijt: brede, gestreepte vegen zoals in Steiners vuur.
+  const veeg = (pts, kleur, w, o = {}) =>
+    new Streek(pts, Object.assign({ kleur, w, tanden: Math.round(w / 1.1), gat: 0.24, alfa: 0.42, stof: 0.6, ruw: 2.4 }, o));
+
+  // ---------- Afrika ----------
+  const K = 10, MX = 560, MY = 120;
+  const geo = ([lon, lat]) => [MX + (lon + 18) * K, MY + (38 - lat) * K];
+  const AFRIKA = [
+    [-5.9, 35.8], [-2, 35.1], [3, 36.8], [10.2, 37.2], [11, 35.2], [10.1, 33.8], [15.2, 32.3], [19.9, 30.7],
+    [20.1, 32.1], [23.2, 32.6], [25.2, 31.6], [29.9, 31.2], [32.3, 31.3], [32.6, 29.9], [33.6, 27.9], [35.5, 23.9],
+    [37.2, 19.6], [38.5, 18], [39.5, 15.6], [41.7, 13.4], [43.3, 12.5], [43.1, 11.6], [44.5, 10.4], [47.5, 11.2],
+    [51.3, 11.8], [51, 10.4], [49.8, 7.5], [48.5, 5], [45.3, 2], [42.5, -0.5], [40.1, -3.3], [39.2, -4.7],
+    [39.3, -6.8], [39.6, -10], [40.5, -11], [40.6, -14.5], [39, -17], [36.8, -18.8], [35, -20], [35.5, -22],
+    [35.4, -24], [32.9, -25.9], [32.4, -28.6], [30.9, -30], [28, -32.8], [25.6, -34], [20, -34.8], [18.4, -34.3],
+    [18.3, -33], [17.3, -30], [16.5, -28.6], [15.2, -26.6], [14.5, -23], [13, -19], [11.8, -17], [12.5, -13.5],
+    [13.2, -8.8], [12.2, -6], [11.8, -4.8], [9.3, -0.7], [9.5, 1], [9.8, 3], [8.5, 4.6], [6, 4.3], [5.5, 5.5],
+    [3.4, 6.4], [1.2, 6.1], [-0.2, 5.5], [-2, 4.8], [-4, 5.2], [-7.5, 4.4], [-10.8, 6.3], [-13.2, 8.5], [-15, 10.9],
+    [-16.7, 12.5], [-16.8, 13.4], [-17.5, 14.7], [-16.5, 16], [-16.1, 18.1], [-17, 20.8], [-16.9, 21.3], [-15, 24],
+    [-13.2, 27], [-11.5, 28.2], [-9.8, 29.5], [-9.6, 30.4], [-9.8, 31.5], [-8.5, 33.2], [-7.6, 33.6], [-6.8, 34],
+    [-6.2, 35.2], [-5.9, 35.8],
+  ].map(geo);
+  const MADAGASKAR = [
+    [49.3, -12], [50.4, -15.5], [49.5, -17], [48, -22], [47.1, -24.9], [45.2, -25.5], [43.9, -23], [43.3, -21.5],
+    [44.4, -19], [44, -16.8], [46.3, -15.7], [48, -13.5], [49.3, -12],
+  ].map(geo);
+  // Het kind tekent Gambia groter dan het is: zo groot voelde het.
+  const GAMBIA = [[-17.3, 13.5], [-16.3, 13.45], [-15.4, 13.3], [-14.6, 13.6], [-13.6, 13.45], [-12.4, 13.25]].map(geo);
+
+  // ---------- scènes ----------
+  function bouw(fn) {
+    const acties = [], subs = [];
+    let t = 0;
+    const api = {
+      t: () => t,
+      wacht: s => { t += s; },
+      teken: (obj, dur, overlap = 0) => { acties.push({ s: t, d: dur, o: obj }); t += dur - overlap; return obj; },
+      tegelijk: (obj, dur, na = 0) => { acties.push({ s: t + na, d: dur, o: obj }); return obj; },
+      zeg: (tekst, dur) => { subs.push({ s: t, e: t + dur, tekst }); },
+    };
+    fn(api);
+    return { acties, subs, eind: t };
+  }
+
+  const SCENES = {
+    gambia: () => bouw(s => {
+      s.wacht(0.6);
+      s.zeg('Ik was acht.', 2.6);
+      s.teken(new Streek(wiebel(AFRIKA, 2.2), { w: 4.5, tanden: 5 }), 7.5);
+      s.teken(new Streek(wiebel(MADAGASKAR, 1.2), { w: 4, tanden: 4 }), 1.4);
+      s.zeg('Ik vertelde in de klas dat we op vakantie gingen. Naar Gambia.', 4);
+      s.wacht(0.8);
+      s.teken(new Streek(GAMBIA, { kleur: ROOD, w: 9, tanden: 6, alfa: 0.95, gat: 0.08 }), 1.1);
+      s.teken(new Streek(GAMBIA.map(([x, y]) => [x + 2, y + 3]), { kleur: ROOD, w: 6, tanden: 4, alfa: 0.8 }), 0.6);
+      s.teken(new Schrift('GAMBIA', 100, 300, { font: '112px "Gochi Hand"', kleur: ROOD, rot: -0.05 }), 2.2);
+      s.teken(new Streek(wiebel([[300, 330], [420, 352], [500, 360], [548, 362]], 1.5), { kleur: ROOD, w: 4, tanden: 3 }), 0.8);
+      s.teken(new Streek([[528, 346], [550, 362], [526, 378]], { kleur: ROOD, w: 4, tanden: 3, glad: false }), 0.4);
+      s.wacht(1.6);
+      s.zeg('De juffrouw zei dat Gambia niet bestond. Dat ik een fantast was.', 4.5);
+      s.teken(new Schrift('Gambia bestaat niet.', 1290, 210, { font: '500 76px Caveat', rot: -0.02 }), 2.6);
+      s.teken(new Schrift('fantast', 1420, 300, { font: '500 64px Caveat', rot: -0.03 }), 1.4);
+      s.wacht(1);
+      s.teken(new Spons(80, 215, 560, 190, { rijen: 5 }), 3.6);
+      s.wacht(0.6);
+      s.zeg('En de klas lachte mee.', 3.5);
+      const n = 13;
+      for (let i = 0; i < n; i++) {
+        const x = 250 + i * 118 + (R() - 0.5) * 14, y = 975 + (R() - 0.5) * 10;
+        s.tegelijk(new Streek(wiebel(cirkel(x, y, 24, 26), 0.8), { w: 3.5, tanden: 4 }), 0.5, i * 0.12);
+        s.tegelijk(new Streek(wiebel([[x - 44, y + 80], [x - 30, y + 40], [x, y + 32], [x + 30, y + 40], [x + 44, y + 80]], 0.6), { w: 3.5, tanden: 4 }), 0.5, i * 0.12 + 0.3);
+      }
+      s.wacht(n * 0.12 + 1.2);
+      for (let i = 0; i < n; i++) {
+        const x = 230 + i * 118 + (R() - 0.5) * 20;
+        s.tegelijk(new Schrift(R() < 0.5 ? 'ha' : 'haha', x, 912 - R() * 26, { font: '500 40px Caveat', rot: (R() - 0.5) * 0.5, alfa: 0.9 }), 0.35, R() * 1.6);
+      }
+      s.wacht(2.4);
+      s.zeg('Ik wist dat het waar was. Ik wist dat Gambia bestond.', 4);
+      s.wacht(4.2);
+      s.zeg('Maar de juffrouw en de klas waren één blok. En ik was acht. En klein.', 4.5);
+      s.wacht(5);
+      s.teken(new Schrift('Wat niet uitgeveegd', 1290, 560, { font: '500 70px Caveat' }), 2);
+      s.teken(new Schrift('kan worden', 1290, 640, { font: '500 70px Caveat' }), 1.2);
+      s.wacht(2);
+    }),
+
+    kring: () => bouw(s => {
+      const cx = 900, cy = 500, r = 250, n = 14, rood = 3;
+      const hoek = i => -Math.PI / 2 + (i / n) * Math.PI * 2;
+      s.wacht(0.5);
+      s.zeg('Dat gevoel verdwijnt niet als je groot wordt. Het verandert alleen van vorm.', 4.5);
+      for (let i = 0; i < n; i++) {
+        const a = hoek(i), x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+        const kleur = i === rood ? ROOD : KRIJT;
+        s.tegelijk(new Streek(wiebel(cirkel(x, y - 14, 17, 22), 0.6), { kleur, w: 3.5, tanden: 4 }), 0.45, i * 0.22);
+        s.tegelijk(new Streek([[x - 30, y + 38], [x - 20, y + 14], [x, y + 8], [x + 20, y + 14], [x + 30, y + 38]], { kleur, w: 3.5, tanden: 4 }), 0.45, i * 0.22 + 0.25);
+      }
+      s.wacht(n * 0.22 + 1.2);
+      s.zeg('Wie iets anders ziet dan de groep, komt buiten de kring te staan.', 4.5);
+      // De kring sluit zich, maar buigt naar binnen om het rode figuurtje heen.
+      const ar = hoek(rood), lijn = [];
+      for (let i = 0; i <= 120; i++) {
+        const a = -Math.PI / 2 + (i / 120) * Math.PI * 2.04;
+        let d = Math.atan2(Math.sin(a - ar), Math.cos(a - ar));
+        const rr = 335 - 165 * Math.exp(-((d / 0.3) ** 2));
+        lijn.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
+      }
+      s.teken(new Streek(wiebel(lijn, 2), { w: 6, tanden: 6, alfa: 0.9 }), 3.4);
+      s.wacht(0.8);
+      s.zeg('En je krijgt er een etiket bij.', 2.6);
+      const fx0 = cx + Math.cos(ar) * r, fy0 = cy + Math.sin(ar) * r;
+      const labels = [['fantast', 1330, 210], ['gekkie', 1500, 330], ['wappie', 1360, 450], ['complotdenker', 1470, 590], ['woke', 1330, 720], ['fascist', 1520, 820]];
+      s.wacht(0.4);
+      s.zeg('Fantast. Gekkie. Wappie. Complotdenker. Woke. Fascist.', 5.5);
+      labels.forEach(([w, x, y], i) => {
+        s.tegelijk(new Streek(wiebel([[x - 14, y - 16], [(x + fx0) / 2, (y + fy0) / 2 + 10], [fx0 + 34, fy0 - 6]], 1), { w: 2, tanden: 2, alfa: 0.5 }), 0.5, i * 0.85);
+        s.tegelijk(new Schrift(w, x, y, { font: '500 58px Caveat', rot: (R() - 0.5) * 0.12 }), 0.7, i * 0.85 + 0.3);
+      });
+      s.wacht(labels.length * 0.85 + 2);
+      s.zeg('Welk etiket je krijgt, hangt af van de kring. Het mechanisme is steeds hetzelfde.', 5);
+      s.wacht(5.5);
+      s.teken(new Schrift('In de minderheid zijn, zelfs in een minderheid van één, maakte je niet gek.', 170, 975, { font: '500 50px Caveat', alfa: 0.9 }), 4.2);
+      s.teken(new Schrift('George Orwell, 1984', 1380, 1035, { font: '500 36px Caveat', alfa: 0.6 }), 1);
+      s.wacht(2.5);
+    }),
+
+    kachel: () => bouw(s => {
+      const x = 330, y = 520;
+      s.wacht(0.5);
+      s.zeg('Een vrije geest kun je niet verordenen.', 3);
+      // de kachel
+      s.teken(new Streek(wiebel([[x, y], [x + 280, y], [x + 280, y + 360], [x, y + 360], [x, y]], 1), { w: 5, tanden: 5, glad: false }), 2);
+      s.teken(new Streek(wiebel([[x + 70, y + 110], [x + 210, y + 110], [x + 210, y + 250], [x + 70, y + 250], [x + 70, y + 110]], 0.6), { w: 4, tanden: 4, glad: false }), 1);
+      s.teken(new Streek([[x + 30, y + 360], [x + 20, y + 420]], { w: 5, tanden: 4 }), 0.3);
+      s.teken(new Streek([[x + 250, y + 360], [x + 260, y + 420]], { w: 5, tanden: 4 }), 0.3);
+      s.teken(new Streek(wiebel([[x + 110, y], [x + 110, y - 260], [x + 140, y - 300], [x + 260, y - 300]], 0.8), { w: 5, tanden: 5 }), 1);
+      s.teken(new Streek(wiebel([[x + 170, y], [x + 170, y - 240], [x + 260, y - 240]], 0.8), { w: 5, tanden: 5 }), 0.9);
+      s.zeg('Je kunt tegen een kachel zeggen dat het zijn plicht is de kamer te verwarmen.', 4.5);
+      s.teken(new Schrift('Lieve kachel,', 760, 330, { font: '500 66px Caveat' }), 1.4);
+      s.teken(new Schrift('het is jouw plicht', 760, 410, { font: '500 66px Caveat' }), 1.6);
+      s.teken(new Schrift('de kamer te verwarmen.', 760, 490, { font: '500 66px Caveat' }), 1.8);
+      s.wacht(1.2);
+      s.zeg('Er gebeurt niets.', 2.8);
+      s.wacht(3);
+      s.zeg('Er moet hout in. En vuur.', 3);
+      // hout
+      for (let i = 0; i < 3; i++) s.teken(new Streek([[x + 90 + i * 8, y + 236 - i * 16], [x + 190 + i * 6, y + 228 - i * 16]], { kleur: '#b98b5a', w: 10, tanden: 6, alfa: 0.8 }), 0.35);
+      // vlammen: de zijkant van het krijt, van onder naar boven, Steiners rood-oranje
+      const vlammen = [
+        [[x + 100, y + 230], [x + 90, y + 180], [x + 112, y + 140], [x + 98, y + 100]],
+        [[x + 140, y + 232], [x + 150, y + 170], [x + 132, y + 120], [x + 146, y + 70]],
+        [[x + 180, y + 230], [x + 172, y + 180], [x + 192, y + 136], [x + 182, y + 96]],
+      ];
+      vlammen.forEach((v, i) => s.tegelijk(veeg(v, ROOD, 34, { taper: 0.75 }), 1.1, i * 0.3));
+      s.wacht(1.6);
+      s.zeg('Dat vuur is je eigen denken. Zelf kijken. Zelf zoeken.', 4.5);
+      // De warmte trekt over het bord: een rode stroom met opgaande tongen,
+      // elk om een witte druppel heen, zoals in Steiners vuurtekening van 13.9.24.
+      s.teken(veeg(wiebel([[650, 900], [800, 880], [960, 905], [1120, 875], [1280, 900], [1460, 880], [1560, 910]], 6), ROOD, 70), 1.6, 0.6);
+      s.tegelijk(veeg([[660, 925], [900, 915], [1150, 930], [1500, 920]], ORANJE, 40, { alfa: 0.3 }), 1.4);
+      const tongen = [[760, 300], [930, 360], [1100, 330], [1270, 380], [1440, 290]];
+      tongen.forEach(([cx, h], i) => {
+        const b = 880, tong = [[cx - 62, b], [cx - 74, b - h * 0.35], [cx - 44, b - h * 0.75], [cx - 6, b - h], [cx + 36, b - h * 0.78], [cx + 66, b - h * 0.38], [cx + 56, b]];
+        s.tegelijk(veeg(wiebel(catmull(tong), 3), ROOD, 36), 1.5, 0.4 + i * 0.4);
+        s.tegelijk(veeg([[cx - 4, b - 30], [cx - 2, b - h * 0.45], [cx + 2, b - h * 0.7]], KRIJT, 34, { alfa: 0.22, taper: 0.8 }), 0.9, 1.3 + i * 0.4);
+      });
+      s.wacht(5 * 0.4 + 1.6);
+      // licht: gele, schuine vlakken boven het vuur
+      for (let i = 0; i < 6; i++) {
+        const bx = 690 + i * 136, by = 60 + (i % 2) * 30, hh = 130 + (i % 3) * 20;
+        for (let k = 0; k < 6; k++) {
+          s.tegelijk(veeg([[bx + k * 13, by + hh], [bx + 18 + k * 13, by + hh * 0.5], [bx + 26 + k * 13, by]], GEEL, 30, { alfa: 0.3 }), 0.45, i * 0.25 + k * 0.06);
+        }
+      }
+      s.wacht(6 * 0.25 + 1.5);
+      s.zeg('Een vrij geestesleven: geen overheid die het voorschrijft, geen markt die het koopt.', 5);
+      s.wacht(6);
+    }),
+  };
+
+  // ---------- afspelen ----------
+  let huidig = null, start = 0, naam = 'gambia';
+  function speel(n) {
+    naam = n;
+    R = mulberry(11);
+    ck.clearRect(0, 0, W, H);
+    fx.clearRect(0, 0, W, H);
+    huidig = SCENES[n]();
+    start = performance.now();
+    cam.classList.remove('push');
+    void cam.offsetWidth;
+    cam.style.setProperty('--dur', (huidig.eind + 4) + 's');
+    cam.classList.add('push');
+    document.querySelectorAll('[data-s]').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === n));
+  }
+  function frame(nu) {
+    if (huidig) {
+      const t = (nu - start) / 1000;
+      fx.clearRect(0, 0, W, H);
+      for (const a of huidig.acties) {
+        if (a.klaar || t < a.s) continue;
+        const p = Math.min(1, (t - a.s) / a.d);
+        a.o.tot(p);
+        if (a.o.teken) a.o.teken();
+        if (p >= 1) a.klaar = true;
+      }
+      const sub = huidig.subs.find(x => t >= x.s && t < x.e);
+      if (sub) { if (ot.textContent !== sub.tekst) ot.textContent = sub.tekst; ot.classList.add('aan'); }
+      else ot.classList.remove('aan');
+    }
+    requestAnimationFrame(frame);
+  }
+
+  document.querySelectorAll('[data-s]').forEach(b => b.addEventListener('click', () => speel(b.dataset.s)));
+  document.getElementById('opnieuw').addEventListener('click', () => speel(naam));
+
+  tekenBord();
+  const fonts = Promise.all(['500 64px Caveat', '64px "Gochi Hand"'].map(f => document.fonts.load(f)));
+  Promise.race([fonts, new Promise(r => setTimeout(r, 2500))]).then(() => {
+    speel('gambia');
+    requestAnimationFrame(frame);
+  });
+})();
+</script>
+</body>
+</html>
