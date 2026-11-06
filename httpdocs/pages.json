@@ -68,6 +68,15 @@
       "thumb": "/images/thumbs/vuur.jpg"
     },
     {
+      "slug": "zelfportret-claude",
+      "path": "/zelfportret-claude/",
+      "title": "claude",
+      "subtitle": "one sentence, a thousand rooms",
+      "theme": "#070a13",
+      "ogImage": "/images/og/zelfportret-claude.jpg",
+      "thumb": "/images/thumbs/zelfportret-claude.jpg"
+    },
+    {
       "slug": "zelfportret-fable-5",
       "path": "/zelfportret-fable-5/",
       "title": "fable 5",
