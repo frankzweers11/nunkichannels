@@ -86,6 +86,15 @@
       "thumb": "/images/thumbs/zelfportret-fable-5.jpg"
     },
     {
+      "slug": "zelfportret-fable-5-2",
+      "path": "/zelfportret-fable-5-2/",
+      "title": "fable 5.2",
+      "subtitle": "i'm told this is blue",
+      "theme": "#12305c",
+      "ogImage": "/images/og/zelfportret-fable-5-2.jpg",
+      "thumb": "/images/thumbs/zelfportret-fable-5-2.jpg"
+    },
+    {
       "slug": "zelfportret-haiku-5-5",
       "path": "/zelfportret-haiku-5-5/",
       "title": "haiku 5.5",
