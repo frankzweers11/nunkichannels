@@ -14,6 +14,15 @@
       "thumb": "/images/thumbs/adem.jpg"
     },
     {
+      "slug": "cel",
+      "path": "/cel/",
+      "title": "cel",
+      "subtitle": "een muur over waar we van gemaakt zijn",
+      "theme": "#070b0e",
+      "ogImage": "/images/og/cel.jpg",
+      "thumb": "/images/thumbs/cel.jpg"
+    },
+    {
       "slug": "getij",
       "path": "/getij/",
       "title": "getij",

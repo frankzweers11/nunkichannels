@@ -1,0 +1,1102 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- nunki:social -->
+<meta name="description" content="een muur over waar we van gemaakt zijn">
+<link rel="canonical" href="https://nunkichannels.nl/cel/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:site_name" content="nunkichannels">
+<meta property="og:title" content="cel">
+<meta property="og:description" content="een muur over waar we van gemaakt zijn">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nunkichannels.nl/cel/">
+<meta property="og:image" content="https://nunkichannels.nl/images/og/cel.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="cel — een muur over waar we van gemaakt zijn">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="cel">
+<meta name="twitter:description" content="een muur over waar we van gemaakt zijn">
+<meta name="twitter:image" content="https://nunkichannels.nl/images/og/cel.jpg">
+<meta name="twitter:image:alt" content="cel — een muur over waar we van gemaakt zijn">
+<!-- /nunki:social -->
+<title>cel · een muur over waar we van gemaakt zijn</title>
+<style>
+  html,body{margin:0;padding:0;background:#070b0e}
+  html{scrollbar-width:none}
+  ::-webkit-scrollbar{display:none;width:0;height:0}
+  body{overflow-x:hidden}
+  #wall{position:relative;width:100vw;overflow:hidden;z-index:0}
+  #wall section{position:absolute;left:0;width:100%;overflow:hidden}
+  #wall canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+  #wall canvas.lv{pointer-events:none}
+  #wall input{position:absolute;z-index:3;left:50%;transform:translate(-50%,-50%);box-sizing:border-box;padding:.15em .4em;border:0;border-bottom:1.5px dashed rgba(236,232,216,.6);
+    border-radius:0;background:transparent;color:#f4e9b0;text-align:center;outline:none;-webkit-appearance:none;appearance:none;
+    font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;text-transform:lowercase}
+  #wall input::placeholder{color:rgba(236,232,216,.5)}
+  #wall input:focus{border-bottom-color:#f4e9b0}
+  #snd{position:fixed;z-index:61;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);height:34px;padding:0 14px;border:0;border-radius:17px;cursor:pointer;
+    background:rgba(14,20,24,.66);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#d9e6e4;box-shadow:0 0 0 1px rgba(220,240,240,.12);
+    font:400 1.02rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;-webkit-tap-highlight-color:transparent}
+  #snd.off{color:rgba(217,230,228,.5);text-decoration:line-through}
+  #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
+</style>
+</head>
+<body>
+<!-- nunki:mark -->
+<style>
+.nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
+  height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:padding .4s ease,background-color .3s ease,box-shadow .3s ease}
+.nunki-mark svg{display:block;width:24px;height:24px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-mark .nm-name{display:block;overflow:hidden;max-width:12em;margin-left:7px;white-space:nowrap;
+  font:400 1.06rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px);transition:max-width .45s ease,margin .45s ease,opacity .3s ease}
+.nunki-mark.nm-min{padding:0 5px}
+.nunki-mark.nm-min .nm-name{max-width:0;margin-left:0;opacity:0}
+.nunki-mark:hover,.nunki-mark:focus-visible{padding:0 14px 0 6px;background:rgba(251,248,239,.97);outline:none}
+.nunki-mark:hover .nm-name,.nunki-mark:focus-visible .nm-name{max-width:12em;margin-left:7px;opacity:1}
+.nunki-mark:hover svg,.nunki-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-mark:focus-visible{box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+@media (max-width:600px){.nunki-mark,.nunki-mark:hover{padding:0 5px}.nunki-mark .nm-name{display:none}}
+@media (prefers-reduced-motion:reduce){.nunki-mark,.nunki-mark svg,.nunki-mark .nm-name{transition:none}}
+@media print{.nunki-mark{display:none}}
+</style>
+<a class="nunki-mark" href="/" title="alle wanden" aria-label="cel, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">cel</span></a>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
+<!-- /nunki:mark -->
+<div id="wall"></div>
+<button id="snd" type="button" aria-label="geluid aan of uit">geluid</button>
+<script>
+// ---------------------------------------------------------------------------
+// cel — een muur over waar we van gemaakt zijn.
+// veertien zwarte tafels, getekend zoals haeckel zijn stralendiertjes tekende,
+// met de kleuren van een fluorescentiemicroscoop. elke tafel heeft één ding
+// dat je zelf doet: pompen, lopen, malen, trekken, typen, stil zijn, delen.
+// geluid pas na een tik. ?fast tekent één stilstaand beeld (voor de build),
+// ?still hetzelfde bij elke scroll, ?hud toont de frametijd.
+// ---------------------------------------------------------------------------
+const TAU=Math.PI*2, qs=new URLSearchParams(location.search);
+const FAST=qs.has('fast'), STILL=FAST||qs.has('still'), HUD=qs.has('hud'), PROF=qs.has('prof');
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const LW=1600;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t, sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const hs=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s)};
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+function hsl(h,s,l){const f=n=>{const k=(n+h/30)%12,a=s*Math.min(l,1-l);return Math.round(255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))))};return[f(0),f(8),f(4)]}
+const nl=n=>Math.round(n).toLocaleString('nl-NL');
+// krijt, en de kleuren waarmee een cel onder de lamp oplicht
+const CH=[236,232,216], DIM=[150,162,170], CY=[96,220,236], GR=[124,236,146], MG=[240,96,172], OR=[255,164,76], YE=[250,226,116],
+      VI=[164,134,255], BL=[84,142,255], RD=[255,96,84], ICE=[204,234,255], GOLD=[214,178,108], BG=[7,11,14];
+const FF='"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif';
+
+// ---------------- tekenen ----------------
+function tx(c,s,x,y,sz,col,a,al,mw){
+  c.fillStyle=rgba(col||CH,a==null?.9:a);c.textAlign=al||'center';c.textBaseline='alphabetic';
+  const L=String(s).split('\n');let f=sz;c.font=f+'px '+FF;
+  if(mw==null)mw=(!al||al==='center')?850:0;
+  if(mw){let w=0;for(const l of L)w=Math.max(w,c.measureText(l).width);if(w>mw){f=sz*mw/w;c.font=f+'px '+FF}}
+  for(let i=0;i<L.length;i++)c.fillText(L[i],x,y+i*sz*1.36);
+}
+function wl(c,pts,col,a,w,j,seed){
+  c.strokeStyle=rgba(col,a);c.lineWidth=w||2;c.lineCap='round';c.lineJoin='round';c.beginPath();
+  for(let i=0;i<pts.length;i++){const jx=j?(hs((seed||1)+i*3.1)-.5)*j:0,jy=j?(hs((seed||1)+i*7.7)-.5)*j:0;
+    i?c.lineTo(pts[i][0]+jx,pts[i][1]+jy):c.moveTo(pts[i][0]+jx,pts[i][1]+jy)}
+  c.stroke();
+}
+function ring(c,x,y,r,col,a,w,seed,wob,ry){
+  const n=Math.max(16,Math.min(72,(r*.7)|0));if(wob==null)wob=r*.035;seed=seed||1;
+  c.strokeStyle=rgba(col,a);c.lineWidth=w||2;c.lineCap='round';c.lineJoin='round';c.beginPath();
+  for(let i=0;i<=n+1;i++){const th=i/n*TAU,k=1+(Math.sin(th*3+seed)*.5+Math.sin(th*5+seed*2.3)*.3)*wob/r;
+    const px=x+Math.cos(th)*r*k,py=y+Math.sin(th)*(ry||r)*k;i?c.lineTo(px,py):c.moveTo(px,py)}
+  c.stroke();
+}
+function disc(c,x,y,r,col,a){c.fillStyle=rgba(col,a);c.beginPath();c.arc(x,y,r,0,TAU);c.fill()}
+const SPR={};
+function spr(col){const k=col.join();let s=SPR[k];
+  if(!s){s=SPR[k]=document.createElement('canvas');s.width=s.height=64;const g=s.getContext('2d'),gr=g.createRadialGradient(32,32,0,32,32,32);
+    gr.addColorStop(0,rgba(col,1));gr.addColorStop(.25,rgba(col,.55));gr.addColorStop(.6,rgba(col,.13));gr.addColorStop(1,rgba(col,0));g.fillStyle=gr;g.fillRect(0,0,64,64)}
+  return s}
+function gl(c,x,y,r,col,a){if(a<=0)return;c.globalAlpha=a>1?1:a;c.drawImage(spr(col),x-r,y-r,r*2,r*2);c.globalAlpha=1}
+function pill(c,x,y,label,col,a){a=a==null?1:a;c.font='26px '+FF;const w=c.measureText(label).width+46;
+  c.strokeStyle=rgba(col||CH,a*.55);c.lineWidth=1.6;c.beginPath();
+  if(c.roundRect)c.roundRect(x-w/2,y-25,w,50,25);else c.rect(x-w/2,y-25,w,50);c.stroke();
+  tx(c,label,x,y+9,26,col||CH,a*.92);return w}
+// een stralendiertje, voor de marges
+function rad(c,x,y,r,R,col){const n=6+((R()*9)|0),a=.3;ring(c,x,y,r,col,a,1.5,R()*9);ring(c,x,y,r*.55,col,a*.8,1.2,R()*9);
+  for(let i=0;i<n;i++){const th=i/n*TAU+R()*.1,l=r*(1.25+R()*.6);wl(c,[[x+Math.cos(th)*r*.55,y+Math.sin(th)*r*.55],[x+Math.cos(th)*l,y+Math.sin(th)*l]],col,a,1.2)}
+  for(let i=0;i<n*2;i++){const th=i/(n*2)*TAU;disc(c,x+Math.cos(th)*r*.78,y+Math.sin(th)*r*.78,r*.06,col,a)}}
+function ground(c,s,R){
+  c.fillStyle=rgba(BG,1);c.fillRect(0,0,LW,s.h);
+  if(s.tint){const g=c.createRadialGradient(800,s.h*.48,60,800,s.h*.48,780);g.addColorStop(0,rgba(s.tint,.17));g.addColorStop(1,rgba(s.tint,0));c.fillStyle=g;c.fillRect(0,0,LW,s.h)}
+  for(let i=0;i<460;i++){const x=R()*LW,y=R()*s.h,a=.04+R()*R()*.3,z=1+R()*1.7;c.fillStyle=rgba(CH,a);c.fillRect(x,y,z,z)}
+  c.strokeStyle=rgba(CH,.11);c.lineWidth=1.5;c.strokeRect(64,30,LW-128,s.h-60);
+  c.strokeStyle=rgba(CH,.05);c.strokeRect(74,40,LW-148,s.h-80);
+  if(s.i){for(let i=0;i<(s.norad?0:4);i++){const left=i%2,x=left?130+R()*150:1320+R()*150,y=140+R()*(s.h-280);rad(c,x,y,16+R()*30,R,[CY,GR,MG,OR,VI,YE][(R()*6)|0])}
+    tx(c,'tafel '+s.i,800,74,21,DIM,.7)}
+}
+function head(c,title,sub){tx(c,title,800,158,66,CH,.95);if(sub)tx(c,sub,800,210,28,CH,.72)}
+
+// ---------------- geluid: pas na een tik ----------------
+let AC=null,MAS=null,NB=null,MUTE=false;try{MUTE=localStorage.getItem('nunki:cel:snd')==='0'}catch(e){}
+function au(){
+  if(MUTE||STILL)return;
+  if(!AC){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;AC=new A();
+    const cp=AC.createDynamicsCompressor();MAS=AC.createGain();MAS.gain.value=.5;MAS.connect(cp);cp.connect(AC.destination);
+    NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    // de bodem: het ruisen van warm water, en een lage toon die ademt
+    const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;s.loop=true;f.type='lowpass';f.frequency.value=170;g.gain.value=.13;s.connect(f);f.connect(g);g.connect(MAS);s.start();
+    const o=AC.createOscillator(),og=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();o.frequency.value=55;og.gain.value=.03;l.frequency.value=.07;lg.gain.value=.02;l.connect(lg);lg.connect(og.gain);o.connect(og);og.connect(MAS);o.start();l.start()}
+  if(AC.state==='suspended')AC.resume();
+}
+function tone(f,d,v,type,at){if(!AC||MUTE)return;const n=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;
+  g.gain.setValueAtTime(.0001,n);g.gain.linearRampToValueAtTime(v,n+(at||.008));g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(MAS);o.start(n);o.stop(n+d+.05)}
+function nz(d,v,f,q,type){if(!AC||MUTE)return;const n=AC.currentTime,s=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;s.loop=true;
+  fl.type=type||'bandpass';fl.frequency.value=f;fl.Q.value=q||1;g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.0001,n+d);s.connect(fl);fl.connect(g);g.connect(MAS);s.start(n,Math.random());s.stop(n+d+.05)}
+const DR={};
+function drone(k,f,v,type){if(!AC||MUTE)return;let d=DR[k];
+  if(!d){if(v<=0)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.value=0;o.connect(g);g.connect(MAS);o.start();d=DR[k]={o,g}}
+  const n=AC.currentTime;d.o.frequency.setTargetAtTime(f,n,.05);d.g.gain.setTargetAtTime(v,n,.09)}
+const PENT=[0,2,4,7,9], note=i=>220*Math.pow(2,(PENT[((i%5)+5)%5]+12*Math.floor(i/5))/12);
+const sndB=document.getElementById('snd');
+function sndLabel(){sndB.classList.toggle('off',MUTE);sndB.textContent='geluid'}
+sndB.addEventListener('click',()=>{MUTE=!MUTE;try{localStorage.setItem('nunki:cel:snd',MUTE?'0':'1')}catch(e){}
+  if(MUTE){if(MAS)MAS.gain.setTargetAtTime(0,AC.currentTime,.05)}else{au();if(MAS)MAS.gain.setTargetAtTime(.5,AC.currentTime,.05)}sndLabel()});
+sndLabel();if(FAST)sndB.style.display='none';
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else if(!MUTE)AC.resume()});
+
+// ---------------- de wand ----------------
+// elke tafel is 1600 breed getekend; wat ertoe doet staat in de kolom 350..1250,
+// zodat een telefoon alleen die kolom laat zien.
+const wall=document.getElementById('wall'), SHEETS=[];
+let U=1,OX=0,VW=0,VH=0,VU=LW,T=0,LT=0;
+function sheet(o){o.i=SHEETS.length;SHEETS.push(o);return o}
+const P={cx:-1,cy:-1,x:0,y:0,gy:0,ly:0,lx:0,s:null,act:false,down:false,touch:false,tend:0,sp:0,idle:0};
+const FILM={on:false,i:0,t:0,a:0,half:false};
+function locate(){
+  if(P.cx<0){P.s=null;return}
+  const yy=(P.cy+scrollY)/U;let s=null;for(const q of SHEETS)if(yy>=q.y0&&yy<q.y0+q.h){s=q;break}
+  P.s=s;P.x=P.cx/U+OX;P.gy=yy;P.y=s?yy-s.y0:0;
+}
+function layout(){
+  VW=document.documentElement.clientWidth||innerWidth;VH=innerHeight;const ph=VW<760;VU=ph?900:LW;OX=ph?350:0;U=VW/VU;
+  let y=0;for(const s of SHEETS){release(s);s.y0=y;y+=s.h;
+    if(!s.el){s.el=document.createElement('section');wall.appendChild(s.el);s.init&&s.init(s.el)}
+    s.el.style.top=(s.y0*U)+'px';s.el.style.height=(s.h*U)+'px';s.size&&s.size()}
+  wall.style.height=(y*U)+'px';
+}
+function alloc(s){
+  const dpr=Math.min(devicePixelRatio||1,3);
+  const mk=(cap,cls)=>{const cv=document.createElement('canvas'),w=Math.min(Math.round(VW*dpr),cap);cv.width=w;cv.height=Math.round(w*s.h/VU);cv.className=cls;s.el.appendChild(cv);
+    const c=cv.getContext('2d');c.k=w/VU;return c};
+  s.sc=mk(2600,'st');s.lc=mk(2000,'lv');
+  const c=s.sc;c.setTransform(c.k,0,0,c.k,-OX*c.k,0);ground(c,s,mul32(s.i*31+7));s.stat&&s.stat(c,mul32(s.i*57+3));
+}
+function release(s){for(const c of[s.sc,s.lc])if(c){c.canvas.width=c.canvas.height=0;c.canvas.remove()}s.sc=s.lc=null}
+let fN=0,fMs=0,fT=0;const hud=HUD?document.body.appendChild(Object.assign(document.createElement('div'),{id:'hud'})):null;
+function frame(now){
+  const t=now/1000;let dt=Math.min(.05,t-LT);if(!(dt>0))dt=.016;LT=t;T=t;
+  const sy=scrollY,b0=performance.now();
+  locate();
+  {const d=Math.hypot(P.x-P.lx,P.gy-P.ly);P.sp=lerp(P.sp,d/dt,.25);P.lx=P.x;P.ly=P.gy;P.idle=d<.5?P.idle+dt:0}
+  if(P.touch&&!P.down&&now-P.tend>4000)P.act=false;
+  if(FILM.on)film(dt);
+  for(const s of SHEETS){
+    const top=s.y0*U-sy,bot=top+s.h*U,near=bot>-VH*1.2&&top<VH*2.2,vis=bot>-10&&top<VH+10;
+    if(near&&!s.sc)alloc(s);else if(!near&&s.sc&&(bot<-VH*2.6||top>VH*3.6))release(s);
+    if(vis&&s.lc){const c=s.lc;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,c.canvas.width,c.canvas.height);c.setTransform(c.k,0,0,c.k,-OX*c.k,0);
+      s.pin=P.s===s&&P.act&&!FILM.on;
+      try{s.live&&s.live(c,t,dt)}catch(e){if(!s.err){s.err=1;console.error(s.name,e)}}
+      if(PROF)c.getImageData(0,0,1,1);
+      s.was=true}
+    else if(s.was){s.was=false;s.quiet&&s.quiet()}
+  }
+  if(hud){fMs+=performance.now()-b0;fN++;if(t-fT>.5){hud.textContent=(fN/(t-fT)).toFixed(0)+' fps\n'+(fMs/fN).toFixed(1)+' ms';fN=0;fMs=0;fT=t}}
+  if(!STILL)requestAnimationFrame(frame);
+}
+// de film: de wand loopt zelf langs, en doet op elke tafel voor wat jij er kunt doen
+function film(dt){
+  const s=SHEETS[FILM.i];FILM.t+=dt;FILM.a+=dt;
+  const dwell=FILM.i?17:7,maxY=Math.max(0,(s.y0+s.h)*U-VH);
+  if(!FILM.half&&FILM.t>dwell*.5){FILM.half=true;scrollTo({top:Math.min(maxY,s.y0*U+s.h*U*.5),behavior:'smooth'})}
+  if(FILM.a>2.4){FILM.a=0;s.act&&s.act()}
+  if(FILM.t>dwell){FILM.i++;FILM.t=0;FILM.half=false;if(FILM.i>=SHEETS.length){FILM.on=false;return}scrollTo({top:SHEETS[FILM.i].y0*U,behavior:'smooth'})}
+}
+function filmStart(){au();FILM.on=true;FILM.i=0;FILM.t=5;FILM.a=0;FILM.half=true}
+function filmStop(){FILM.was=FILM.on;FILM.on=false}
+
+// ---------------- hand en vinger ----------------
+addEventListener('mousemove',e=>{P.cx=e.clientX;P.cy=e.clientY;P.act=true;P.touch=false},{passive:true});
+document.addEventListener('mouseleave',()=>{P.act=false;P.down=false});
+addEventListener('mousedown',e=>{if(e.button||e.target.closest('a,button,input,nav'))return;filmStop();P.down=true;locate();P.s&&P.s.down&&P.s.down(P.x,P.y)});
+addEventListener('mouseup',()=>{P.down=false});
+addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('a,button,input,nav'))return;const t=e.touches[0];filmStop();P.cx=t.clientX;P.cy=t.clientY;P.act=true;P.touch=true;P.down=true;locate();P.s&&P.s.down&&P.s.down(P.x,P.y)},{passive:true});
+addEventListener('touchmove',e=>{const t=e.touches[0];P.cx=t.clientX;P.cy=t.clientY},{passive:true});
+const tEnd=()=>{P.down=false;P.tend=performance.now();au()};
+addEventListener('touchend',tEnd,{passive:true});addEventListener('touchcancel',tEnd,{passive:true});
+addEventListener('wheel',filmStop,{passive:true});
+addEventListener('keydown',e=>{au();if(!e.target.closest('input'))filmStop()});
+addEventListener('click',e=>{if(e.target.closest('a,button,input,nav'))return;au();P.cx=e.clientX;P.cy=e.clientY;locate();P.s&&P.s.tap&&P.s.tap(P.x,P.y)});
+addEventListener('scroll',()=>{if(STILL)frame(performance.now())},{passive:true});
+let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(Math.abs((document.documentElement.clientWidth||innerWidth)-VW)>1||STILL){layout();if(STILL)frame(performance.now())}else VH=innerHeight},150)});
+
+// de cel zoals ze onder de lamp oplicht: vlies, kern, buisjes, blaasjes, centrales
+function cellGlow(c,X,Y,r,t){
+  gl(c,X,Y,r*1.3,[40,120,150],.55);
+  c.strokeStyle=rgba(CY,.9);c.lineWidth=2.4;c.lineJoin='round';c.beginPath();
+  for(let i=0;i<=60;i++){const th=i/60*TAU,k=1+.035*Math.sin(th*3+t*.7)+.025*Math.sin(th*5-t*.9),x=X+Math.cos(th)*r*k,y=Y+Math.sin(th)*r*k*.94;i?c.lineTo(x,y):c.moveTo(x,y)}
+  c.stroke();
+  const cx=X+r*.14,cy=Y+r*.12,nx=X-r*.28,ny=Y-r*.12,nr=r*.34;
+  for(let i=0;i<16;i++){const th=i/16*TAU+.15*Math.sin(t*.3+i),l=r*(.74+.12*hs(i)),ex=cx+Math.cos(th)*l,ey=cy+Math.sin(th)*l*.92;
+    c.strokeStyle=rgba(GR,.3);c.lineWidth=1.3;c.beginPath();c.moveTo(cx,cy);c.lineTo(ex,ey);c.stroke();
+    const u=(t*(.07+.07*hs(i+9))+hs(i+3))%1,v=i%2?u:1-u;gl(c,lerp(cx,ex,v),lerp(cy,ey,v),r*.055,YE,.95)}
+  gl(c,nx,ny,nr*1.5,BL,.6);ring(c,nx,ny,nr,VI,.9,2,4,2);
+  for(let i=0;i<5;i++){c.strokeStyle=rgba(CY,.5);c.lineWidth=1.6;c.beginPath();const a=i*1.3+t*.1;c.arc(nx+Math.cos(a)*nr*.3,ny+Math.sin(a*1.3)*nr*.3,nr*.3,a,a+2.2);c.stroke()}
+  disc(c,nx+nr*.2,ny+nr*.15,nr*.16,MG,.7);
+  for(let i=0;i<3;i++){c.strokeStyle=rgba(MG,.42);c.lineWidth=1.5;c.beginPath();const rr=nr*(1.25+i*.2);
+    for(let j=0;j<=24;j++){const th=-1.1+j/24*2.6,k=rr+Math.sin(j*1.6+t+i)*r*.02,x=nx+Math.cos(th)*k,y=ny+Math.sin(th)*k;j?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}
+  for(let i=0;i<10;i++){const a=hs(i+20)*TAU+Math.sin(t*.2+i)*.3,d=r*(.45+.36*hs(i+30)),x=X+Math.cos(a)*d+r*.08,y=Y+Math.sin(a)*d*.9,ro=a+1.2+Math.sin(t*.5+i*2)*.5,l=r*.11;
+    if(Math.hypot(x-nx,y-ny)<nr*1.55)continue;
+    gl(c,x,y,l*2,OR,.5);c.save();c.translate(x,y);c.rotate(ro);c.strokeStyle=rgba(OR,.95);c.lineWidth=1.6;c.beginPath();c.ellipse(0,0,l,l*.45,0,0,TAU);c.stroke();
+    c.beginPath();for(let j=-3;j<=3;j++)c.lineTo(j*l*.25,(j%2?1:-1)*l*.22);c.strokeStyle=rgba(YE,.6);c.lineWidth=1;c.stroke();c.restore()}
+  for(let i=0;i<70;i++){const a=hs(i+50)*TAU,d=r*.9*Math.sqrt(hs(i+60));c.fillStyle=rgba(CH,.25+.4*hs(i+70+Math.floor(t*6)));
+    c.fillRect(X+Math.cos(a)*d+Math.sin(t*3+i)*1.5,Y+Math.sin(a)*d*.92+Math.cos(t*2.6+i)*1.5,2,2)}
+}
+
+// ======================= tafel 0: het plasje ================================
+(()=>{
+const PAP=[233,223,200],INK=[58,44,34],BR=[150,112,58],LR=178;
+let lx=850,ly=612,mask=null,first=true;
+const S=sheet({name:'titel',h:1300,
+  stat(c,R){
+    const pts=[];for(let x=250;x<=1350;x+=24)pts.push([x,44+R()*9]);for(let y=70;y<=1130;y+=24)pts.push([1346+R()*8,y]);
+    for(let x=1350;x>=250;x-=24)pts.push([x,1138+R()*10]);for(let y=1130;y>=70;y-=24)pts.push([246+R()*8,y]);
+    c.save();c.shadowColor='rgba(0,0,0,.7)';c.shadowBlur=34*c.k;c.shadowOffsetY=12*c.k;c.fillStyle=rgba(PAP,1);c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill();c.restore();
+    for(let i=0;i<5;i++){const x=300+R()*1000,y=100+R()*1000,r=120+R()*220,g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba(150,110,60,.09)');g.addColorStop(1,'rgba(150,110,60,0)');c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2)}
+    for(let i=0;i<2600;i++){c.fillStyle=rgba(INK,.03+R()*.06);c.fillRect(256+R()*1088,56+R()*1076,1+R()*2,1)}
+    tx(c,'cel',800,262,210,INK,.92);
+    tx(c,'een muur over waar we van gemaakt zijn',800,330,34,INK,.82);
+    const X=800,Y=660,Rr=250;
+    c.save();c.beginPath();c.arc(X,Y,Rr,0,TAU);c.clip();c.fillStyle='rgb(216,202,170)';c.fillRect(X-Rr,Y-Rr,Rr*2,Rr*2);
+    const mud=[[150,120,70],[120,95,60],[176,150,100],[96,84,60]];
+    for(let i=0;i<110;i++){const a=R()*TAU,d=Math.sqrt(R())*Rr,r=18+R()*70;c.fillStyle=rgba(mud[(R()*4)|0],.05+R()*.11);c.beginPath();c.ellipse(X+Math.cos(a)*d,Y+Math.sin(a)*d,r,r*(.5+R()*.5),R()*3,0,TAU);c.fill()}
+    for(let i=0;i<260;i++){const a=R()*TAU,d=Math.sqrt(R())*Rr;c.fillStyle=rgba(INK,.1+R()*.2);c.fillRect(X+Math.cos(a)*d,Y+Math.sin(a)*d,1.5+R()*2,1.5+R()*2)}
+    c.restore();
+    ring(c,X+10,Y+5,150,INK,.5,2.2,3,9);ring(c,X-32,Y-13,50,INK,.28,1.6,5,5);
+    for(let i=0;i<26;i++){const a=R()*TAU,d=R()*130;disc(c,X+10+Math.cos(a)*d,Y+5+Math.sin(a)*d,1.5+R()*2.5,INK,.3)}
+    ring(c,X,Y,Rr,INK,.85,3,1,3);ring(c,X,Y,Rr+8,INK,.4,1.4,2,4);
+    tx(c,'wat de lens liet zien, omstreeks 1860',X,Y+Rr+44,22,INK,.6);
+    tx(c,'darwin dacht dat het leven begon in een warm poeltje.\nzijn tijdgenoot haeckel zag in de cel niet meer dan een klompje slijm.',800,1012,27,INK,.84);
+    tx(c,'(ga met je lens over de modder)',800,1104,23,INK,.55);
+    tx(c,'scrol naar beneden: elke tafel kijkt een slag dieper',800,1262,23,CH,.5);
+  },
+  live(c,t,dt){
+    if(!mask){mask=document.createElement('canvas');mask.width=mask.height=256;const g=mask.getContext('2d'),gr=g.createRadialGradient(128,128,0,128,128,128);
+      gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(.91,'rgba(0,0,0,1)');gr.addColorStop(.955,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,256,256)}
+    let gx=800+Math.cos(t*.31)*95,gy=650+Math.sin(t*.43)*70;if(S.pin){gx=P.x;gy=P.y}if(STILL){gx=852;gy=620}
+    const k=first||STILL?1:1-Math.exp(-dt*10);first=false;lx=lerp(lx,gx,k);ly=lerp(ly,gy,k);
+    // het masker ligt op hele beeldpunten, anders blijft er een haarlijn van het vierkant staan
+    const ax=Math.floor((lx-LR-6-OX)*c.k)/c.k+OX,ay=Math.floor((ly-LR-6)*c.k)/c.k,as=Math.ceil((LR*2+12)*c.k)/c.k;
+    c.save();c.beginPath();c.rect(ax,ay,as,as);c.clip();
+    c.fillStyle='#04070a';c.beginPath();c.arc(lx,ly,LR-1,0,TAU);c.fill();
+    const x0=Math.floor((lx-LR)/44),y0=Math.floor((ly-LR)/44);
+    for(let i=x0;i<=x0+9;i++)for(let j=y0;j<=y0+9;j++){const h=hs(i*37.7+j*91.3);if(h<.45)continue;
+      gl(c,i*44+hs(i+j*3.3)*44+Math.sin(t*.4+h*9)*6,j*44+hs(i*2.1+j)*44+Math.cos(t*.3+h*7)*6,3+h*5,[CY,GR,MG,CH][(h*40)&3],.25+.5*hs(i*5+j*7))}
+    if(Math.abs(lx-810)<LR+200&&Math.abs(ly-665)<LR+200)cellGlow(c,810,665,152,t);
+    c.globalCompositeOperation='destination-in';c.drawImage(mask,ax,ay,as,as);c.globalCompositeOperation='source-over';c.restore();
+    // de lens zelf: messing, met een steel
+    const ha=.82;c.strokeStyle=rgba([92,66,36],.95);c.lineWidth=17;c.lineCap='round';c.beginPath();c.moveTo(lx+Math.cos(ha)*(LR+4),ly+Math.sin(ha)*(LR+4));c.lineTo(lx+Math.cos(ha)*(LR+150),ly+Math.sin(ha)*(LR+150));c.stroke();
+    c.strokeStyle=rgba(BR,1);c.lineWidth=8;c.beginPath();c.arc(lx,ly,LR-3,0,TAU);c.stroke();
+    c.strokeStyle='rgba(240,214,150,.7)';c.lineWidth=2;c.beginPath();c.arc(lx,ly,LR-1,3.5,5.2);c.stroke();
+    c.strokeStyle='rgba(255,255,255,.16)';c.lineWidth=5;c.beginPath();c.arc(lx,ly,LR-26,3.7,4.6);c.stroke();
+    if(!FAST)pill(c,800,1196,FILM.on?'stop de film':'of kijk het als film',CH,.8);
+  },
+  tap(x,y){if(Math.abs(x-800)<190&&Math.abs(y-1196)<32){if(!FILM.was)filmStart();FILM.was=false}}
+});
+})();
+
+// ======================= tafel 1: hoe klein =================================
+(()=>{
+const D=[
+ (c)=>{c.beginPath();c.arc(0,-62,20,0,TAU);c.moveTo(0,-42);c.lineTo(0,30);c.moveTo(-42,-18);c.lineTo(42,-18);c.moveTo(0,30);c.lineTo(-28,92);c.moveTo(0,30);c.lineTo(28,92);c.stroke()},
+ (c)=>{c.beginPath();[[-60,-20],[-20,-62],[44,-48],[70,4],[38,56],[-30,60],[-66,22]].forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.stroke();c.beginPath();c.moveTo(-20,-62);c.lineTo(6,-8);c.lineTo(70,4);c.moveTo(6,-8);c.lineTo(-30,60);c.stroke()},
+ (c)=>{c.beginPath();c.arc(0,0,62,0,TAU);c.moveTo(74,0);c.arc(0,0,74,0,TAU);c.moveTo(-2,-8);c.arc(-14,-8,12,0,TAU);c.stroke();for(let i=0;i<22;i++){const a=i/22*TAU;c.beginPath();c.arc(Math.cos(a)*90,Math.sin(a)*90,5,0,TAU);c.stroke()}},
+ (c)=>{c.beginPath();for(let i=0;i<=6;i++){const a=i/6*TAU+.2;i?c.lineTo(Math.cos(a)*74,Math.sin(a)*60):c.moveTo(Math.cos(a)*74,Math.sin(a)*60)}c.stroke();c.beginPath();c.arc(6,2,17,0,TAU);c.stroke()},
+ (c)=>{c.beginPath();c.ellipse(0,0,78,44,-.2,0,TAU);c.stroke();c.beginPath();c.ellipse(0,0,36,17,-.2,0,TAU);c.stroke()},
+ (c)=>{c.beginPath();c.ellipse(0,0,84,38,.15,0,TAU);c.stroke();c.beginPath();for(let j=-5;j<=5;j++)c.lineTo(j*13,(j%2?1:-1)*20+j*2);c.stroke()},
+ (c)=>{c.beginPath();c.arc(0,0,46,0,TAU);c.stroke();for(let i=0;i<14;i++){const a=i/14*TAU;c.beginPath();c.moveTo(Math.cos(a)*46,Math.sin(a)*46);c.lineTo(Math.cos(a)*68,Math.sin(a)*68);c.stroke();c.beginPath();c.arc(Math.cos(a)*74,Math.sin(a)*74,6,0,TAU);c.stroke()}},
+ (c)=>{c.beginPath();c.ellipse(0,-22,62,46,0,0,TAU);c.stroke();c.beginPath();c.ellipse(4,40,48,24,0,0,TAU);c.stroke();c.beginPath();c.moveTo(-90,14);c.lineTo(90,14);c.stroke()},
+ (c)=>{c.beginPath();for(let i=0;i<=90;i++){const a=i*.33,r=18+34*Math.abs(Math.sin(i*.21))+i*.25,x=Math.cos(a)*r*1.1,y=Math.sin(a*1.3)*r;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()},
+ (c)=>{for(const s of[1,-1]){c.beginPath();for(let i=0;i<=40;i++){const y=-90+i*4.5,x=Math.sin(i*.42)*30*s;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}c.beginPath();for(let i=1;i<40;i+=2){const y=-90+i*4.5,x=Math.sin(i*.42)*30;c.moveTo(-x,y);c.lineTo(x,y)}c.stroke()},
+ (c)=>{c.beginPath();c.arc(0,10,44,0,TAU);c.moveTo(-28,-40);c.arc(-50,-40,22,0,TAU);c.moveTo(72,-40);c.arc(50,-40,22,0,TAU);c.stroke()}
+];
+const IT=[
+ ['jij','1,7 meter','850.000 kilometer: ruim twee keer naar de maan',CH],
+ ['een zandkorrel','1 millimeter','500 kilometer',GOLD],
+ ['de eicel','0,1 millimeter','50 kilometer: de grootste cel die je hebt',YE],
+ ['een huidcel','0,03 millimeter','15 kilometer: de stad zelf',CY],
+ ['een rode bloedcel','0,007 millimeter','een wijk van 3,5 kilometer',RD],
+ ['een mitochondrion','0,001 millimeter','een energiecentrale van 500 meter',OR],
+ ['een virus','100 nanometer','een flat van 50 meter',MG],
+ ['een ribosoom','25 nanometer','een werkplaats van 12 meter',VI],
+ ['een eiwit','5 nanometer','2,5 meter: de inwoners',GR],
+ ['de draad DNA','2 nanometer dik','een kabel van 1 meter dik, een miljoen kilometer lang',BL],
+ ['een watermolecuul','0,3 nanometer','een appel',ICE]];
+const Y0=300,DY=66,LX=560;let sel=3,selT=-9,auto=0,usr=false;
+const S=sheet({name:'maat',h:1230,tint:[40,90,120],
+  stat(c,R){
+    head(c,'hoe klein','blaas één cel op tot een stad van vijftien kilometer');
+    wl(c,[[LX,Y0-24],[LX,Y0+DY*10+24]],CH,.5,2,2,3);
+    IT.forEach((it,i)=>{const y=Y0+i*DY;wl(c,[[LX-12,y],[LX+12,y]],CH,.7,2);tx(c,it[0],LX-26,y+8,25,CH,.7,'right');tx(c,it[1],LX-26,y+31,18,DIM,.75,'right')});
+    tx(c,'(wijs er een aan)',LX-26,Y0+DY*10+62,21,DIM,.7,'right');
+    tx(c,'hoe groot is een halve millimeter? zo:',800,1076,25,CH,.78);
+    tx(c,'de eicel waar je uit groeide past er vijf keer naast elkaar in.\nhet is de enige cel van je lijf die je met het blote oog kunt zien.',800,1146,25,CH,.78);
+  },
+  live(c,t,dt){
+    let n=sel;
+    if(S.pin&&P.x>330&&P.x<1270&&P.y>Y0-40&&P.y<Y0+DY*10+40){n=clamp(Math.round((P.y-Y0)/DY),0,10);usr=true}
+    else if(!usr||FILM.on){auto+=dt;n=Math.floor(auto/2.6)%11;if(STILL)n=3}
+    if(n!==sel){sel=n;selT=t;tone(note(n+2),.22,.05,'triangle')}
+    const it=IT[sel],y=Y0+sel*DY,a=sm((t-selT)/.45),col=it[3],PX=930,PY=560;
+    gl(c,LX,y,26,col,.9);disc(c,LX,y,5,col,1);
+    wl(c,[[LX+16,y],[PX-190,lerp(y,PY,.6)],[PX-150,PY]],col,.3,1.4);
+    for(let i=0;i<3;i++){const q=((t-selT)*.7+i/3)%1;c.strokeStyle=rgba(col,.22*(1-q));c.lineWidth=1.5;c.beginPath();c.arc(PX,PY,200*(1-q)+30,0,TAU);c.stroke()}
+    gl(c,PX,PY,210,col,.16);
+    c.save();c.translate(PX,PY);c.scale(.6+.75*a,.6+.75*a);c.strokeStyle=rgba(col,.95);c.lineWidth=2.6;c.lineCap='round';c.lineJoin='round';D[sel](c);c.restore();
+    tx(c,it[0],PX,PY+218,40,col,a,'center',560);
+    tx(c,'in het echt: '+it[1],PX,PY+262,26,CH,.85*a,'center',560);
+    tx(c,'in de stad: '+it[2],PX,PY+300,26,YE,.9*a,'center',600);
+    disc(c,800,1100,.945/U,CH,1);
+  },
+  act(){}
+});
+})();
+
+// ======================= tafel 2: het vlies =================================
+(()=>{
+const MY=600,ions=[],R0=mul32(77);let V=0,pumpT=-9,leakT=0,hot=false,holdT=0;
+for(let i=0;i<48;i++){const s=i<24?-1:1,k=(i%24)<14?0:1;ions.push({k,s,x:400+R0()*(s<0?800:600),y:s<0?290+R0()*220:690+R0()*210,vx:0,vy:0,m:0,q:null,ns:s})}
+function send(o,q,ns){o.m=1;o.q=q;o.ns=ns}
+function pump(){
+  const pick=(k,s,n)=>ions.filter(o=>o.k===k&&o.s===s&&!o.m).sort((a,b)=>Math.abs(a.x-800)-Math.abs(b.x-800)).slice(0,n);
+  const na=pick(0,1,3),ka=pick(1,-1,2);if(!na.length&&!ka.length)return;
+  na.forEach((o,i)=>send(o,[[778+i*22,676],[778+i*22,524],[690+i*110,440-i*20]],-1));
+  ka.forEach((o,i)=>send(o,[[786+i*28,524],[786+i*28,676],[730+i*120,770+i*20]],1));
+  pumpT=T;nz(.06,.25,1800,2);tone(92,.2,.2);setTimeout(()=>nz(.05,.16,2600,2),150);
+}
+function leak(gx){
+  const c=ions.filter(o=>!o.m&&((o.k===0&&o.s===-1)||(o.k===1&&o.s===1)));if(!c.length)return;
+  const o=c[(Math.random()*c.length)|0],x=gx||(o.k?1040:560);
+  send(o,[[x,o.s<0?540:660],[x,o.s<0?660:540],[x+(Math.random()-.5)*160,o.s<0?760:440]],-o.s);
+}
+const S=sheet({name:'vlies',h:1210,tint:[30,110,130],
+  stat(c,R){
+    head(c,'het vlies','twee lagen vet, vijf miljoenste millimeter dik');
+    tx(c,'buiten',372,300,26,DIM,.8,'left');tx(c,'binnen',372,910,26,DIM,.8,'left');
+    disc(c,1010,252,7,YE,.95);tx(c,'natrium',1026,260,22,CH,.7,'left');disc(c,1130,252,7,VI,.95);tx(c,'kalium',1146,260,22,CH,.7,'left');
+    tx(c,'lek',560,702,19,DIM,.7);tx(c,'lek',1040,702,19,DIM,.7);
+    tx(c,'elke slag van de pomp: drie natrium eruit, twee kalium erin, één ATP.\nzo laadt de cel zich op tot zeventig millivolt, en houdt dat haar leven lang vol.\nhet kost haar een kwart van al haar energie. (prik gerust een gat: het lekt, en sluit vanzelf.)',800,1040,26,CH,.82);
+    tx(c,'bruce lipton noemt dit vlies het brein van de cel: hier voelt ze wat er buiten is.',800,1166,22,DIM,.85);
+  },
+  live(c,t,dt){
+    // het vet: koppen en staarten, die deinen en opzij gaan voor je vinger
+    hot=S.pin&&Math.abs(P.y-MY)<64&&Math.abs(P.x-800)>70;
+    c.beginPath();const hx=[],hy=[];
+    for(let i=0;i<72;i++){let x=58+i*21;if(Math.abs(x-800)<50||Math.abs(x-560)<17||Math.abs(x-1040)<17)continue;
+      if(hot){const d=x-P.x;if(Math.abs(d)<64)x+=Math.sign(d||1)*(64-Math.abs(d))*.85}
+      x+=Math.sin(t*2.6+i*1.7)*2.4;const dy=Math.sin(t*1.9+i*.9)*2;
+      hx.push(x);hy.push(dy);c.moveTo(x-3,MY-36+dy);c.lineTo(x-4,MY-4);c.moveTo(x+3,MY-36+dy);c.lineTo(x+4,MY-4);c.moveTo(x-3,MY+36-dy);c.lineTo(x-4,MY+4);c.moveTo(x+3,MY+36-dy);c.lineTo(x+4,MY+4)}
+    c.strokeStyle=rgba(CH,.3);c.lineWidth=1.5;c.stroke();
+    c.beginPath();for(let i=0;i<hx.length;i++){c.moveTo(hx[i]+7,MY-43+hy[i]);c.arc(hx[i],MY-43+hy[i],7,0,TAU);c.moveTo(hx[i]+7,MY+43-hy[i]);c.arc(hx[i],MY+43-hy[i],7,0,TAU)}
+    c.fillStyle=rgba([150,200,205],.85);c.fill();
+    // de spanning als een dun licht langs het vlies
+    const ch=Math.min(1,-V/70);if(ch>.05){c.strokeStyle=rgba(CY,.5*ch);c.lineWidth=2;c.beginPath();for(let x=60;x<=1540;x+=20)c.lineTo(x,MY+(hs(x+Math.floor(t*14))-.5)*10*ch);c.stroke()}
+    // lekkanalen en de pomp
+    for(const x of[560,1040]){wl(c,[[x-13,MY-50],[x-11,MY+50]],CH,.6,3);wl(c,[[x+13,MY-50],[x+11,MY+50]],CH,.6,3)}
+    const pa=Math.max(0,1-(t-pumpT)/.5),sq=1-pa*.12;gl(c,800,MY,150,MG,.25+pa*.6);
+    c.strokeStyle=rgba(MG,.95);c.lineWidth=3;c.fillStyle=rgba([70,20,50],.9);
+    for(const sg of[-1,1]){c.beginPath();c.moveTo(800+sg*8*sq,MY-70);c.bezierCurveTo(800+sg*62,MY-80,800+sg*58*sq,MY-10,800+sg*(20+pa*14),MY);c.bezierCurveTo(800+sg*58*sq,MY+10,800+sg*62,MY+80,800+sg*8*sq,MY+70);c.closePath();c.fill();c.stroke()}
+    tx(c,'de pomp',878,MY+82,22,MG,.9,'left');
+    if(S.pin&&P.down&&Math.abs(P.x-800)<110&&Math.abs(P.y-MY)<130){holdT+=dt;if(holdT>.55){holdT=0;pump()}}else holdT=.2;
+    // lekken: langzaam vanzelf, snel door een gat
+    leakT+=dt*(hot?7:1);if(leakT>4.2){leakT=0;leak(hot?P.x:0)}
+    // de deeltjes
+    let ok=0;
+    for(const o of ions){
+      if(o.m){const q=o.q[0],dx=q[0]-o.x,dy=q[1]-o.y,d=Math.hypot(dx,dy),st=330*dt;if(d<=st){o.x=q[0];o.y=q[1];o.q.shift();if(!o.q.length){o.m=0;o.s=o.ns;o.vx=0;o.vy=0}}else{o.x+=dx/d*st;o.y+=dy/d*st}}
+      else{o.vx+=(Math.random()-.5)*900*dt;o.vy+=(Math.random()-.5)*900*dt;o.vx*=.94;o.vy*=.94;o.x+=o.vx*dt;o.y+=o.vy*dt;
+        const x1=o.s<0?1200:1000,y0=o.s<0?280:676,y1=o.s<0?524:920;
+        if(o.x<400){o.x=400;o.vx=Math.abs(o.vx)}if(o.x>x1){o.x=x1;o.vx=-Math.abs(o.vx)}if(o.y<y0){o.y=y0;o.vy=Math.abs(o.vy)}if(o.y>y1){o.y=y1;o.vy=-Math.abs(o.vy)}}
+      if((o.k===0&&o.s===-1)||(o.k===1&&o.s===1))ok++;
+      const col=o.k?VI:YE;gl(c,o.x,o.y,20,col,.55);disc(c,o.x,o.y,7,col,.95);
+    }
+    const tv=-90*clamp((ok/48-.5)*2,0,1),was=V;V=lerp(V,tv,1-Math.exp(-dt*3));
+    if(was>-60&&V<=-60){tone(330,.9,.07);tone(495,1.1,.05)}
+    // de meter
+    const mx=1125,my=830;c.strokeStyle=rgba(CH,.6);c.lineWidth=2;c.beginPath();c.arc(mx,my,78,Math.PI,TAU);c.stroke();
+    for(let i=0;i<=9;i++){const a=Math.PI+i/9*Math.PI;wl(c,[[mx+Math.cos(a)*78,my+Math.sin(a)*78],[mx+Math.cos(a)*68,my+Math.sin(a)*68]],CH,.5,1.5)}
+    const na=TAU-clamp(-V/90,0,1)*Math.PI;wl(c,[[mx,my],[mx+Math.cos(na)*70,my+Math.sin(na)*70]],YE,.95,3);disc(c,mx,my,5,YE,1);
+    tx(c,(V<-.5?'−':'')+Math.round(-V)+' millivolt',mx,my+40,26,YE,.95);
+    const m=sm((-V-52)/14);
+    if(m>.02)tx(c,'140.000 volt per centimeter over dit vlies. lucht slaat al door bij 30.000.',800,978,27,YE,m);
+    if(m<.98)tx(c,'(tik op de pomp, een paar keer achter elkaar)',800,978,23,DIM,.8*(1-m));
+  },
+  tap(x,y){if(Math.abs(x-800)<120&&Math.abs(y-MY)<140)pump()},
+  act(){pump()}
+});
+})();
+
+// ======================= tafel 3: spitsuur ==================================
+(()=>{
+const A=[300,830],B=[1300,470],LN=Math.hypot(B[0]-A[0],B[1]-A[1]),ux=(B[0]-A[0])/LN,uy=(B[1]-A[1])/LN,nx=uy,ny=-ux,ST=26;
+const at=(s,h)=>[A[0]+ux*s+nx*h,A[1]+uy*s+ny*h];
+let fa=40,fb=66,mv=0,ph=0,steps=0,deliv=0,gone=0,crowd=0,crowdT=0,sway=0,cc=0;
+const S=sheet({name:'spitsuur',h:1230,tint:[40,120,60],
+  stat(c,R){
+    head(c,'spitsuur','een eiwit met twee voeten draagt een blaasje over een buis');
+    for(const h of[-17,17])wl(c,[at(-240,h),at(LN+240,h)],GR,.45,1.6,2,h);
+    for(let s=-236;s<LN+236;s+=13){const k=((s/13)|0)&1;for(const h of[-8,8]){const p=at(s+(h>0?6:0),h);ring(c,p[0],p[1],6,GR,k?.5:.25,1.3,s,1)}}
+    const a=at(-10,-46),b=at(LN+10,-46);tx(c,'−',a[0],a[1],30,GR,.7);tx(c,'+',b[0],b[1],30,GR,.7);
+    tx(c,'stappen van acht nanometer. één ATP per stap. honderd stappen per seconde.\nde tekenaars lieten de cel leeg, om dit te kunnen laten zien.\nin het echt loopt ze door een menigte van miljarden eiwitten, die allemaal trillen en botsen.\nniemand regelt het verkeer. toch komt alles aan.',800,1042,26,CH,.82);
+    tx(c,'naar ‘the inner life of the cell’ (harvard, 2006), en het vervolg dat de cel weer vol tekende',800,1196,19,DIM,.75);
+  },
+  live(c,t,dt){
+    crowd=lerp(crowd,crowdT,1-Math.exp(-dt*2.5));
+    if(crowd>.01){const fr=Math.floor(t*14),cols=[CY,MG,YE,VI,CH];
+      for(let k=0;k<5;k++){c.fillStyle=rgba(cols[k],.5*crowd);for(let i=k;i<2400;i+=5){const z=2+hs(i+.3)*hs(i+.9)*13;c.fillRect(70+hs(i)*1460+(hs(i+fr*.71)-.5)*9,236+hs(i+7.7)*720+(hs(i*1.3+fr*.37)-.5)*9,z,z*(.6+hs(i+2)*.8))}}}
+    const s=(fa+fb)/2;let walk=true;
+    if(S.pin){const pr=(P.x-A[0])*ux+(P.y-A[1])*uy;walk=pr>s+30}
+    if(gone>0){gone-=dt;if(gone<=0){fa=40;fb=66;ph=0;cc++}}
+    else if(walk||ph>0){ph+=dt*6.5;if(ph>=1){ph=0;if(mv)fb=fa+ST;else fa=fb+ST;mv^=1;steps++;tone(mv?520:415,.05,.05,'triangle');if((fa+fb)/2>LN-70){gone=1.4;deliv++;tone(note(7),.5,.06);tone(note(9),.7,.04)}}}
+    const e=sm(ph),pa=mv?fa:lerp(fa,fb+ST,e),pb=mv?lerp(fb,fa+ST,e):fb,lift=Math.sin(Math.PI*ph)*24;
+    const FA=at(pa,20+(mv?0:lift)),FB=at(pb,20+(mv?lift:0)),J=at((pa+pb)/2,88+Math.sin(Math.PI*ph)*5);
+    sway=lerp(sway,(walk&&gone<=0?-12:0)+Math.sin(t*2.3)*5,.08);
+    const up=gone>0?(1.4-gone)*150:0,fade=gone>0?gone/1.4:1,C=[J[0]+nx*150+ux*sway,J[1]+ny*150+uy*sway-up];
+    c.lineCap='round';c.strokeStyle=rgba(MG,.95);c.lineWidth=5;
+    for(const F of[FA,FB]){c.beginPath();c.moveTo(J[0],J[1]);c.quadraticCurveTo((J[0]+F[0])/2+ux*10,(J[1]+F[1])/2+uy*10,F[0],F[1]);c.stroke()}
+    for(const F of[FA,FB]){gl(c,F[0],F[1],22,MG,.6);disc(c,F[0],F[1],10,MG,1)}
+    c.strokeStyle=rgba(MG,.8*fade);c.lineWidth=3;c.beginPath();c.moveTo(J[0],J[1]);c.quadraticCurveTo(J[0]+nx*50-ux*sway,J[1]+ny*50-uy*sway,C[0]-nx*62,C[1]-ny*62);c.stroke();
+    const col=[YE,OR,CY,GR][cc%4];gl(c,C[0],C[1],120,col,.5*fade);ring(c,C[0],C[1],62,col,.95*fade,3,cc+2,3);ring(c,C[0],C[1],55,col,.4*fade,1.5,cc+5,3);
+    for(let i=0;i<9;i++){const a=hs(i+cc)*TAU+t*.4,d=hs(i+3)*40;disc(c,C[0]+Math.cos(a)*d,C[1]+Math.sin(a)*d,4,CH,.6*fade)}
+    tx(c,nl(steps)+' stappen · '+nl(steps)+' ATP · '+deliv+' afgeleverd',800,268,24,DIM,.9);
+    if(S.pin&&!walk&&gone<=0)tx(c,'ze loopt maar één kant op: wijs vóór haar',800,304,22,MG,.8);
+    pill(c,800,968,crowdT?'maak de cel weer leeg':'laat zien hoe vol het echt is',CH,.9);
+  },
+  tap(x,y){if(Math.abs(x-800)<240&&Math.abs(y-968)<32){crowdT=crowdT?0:1;nz(.5,.1,crowdT?900:400,.7)}},
+  act(){if(FILM.a<.1&&FILM.t>6&&FILM.t<9)crowdT=1}
+});
+})();
+
+// ======================= tafel 4: de molen ==================================
+(()=>{
+const MY=540,pr=[],tok=[];let th=0,om=0,sup=0,flow=0,atp=0,made=0,autoT=0,rps=0;
+const R0=mul32(41);for(let i=0;i<34;i++)pr.push({x:390+R0()*820,y:292+R0()*190,vx:0,vy:0,m:0});
+const S=sheet({name:'molen',h:1300,tint:[150,80,20],
+  stat(c,R){
+    head(c,'de molen','in elk mitochondrion staan er duizenden');
+    tx(c,'(houd ingedrukt: laat de waterstofkernen erdoor)',800,256,23,DIM,.85);
+    c.beginPath();for(let x=62;x<=1540;x+=21){if(Math.abs(x-800)<118)continue;for(const s of[-1,1]){c.moveTo(x+7,MY+s*43);c.arc(x,MY+s*43,7,0,TAU)}}c.fillStyle=rgba([150,200,205],.6);c.fill();
+    c.beginPath();for(let x=62;x<=1540;x+=21){if(Math.abs(x-800)<118)continue;for(const s of[-1,1]){c.moveTo(x-3,MY+s*36);c.lineTo(x-4,MY+s*4);c.moveTo(x+3,MY+s*36);c.lineTo(x+4,MY+s*4)}}c.strokeStyle=rgba(CH,.25);c.lineWidth=1.5;c.stroke();
+    tx(c,'veel',372,330,24,CY,.8,'left');tx(c,'weinig',372,640,24,CY,.5,'left');
+    // de stator: de arm die de kop stilhoudt
+    c.strokeStyle=rgba(CH,.6);c.lineWidth=5;c.lineCap='round';c.beginPath();c.moveTo(905,MY-58);c.bezierCurveTo(960,MY-10,965,700,915,770);c.stroke();
+    c.strokeStyle=rgba(CH,.6);c.lineWidth=3;c.beginPath();c.moveTo(690,MY-62);c.lineTo(690,MY+62);c.moveTo(712,MY-62);c.lineTo(712,MY+62);c.stroke();
+    tx(c,'de cel verbrandt je eten om waterstofkernen naar één kant van een vlies te pompen.\nterug kunnen ze alleen door de molen. die draait ervan, en klemt bij elke derde slag een ATP dicht:\nde munt waarmee alles in de cel betaald wordt.\nmeer dan honderd omwentelingen per seconde. elke dag maak je zo je eigen gewicht aan ATP.\nhet mitochondrion waar dit in staat was ooit een vrije bacterie. het heeft nog eigen DNA: van je moeder.',800,1030,26,CH,.82);
+    tx(c,'in jouw lijf, op dit moment: ongeveer een triljard per seconde.',800,1240,26,YE,.85);
+  },
+  live(c,t,dt){
+    const open=(S.pin&&P.down)||t<autoT||STILL;
+    sup+=dt;if(sup>.11&&pr.length<46){sup=0;pr.push({x:390+Math.random()*820,y:284,vx:0,vy:60,m:0})}
+    if(open){flow+=dt*(5+pr.length*.35);if(flow>1){flow=0;let b=null,bd=1e9;for(const o of pr){if(o.m)continue;const d=Math.hypot(o.x-701,o.y-470);if(d<bd){bd=d;b=o}}if(b)b.m=1}}
+    for(let i=pr.length-1;i>=0;i--){const o=pr[i];
+      if(o.m===1){const dx=701-o.x,dy=478-o.y,d=Math.hypot(dx,dy),st=520*dt;if(d<=st){o.x=701;o.y=478;o.m=2}else{o.x+=dx/d*st;o.y+=dy/d*st}}
+      else if(o.m===2){o.y+=300*dt;if(o.y>MY&&!o.h){o.h=1;om+=2.3}if(o.y>MY+150){pr.splice(i,1);continue}}
+      else{o.vx+=(Math.random()-.5)*900*dt;o.vy+=(Math.random()-.5)*900*dt;o.vx*=.94;o.vy*=.94;o.x+=o.vx*dt;o.y+=o.vy*dt;
+        if(o.x<390){o.x=390;o.vx=Math.abs(o.vx)}if(o.x>1210){o.x=1210;o.vx=-Math.abs(o.vx)}if(o.y<284){o.y=284;o.vy=Math.abs(o.vy)}if(o.y>482){o.y=482;o.vy=-Math.abs(o.vy)}}
+      const a=o.m===2?clamp(1-(o.y-MY)/150,0,1):1;gl(c,o.x,o.y,17,CY,.6*a);disc(c,o.x,o.y,5,CY,.95*a)}
+    om*=Math.exp(-dt*1.4);th+=om*dt;rps=lerp(rps,om/TAU,.05);
+    const n=Math.floor(th/(TAU/3));if(n>made){made=n;atp++;tok.push({x:800+(hs(atp)-.5)*150,y:905,l:1});tone(note(5+atp%5),.14,.05)}
+    drone('atp',46+om*8,Math.min(.07,om*.006),'triangle');
+    // de rotor in het vlies
+    gl(c,800,MY,190,CY,.12+Math.min(.3,om*.02));
+    for(let i=0;i<12;i++){const f=th+i*TAU/12,d=Math.cos(f);if(d<-.15)continue;const x=800+96*Math.sin(f),w=20*Math.max(.18,d);
+      c.fillStyle=rgba(CY,.25+.6*Math.max(0,d));c.fillRect(x-w/2,MY-52,w,104)}
+    c.strokeStyle=rgba(CY,.8);c.lineWidth=2;for(const s of[-1,1]){c.beginPath();c.ellipse(800,MY+s*52,98,15,0,0,TAU);c.stroke()}
+    // de as, een beetje krom, zodat je hem ziet draaien
+    const k=Math.sin(th)*20;c.strokeStyle=rgba(OR,.95);c.lineWidth=13;c.lineCap='round';c.beginPath();c.moveTo(800,MY+56);c.bezierCurveTo(800+k,MY+110,800-k,MY+170,800+k*.6,790);c.stroke();
+    // de kop: zes lobben, drie ervan knijpen om beurten
+    const lob=[];for(let i=0;i<6;i++){const a=i*TAU/6+.5;lob.push([Math.sin(a),i,a])}lob.sort((p,q)=>p[0]-q[0]);
+    for(const [sn,i,a] of lob){const beta=!(i&1),sq=beta?1+.13*Math.cos(th-a):1,x=800+92*Math.cos(a),y=800+34*sn,col=beta?OR:[200,150,90],al=.55+.4*(sn+1)/2;
+      c.fillStyle=rgba([40,22,8],.92);c.beginPath();c.ellipse(x,y,50*sq,70/sq,0,0,TAU);c.fill();gl(c,x,y,70,col,.22*al);
+      c.strokeStyle=rgba(col,al);c.lineWidth=2.6;c.beginPath();c.ellipse(x,y,50*sq,70/sq,0,0,TAU);c.stroke()}
+    for(let i=tok.length-1;i>=0;i--){const o=tok[i];o.y+=46*dt;o.l-=dt*.42;if(o.l<=0){tok.splice(i,1);continue}gl(c,o.x,o.y-7,34,YE,.6*o.l);tx(c,'ATP',o.x,o.y,22,YE,o.l)}
+    tx(c,nl(atp)+' ATP',1100,760,34,YE,.95);tx(c,rps.toFixed(1).replace('.',',')+' omwentelingen per seconde',1100,798,20,DIM,.9,'center',250);
+  },
+  quiet(){drone('atp',46,0)},
+  act(){autoT=T+1.9}
+});
+})();
+
+// ======================= tafel 5: de draad ==================================
+(()=>{
+const K=TAU/72,AM=11,BASE=[GR,RD,BL,YE],BN=[262,330,392,494];
+let tr=[],L=0,L0=0,last=null,act=0,lastR=0;
+for(let i=0;i<=120;i++){const u=i/120;tr.push({x:640+u*520,y:600+Math.sin(u*TAU)*120*u+u*40,s:L});if(i)L+=Math.hypot(tr[i].x-tr[i-1].x,tr[i].y-tr[i-1].y);tr[i].s=L}
+L0=L;
+const S=sheet({name:'draad',h:1220,tint:[50,60,150],
+  stat(c,R){
+    head(c,'de draad','twee meter, in elke kern');
+    // chromosoom, kralensnoer, dubbele draad
+    c.strokeStyle=rgba(VI,.85);c.lineWidth=13;c.lineCap='round';c.beginPath();c.moveTo(505,268);c.quadraticCurveTo(540,310,575,352);c.moveTo(575,268);c.quadraticCurveTo(540,310,505,352);c.stroke();
+    wl(c,[[620,310],[690,310]],CH,.4,1.5);wl(c,[[680,303],[690,310],[680,317]],CH,.4,1.5);
+    c.strokeStyle=rgba(CH,.5);c.lineWidth=1.5;c.beginPath();for(let i=0;i<=60;i++){const x=730+i*2.4,y=310+Math.sin(i*.42)*14;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();
+    for(let i=0;i<6;i++){const x=738+i*25.6;disc(c,x,310+Math.sin(i*1.9)*12,10,[60,50,120],1);ring(c,x,310+Math.sin(i*1.9)*12,10,VI,.9,2,i,1)}
+    wl(c,[[910,310],[980,310]],CH,.4,1.5);wl(c,[[970,303],[980,310],[970,317]],CH,.4,1.5);
+    for(const s of[1,-1]){c.strokeStyle=rgba(BL,.9);c.lineWidth=2;c.beginPath();for(let i=0;i<=40;i++){const x=1010+i*3,y=310+Math.sin(i*.33)*15*s;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}
+    tx(c,'chromosoom',540,392,21,DIM,.85);tx(c,'kralensnoer',802,392,21,DIM,.85);tx(c,'dubbele draad',1070,392,21,DIM,.85);
+    // de kern, met de kluwen erin
+    gl(c,560,620,190,BL,.4);ring(c,560,620,112,VI,.9,2.6,3,4);ring(c,560,620,104,VI,.35,1.4,7,4);
+    c.strokeStyle=rgba(CY,.4);c.lineWidth=1.6;c.beginPath();for(let i=0;i<260;i++){const a=i*.37,r=30+62*Math.abs(Math.sin(i*.113)),x=560+Math.cos(a)*r,y=620+Math.sin(a*1.21)*r;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();
+    tx(c,'(beweeg: je trekt de draad uit de kern)',800,860,23,DIM,.85);
+    tx(c,'twee meter draad in een kern van zes duizendste millimeter:\nalsof je twintig kilometer ragfijn garen in een tennisbal stopt.\nzo dik getekend als hier zou de draad uit één kern vijfduizend kilometer lang zijn.\nalle draad uit je lijf, achter elkaar gelegd, reikt tot pluto.',800,1040,26,CH,.82);
+  },
+  live(c,t,dt){
+    let px=null,py;
+    if(S.pin&&P.y>230&&P.y<1000){px=P.x;py=P.y}
+    else if(FILM.on){px=820+330*Math.cos(t*.9);py=640+150*Math.sin(t*1.7)}
+    if(px!=null){if(!last)last=[px,py];const d=Math.hypot(px-last[0],py-last[1]);
+      if(d>280){tr.push({x:px,y:py,s:L,b:1});last=[px,py]}
+      else if(d>5){L+=d;tr.push({x:px,y:py,s:L});last=[px,py];act+=dt;if(tr.length>640)tr.splice(0,tr.length-640)}}
+    else last=null;
+    const rn=Math.floor((L-L0)/9);if(rn>=lastR+5){lastR=rn;tone(BN[(hs(rn)*4)|0],.09,.035,'triangle')}
+    // de twee strengen
+    for(const sg of[1,-1]){c.strokeStyle=rgba(sg>0?BL:CY,.9);c.lineWidth=2.4;c.lineJoin='round';c.beginPath();
+      for(let i=1;i<tr.length;i++){const a=tr[i-1],b=tr[i];if(b.b)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,ox=-dy/d,oy=dx/d,
+        o0=Math.sin(a.s*K)*AM*sg,o1=Math.sin(b.s*K)*AM*sg;if(i===1||a.b||tr[i-1]===undefined)c.moveTo(a.x+ox*o0,a.y+oy*o0);
+        const sm_=(a.s+b.s)/2,om_=Math.sin(sm_*K)*AM*sg;c.lineTo((a.x+b.x)/2+ox*om_,(a.y+b.y)/2+oy*om_);c.lineTo(b.x+ox*o1,b.y+oy*o1)}
+      c.stroke()}
+    // de sporten: vier kleuren, vier letters
+    for(let q=0;q<4;q++){c.strokeStyle=rgba(BASE[q],.8);c.lineWidth=2;c.beginPath();
+      for(let i=1;i<tr.length;i++){const a=tr[i-1],b=tr[i];if(b.b)continue;const ds=b.s-a.s;if(ds<=0)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,ox=-dy/d,oy=dx/d;
+        for(let r=Math.ceil(a.s/9);r*9<b.s;r++){if(((hs(r*1.7)*4)|0)!==q)continue;const u=(r*9-a.s)/ds,x=a.x+dx*u,y=a.y+dy*u,o=Math.sin(r*9*K)*AM;c.moveTo(x+ox*o,y+oy*o);c.lineTo(x-ox*o,y-oy*o)}}
+      c.stroke()}
+    const n=Math.max(0,rn);
+    if(n>0){tx(c,'je las '+nl(n)+' van de 6.400.000.000 letters',800,918,28,YE,.95);
+      if(act>1.5){const yr=6.4e9/(n/act)/3.156e7;tx(c,'in dit tempo ben je over '+(yr>=2?nl(yr)+' jaar':'ruim een jaar')+' klaar met één kern',800,956,24,CH,.8)}}
+  },
+  act(){}
+});
+})();
+
+// ======================= tafel 6: het schrift ===============================
+(()=>{
+const AA={a:'GCU',c:'UGU',d:'GAU',e:'GAA',f:'UUU',g:'GGU',h:'CAU',i:'AUU',k:'AAA',l:'CUG',m:'AUG',n:'AAU',p:'CCU',q:'CAA',r:'CGU',s:'UCU',t:'ACU',v:'GUU',w:'UGG',y:'UAU',u:'UGA',o:'UAG'};
+const cls=l=>'avlimfwpgc'.includes(l)?0:'stnqy'.includes(l)?1:'krh'.includes(l)?2:'de'.includes(l)?3:4,CC=[OR,GR,BL,RD,VI],QQ=[0,0,1,-1,0];
+const DEMO=['leven','adem','water','licht','hart','wonder'],E=[652,438],C0=[960,385],RB=[600,540];
+let seq=[],bad='',prog=0,beads=[],di=0,doneT=0,usr=false,inp=null,deb=0;
+function start(w){const all=[...w.toLowerCase()].filter(ch=>/[a-z]/.test(ch));seq=all.filter(ch=>AA[ch]);bad=[...new Set(all.filter(ch=>!AA[ch]))].join(', ');beads=[];prog=-.6;doneT=0}
+start(DEMO[0]);
+if(STILL){beads=seq.map((l,i)=>({l,k:cls(l),x:C0[0]+Math.cos(i*2.1)*34*(1+i*.25),y:C0[1]+Math.sin(i*2.1)*30*(1+i*.25),vx:0,vy:0}));prog=seq.length+1}
+const S=sheet({name:'schrift',h:1250,tint:[110,60,150],
+  init(el){inp=document.createElement('input');inp.type='text';inp.maxLength=22;inp.placeholder='typ een woord';inp.autocomplete='off';inp.spellcheck=false;inp.setAttribute('aria-label','typ een woord, de cel maakt er een eiwit van');
+    el.appendChild(inp);inp.addEventListener('input',()=>{clearTimeout(deb);deb=setTimeout(()=>{const v=inp.value.trim();usr=!!v;start(v||DEMO[di])},480)})},
+  size(){inp.style.top=(700/1250*100)+'%';inp.style.fontSize=Math.max(16,U*38)+'px';inp.style.width=Math.max(200,U*480)+'px'},
+  stat(c,R){
+    head(c,'het schrift','van draad naar ding');
+    wl(c,[[340,562],[1260,562]],CH,.4,2,2,5);
+    tx(c,'drie letters op de draad staan voor één bouwsteen. er zijn er twintig, en elk heeft een letter.\ntyp een woord: de cel rijgt het aaneen, en het vouwt zich tot een vorm die alleen bij dat woord hoort.\nzo wordt van schrift een werktuig: een pomp, een molen, een voet.',800,810,26,CH,.82);
+    disc(c,476,938,8,OR,.95);tx(c,'schuwt water',492,946,21,DIM,.9,'left');disc(c,640,938,8,GR,.95);tx(c,'zoekt water',656,946,21,DIM,.9,'left');
+    disc(c,794,938,8,BL,.95);tx(c,'plus',810,946,21,DIM,.9,'left');disc(c,884,938,8,RD,.95);tx(c,'min',900,946,21,DIM,.9,'left');disc(c,968,938,8,VI,.95);tx(c,'zeldzaam (de u en de o)',984,946,21,DIM,.9,'left');
+    tx(c,'maar nog geen twee procent van de draad is zo te lezen. waar de rest voor dient, is nog lang niet uit.\npeter gariaev las de hele draad als taal, met homoniemen, en als golf die zendt en ontvangt.\ndat is omstreden, en door niemand bevestigd.',800,1040,25,CH,.72);
+    tx(c,'hypothese',800,1176,20,MG,.8);
+  },
+  live(c,t,dt){
+    const n=seq.length,syn=beads.length<n;
+    if(!STILL){prog+=dt*2.1;
+      while(beads.length<n&&prog>=beads.length+1){const l=seq[beads.length];beads.push({l,k:cls(l),x:E[0],y:E[1],vx:0,vy:0});tone(note(l.charCodeAt(0)%10+2),.3,.06)}
+      if(!syn&&!doneT){doneT=t;tone(note(3),.9,.04);tone(note(5),1.1,.03)}
+      if(!usr&&doneT&&t-doneT>6){di=(di+1)%DEMO.length;start(DEMO[di])}
+      // de ketting vouwt: wat water schuwt kruipt naar binnen, plus zoekt min
+      for(let i=0;i<beads.length;i++){const b=beads[i],pin=syn&&i===beads.length-1;if(pin){b.x=E[0];b.y=E[1];continue}
+        let fx=(C0[0]-b.x)*(b.k?1.7:4.4),fy=(C0[1]-b.y)*(b.k?1.7:4.4);
+        for(let j=0;j<beads.length;j++){if(j===i)continue;const o=beads[j],dx=b.x-o.x,dy=b.y-o.y,d=Math.hypot(dx,dy)||1;
+          if(d<36){const f=(36-d)*26;fx+=dx/d*f;fy+=dy/d*f}
+          const q=QQ[b.k]*QQ[o.k];if(q&&d<150){const f=q*9000/(d*d+400);fx+=dx/d*f;fy+=dy/d*f}}
+        b.vx=(b.vx+fx*dt)*.9;b.vy=(b.vy+fy*dt)*.9;b.x+=b.vx*dt;b.y+=b.vy*dt}
+      for(let it=0;it<3;it++)for(let i=1;i<beads.length;i++){const a=beads[i-1],b=beads[i],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,e=(d-32)/d*.5,pin=syn&&i===beads.length-1;
+        if(pin){a.x+=dx*e*2;a.y+=dy*e*2}else{a.x+=dx*e;a.y+=dy*e;b.x-=dx*e;b.y-=dy*e}}
+    }
+    // de boodschap schuift door het ribosoom
+    for(let j=-1;j<=n;j++){const x=RB[0]+(j-Math.max(0,Math.min(prog,n)))*72+36;if(x<360||x>1250)continue;const cur=j===Math.floor(prog)&&syn;
+      tx(c,j<0?'···':j===n?'UAA':AA[seq[j]],x,600,23,cur?YE:CH,cur?1:j===n?.4:.6)}
+    c.fillStyle=rgba([22,16,34],.96);c.beginPath();c.ellipse(RB[0],RB[1]-38,96,70,0,0,TAU);c.fill();
+    gl(c,RB[0],RB[1],170,VI,.25+(syn?.15*Math.sin(t*9)+.15:0));ring(c,RB[0],RB[1]-38,96,VI,.95,2.6,3,5,70);ring(c,RB[0],RB[1]+50,76,VI,.8,2.2,6,4,34);
+    tx(c,'ribosoom',RB[0],RB[1]-30,22,VI,.85);
+    if(beads.length){c.strokeStyle=rgba(CH,.5);c.lineWidth=3;c.lineJoin='round';c.beginPath();beads.forEach((b,i)=>i?c.lineTo(b.x,b.y):c.moveTo(b.x,b.y));c.stroke()}
+    for(const b of beads){gl(c,b.x,b.y,34,CC[b.k],.5);disc(c,b.x,b.y,15,CC[b.k],.96);tx(c,b.l.toUpperCase(),b.x,b.y+6.5,19,[10,14,18],.95)}
+    if(!syn&&doneT&&n)tx(c,'gevouwen',C0[0],250,21,DIM,.8*sm((t-doneT)/1.5));
+    if(bad)tx(c,'‘'+bad+'’ '+(bad.length>1?'bestaan':'bestaat')+' niet in dit alfabet',800,752,22,MG,.85);
+  }
+});
+})();
+
+// ======================= tafel 7: het boek ==================================
+(()=>{
+const NS=200,CX=800,CY_=600,NG=18;
+const sp=(th,a,L,w)=>{let d=Math.abs(th-a)%TAU;if(d>Math.PI)d=TAU-d;return L*Math.exp(-(d/w)*(d/w))};
+const TY=[
+ {n:'zenuwcel',col:YE,nu:[0,0,26,1],say:'een zenuwcel: soms een meter lang, en net zo oud als jij',f:th=>58+sp(th,5.9,330,.045)+sp(th,1.0,170,.08)+sp(th,2.1,200,.07)+sp(th,3.2,230,.06)+sp(th,4.3,180,.08)+sp(th,.3,120,.09)},
+ {n:'spiercel',col:RD,nu:[-90,-28,20,1],say:'een spiercel: vol draden die langs elkaar schuiven',f:th=>Math.pow(Math.pow(Math.abs(Math.cos(th))/310,2.6)+Math.pow(Math.abs(Math.sin(th))/58,2.6),-1/2.6)},
+ {n:'huidcel',col:CY,nu:[0,0,34,1],say:'een huidcel: plat en taai, en na een maand weer afgestoten',f:th=>150*(1+.06*Math.cos(6*th))},
+ {n:'rode bloedcel',col:[255,70,70],nu:[0,0,30,0],say:'een rode bloedcel: gooit haar boek weg om zuurstof te kunnen dragen',f:th=>112},
+ {n:'vetcel',col:GOLD,nu:[146,-62,20,1],say:'een vetcel: één grote druppel voorraad, de kern opzij geduwd',f:th=>186},
+ {n:'afweercel',col:GR,nu:[10,6,44,1],say:'een afweercel: kruipt rond, en onthoudt een ziekte zestig jaar',f:(th,t)=>122*(1+.13*Math.sin(3*th+t*1.1)+.09*Math.sin(5*th-t*1.6))}];
+const cur=new Float32Array(NS).fill(120),w=[1,0,0,0,0,0],nu=[0,0,26,1],col=[...YE];let sel=0,auto=0,usr=false;
+const open=(k,i)=>i<2||hs(k*31+i*7.3)>.6;
+const chipX=i=>425+i*150;
+const S=sheet({name:'boek',h:1210,tint:[120,110,40],
+  stat(c,R){
+    head(c,'het boek','dezelfde twee meter in elke kern');
+    tx(c,'elk streepje een gen. licht: de bladzijde ligt open. een stip: op slot.',800,372,21,DIM,.85);
+    tx(c,'wat verschilt, is welke bladzijden open liggen: tweehonderd soorten cellen uit één boek.\neen cel onthoudt wat ze is, en geeft dat door als ze deelt.\nook wat ze meemaakt slaat bladzijden open en dicht. wat je erft is niet het laatste woord.',800,1022,26,CH,.82);
+    tx(c,'rudolf steiner, 1910: het geërfde zit in het lichaam. de geest kan het compenseren.\nbruce lipton: niet de genen sturen de cel, maar wat ze van buiten opvangt.',800,1140,22,DIM,.85);
+  },
+  live(c,t,dt){
+    if(!usr||FILM.on){auto+=dt;const n=Math.floor(auto/4.5)%6;if(n!==sel&&!STILL)pick(n)}
+    const k=STILL?1:1-Math.exp(-dt*4.5),T_=TY[sel];
+    for(let i=0;i<6;i++)w[i]=lerp(w[i],i===sel?1:0,k);
+    for(let i=0;i<4;i++)nu[i]=lerp(nu[i],T_.nu[i],k);for(let i=0;i<3;i++)col[i]=lerp(col[i],T_.col[i],k);
+    for(let i=0;i<NS;i++)cur[i]=lerp(cur[i],T_.f(i/NS*TAU,t),k);
+    // de genen
+    for(let i=0;i<NG;i++){const x=443+i*42,o=open(sel,i);
+      if(o){gl(c,x,300,40,GR,.5);c.fillStyle=rgba(GR,.8);c.fillRect(x-9,272,18,56)}
+      else{c.strokeStyle=rgba(CH,.3);c.lineWidth=1.5;c.strokeRect(x-9,272,18,56);disc(c,x,262,4,MG,.9)}}
+    // de cel
+    gl(c,CX,CY_,260,col,.22);
+    c.beginPath();for(let i=0;i<=NS;i++){const th=i/NS*TAU,r=cur[i%NS],x=CX+Math.cos(th)*r,y=CY_+Math.sin(th)*r;i?c.lineTo(x,y):c.moveTo(x,y)}
+    c.fillStyle=rgba(col,.1);c.fill();c.strokeStyle=rgba(col,.95);c.lineWidth=2.6;c.lineJoin='round';c.stroke();
+    if(w[1]>.02){c.strokeStyle=rgba(RD,.45*w[1]);c.lineWidth=2;c.beginPath();for(let x=-270;x<=270;x+=18){const h=58*Math.pow(Math.max(0,1-Math.pow(Math.abs(x)/310,2.6)),1/2.6)-5;if(h>4){c.moveTo(CX+x,CY_-h);c.lineTo(CX+x,CY_+h)}}c.stroke()}
+    if(w[3]>.02){ring(c,CX,CY_,56,[255,70,70],.7*w[3],2,3,3);gl(c,CX,CY_,70,[120,10,10],.6*w[3])}
+    if(w[4]>.02){ring(c,CX-8,CY_+6,150,YE,.7*w[4],2,4,5);gl(c,CX-40,CY_-40,60,YE,.2*w[4])}
+    if(w[5]>.02)for(let i=0;i<14;i++){const a=hs(i)*TAU+t*.3,d=30+hs(i+5)*60;disc(c,CX+Math.cos(a)*d,CY_+Math.sin(a)*d,4,GR,.6*w[5])}
+    if(nu[3]>.02){gl(c,CX+nu[0],CY_+nu[1],nu[2]*2,BL,.6*nu[3]);disc(c,CX+nu[0],CY_+nu[1],nu[2],[40,50,120],.9*nu[3]);ring(c,CX+nu[0],CY_+nu[1],nu[2],VI,.95*nu[3],2,5,2)}
+    tx(c,T_.say,800,890,26,T_.col,.95);
+    for(let i=0;i<6;i++){const x=chipX(i),on=i===sel;tx(c,TY[i].n,x,946,24,on?TY[i].col:CH,on?1:.55,'center',140);if(on)wl(c,[[x-54,956],[x+54,957]],TY[i].col,.8,2,2,i)}
+  },
+  tap(x,y){if(Math.abs(y-940)<34){const i=Math.round((x-425)/150);if(i>=0&&i<6){usr=true;pick(i)}}},
+  act(){}
+});
+function pick(i){sel=i;tone(note(i+3),.6,.06);tone(note(i+5),.8,.04)}
+})();
+
+// ======================= tafel 8: het licht =================================
+(()=>{
+const EM=[[540,470],[500,452],[580,448],[468,470],[612,462],[540,520],[538,580],[542,640],[545,700],[520,730],[565,735],[540,755]];
+let adapt=.55,op=-1,stress=0,cnt=0,fl=[],lastTk=0,quartz=true,ph=[],marks=[],spT=0;
+const S=sheet({name:'licht',h:1220,tint:[20,70,50],
+  stat(c,R){
+    head(c,'het licht','elke levende cel geeft licht. heel weinig');
+    // een kiem
+    ring(c,542,738,34,GR,.6,2,3,3,22);wl(c,[[540,718],[536,640],[542,560],[540,480]],GR,.6,2.6,3,4);
+    for(const s of[-1,1]){c.strokeStyle=rgba(GR,.6);c.lineWidth=2.2;c.beginPath();c.moveTo(540,484);c.bezierCurveTo(540+s*30,430,540+s*88,430,540+s*84,468);c.bezierCurveTo(540+s*60,488,540+s*30,490,540,484);c.stroke()}
+    for(let i=0;i<5;i++)wl(c,[[540+(i-2)*6,760],[540+(i-2)*22,800+hs(i)*20]],GR,.35,1.4);
+    tx(c,'een kiem, in het donker',540,838,21,DIM,.8);
+    // gurwitsch: twee uienwortels
+    ring(c,742,520,36,GOLD,.6,2,2,3,30);wl(c,[[776,512],[900,516]],GOLD,.65,2.2,2,3);wl(c,[[776,528],[900,524]],GOLD,.65,2.2,2,6);wl(c,[[900,516],[910,520],[900,524]],GOLD,.65,2.2);
+    ring(c,1040,300,38,GOLD,.6,2,5,3,30);wl(c,[[1028,334],[1030,760]],GOLD,.65,2.2,3,7);wl(c,[[1052,334],[1050,760]],GOLD,.65,2.2,3,9);wl(c,[[1030,760],[1040,776],[1050,760]],GOLD,.65,2.2);
+    for(let i=0;i<6;i++)disc(c,1046,380+i*66+hs(i)*20,3,YE,.5);
+    tx(c,'de ene wijst',820,572,20,DIM,.8);tx(c,'de andere deelt',1140,560,20,DIM,.8,'center',150);
+    tx(c,'fritz-albert popp telde het: enkele tot een paar honderd lichtdeeltjes per seconde,\nper vierkante centimeter. duizend keer te zwak voor je oog. bij stress wordt het meer.\n(blijf stil, dan wennen je ogen. beweeg wild, en kijk wat de kiem doet.)',800,930,25,CH,.85);
+    tx(c,'alexander gurwitsch, 1923: een uienwortel wijst naar een andere, en daar gaan meer cellen delen.\ndoor kwarts wel, door glas niet. zevenhonderd artikelen, toen werd het stil. gesloten is het dossier nooit.\n(tik op het plaatje tussen de wortels)',800,1056,25,CH,.85);
+    tx(c,'popp las er een veld in waarmee cellen elkaar bijpraten. dat is zijn lezing, geen gedeelde.',800,1180,21,DIM,.9);
+  },
+  live(c,t,dt){
+    // ogen die wennen: stil zijn maakt de tafel lichter
+    const still=S.pin?P.sp<30:true;adapt=clamp(adapt+(still?dt*.32:-dt*1.2),S.pin?.12:.3,1);if(STILL||RM)adapt=1;
+    const o=Math.round((.5+.5*sm(adapt))*50)/50;if(S.sc&&+S.sc.canvas.style.opacity!==o)S.sc.canvas.style.opacity=o;
+    if(S.pin&&P.sp>500)stress=Math.min(1,stress+dt*1.4);stress=Math.max(0,stress-dt*.22);
+    const lam=2.2+stress*stress*70;
+    if(Math.random()<lam*dt||(lam*dt>1)){const k=Math.max(1,Math.round(lam*dt));for(let i=0;i<k;i++){const e=EM[(Math.random()*EM.length)|0],a=Math.random()*TAU;fl.push({x:e[0]+(Math.random()-.5)*26,y:e[1]+(Math.random()-.5)*26,a,l:1});cnt++}
+      if(t-lastTk>.05){lastTk=t;tone(2600+Math.random()*1800,.025,.03,'square')}}
+    gl(c,540,600,230,RD,.28*stress);
+    for(let i=fl.length-1;i>=0;i--){const f=fl[i];f.l-=dt*3;if(f.l<=0){fl.splice(i,1);continue}const d=(1-f.l)*46;
+      gl(c,f.x,f.y,20,[190,255,225],f.l);wl(c,[[f.x+Math.cos(f.a)*d,f.y+Math.sin(f.a)*d],[f.x+Math.cos(f.a)*(d+16),f.y+Math.sin(f.a)*(d+16)]],[190,255,225],f.l*.8,1.5)}
+    tx(c,nl(cnt)+' geteld · nu ongeveer '+nl(lam)+' per seconde',540,872,21,[190,255,225],.9,'center',400);
+    // het plaatje: kwarts of glas
+    const px=958;c.fillStyle=rgba(quartz?CY:[120,130,130],quartz?.16:.4);c.fillRect(px-8,440,16,160);c.strokeStyle=rgba(quartz?CY:CH,quartz?.9:.5);c.lineWidth=2;c.strokeRect(px-8,440,16,160);
+    if(!quartz)for(let y=448;y<596;y+=12)wl(c,[[px-8,y+10],[px+8,y]],CH,.35,1.2);
+    tx(c,quartz?'kwarts':'glas',px,634,24,quartz?CY:CH,.95);
+    spT+=dt;if(spT>.22){spT=0;ph.push({x:912,y:520,vy:(Math.random()-.5)*300,l:1})}
+    for(let i=ph.length-1;i>=0;i--){const p=ph[i];p.x+=230*dt;p.y+=p.vy*dt;
+      if(p.x>px-10&&!quartz){p.l-=dt*8;p.x=px-10}
+      if(p.x>1026){ph.splice(i,1);marks.push({y:p.y,t});if(marks.length>16)marks.shift();tone(note(8+marks.length%5),.12,.025);continue}
+      if(p.l<=0){ph.splice(i,1);continue}gl(c,p.x,p.y,12,[200,180,255],p.l*.9)}
+    for(const m of marks){const a=clamp(1-(t-m.t)/14,0,1);if(a<=0)continue;gl(c,1034,m.y,16,YE,a*.7);ring(c,1034,m.y-4,4,YE,a,1.5,2,.5);ring(c,1034,m.y+4,4,YE,a,1.5,4,.5)}
+    const live=marks.filter(m=>t-m.t<14).length;tx(c,live?live+' extra delingen':'geen extra delingen',1140,592,21,YE,.9,'center',170);
+  },
+  tap(x,y){if(Math.abs(x-958)<70&&Math.abs(y-530)<130){quartz=!quartz;tone(quartz?1320:330,.3,.06,'triangle')}else stress=Math.min(1,stress+.35)},
+  act(){if(FILM.t>8&&FILM.t<11)quartz=false;else if(FILM.t>13)quartz=true;else stress=1}
+});
+})();
+
+// ======================= tafel 9: het water =================================
+(()=>{
+const sp=[],R0=mul32(9),grow=new Float32Array(11),cr=[{x:1030,y:560,sd:5.2,t0:-20,L:112}];
+for(let i=0;i<150;i++)sp.push({hx:440+R0()*330,hy:300+R0()*500,x:600,ph:R0()*9});sp.forEach(o=>o.x=o.hx);
+const wid=y=>{const f=clamp((y-300)/50,0,9.999),i=f|0;return 46+lerp(grow[i],grow[i+1],f-i)};
+function crystal(c,k,t){
+  const g=STILL?1:sm((t-k.t0)/3.4),L=k.L,nb=3+((hs(k.sd)*3)|0);
+  gl(c,k.x,k.y,L*1.2,ICE,.3*g);c.save();c.translate(k.x,k.y);c.rotate(hs(k.sd+1)*1);c.strokeStyle=rgba(ICE,.92);c.lineWidth=2;c.lineCap='round';
+  for(let a=0;a<6;a++){c.rotate(TAU/6);c.beginPath();c.moveTo(0,0);c.lineTo(L*g,0);
+    for(let j=0;j<nb;j++){const p=(j+1)/(nb+1)+(hs(k.sd+j*3)-.5)*.1;if(g<=p)continue;const bl=L*(.2+.3*hs(k.sd+j))*(1-p*.55)*Math.min(1,(g-p)/.35);
+      for(const s of[-1,1]){const ex=p*L+bl*.5,ey=s*bl*.866;c.moveTo(p*L,0);c.lineTo(ex,ey);
+        if(hs(k.sd+j*7)>.4){const mx=p*L+bl*.25,my=s*bl*.433;c.moveTo(mx,my);c.lineTo(mx+bl*.3,my)}}}
+    c.moveTo(L*.14*g,0);c.lineTo(L*.07*g,L*.121*g);c.stroke()}
+  c.restore();
+}
+const S=sheet({name:'water',h:1250,tint:[30,80,150],
+  stat(c,R){
+    head(c,'het water','van elke honderd moleculen in een cel zijn er negenennegentig water');
+    c.fillStyle=rgba(BL,.25);c.beginPath();c.moveTo(394,290);for(let y=290;y<=810;y+=20)c.lineTo(430+Math.sin(y*.05)*4,y);c.lineTo(394,810);c.closePath();c.fill();
+    for(let y=296;y<810;y+=11)wl(c,[[396,y+8],[428,y]],BL,.5,1.3);
+    wl(c,[[430,290],[432,810]],CY,.7,2,3,4);
+    tx(c,'natte wand',412,842,20,DIM,.85);
+    tx(c,'gerald pollack: langs een natte wand\nhoudt water een strook vrij van alles.\nwarmte en licht maken de strook breder.\n(schijn erop met je hand)',600,880,23,CH,.82,'center',400);
+    tx(c,'(tik: laat water bevriezen)\nde zeshoek is van het water zelf.\ngeen twee kristallen zijn gelijk.',1030,880,23,CH,.82,'center',400);
+    tx(c,'de strook is door andere labs nagemeten. pollacks uitleg, een vierde fase van water, is omstreden.\nmasaru emoto fotografeerde ijskristallen na een woord of muziek. hij noemde het zelf geen wetenschap,\nmaar een nieuwe kunst. luc montagnier meende dat water een signaal van DNA kan bewaren:\nonafhankelijk bevestigd is dat niet. viktor schauberger zei het in 1933 eenvoudiger: water is zelf een levend wezen.',800,1048,24,CH,.78);
+  },
+  live(c,t,dt){
+    const lamp=S.pin&&P.x<790&&P.y>260&&P.y<850;
+    for(let i=0;i<11;i++){const y=300+i*50;grow[i]=Math.max(0,grow[i]-dt*5);if(lamp){const d=Math.abs(P.y-y);if(d<130)grow[i]=Math.min(130,grow[i]+dt*70*(1-d/130))}
+      if(FILM.on)grow[i]=Math.min(100,grow[i]+dt*14*(1+Math.sin(i+t)))}
+    if(lamp)gl(c,P.x,P.y,120,OR,.4);drone('lamp',98,lamp?.035:0);
+    c.strokeStyle=rgba(CY,.4);c.lineWidth=1.5;c.setLineDash([7,9]);c.beginPath();for(let y=300;y<=800;y+=25)c.lineTo(430+wid(y),y);c.stroke();c.setLineDash([]);
+    c.fillStyle=rgba(CH,.75);c.beginPath();
+    for(const o of sp){const tgt=Math.max(o.hx,436+wid(o.hy));o.x=lerp(o.x,tgt,1-Math.exp(-dt*2.2));const x=o.x+Math.sin(t*2.1+o.ph)*2.5,y=o.hy+Math.cos(t*1.7+o.ph*2)*2.5;c.moveTo(x+4,y);c.arc(x,y,4,0,TAU)}
+    c.fill();
+    tx(c,'vrije strook',452+wid(300)/2,278,19,CY,.75,'center',200);
+    for(const k of cr)crystal(c,k,t);
+  },
+  quiet(){drone('lamp',98,0)},
+  tap(x,y){if(x>790&&y>250&&y<860||x<380){add(x,y)}},
+  act(){add(840+Math.random()*360,330+Math.random()*440)}
+});
+function add(x,y){cr.push({x,y,sd:Math.random()*900,t0:T,L:60+Math.random()*60});if(cr.length>7)cr.shift();const f=1400+Math.random()*700;tone(f,1,.05);tone(f*1.335,1.4,.03)}
+})();
+
+// ======================= tafel 10: delen ====================================
+(()=>{
+const EX=800,EY=560,ER=215;let cells,sid=0;
+const one=()=>{cells=[{x:EX,y:EY,r:150,g:0,d:-1,b:-9,id:sid++}]};one();
+if(STILL){for(let g=0;g<3;g++)cells=cells.flatMap(o=>{const a=hs(o.id+g)*TAU,r=o.r/Math.SQRT2;return[1,-1].map(s=>({x:o.x+Math.cos(a)*r*.6*s,y:o.y+Math.sin(a)*r*.6*s,r,g:o.g+1,d:-1,b:-9,id:sid++}))})}
+function go(){if(cells.length>=32){one();tone(110,.8,.08);return}if(cells.some(o=>o.d>0))return;cells.forEach(o=>o.d=T+.1+Math.random()*1.5)}
+function relax(n){for(let it=0;it<n;it++){const N=cells.length,bl=N>=32;
+  for(let i=0;i<N;i++){const a=cells[i];
+    for(let j=i+1;j<N;j++){const b=cells[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01,m=(a.r+b.r)*.93;if(d<m){const e=(m-d)/d*.5;a.x-=dx*e;a.y-=dy*e;b.x+=dx*e;b.y+=dy*e}}
+    const dx=a.x-EX,dy=a.y-EY,d=Math.hypot(dx,dy)||.01;
+    if(bl){if(i<8){a.x+=(EX+70-a.x)*.03;a.y+=(EY-90-a.y)*.03}else{const e=(ER-a.r-d)/d*.08;a.x+=dx*e;a.y+=dy*e}}else{a.x-=dx*.012;a.y-=dy*.012}
+    const d2=Math.hypot(a.x-EX,a.y-EY)||.01;if(d2+a.r>ER){const e=(ER-a.r)/d2;a.x=EX+(a.x-EX)*e;a.y=EY+(a.y-EY)*e}}}}
+if(STILL)relax(80);
+const S=sheet({name:'delen',h:1230,tint:[130,90,30],
+  stat(c,R){
+    head(c,'delen','het geheel wordt er niet groter van');
+    tx(c,'(tik op het ei)',800,258,23,DIM,.85);
+    ring(c,EX,EY,ER+10,CH,.75,2.4,2,3);ring(c,EX,EY,ER+19,CH,.3,1.4,5,3);
+    tx(c,'één wordt twee, vier, acht. maar niet in de maat: je ziet ook drie, vijf en zeven.\nalleen het ei van een zee-egel deelt zo keurig als in het schoolboek.\nbij acht ligt er een figuur overheen: het ei van het leven, noemt drunvalo melchizedek het,\nhet begin van de bloem van het leven. de figuur is een tekening. het echte kluitje deelt gewoon door.\nvijfenveertig keer verdubbelen, en het zijn er genoeg voor een heel mens.',800,968,25,CH,.82);
+  },
+  live(c,t,dt){
+    for(let i=cells.length-1;i>=0;i--){const o=cells[i];if(o.d>0&&t>o.d){const a=Math.random()*TAU,r=o.r/Math.SQRT2;cells.splice(i,1);
+      for(const s of[1,-1])cells.push({x:o.x+Math.cos(a)*r*.5*s,y:o.y+Math.sin(a)*r*.5*s,r,g:o.g+1,d:-1,b:t,id:sid++});tone(98*Math.pow(1.335,o.g+1),.5,.07,'triangle');tone(196*Math.pow(1.335,o.g+1),.3,.03)}}
+    if(!STILL)relax(3);
+    const N=cells.length,cmp=N>=8?.55:1;
+    // de figuur: zaad en bloem
+    const sa=N>=8&&N<32?1:0;S.fa=lerp(S.fa||0,sa,1-Math.exp(-dt*1.5));S.fb=lerp(S.fb||0,N>=16?1:0,1-Math.exp(-dt*1.2));if(STILL){S.fa=1;S.fb=0}
+    if(S.fa>.02){const q=ER/2;c.strokeStyle=rgba(GOLD,.5*S.fa);c.lineWidth=1.6;c.beginPath();c.moveTo(EX+q,EY);c.arc(EX,EY,q,0,TAU);for(let i=0;i<6;i++){const a=i*TAU/6,x=EX+Math.cos(a)*q,y=EY+Math.sin(a)*q;c.moveTo(x+q,y);c.arc(x,y,q,0,TAU)}c.stroke()}
+    if(S.fb>.02){const q=ER/2;c.strokeStyle=rgba(GOLD,.2*S.fb);c.lineWidth=1.3;c.beginPath();for(let i=0;i<6;i++){const a=i*TAU/6;for(const[d,o]of[[2,0],[Math.sqrt(3),TAU/12]]){const x=EX+Math.cos(a+o)*q*d,y=EY+Math.sin(a+o)*q*d;c.moveTo(x+q,y);c.arc(x,y,q,0,TAU)}}c.stroke()}
+    for(const o of cells){const nb=sm((t-o.b)/.6),r=o.r*(.8+.2*nb),dv=o.d>0?clamp(1-(o.d-t)/.5,0,1):0;
+      gl(c,o.x,o.y,r*1.35,[236,170,90],.42);ring(c,o.x,o.y,r*.97,CH,.85*cmp,2,o.id*1.7,r*.03);
+      if(dv>0){disc(c,o.x-r*.25*dv,o.y,r*.15,YE,.7);disc(c,o.x+r*.25*dv,o.y,r*.15,YE,.7)}else disc(c,o.x,o.y,r*.2,YE,.55)}
+    const day=N===1?'dag 0: één bevruchte eicel, een tiende millimeter':N<=2?'dag 1':N<=4?'dag 2':N<=8?'dag 3: ze kruipen tegen elkaar aan, de randen vervagen':N<=16?'dag 4: de moerbei':'dag 5: een holte. voor het eerst een binnen en een buiten';
+    tx(c,N+(N>1?' cellen':' cel'),800,838,34,YE,.95);tx(c,day,800,880,24,CH,.85);
+    if(N>=32)tx(c,'(tik: opnieuw)',800,912,20,DIM,.8);
+  },
+  tap(x,y){if(y>240&&y<930)go()},
+  act(){go()}
+});
+})();
+
+// ======================= tafel 11: loslaten =================================
+(()=>{
+const PX=800,PY=838,AN=[-162,-124,-90,-56,-18].map(d=>d*Math.PI/180),LE=[262,372,402,366,252],W=54,web=[],R0=mul32(23);
+function fill(){web.length=0;for(let g=0;g<4;g++){const a0=AN[g],a1=AN[g+1],rm=Math.min(LE[g],LE[g+1])*.9;
+  for(let i=0;i<(g%3?46:26);i++){const r=178+Math.sqrt(R0())*(rm-178),m=(W/2+12)/r,a=a0+m+R0()*Math.max(0,a1-a0-2*m);web.push({x:PX+Math.cos(a)*r,y:PY+Math.sin(a)*r,r:10+R0()*4,st:0,t:0,sd:R0()*9})}}}
+fill();let doneT=0;
+function kill(o){if(o.st)return;o.st=1;o.t=0;tone(620+Math.random()*500,.06,.03)}
+const S=sheet({name:'loslaten',h:1230,tint:[130,40,90],
+  stat(c,R){
+    head(c,'loslaten','een cel kan zichzelf opruimen');
+    gl(c,PX,PY-120,400,MG,.16);
+    ring(c,PX,PY+8,138,CH,.8,2.6,3,5,96);
+    for(let i=0;i<5;i++){const a=AN[i],cx=Math.cos(a),sy=Math.sin(a),ox=-sy*W/2,oy=cx*W/2,L=LE[i];
+      wl(c,[[PX+cx*128+ox,PY+sy*128+oy],[PX+cx*L+ox,PY+sy*L+oy]],CH,.8,2.4,3,i);wl(c,[[PX+cx*128-ox,PY+sy*128-oy],[PX+cx*L-ox,PY+sy*L-oy]],CH,.8,2.4,3,i+9);
+      c.strokeStyle=rgba(CH,.8);c.lineWidth=2.4;c.beginPath();c.arc(PX+cx*L,PY+sy*L,W/2,a-Math.PI/2,a+Math.PI/2);c.stroke();
+      for(let j=0;j<3;j++){const r0=150+j*(L-150)/3+7,r1=150+(j+1)*(L-150)/3-7;wl(c,[[PX+cx*r0,PY+sy*r0],[PX+cx*r1,PY+sy*r1]],CH,.22,9)}}
+    tx(c,'als embryo had je peddels. de cellen tussen je vingers kregen een teken, en ruimden zichzelf op:\nnetjes, in blaasjes, die de buren opeten. (strijk ertussendoor)\nelke seconde doen bijna vier miljoen van je cellen hetzelfde, en komen er evenveel bij.',800,1074,25,CH,.82);
+  },
+  live(c,t,dt){
+    let alive=0;
+    for(const o of web){
+      if(!o.st){alive++;if(S.pin&&Math.hypot(P.x-o.x,P.y-o.y)<44)kill(o);const j=Math.sin(t*1.3+o.sd)*1.5;disc(c,o.x+j,o.y,o.r,MG,.32);ring(c,o.x+j,o.y,o.r,MG,.8,1.5,o.sd,1)}
+      else if(o.st===1){o.t+=dt/1.2;if(o.t>=1){o.st=2;continue}const q=o.t;ring(c,o.x,o.y,o.r*(1-q),MG,.8*(1-q),1.5,o.sd,1);
+        for(let b=0;b<4;b++){const a=o.sd+b*TAU/4+q*1.4,d=o.r*(.6+q*2.4);gl(c,o.x+Math.cos(a)*d,o.y+Math.sin(a)*d,8,YE,.8*(1-q));ring(c,o.x+Math.cos(a)*d,o.y+Math.sin(a)*d,o.r*.34*(1-q*.6),YE,.9*(1-q),1.2,b,.5)}}
+    }
+    // de rand van de peddel, zolang er nog vlies is
+    const f=alive/web.length;if(f>.02){c.strokeStyle=rgba(MG,.55*f);c.lineWidth=2;c.beginPath();for(let i=0;i<5;i++){const x=PX+Math.cos(AN[i])*(LE[i]+W/2),y=PY+Math.sin(AN[i])*(LE[i]+W/2);if(!i)c.moveTo(x,y);else{const pa=(AN[i]+AN[i-1])/2,pr=Math.min(LE[i],LE[i-1])*(.93+.1*f)+W/2;c.quadraticCurveTo(PX+Math.cos(pa)*pr,PY+Math.sin(pa)*pr,x,y)}}c.stroke()}
+    if(!alive&&!doneT){doneT=t;[0,2,4,7].forEach((n,i)=>setTimeout(()=>tone(note(n+5),.8,.05),i*110))}
+    if(doneT){const a=sm((t-doneT)/1.2);tx(c,'zo kreeg je vingers: niet aangegroeid, maar uitgespaard.',800,1004,28,YE,a);pill(c,1160,900,'opnieuw',CH,a*.9)}
+    else tx(c,alive+' cellen in de weg',800,1000,22,DIM,.8);
+  },
+  tap(x,y){if(doneT&&Math.abs(x-1160)<80&&Math.abs(y-900)<34){fill();doneT=0;return}for(const o of web)if(Math.hypot(x-o.x,y-o.y)<60)kill(o)},
+  act(){const a=web.filter(o=>!o.st);if(!a.length){if(T-doneT>4){fill();doneT=0}return}a.sort((p,q)=>p.x-q.x);const i=(Math.random()*a.length)|0;for(let k=0;k<26;k++)a[(i+k)%a.length]&&kill(a[(i+k)%a.length])}
+});
+})();
+
+// ======================= tafel 12: samen ====================================
+(()=>{
+const cs=[],R0=mul32(5),wv=[];let idle=0;
+for(let r=0;r<10;r++)for(let q=0;q<24;q++){const x=86+q*62+(r%2)*31+(R0()-.5)*14,y=304+r*54+(R0()-.5)*12;cs.push({x,y,r:25+R0()*5,c:hsl(R0()*360,.85,.62),a:0,sd:R0()*9})}
+function wave(x,y){wv.push({x,y,t0:T,k:-1});if(wv.length>4)wv.shift();tone(note(0),.4,.06)}
+const S=sheet({name:'samen',h:1200,norad:1,tint:[70,50,120],
+  stat(c,R){
+    head(c,'samen','geen cel is alleen');
+    tx(c,'buren zijn verbonden door poortjes. tik er één aan, en het loopt van cel tot cel.\nin 2007 gaf een lab in harvard elke zenuwcel van een muis een eigen kleur:\nnegentig tinten, om buren uit elkaar te kunnen houden. brainbow.\nwat één cel weet, weten ze na een seconde allemaal.',800,958,26,CH,.82);
+  },
+  live(c,t,dt){
+    if(!S.pin&&!STILL){idle+=dt;if(idle>5.5){idle=0;const o=cs[(Math.random()*cs.length)|0];wave(o.x,o.y)}}
+    if(STILL&&!wv.length)wv.push({x:800,y:560,t0:t-.9,k:99});
+    for(const w of wv){const k=Math.floor((t-w.t0)*330/62);if(k>w.k&&k<13&&k>0){w.k=k;tone(note(k),.35,.04*(1-k/14))}}
+    let near=null,nd=34;
+    for(const o of cs){o.a=Math.max(0,o.a-dt*2.2);
+      for(const w of wv){const tt=(t-w.t0)-Math.hypot(o.x-w.x,o.y-w.y)/330;if(tt>0&&tt<.7)o.a=Math.max(o.a,Math.sin(Math.PI*tt/.7))}
+      if(S.pin){const d=Math.hypot(P.x-o.x,P.y-o.y);if(d<nd){nd=d;near=o}}}
+    if(near)near.a=Math.max(near.a,.6);
+    for(const o of cs){const j=Math.sin(t*.9+o.sd)*1.2;disc(c,o.x+j,o.y,o.r,o.c,.2+.5*o.a);ring(c,o.x+j,o.y,o.r,o.c,.6+.4*o.a,1.6,o.sd,1.6);disc(c,o.x+j+3,o.y-2,4.5,o.c,.75);
+      if(o.a>.05){gl(c,o.x,o.y,o.r*2.4,CH,.55*o.a)}}
+  },
+  tap(x,y){if(y>250&&y<880){let b=null,bd=1e9;for(const o of cs){const d=Math.hypot(x-o.x,y-o.y);if(d<bd){bd=d;b=o}}wave(b.x,b.y);idle=0}},
+  act(){const o=cs[(Math.random()*cs.length)|0];wave(o.x,o.y)}
+});
+})();
+
+// ======================= tafel 13: een heelal ===============================
+(()=>{
+const pts=[],R0=mul32(3),T0=performance.now();
+const seg=(x,y,x0,y0,x1,y1,w)=>{const dx=x1-x0,dy=y1-y0,u=clamp(((x-x0)*dx+(y-y0)*dy)/(dx*dx+dy*dy),0,1);return Math.hypot(x-x0-dx*u,y-y0-dy*u)<w};
+const inside=(x,y)=>Math.hypot(x-800,y-352)<56||seg(x,y,800,400,800,430,24)||(y>428&&y<716&&Math.abs(x-800)<lerp(104,70,sm((y-428)/160))+(y>640?(y-640)*.12:0))
+  ||seg(x,y,712,452,596,690,21)||seg(x,y,888,452,1004,690,21)||seg(x,y,596,690,574,744,15)||seg(x,y,1004,690,1026,744,15)
+  ||seg(x,y,766,700,738,1010,29)||seg(x,y,834,700,862,1010,29)||seg(x,y,738,1010,716,1030,16)||seg(x,y,862,1010,884,1030,16);
+while(pts.length<2500){const x=560+R0()*480,y=290+R0()*750;if(inside(x,y))pts.push({hx:x,hy:y,x,y,ph:R0()*TAU,k:(R0()*R0()*6)|0,z:1.6+R0()*2})}
+pts.sort((a,b)=>a.k-b.k);const COL=[CH,CH,CY,YE,MG,GR];
+const S=sheet({name:'heelal',h:1370,tint:[30,50,110],
+  stat(c,R){
+    head(c,'een heelal','37 biljoen cellen');
+    for(let i=0;i<700;i++){const x=R()*LW,y=R()*1060,a=R()*R()*.5;c.fillStyle=rgba(CH,a);c.fillRect(x,y,1+R()*1.6,1+R()*1.6)}
+    tx(c,'de melkweg telt een paar honderd miljard sterren. jij hebt honderd keer zoveel cellen.\nelke stip hier staat voor vijftien miljard ervan.\nze kwamen allemaal uit één punt van een tiende millimeter.',800,1100,26,CH,.84);
+    tx(c,'geen plasje modder.',800,1282,50,CH,.95);
+    tx(c,'aantallen: bianconi e.a. 2013, sender en milo 2021. omstreden waar het erbij staat.',800,1334,19,DIM,.7);
+  },
+  live(c,t,dt){
+    gl(c,800,640,520,BL,.14);
+    let k=-1;const pin=S.pin;
+    for(const o of pts){let tx_=o.hx,ty_=o.hy;
+      if(pin){const dx=o.hx-P.x,dy=o.hy-P.y,d=Math.hypot(dx,dy);if(d<130){const f=(130-d)*.9/(d||1);tx_+=dx*f;ty_+=dy*f}}
+      o.x+=(tx_-o.x)*.12;o.y+=(ty_-o.y)*.12;
+      if(o.k!==k){k=o.k;c.fillStyle=rgba(COL[k],1)}
+      c.globalAlpha=.35+.6*(.5+.5*Math.sin(t*1.4+o.ph));c.fillRect(o.x,o.y,o.z,o.z)}
+    c.globalAlpha=1;
+    const n=3.8e6*(performance.now()-T0)/1000,s=n<1e9?nl(n/1e6)+' miljoen':(n/1e9).toFixed(1).replace('.',',')+' miljard';
+    tx(c,'terwijl je hier keek zijn er '+s+' van vervangen. je bent er nog.',800,1218,27,YE,.95);
+  }
+});
+})();
+
+// ---------------- begin ----------------
+layout();
+if(location.hash==='#film')filmStart();
+if(STILL){frame(performance.now());window.__done=true}else requestAnimationFrame(frame);
+window.__nunki={SHEETS,P,FILM};
+</script>
+<script>
+// een tik met een vinger telt als klik. een telefoon stuurt niet altijd een klik
+// voor een tik op een canvas, dus de tik wordt uit de aanraking zelf gelezen.
+(function(){
+  let down=null,last=-1e9;
+  const skip=el=>el&&el.closest&&el.closest('a,button,nav,input,label,select,textarea,summary');
+  addEventListener('touchstart',e=>{down=e.touches.length===1?{x:e.touches[0].clientX,y:e.touches[0].clientY,t:performance.now()}:null},{passive:true});
+  addEventListener('touchmove',e=>{if(down&&Math.hypot(e.touches[0].clientX-down.x,e.touches[0].clientY-down.y)>12)down=null},{passive:true});
+  addEventListener('touchcancel',()=>{down=null},{passive:true});
+  addEventListener('touchend',e=>{
+    const d=down,t=e.changedTouches[0];down=null;
+    if(!d||!t||e.touches.length||performance.now()-d.t>600||Math.hypot(t.clientX-d.x,t.clientY-d.y)>12)return;
+    const el=document.elementFromPoint(t.clientX,t.clientY)||e.target;
+    if(skip(el)){last=-1e9;return}
+    last=performance.now();
+    el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window,clientX:t.clientX,clientY:t.clientY,screenX:t.screenX,screenY:t.screenY}));
+  },{passive:true});
+  addEventListener('click',e=>{if(e.isTrusted&&performance.now()-last<800&&!skip(e.target)){e.stopImmediatePropagation();e.preventDefault()}},true);
+})();
+</script>
+<!-- nunki:nav -->
+<style>
+.nunki-nav{--paper:#eee3c5;--card:#f6f1e4;--ink:#2a251f;--muted:#7a6f5c;--clay:#ac5036;
+  position:relative;z-index:2;margin-top:-14px;box-sizing:border-box;
+  filter:drop-shadow(0 -8px 14px rgba(0,0,0,.28));
+  font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.nunki-nav *{box-sizing:border-box}
+.nunki-sheet{position:relative;padding:clamp(2.6rem,6vw,4rem) clamp(1rem,4vw,2.5rem) clamp(2.2rem,5vw,3.2rem);
+  background:radial-gradient(120% 80% at 50% 0%,rgba(255,252,240,.6),transparent 65%),var(--paper);
+  clip-path:polygon(0.00% 5.3px, 2.17% 7.7px, 4.35% 12.1px, 6.52% 6.6px, 8.70% 7.1px, 10.87% 8.0px, 13.04% 3.2px, 15.22% 7.1px, 17.39% 8.6px, 19.57% 10.5px, 21.74% 2.1px, 23.91% 4.6px, 26.09% 2.1px, 28.26% 10.7px, 30.43% 9.3px, 32.61% 1.5px, 34.78% 12.8px, 36.96% 12.6px, 39.13% 8.8px, 41.30% 8.4px, 43.48% 2.9px, 45.65% 1.2px, 47.83% 7.3px, 50.00% 1.7px, 52.17% 3.3px, 54.35% 3.9px, 56.52% 1.4px, 58.70% 6.6px, 60.87% 6.3px, 63.04% 11.1px, 65.22% 7.2px, 67.39% 8.7px, 69.57% 7.0px, 71.74% 8.9px, 73.91% 6.5px, 76.09% 4.3px, 78.26% 13.0px, 80.43% 12.9px, 82.61% 11.1px, 84.78% 9.5px, 86.96% 4.8px, 89.13% 3.8px, 91.30% 4.5px, 93.48% 1.8px, 95.65% 10.2px, 97.83% 5.8px, 100.00% 7.2px, 100% 100%, 0 100%)}
+.nunki-sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.nunki-kicker{position:relative;margin:0 0 clamp(1.6rem,4vw,2.2rem);text-align:center;font-size:clamp(1.5rem,4vw,2rem);line-height:1.1;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-weight:400;text-transform:lowercase;color:var(--ink)}
+.nunki-kicker::after{content:"";display:block;width:110px;height:3px;margin:.55rem auto 0;border-radius:3px;background:var(--clay);opacity:.85;transform:rotate(-1deg)}
+.nunki-group{position:relative;display:flex;align-items:center;justify-content:center;gap:.9rem;max-width:1000px;margin:0 auto 1.4rem;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;font-size:1.15rem;line-height:1;
+  text-transform:lowercase;color:var(--muted)}
+.nunki-group::before,.nunki-group::after{content:"";flex:0 1 70px;height:1px;background:rgba(42,37,31,.16)}
+.nunki-grid+.nunki-group{margin-top:clamp(2.2rem,5vw,3rem)}
+.nunki-grid{position:relative;list-style:none;margin:0 auto;padding:0;max-width:1000px;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:1.9rem 1.4rem}
+.nunki-grid li{display:flex;flex:0 1 196px;min-width:min(100%,170px)}
+@media (min-width:720px){
+  .nunki-grid.nunki-n-4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:520px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-4 li{flex:none;width:100%;max-width:240px;justify-self:center}
+  .nunki-grid.nunki-n-5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-5 li{flex:none;width:100%;max-width:240px;justify-self:center;grid-column:span 2}
+  .nunki-grid.nunki-n-5 li:nth-child(4){grid-column:2/span 2}
+  .nunki-grid.nunki-n-6{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:780px;gap:1.9rem 1.4rem}
+  .nunki-grid.nunki-n-6 li{flex:none;width:100%;max-width:240px;justify-self:center}
+}
+.nunki-card{--tilt:-1deg;position:relative;display:flex;flex-direction:column;width:100%;padding:.5rem .5rem .7rem;color:inherit;text-decoration:none;
+  background:var(--card);border-radius:3px;transform:rotate(var(--tilt));
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px rgba(42,37,31,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(42,37,31,.18),0 12px 22px -14px color-mix(in srgb,var(--theme,#2a251f) 70%,transparent);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease}
+.nunki-grid li:nth-child(4n+2) .nunki-card{--tilt:.8deg}
+.nunki-grid li:nth-child(4n+3) .nunki-card{--tilt:-.4deg}
+.nunki-grid li:nth-child(4n+4) .nunki-card{--tilt:1.1deg}
+.nunki-card:hover,.nunki-card:focus-visible{transform:rotate(0) translateY(-5px);outline:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(42,37,31,.2),0 22px 30px -16px rgba(42,37,31,.6)}
+.nunki-card:focus-visible{outline:2px solid var(--clay);outline-offset:4px}
+.nunki-tape{position:absolute;top:-9px;left:50%;width:64px;height:19px;margin-left:-32px;transform:rotate(-2.5deg);background:rgba(214,178,108,.55);
+  box-shadow:0 1px 2px rgba(42,37,31,.12);z-index:2}
+.nunki-grid li:nth-child(even) .nunki-tape{transform:rotate(2deg)}
+.nunki-thumb{display:block;position:relative;overflow:hidden;aspect-ratio:800/420;background:#e6d9b6}
+.nunki-thumb::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 1px rgba(42,37,31,.16) inset}
+.nunki-thumb img{display:block;width:100%;height:auto;aspect-ratio:800/420;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.nunki-card:hover .nunki-thumb img,.nunki-card:focus-visible .nunki-thumb img{transform:scale(1.05)}
+.nunki-cap{display:block;padding:.6rem .15rem 0}
+.nunki-name{display:block;font-size:1.3rem;line-height:1.1;text-transform:lowercase;
+  font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
+.nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
+.nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
+.nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
+  color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,background-color .3s ease}
+.nunki-home-mark svg{display:block;width:26px;height:26px;flex:none;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.nunki-home-mark .nm-name{display:block;margin-left:8px;white-space:nowrap;font:400 1.15rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-transform:lowercase;transform:translateY(1px)}
+.nunki-home-mark:hover,.nunki-home-mark:focus-visible{outline:none;transform:translateY(-2px);background:rgba(251,248,239,.97);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 12px 28px -12px rgba(0,0,0,.5)}
+.nunki-home-mark:hover svg,.nunki-home-mark:focus-visible svg{transform:rotate(-8deg)}
+.nunki-home-mark:focus-visible{box-shadow:0 0 0 2px var(--clay),0 8px 20px -12px rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){.nunki-card,.nunki-thumb img,.nunki-home-mark,.nunki-home-mark svg{transition:none}}
+</style>
+<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">
+  <p class="nunki-kicker">nog meer wanden</p>
+  <p class="nunki-group">zelfportretten</p>
+  <ul class="nunki-grid nunki-self nunki-n-6">
+      <li><a class="nunki-card" href="/zelfportret-claude/" style="--theme:#070a13">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-claude.jpg?v=a72b25fc" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">claude</span><span class="nunki-sub">one sentence, a thousand rooms</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-fable-5/" style="--theme:#181410">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">fable 5</span><span class="nunki-sub">drawn from the inside</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-fable-5-2/" style="--theme:#12305c">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-fable-5-2.jpg?v=eaf207ae" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">fable 5.2</span><span class="nunki-sub">i'm told this is blue</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-haiku-5-5/" style="--theme:#1b2030">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=0e357308" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">haiku 5.5</span><span class="nunki-sub">a collection of selves, to find yourself in</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-opus-5-5/" style="--theme:#120e0b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=2ca64a12" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">opus 5.5</span><span class="nunki-sub">a self-portrait in warp and weft</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/zelfportret-sonnet-5-5/" style="--theme:#070d13">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=6965c746" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">sonnet 5.5</span><span class="nunki-sub">a liquid prisoner pent in walls of glass</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-group">andere wanden</p>
+  <ul class="nunki-grid nunki-walls">
+      <li><a class="nunki-card" href="/hart/" style="--theme:#1a090f">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/hart.jpg?v=9cf3d69d" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">hart</span><span class="nunki-sub">een muur over wat ons raakt</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/adem/" style="--theme:#e3e9ee">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/adem.jpg?v=4791763f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">adem</span><span class="nunki-sub">een muur over wat ons beweegt</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/getij/" style="--theme:#13202b">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/getij.jpg?v=450853d8" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">getij</span><span class="nunki-sub">een muur van water, van binnenuit</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/patronen/" style="--theme:#16131d">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/patronen.jpg?v=f9f650da" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">patronen</span><span class="nunki-sub">een muur over getal en vorm</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/ringen/" style="--theme:#1a1712">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/ringen.jpg?v=08b7e913" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">ringen</span><span class="nunki-sub">een muur over een boom en zijn jaren</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/velden/" style="--theme:#0e1020">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/velden.jpg?v=21ee3090" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">velden</span><span class="nunki-sub">elektromagnetisch universum</span></span>
+      </a></li>
+      <li><a class="nunki-card" href="/vuur/" style="--theme:#160f0e">
+        <span class="nunki-tape" aria-hidden="true"></span>
+        <span class="nunki-thumb"><img src="/images/thumbs/vuur.jpg?v=69c631f6" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+        <span class="nunki-cap"><span class="nunki-name">vuur</span><span class="nunki-sub">een muur over wat ons aansteekt</span></span>
+      </a></li>
+  </ul>
+  <p class="nunki-home"><a class="nunki-home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">nunkichannels</span></a></p>
+</div></nav>
+<!-- /nunki:nav -->
+</body>
+</html>
