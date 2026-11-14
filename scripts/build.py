@@ -2,6 +2,7 @@
 """Scan httpdocs/*/index.html, write pages.json, OG images, and social meta in head."""
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import os
@@ -35,6 +36,10 @@ W, H = 1200, 630
 CREAM = (246, 241, 228)
 MUTED = (180, 172, 158)
 
+DESC_JSON = ROOT / "scripts" / "descriptions.json"
+SEO_JSON = ROOT / "scripts" / "seo.json"
+SEO_START = "<!-- nunki:seo -->"
+SEO_END = "<!-- /nunki:seo -->"
 SOCIAL_START = "<!-- nunki:social -->"
 SOCIAL_END = "<!-- /nunki:social -->"
 NAV_START = "<!-- nunki:nav -->"
@@ -115,8 +120,10 @@ def parse_page(slug: str, html: str) -> dict:
     theme = parse_theme(html)
     path = f"/{slug}/"
     og_image = f"/images/og/{slug}.jpg"
+    lm = re.search(r"<html[^>]*\blang=[\"']([a-zA-Z-]+)", html)
     return {
         "slug": slug,
+        "lang": (lm.group(1).lower() if lm else "nl"),
         "path": path,
         "title": title,
         "subtitle": subtitle,
@@ -346,6 +353,9 @@ def clean_for_shot(html: str) -> str:
     html = re.sub(
         re.escape(MARK_START) + r".*?" + re.escape(MARK_END), "", html, flags=re.DOTALL
     )
+    html = re.sub(
+        re.escape(SEO_START) + r".*?" + re.escape(SEO_END), "", html, flags=re.DOTALL
+    )
     return strip_julius(html)
 
 
@@ -545,47 +555,111 @@ def torn_edge(seed: int = 11) -> str:
     return ", ".join(pts)
 
 
-def nav_card(p: dict) -> str:
-    sub = f'<span class="nunki-sub">{esc(p["subtitle"])}</span>' if p.get("subtitle") else ""
-    return f"""      <li><a class="nunki-card" href="{esc(p["path"])}" style="--theme:{esc(p["theme"])}">
-        <span class="nunki-tape" aria-hidden="true"></span>
-        <span class="nunki-thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
-        <span class="nunki-cap"><span class="nunki-name">{esc(p["title"])}</span>{sub}</span>
-      </a></li>"""
+NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand aanpassen. */
+(function () {
+  var DATA = __DATA__;
+  var LOGO = __LOGO__;
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  }
+  function card(p) {
+    var li = el('li');
+    var a = el('a', 'nunki-card');
+    a.href = p.path;
+    a.style.setProperty('--theme', p.theme);
+    a.appendChild(el('span', 'nunki-tape')).setAttribute('aria-hidden', 'true');
+    var th = el('span', 'nunki-thumb');
+    var img = new Image();
+    img.src = p.thumb + '?v=' + p.v;
+    img.alt = '';
+    img.width = 800;
+    img.height = 420;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    th.appendChild(img);
+    a.appendChild(th);
+    var cap = el('span', 'nunki-cap');
+    cap.appendChild(el('span', 'nunki-name', p.title));
+    if (p.subtitle) cap.appendChild(el('span', 'nunki-sub', p.subtitle));
+    a.appendChild(cap);
+    li.appendChild(a);
+    return li;
+  }
+  function build() {
+    if (document.querySelector('.nunki-nav')) return;
+    var here = location.pathname.replace(/index\.html$/, '');
+    if (here.slice(-1) !== '/') here += '/';
+    var nav = el('nav', 'nunki-nav');
+    nav.setAttribute('aria-label', 'Andere wanden');
+    var sheet = el('div', 'nunki-sheet');
+    sheet.appendChild(el('p', 'nunki-kicker', 'nog meer wanden'));
+    var any = false;
+    DATA.series.forEach(function (g) {
+      var others = g.pages.filter(function (p) { return p.path !== here; });
+      if (!others.length) return;
+      any = true;
+      sheet.appendChild(el('p', 'nunki-group', g.label));
+      var n = others.length;
+      var ul = el('ul', 'nunki-grid nunki-' + g.key + (n >= 4 && n <= 6 ? ' nunki-n-' + n : ''));
+      others.forEach(function (p) { ul.appendChild(card(p)); });
+      sheet.appendChild(ul);
+    });
+    if (!any) return;
+    var home = el('p', 'nunki-home');
+    var a = el('a', 'nunki-home-mark');
+    a.href = '/';
+    a.title = DATA.name;
+    a.setAttribute('aria-label', DATA.name + ', alle wanden');
+    a.innerHTML = LOGO + '<span class="nm-name"></span>';
+    a.querySelector('.nm-name').textContent = DATA.name;
+    home.appendChild(a);
+    sheet.appendChild(home);
+    nav.appendChild(sheet);
+    document.body.appendChild(nav);
+  }
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = '/nav.css';
+  document.head.appendChild(css);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
+  else build();
+})();
+"""
 
 
-def nav_home_badge(site: dict) -> str:
-    name = esc(site["name"])
-    return (
-        f'  <p class="nunki-home">'
-        f'<a class="nunki-home-mark" href="/" title="{name}" aria-label="{name}, alle wanden">'
-        f"{LOGO_SVG}<span class=\"nm-name\">{name}</span></a></p>\n"
+def write_nav_assets(pages: list[dict], site: dict) -> None:
+    """De navigatie onderaan elke wand staat op één plek: /nav.css en /nav.js."""
+    series = [
+        {
+            "key": key,
+            "label": label,
+            "pages": [
+                {
+                    "path": p["path"],
+                    "title": p["title"],
+                    "subtitle": p.get("subtitle") or "",
+                    "theme": p["theme"],
+                    "thumb": p["thumb"],
+                    "v": p["ogVersion"],
+                }
+                for p in items
+            ],
+        }
+        for key, label, items in series_of(pages)
+    ]
+    data = {"name": site["name"], "series": series}
+    js = NAV_JS.replace("__DATA__", json.dumps(data, ensure_ascii=False)).replace(
+        "__LOGO__", json.dumps(LOGO_SVG)
     )
+    write_public(HTTPDOCS / "nav.js", js)
+    write_public(HTTPDOCS / "nav.css", NAV_CSS.replace("__TORN__", torn_edge()).strip() + "\n")
 
 
-def nav_block(current: dict, pages: list[dict], site: dict) -> str:
-    groups = []
-    for key, label, items in series_of(pages):
-        others = [p for p in items if p["slug"] != current["slug"]]
-        if not others:
-            continue
-        n = len(others)
-        count = f" nunki-n-{n}" if n in (4, 5, 6) else ""
-        groups.append(
-            f'  <p class="nunki-group">{esc(label)}</p>\n'
-            f'  <ul class="nunki-grid nunki-{key}{count}">\n' + "\n".join(nav_card(p) for p in others) + "\n  </ul>\n"
-        )
-    if not groups:
-        return ""
-    css = NAV_CSS.replace("__TORN__", torn_edge())
-    return (
-        f"{NAV_START}\n<style>{css}</style>\n"
-        '<nav class="nunki-nav" aria-label="Andere wanden"><div class="nunki-sheet">\n'
-        '  <p class="nunki-kicker">nog meer wanden</p>\n'
-        + "".join(groups)
-        + nav_home_badge(site)
-        + f"</div></nav>\n{NAV_END}"
-    )
+def nav_block() -> str:
+    return f'{NAV_START}<script src="/nav.js" defer></script>{NAV_END}'
 
 
 MARK_CSS = """
@@ -660,10 +734,36 @@ def social_block(page: dict, site: dict, *, is_home: bool = False) -> str:
     title = page["title"]
     if is_home:
         title = site["name"]
-    desc = page.get("subtitle") or site["name"]
+    descs = json.loads(DESC_JSON.read_text(encoding="utf-8")) if DESC_JSON.is_file() else {}
+    desc = descs.get("_home" if is_home else page.get("slug", ""), "") or page.get("subtitle") or site["name"]
+    sub = page.get("subtitle") or site["name"]
     url = abs_url(site, page["path"] if not is_home else "/")
     img = abs_url(site, page["ogImage"])
-    alt = f"{page['title']} — {desc}" if desc else page["title"]
+    alt = f"{page['title']} — {sub}"
+    lang = page.get("lang", "nl")
+    locale = {"nl": "nl_NL", "en": "en_US"}.get(lang, lang)
+    if is_home:
+        ld = {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": site["name"],
+            "url": abs_url(site, "/"),
+            "description": desc,
+            "inLanguage": lang,
+        }
+    else:
+        ld = {
+            "@context": "https://schema.org",
+            "@type": "CreativeWork",
+            "name": page["title"],
+            "headline": f"{page['title']} · {sub}" if sub else page["title"],
+            "description": desc,
+            "url": url,
+            "image": img,
+            "inLanguage": lang,
+            "isPartOf": {"@type": "WebSite", "name": site["name"], "url": abs_url(site, "/")},
+        }
+    ld_json = json.dumps(ld, ensure_ascii=False).replace("</", "<\\/")
     return textwrap.dedent(
         f"""
         {SOCIAL_START}
@@ -676,6 +776,7 @@ def social_block(page: dict, site: dict, *, is_home: bool = False) -> str:
         <meta property="og:title" content="{esc(title)}">
         <meta property="og:description" content="{esc(desc)}">
         <meta property="og:type" content="website">
+        <meta property="og:locale" content="{locale}">
         <meta property="og:url" content="{esc(url)}">
         <meta property="og:image" content="{esc(img)}">
         <meta property="og:image:width" content="1200">
@@ -686,6 +787,7 @@ def social_block(page: dict, site: dict, *, is_home: bool = False) -> str:
         <meta name="twitter:description" content="{esc(desc)}">
         <meta name="twitter:image" content="{esc(img)}">
         <meta name="twitter:image:alt" content="{esc(alt)}">
+        <script type="application/ld+json">{ld_json}</script>
         {SOCIAL_END}
         """
     ).strip()
@@ -698,6 +800,71 @@ def esc(s: str) -> str:
         .replace("<", "&lt;")
         .replace(">", "&gt;")
     )
+
+
+def last_modified(path: Path) -> str:
+    """Datum van de laatste commit die dit bestand raakte (fallback: mtime)."""
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%cs", "--", str(path)],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if out:
+            return out
+    except Exception:
+        pass
+    return datetime.date.fromtimestamp(path.stat().st_mtime).isoformat()
+
+
+def write_sitemap(site: dict, pages: list[dict]) -> None:
+    entries = [("/", last_modified(HTTPDOCS / "index.html"), "1.0")]
+    for p in pages:
+        entries.append((p["path"], last_modified(HTTPDOCS / p["slug"] / "index.html"), "0.8"))
+    # de homepage verandert mee met de nieuwste wand
+    entries[0] = ("/", max(e[1] for e in entries), "1.0")
+    urls = "\n".join(
+        f"  <url>\n    <loc>{esc(abs_url(site, path))}</loc>\n"
+        f"    <lastmod>{lm}</lastmod>\n    <priority>{pr}</priority>\n  </url>"
+        for path, lm, pr in entries
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{urls}\n</urlset>\n"
+    )
+    write_public(HTTPDOCS / "sitemap.xml", xml)
+    write_public(
+        HTTPDOCS / "robots.txt",
+        f"User-agent: *\nAllow: /\n\nSitemap: {abs_url(site, '/sitemap.xml')}\n",
+    )
+
+
+SEO_CSS = (
+    "position:absolute;width:1px;height:1px;margin:-1px;padding:0;"
+    "overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0"
+)
+
+
+def seo_block(page: dict, html: str, text: str) -> str:
+    """Leesbare tekst voor zoekmachines en schermlezers (visueel verborgen)."""
+    plain = re.sub(re.escape(SEO_START) + r".*?" + re.escape(SEO_END), "", html, flags=re.DOTALL)
+    has_h1 = re.search(r"<h1[\s>]", plain, re.IGNORECASE) is not None
+    head = "" if has_h1 else f"<h1>{esc(page['title'])}</h1>"
+    return (
+        f'{SEO_START}\n<div style="{SEO_CSS}">{head}<p>{esc(text)}</p></div>\n{SEO_END}'
+    )
+
+
+def inject_seo(html: str, block: str) -> str:
+    html = re.sub(
+        r"\s*" + re.escape(SEO_START) + r".*?" + re.escape(SEO_END), "", html, flags=re.DOTALL
+    )
+    if not block:
+        return html
+    m = re.search(r"<body[^>]*>", html, re.IGNORECASE)
+    if not m:
+        return html
+    return html[: m.end()] + "\n" + block + html[m.end() :]
 
 
 def strip_julius(html: str) -> str:
@@ -800,8 +967,10 @@ def main() -> None:
 
     for html_path, html, page in sources:
         html = inject_social(html, social_block(page, site))
+        seo_text = json.loads(SEO_JSON.read_text(encoding="utf-8")).get(page["slug"], "")
+        html = inject_seo(html, seo_block(page, html, seo_text) if seo_text else "")
         html = inject_mark(html, mark_block(page))
-        write_public(html_path, inject_nav(html, nav_block(page, pages, site)))
+        write_public(html_path, inject_nav(html, nav_block()))
 
     public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]
     payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": public_pages}
@@ -838,6 +1007,8 @@ def main() -> None:
             inject_social(html, social_block(home, site, is_home=True)),
         )
 
+    write_sitemap(site, pages)
+    write_nav_assets(pages, site)
     print(f"Built {len(pages)} pages → {PAGES_JSON.relative_to(ROOT)}")
 
 

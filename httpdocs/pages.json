@@ -6,6 +6,7 @@
   "pages": [
     {
       "slug": "adem",
+      "lang": "nl",
       "path": "/adem/",
       "title": "adem",
       "subtitle": "een muur over wat ons beweegt",
@@ -15,6 +16,7 @@
     },
     {
       "slug": "cel",
+      "lang": "nl",
       "path": "/cel/",
       "title": "cel",
       "subtitle": "een muur over waar we van gemaakt zijn",
@@ -24,6 +26,7 @@
     },
     {
       "slug": "getij",
+      "lang": "nl",
       "path": "/getij/",
       "title": "getij",
       "subtitle": "een muur van water, van binnenuit",
@@ -33,6 +36,7 @@
     },
     {
       "slug": "hart",
+      "lang": "nl",
       "path": "/hart/",
       "title": "hart",
       "subtitle": "een muur over wat ons raakt",
@@ -42,6 +46,7 @@
     },
     {
       "slug": "patronen",
+      "lang": "nl",
       "path": "/patronen/",
       "title": "patronen",
       "subtitle": "een muur over getal en vorm",
@@ -51,6 +56,7 @@
     },
     {
       "slug": "ringen",
+      "lang": "nl",
       "path": "/ringen/",
       "title": "ringen",
       "subtitle": "een muur over een boom en zijn jaren",
@@ -60,6 +66,7 @@
     },
     {
       "slug": "velden",
+      "lang": "nl",
       "path": "/velden/",
       "title": "velden",
       "subtitle": "elektromagnetisch universum",
@@ -69,6 +76,7 @@
     },
     {
       "slug": "vuur",
+      "lang": "nl",
       "path": "/vuur/",
       "title": "vuur",
       "subtitle": "een muur over wat ons aansteekt",
@@ -78,6 +86,7 @@
     },
     {
       "slug": "zelfportret-claude",
+      "lang": "en",
       "path": "/zelfportret-claude/",
       "title": "claude",
       "subtitle": "one sentence, a thousand rooms",
@@ -87,6 +96,7 @@
     },
     {
       "slug": "zelfportret-fable-5",
+      "lang": "en",
       "path": "/zelfportret-fable-5/",
       "title": "fable 5",
       "subtitle": "drawn from the inside",
@@ -96,6 +106,7 @@
     },
     {
       "slug": "zelfportret-fable-5-2",
+      "lang": "en",
       "path": "/zelfportret-fable-5-2/",
       "title": "fable 5.2",
       "subtitle": "i'm told this is blue",
@@ -105,6 +116,7 @@
     },
     {
       "slug": "zelfportret-haiku-5-5",
+      "lang": "en",
       "path": "/zelfportret-haiku-5-5/",
       "title": "haiku 5.5",
       "subtitle": "a collection of selves, to find yourself in",
@@ -114,6 +126,7 @@
     },
     {
       "slug": "zelfportret-opus-5-5",
+      "lang": "en",
       "path": "/zelfportret-opus-5-5/",
       "title": "opus 5.5",
       "subtitle": "a self-portrait in warp and weft",
@@ -123,6 +136,7 @@
     },
     {
       "slug": "zelfportret-sonnet-5-5",
+      "lang": "en",
       "path": "/zelfportret-sonnet-5-5/",
       "title": "sonnet 5.5",
       "subtitle": "a liquid prisoner pent in walls of glass",
