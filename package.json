@@ -1,0 +1,9 @@
+{
+  "name": "nunkichannels",
+  "private": true,
+  "description": "Alleen dev-tools (tests van de wanden); de site zelf heeft geen build-afhankelijkheden.",
+  "type": "module",
+  "devDependencies": {
+    "playwright-core": "1.50.1"
+  }
+}
