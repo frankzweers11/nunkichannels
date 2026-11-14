@@ -4,7 +4,8 @@ Verzameld op 13 november 2026. Drie bronnen, op volgorde van wat je vroeg:
 
 1. Het NAS-volume **Data** (`/Volumes/Data`), met de gesorteerde kast `health` en wat er inhoudelijk naast ligt (water, Schauberger).
 2. `frankzweers.nl`, site **geloof in liefde**: `over_celgeheugen` (25 berichten, 2017–2020) en `over_gezondheid` (14 berichten, 2018–2021).
-3. Wat in deze repo al over de cel staat, in `documentatie/one-6gmatrix`. Die teksten zijn hier niet gekopieerd. Hieronder staat de kaart.
+3. Wat in deze repo al over de cel staat, in `documentatie/one-6gmatrix`. De teksten staan nu ook hier, in [one-cel.md](one-cel.md).
+4. Ulrike Granögger, *The Wave Genome* (2018): [wave-genome-granogger.md](wave-genome-granogger.md).
 
 De pdf’s blijven op de NAS. De blogs blijven in `frankzweers.nl/httpdocs/geloofinliefde/`. In deze map staan de teksten van de blogs en een inhoudsopgave van de bestanden.
 
@@ -15,6 +16,11 @@ De pdf’s blijven op de NAS. De blogs blijven in `frankzweers.nl/httpdocs/geloo
 | [over-celgeheugen.md](over-celgeheugen.md) | De wall: Lipton, Emoto, Montagnier, Steiner over erfelijkheid, 528 Hz, en de serie van 18 delen |
 | [over-gezondheid.md](over-gezondheid.md) | De wall: lading, bloed en straling, adem, koorts, vasten, het lange stuk over psyche en lichaam, darmen, aluminium, cosmetica, wortelkanalen, de leverreiniging, CBD |
 | [nas-data.md](nas-data.md) | Welke bestanden op Data daarbij horen, met pad |
+| [one-cel.md](one-cel.md) | 16 onderwerpen en 50 feiten uit One, plus de portretten van Popp, Lakhovsky, Rife, Pollack, Emoto, Schauberger en Sheldrake |
+| [wave-genome-granogger.md](wave-genome-granogger.md) | De lezing van Granögger: hoofdstukken, en de bronnenlijst van Solari |
+| [blinde-vlekken.md](blinde-vlekken.md) | Wat er nog niet in zit: de cel zelf, en de boeken die de map al aanraakt |
+| [eerste-delingen.md](eerste-delingen.md) | De eerste dagen, het Ei van het Leven, de Bloem van het Leven |
+| [beelden.md](beelden.md) | De paar animaties en microfoto’s die de cel zichtbaar hebben gemaakt |
 
 ## Zes draden
 
@@ -23,6 +29,8 @@ Het materiaal valt in zes lagen. Voor een filmwand is dit de volgorde die er al 
 ### 1. Hoe een cel werkt
 
 Bruce Lipton, *The Joy of Cells* (28 oktober 2017), in de vorm van een Bob Ross-imitatie. Op de NAS de lijn Béchamp: het bloed en zijn derde element, en Hume, *Béchamp or Pasteur?*
+
+De eerste delingen en hun figuur, het Ei en de Bloem van het Leven, staan in [eerste-delingen.md](eerste-delingen.md). De films en de microfoto’s die de cel tonen staan in [beelden.md](beelden.md).
 
 ### 2. Geheugen van water
 
@@ -40,7 +48,9 @@ Achttien afleveringen, geplaatst op 8 oktober 2017, bijschrift *Het reactieve ve
 
 Steiner over erfelijke belasting (27 oktober 2017): wat geërfd is, zit in het fysieke of hooguit het etherische lichaam; een geestelijke levensbeschouwing kan dat compenseren. Bron in het bericht: *Der Christus-Impuls und die Entwickelung des Ich-Bewußtseins*.
 
-In One, als hypothese ernaast: golfgenoom, taal van DNA, DNA-resonantie.
+In One, als hypothese ernaast: golfgenoom, taal van DNA, DNA-resonantie. Uitgeschreven in [one-cel.md](one-cel.md).
+
+Daar overheen ligt de lezing van Ulrike Granögger, *The Wave Genome* (2018): Gariaev, Popp, Gurwitsch, Fröhlich, Pollack, Montagnier en Tsian Kanchzhen in één verhaal. Hoofdstukken en bronnen in [wave-genome-granogger.md](wave-genome-granogger.md). YouTube heeft daarvan een automatische Engelse ondertiteling. Een los transcript als pdf heeft Solari bij dit rapport niet gemaakt.
 
 ### 5. Frequentie, licht en lading
 
@@ -56,24 +66,6 @@ Het lange eigen stuk van 4 oktober 2018, *Een gezonde psyche begint bij een gezo
 
 Op de NAS sluit daar de kast op aan: Gerson, Weston Price (tandinfecties), silica en aluminium, vitamine C, supplementen en detox, en de Germaanse Nieuwe Geneeskunde van Hamer (ziekte als biologisch programma in het orgaan).
 
-## Al in deze repo (One)
+## One
 
-Teksten, feiten en bronnen: `documentatie/one-6gmatrix/data/topics.json` en `documentatie/one-6gmatrix/bestanden/app/content/nl/onderwerp/`.
-
-| Onderwerp | Id | Waar het over gaat |
-|---|---|---|
-| Coherentie in de cel | `cell-coherence` | Fröhlich: cellen die één modus delen |
-| Biophotonen | `biophotons` | Popp: ultrazwak licht uit levend weefsel |
-| Mitogenetisch | `mitogenetic` | Gurwitsch: ui op ui, deling aan de ontvangende kant |
-| Ultra-zwak licht | `ultraweak-light` | Cellen zenden fotonen uit als bijproduct van stofwisseling |
-| Watergeheugen | `water-memory` | Montagnier 2009: het signaal blijft in sterk verdund water |
-| DNA-signaal | `montagnier-signal` | Dezelfde paper, als hypothese naast de gewone erfelijkheid |
-| Fantoom-DNA | `phantom-dna` | Gariaev: een spoor in water nadat het DNA weg is |
-| Gestructureerd water | `structured-water` | De exclusion zone is nagemeten; de verklaring is open |
-| Vierde fase / EZ | `exclusion-zone` | Pollack: een zone naast hydrofiele oppervlakken die deeltjes weert |
-| Levend water | `living-water` | Pollack en Schauberger naast elkaar |
-| Golfgenoom | `wave-genome` | Het chromosoom als zender en ontvanger |
-| Taal van DNA | `dna-language` | Gariaevs metafoor van een genetische tekst in veldvorm |
-| DNA-harmonics | `dna-harmonics` | Gariaev en Montagnier in één alinea |
-| DNA-resonantie | `dna-resonantie` | Twee hypothesen over erfelijkheid als trilling |
-| Fluorescentie | `fluorescence` | DNA dat in een buis oplicht: een labtechniek |
+De celteksten uit `documentatie/one-6gmatrix` staan in [one-cel.md](one-cel.md): coherentie, biophotonen, mitogenetische straling, ultra-zwak licht, fluorescentie, Rife, watergeheugen, het DNA-signaal van Montagnier, gestructureerd water, de exclusion zone, levend water, golfgenoom, fantoom-DNA, taal van DNA, en de portretten die daarbij horen.
