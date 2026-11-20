@@ -917,9 +917,9 @@ function knock(){
   const t=ac.currentTime+.01,len=Math.floor(ac.sampleRate*.06),b=ac.createBuffer(1,len,ac.sampleRate),d=b.getChannelData(0);
   for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,4);
   const n=ac.createBufferSource(),bp=ac.createBiquadFilter(),g=ac.createGain();
-  n.buffer=b;bp.type='bandpass';bp.frequency.value=900;bp.Q.value=1.4;g.gain.value=.5;
+  n.buffer=b;bp.type='bandpass';bp.frequency.value=900;bp.Q.value=1.4;g.gain.value=.28;
   n.connect(bp);bp.connect(g);g.connect(MASTER);n.start(t);
-  woodTone(140+Math.random()*30,.14);
+  woodTone(140+Math.random()*30,.07);
 }
 const PENTA=[392,330,294,262,220,196,165,147,131,110,98,82,73,65];
 const wallXY=e=>[e.clientX/CSSK,(e.clientY+scrollY)/CSSK];
@@ -948,14 +948,18 @@ addEventListener('pointermove',e=>{
   for(const R0 of RINGS)if(!R0.done&&Math.hypot(x-R0.x,y-R0.y)>12){R0.done=true;R0.end=t}
   const L=TP[TP.length-1];
   if(L&&Math.hypot(x-L.x,y-L.y)*CSSK<3)return;
-  TP.push({x,y,t});if(TP.length>320)TP.shift();
+  // where a sheet has something of its own to touch, the line stays a faint
+  // pencil line and grows nothing: the drawing has the word there
+  const busy=!!h;
+  TP.push({x,y,t,busy});if(TP.length>320)TP.shift();
   trailDirty=true;
   if(!step)step={x,y,d:0,side:1};
+  if(busy){step.d=0;step.x=x;step.y=y;return}
   step.d+=Math.hypot(x-step.x,y-step.y);step.x=x;step.y=y;
   const mode=growAt(y);
   if(mode==='ember'){
-    while(step.d>5){step.d-=5;FX.push({k:'ember',x:x+rd(VR,-7,7),y:y+rd(VR,-5,5),t,vx:rd(VR,-18,18),vy:-rd(VR,45,110),life:rd(VR,1200,2600),s:rd(VR,1.4,3.4)})}
-  }else if(step.d>32){
+    while(step.d>9){step.d-=9;FX.push({k:'ember',x:x+rd(VR,-7,7),y:y+rd(VR,-5,5),t,vx:rd(VR,-18,18),vy:-rd(VR,45,110),life:rd(VR,1200,2600),s:rd(VR,1.4,3.4)})}
+  }else if(step.d>(mode==='root'?56:64)){
     step.d=0;step.side*=-1;
     const P0=TP[Math.max(0,TP.length-5)],dir=Math.atan2(y-P0.y,x-P0.x);
     const ang=mode==='root'?dir+step.side*rd(VR,.5,1.3)+(Math.PI/2-dir)*.25:dir+step.side*rd(VR,.6,1.2);
@@ -975,17 +979,16 @@ addEventListener('click',e=>{
   PTR.tap=t;
   const h=hitAt(x,y);
   if(h&&h.fn(x,y-h.dy,t)!==false)return;
+  // bare paper: a soft knock, and the wood answers with one ring
   knock();
-  const mode=growAt(y);
-  if(mode==='ember')for(let i=0;i<46;i++){const a=rd(VR,0,TAU),v=rd(VR,30,140);FX.push({k:'ember',x,y,t,vx:Math.cos(a)*v,vy:Math.sin(a)*v-60,life:rd(VR,900,2200),s:rd(VR,1.2,2.8)})}
-  else if(mode==='root')for(let i=0;i<7;i++)twig(x,y,Math.PI/2+rd(VR,-1.1,1.1),'root',t+i*60,rd(VR,40,90));
-  else FX.push({k:'sapling',x,y,t,mode,h:rd(VR,90,140),lean:rd(VR,-.22,.22),sd:VR()*99});
+  RINGS.push({x,y,t,years:[{w:rd(VR,7,11),t},{w:rd(VR,2.5,4),t:t+160}],next:1e12,done:true,end:t+600,sd:VR()*99,mode:growAt(y)});
+  if(RINGS.length>4)RINGS.shift();
   trailDirty=true;
 });
 function twig(x,y,ang,mode,t,len){
   len=len??(mode==='root'?rd(VR,24,50):rd(VR,18,40));
   const tw={x,y,ang,len,t,mode,bend:rd(VR,-.55,.55),kids:[],leaf:null,node:false};
-  const nk=mode==='root'?ri(VR,1,2):ch_(VR,.45)?1:0;
+  const nk=mode==='root'?ri(VR,0,1):ch_(VR,.2)?1:0;
   for(let i=0;i<nk;i++)tw.kids.push({at:rd(VR,.4,.75),ang:rd(VR,-1,1),len:len*rd(VR,.4,.65),bend:rd(VR,-.6,.6)});
   if(mode==='leaf'||mode==='dry'||mode==='glow')tw.leaf={s:rd(VR,6,11),rot:rd(VR,-.5,.5),fall:mode==='dry'?rd(VR,1300,2000):rd(VR,2600,3800),vx:rd(VR,-12,12),sw:rd(VR,0,7)};
   if(mode==='root')tw.node=ch_(VR,.6);
@@ -1011,15 +1014,15 @@ function leafCol(mode,age,fall){
 function drawTrail(now){
   const c=trailCx;
   // stand still, and a year grows round you
-  if(!RM&&PTR.in&&!PTR.touch&&now-lastMove>650&&!RINGS.some(R0=>!R0.done)&&PTR.y<TOTALH){
+  if(!RM&&PTR.in&&!PTR.touch&&now-lastMove>1300&&!RINGS.some(R0=>!R0.done)&&PTR.y<TOTALH&&!hitAt(PTR.x,PTR.y)){
     RINGS.push({x:PTR.x,y:PTR.y,t:now,years:[],next:now,done:false,end:0,sd:VR()*99,mode:growAt(PTR.y)});
     if(RINGS.length>4)RINGS.shift();
   }
   for(const R0 of RINGS){
-    if(!R0.done&&now>=R0.next&&R0.years.length<14){
+    if(!R0.done&&now>=R0.next&&R0.years.length<10){
       const k=R0.years.length,w=ch_(VR,.18)?rd(VR,2.5,4):rd(VR,6,13);
       R0.years.push({w,t:now});R0.next=now+(k?820:300);
-      woodTone(PENTA[k],.045);
+      woodTone(PENTA[k],.022);
     }
   }
   RINGS=RINGS.filter(R0=>!R0.done||now-R0.end<3600);
@@ -1037,7 +1040,7 @@ function drawTrail(now){
   const px=1/CSSK;
   // rings first, under everything
   for(const R0 of RINGS){
-    const fade=R0.done?1-(now-R0.end)/3600:1,dark=R0.mode==='root'||R0.mode==='glow'||R0.mode==='ember';
+    const fade=R0.done?clamp(1-(now-R0.end)/3600,0,1):1,dark=R0.mode==='root'||R0.mode==='glow'||R0.mode==='ember';
     const col=dark?GLOWC:[150,104,60];
     let r=5;
     R0.years.forEach((yr,k)=>{
@@ -1055,7 +1058,8 @@ function drawTrail(now){
     const a=TP[i-1],b=TP[i];if(b.t-a.t>110)continue;
     const k=1-(now-b.t)/3000,mode=growAt(b.y);
     const col=mode==='root'?ROOTC:mode==='glow'?GLOWC:mode==='ember'?mix([255,170,70],[110,104,100],1-k):BARKC;
-    c.strokeStyle=rgba(col,(mode==='leaf'||mode==='dry'?.42:.5)*k*k);c.lineWidth=(.9+2.2*k)*px;
+    const q=b.busy?.3:1;
+    c.strokeStyle=rgba(col,(mode==='leaf'||mode==='dry'?.42:.5)*k*k*q);c.lineWidth=(.9+2.2*k)*px*(b.busy?.6:1);
     c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
   }
   // twigs, roots, leaves
