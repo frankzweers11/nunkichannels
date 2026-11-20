@@ -46,6 +46,9 @@ NAV_START = "<!-- nunki:nav -->"
 NAV_END = "<!-- /nunki:nav -->"
 MARK_START = "<!-- nunki:mark -->"
 MARK_END = "<!-- /nunki:mark -->"
+TOUCH_START = "<!-- nunki:touch -->"
+TOUCH_END = "<!-- /nunki:touch -->"
+TOUCH_JS = Path(__file__).resolve().parent / "touch.js"
 
 # De wanden staan in twee series: de zelfportretten van de modellen, en de andere wanden.
 SERIES = [
@@ -355,6 +358,9 @@ def clean_for_shot(html: str) -> str:
     )
     html = re.sub(
         re.escape(SEO_START) + r".*?" + re.escape(SEO_END), "", html, flags=re.DOTALL
+    )
+    html = re.sub(
+        re.escape(TOUCH_START) + r".*?" + re.escape(TOUCH_END), "", html, flags=re.DOTALL
     )
     return strip_julius(html)
 
@@ -709,6 +715,48 @@ def inject_mark(html: str, block: str) -> str:
     return html[: m.end()] + "\n" + block + html[m.end():]
 
 
+# Hoe een wand op een touch-scherm meedoet (zie scripts/touch.js).
+# hand: 'move' = vinger stilhouden en bewegen is de muis, 'press' = ook ingedrukt
+# (tekenen), 'off' = de wand regelt touch zelf. motion: kantelen/schudden gebruikt.
+# shake: 'tap' = schudden is een tik midden in beeld, 'own' = de wand doet het zelf.
+TOUCH_CFG = {
+    "getij": {"hand": "move", "motion": True, "shake": "own"},
+    "ringen": {"hand": "move", "motion": True, "shake": "own"},
+    "velden": {"hand": "press", "motion": True, "shake": "tap"},
+    "patronen": {"hand": "move", "motion": True, "shake": "tap"},
+    "adem": {"hand": "move", "motion": True, "shake": "own"},
+    "hart": {"hand": "move", "motion": True, "shake": "tap"},
+    "vuur": {"hand": "move", "motion": True, "shake": "own"},
+    "cel": {"hand": "off"},
+    "zelfportret-fable-5": {"hand": "off", "sound": False},
+    "zelfportret-haiku-5-5": {"hand": "off", "sound": False},
+}
+TOUCH_DEFAULT = {"hand": "off"}
+
+
+def touch_block(page: dict) -> str:
+    """Geluid, de vinger als hand, kantelen en trillen op telefoon en iPad."""
+    cfg = TOUCH_CFG.get(page["slug"], TOUCH_DEFAULT)
+    js = TOUCH_JS.read_text(encoding="utf-8")
+    return (
+        f"{TOUCH_START}\n<script>window.NUNKI_CFG={json.dumps(cfg)};</script>\n"
+        f"<script>{js}</script>\n{TOUCH_END}"
+    )
+
+
+def inject_touch(html: str, block: str) -> str:
+    html = re.sub(r"\s*" + re.escape(TOUCH_START) + r".*?" + re.escape(TOUCH_END), "", html, flags=re.DOTALL)
+    i = html.find(MARK_END)
+    if i != -1:
+        i += len(MARK_END)
+    else:
+        m = re.search(r"<body[^>]*>", html, re.IGNORECASE)
+        if not m:
+            return html
+        i = m.end()
+    return html[:i] + "\n" + block + html[i:]
+
+
 def inject_nav(html: str, block: str) -> str:
     html = re.sub(
         r"\s*" + re.escape(NAV_START) + r".*?" + re.escape(NAV_END), "", html, flags=re.DOTALL
@@ -970,6 +1018,7 @@ def main() -> None:
         seo_text = json.loads(SEO_JSON.read_text(encoding="utf-8")).get(page["slug"], "")
         html = inject_seo(html, seo_block(page, html, seo_text) if seo_text else "")
         html = inject_mark(html, mark_block(page))
+        html = inject_touch(html, touch_block(page))
         write_public(html_path, inject_nav(html, nav_block()))
 
     public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]

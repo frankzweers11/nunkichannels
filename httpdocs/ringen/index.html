@@ -66,6 +66,244 @@
 <a class="nunki-mark" href="/" title="alle wanden" aria-label="ringen, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">ringen</span></a>
 <script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
 <!-- /nunki:mark -->
+<!-- nunki:touch -->
+<script>window.NUNKI_CFG={"hand": "move", "motion": true, "shake": "own"};</script>
+<script>/* nunki:touch, door scripts/build.py inline in elke wand gezet (direct na <body>,
+   dus vóór de scripts van de wand zelf). Niet in de wanden bewerken, wel hier.
+
+   Zorgt dat geluid en aanraking ook op telefoon en iPad overkomen:
+   1. geluid klinkt ook als de stilknop van de iPhone aan staat (Audio Session 'playback');
+   2. op touch-schermen een luidsprekertje: tik voor geluid, nog eens voor stil;
+   3. vinger even stilhouden en dan bewegen: je vinger is dan de hand (de muis) op
+      de wand, en de pagina scrolt niet. loslaten en vegen scrolt weer gewoon;
+   4. kantelen, schudden en het kompas: NUNKI.tilt {x,y}, het event 'nunki:shake',
+      NUNKI.heading. pas na een eerste tik, en iOS vraagt eerst toestemming;
+   5. NUNKI.buzz(ms): een tik voelbaar maken waar het toestel dat kan.
+
+   De wand kiest via window.NUNKI_CFG (ook door build.py gezet):
+   hand: 'move' (de vinger beweegt de muis), 'press' (ook ingedrukt, voor tekenen), 'off'
+   motion: true als de wand iets met kantelen of schudden doet
+   shake: 'tap' = schudden is een tik midden in beeld, 'own' = de wand luistert zelf
+          naar 'nunki:shake'. */
+(function () {
+  'use strict';
+  var C = window.NUNKI_CFG || {};
+  var N = window.NUNKI = { tilt: { x: 0, y: 0, on: false }, heading: null, muted: false, ctx: [], hand: false, buzz: buzz, motion: motionOn };
+  var coarse = matchMedia('(pointer:coarse)').matches || (navigator.maxTouchPoints > 0 && 'ontouchstart' in window);
+  N.touch = coarse;
+  var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+
+  // ---- 1. sound that is heard, and that stays off when you turned it off ----
+  var Orig = window.AudioContext || window.webkitAudioContext;
+  if (Orig) {
+    var Wrapped = function (o) { var c = o === undefined ? new Orig() : new Orig(o); track(c); return c; };
+    Wrapped.prototype = Orig.prototype;
+    try { window.AudioContext = Wrapped; if (window.webkitAudioContext) window.webkitAudioContext = Wrapped; } catch (e) {}
+  }
+  function track(c) {
+    // without this an iPhone with its silent switch on plays nothing at all
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+    var resume = c.resume.bind(c);
+    c.resume = function () { return N.muted ? Promise.resolve() : resume(); };
+    c._nunkiResume = resume;
+    N.ctx.push(c);
+    if (N.muted) try { c.suspend(); } catch (e) {}
+  }
+  var playing = function () { for (var i = 0; i < N.ctx.length; i++) if (N.ctx[i].state === 'running') return true; return false; };
+
+  // ---- 5. a tap you can feel ----
+  var sw = null;
+  function buzz(ms) {
+    try {
+      if (navigator.vibrate) { navigator.vibrate(ms || 10); return; }
+      // safari on the iphone has no vibrate, but a switch that is flipped gives a small tick
+      if (!coarse) return;
+      if (!sw) {
+        sw = document.createElement('label');
+        sw.setAttribute('aria-hidden', 'true');
+        sw.style.cssText = 'position:fixed;left:-99px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+        var i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1;
+        sw.appendChild(i); document.body.appendChild(sw);
+      }
+      sw.click();
+    } catch (e) {}
+  }
+
+  if (!coarse) return;
+  var css = document.createElement('style');
+  css.textContent =
+    'html{touch-action:manipulation}body{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}' +
+    '.nunki-snd{position:fixed;z-index:61;right:clamp(10px,1.5vw,22px);bottom:max(12px,env(safe-area-inset-bottom));width:42px;height:42px;border:0;border-radius:21px;padding:0;' +
+    'display:flex;align-items:center;justify-content:center;color:#2a251f;background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);' +
+    'box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);-webkit-tap-highlight-color:transparent;transition:opacity .4s}' +
+    '.nunki-snd svg{width:22px;height:22px}.nunki-snd .w{opacity:0;transition:opacity .3s}.nunki-snd.on .w{opacity:1}.nunki-snd.on .x{opacity:0}.nunki-snd .x{transition:opacity .3s}' +
+    '.nunki-tip{position:fixed;z-index:61;right:calc(clamp(10px,1.5vw,22px) + 50px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 6px);max-width:min(68vw,330px);padding:7px 12px;border-radius:15px;' +
+    'font:400 .92rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next",Helvetica,sans-serif;color:#2a251f;background:rgba(246,241,228,.95);' +
+    'box-shadow:0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);opacity:0;transform:translateY(6px);transition:opacity .5s,transform .5s;pointer-events:none}' +
+    '.nunki-tip.on{opacity:1;transform:none}' +
+    '.nunki-hand{position:fixed;z-index:59;left:0;top:0;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;pointer-events:none;opacity:0;transform:scale(.6);transition:opacity .25s,transform .25s;' +
+    'box-shadow:0 0 0 2px rgba(255,248,228,.75),0 0 24px 6px rgba(255,226,160,.35),inset 0 0 18px rgba(255,236,190,.35)}' +
+    '.nunki-hand.on{opacity:1;transform:scale(1)}' +
+    '@media print{.nunki-snd,.nunki-tip,.nunki-hand{display:none}}';
+  document.head.appendChild(css);
+
+  // ---- 2. the little speaker ----
+  var btn = null, tip = null;
+  if (C.sound !== false) {
+    btn = document.createElement('button');
+    btn.className = 'nunki-snd';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'geluid aan of uit');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" fill-opacity=".12"/>' +
+      '<g class="w"><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18 6.8a7.4 7.4 0 0 1 0 10.4"/></g>' +
+      '<g class="x"><path d="M16 9.5l5 5M21 9.5l-5 5"/></g></svg>';
+    document.body.appendChild(btn);
+    tip = document.createElement('div'); tip.className = 'nunki-tip'; tip.setAttribute('aria-live', 'polite');
+    document.body.appendChild(tip);
+    var sync = function () { btn.classList.toggle('on', !N.muted && playing()); };
+    setInterval(sync, 600);
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (N.muted) {
+        N.muted = false;
+        N.ctx.forEach(function (c) { c._nunkiResume(); });
+      } else if (playing()) {
+        N.muted = true;
+        N.ctx.forEach(function (c) { try { c.suspend(); } catch (x) {} });
+      } else {
+        if (typeof window.audio === 'function') { try { window.audio(); } catch (x) {} }
+        N.ctx.forEach(function (c) { c._nunkiResume(); });
+        if (!N.ctx.length) say('tik op de wand, dan klinkt hij', 3500);
+      }
+      buzz(8);
+      motionOn();
+      setTimeout(sync, 80);
+    });
+  }
+  var tipT = 0;
+  function say(t, ms) {
+    if (!tip) return;
+    tip.textContent = t; tip.classList.add('on');
+    clearTimeout(tipT); tipT = setTimeout(function () { tip.classList.remove('on'); }, ms || 4000);
+  }
+  // the first two visits: say once what the speaker and a still finger do
+  var seen = +(store('nunki:touchtip') || 0);
+  if (seen < 2 && btn) {
+    store('nunki:touchtip', String(seen + 1));
+    setTimeout(function () { if (!playing()) say('tik voor geluid', 3800); }, 2200);
+    if (C.hand && C.hand !== 'off') setTimeout(function () { say('houd je vinger even stil en beweeg: dan voelt de wand je hand', 5200); }, 6800);
+  }
+
+  // ---- 3. a finger that is held still becomes the hand ----
+  var mode = C.hand || 'off';
+  if (mode !== 'off') {
+    var ring = document.createElement('div'); ring.className = 'nunki-hand'; document.body.appendChild(ring);
+    var st = null, timer = 0, last = null;
+    var skip = function (el) { return el && el.closest && el.closest('a,button,nav,input,label,select,textarea,summary,.nunki-snd'); };
+    var fire = function (type, x, y, buttons) {
+      var el = document.elementFromPoint(x, y) || document.body, o = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y, screenX: x, screenY: y, button: type === 'pointermove' ? -1 : 0, buttons: buttons };
+      try { el.dispatchEvent(new PointerEvent(type, Object.assign({ pointerType: 'mouse', pointerId: 1, isPrimary: true }, o))); } catch (e) {}
+      var mt = type === 'pointermove' ? 'mousemove' : type === 'pointerdown' ? 'mousedown' : 'mouseup';
+      try { el.dispatchEvent(new MouseEvent(mt, o)); } catch (e) {}
+    };
+    var start = function () {
+      if (!st) return;
+      st.on = true; N.hand = true;
+      ring.style.left = st.x + 'px'; ring.style.top = st.y + 'px'; ring.classList.add('on');
+      fire('pointermove', st.x, st.y, 0);
+      if (mode === 'press') fire('pointerdown', st.x, st.y, 1);
+      last = [st.x, st.y];
+      buzz(8);
+    };
+    var end = function () {
+      clearTimeout(timer);
+      if (st && st.on) {
+        if (mode === 'press' && last) fire('pointerup', last[0], last[1], 0);
+        try { document.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: null })); } catch (e) {}
+        ring.classList.remove('on'); N.hand = false;
+      }
+      st = null;
+    };
+    addEventListener('touchstart', function (e) {
+      end();
+      if (e.touches.length !== 1 || skip(e.target)) return;
+      var t = e.touches[0];
+      st = { x: t.clientX, y: t.clientY, on: false };
+      timer = setTimeout(start, C.holdMs || 280);
+    }, { passive: true });
+    addEventListener('touchmove', function (e) {
+      if (!st) return;
+      var t = e.touches[0];
+      if (!st.on) { if (e.touches.length > 1 || Math.hypot(t.clientX - st.x, t.clientY - st.y) > 10) end(); return; }
+      if (e.cancelable) e.preventDefault();
+      ring.style.left = t.clientX + 'px'; ring.style.top = t.clientY + 'px';
+      last = [t.clientX, t.clientY];
+      fire('pointermove', t.clientX, t.clientY, mode === 'press' ? 1 : 0);
+    }, { passive: false });
+    addEventListener('touchend', end, { passive: true });
+    addEventListener('touchcancel', end, { passive: true });
+    addEventListener('scroll', function () { if (st && !st.on) end(); }, { passive: true });
+  }
+
+  // ---- 4. tilt, shake, compass ----
+  var asked = false;
+  function motionOn() {
+    if (asked || !C.motion) return;
+    asked = true;
+    var go = function () {
+      addEventListener('deviceorientation', function (e) {
+        if (e.beta == null) return;
+        var a = (screen.orientation && screen.orientation.angle) || window.orientation || 0, g = e.gamma / 40, b = (e.beta - 40) / 40;
+        var x = a === 90 ? b : a === -90 || a === 270 ? -b : a === 180 ? -g : g, y = a === 90 ? -g : a === -90 || a === 270 ? g : a === 180 ? -b : b;
+        N.tilt.x = Math.max(-1, Math.min(1, x)); N.tilt.y = Math.max(-1, Math.min(1, y)); N.tilt.on = true;
+        if (e.webkitCompassHeading != null) N.heading = e.webkitCompassHeading; else if (e.absolute && e.alpha != null) N.heading = (360 - e.alpha) % 360;
+      });
+      var prev = null, lastShake = 0;
+      addEventListener('devicemotion', function (e) {
+        var g = e.accelerationIncludingGravity; if (!g || g.x == null) return;
+        if (prev) {
+          var d = Math.abs(g.x - prev[0]) + Math.abs(g.y - prev[1]) + Math.abs(g.z - prev[2]), now = Date.now();
+          if (d > 22 && now - lastShake > 700) { lastShake = now; dispatchEvent(new CustomEvent('nunki:shake', { detail: { power: Math.min(1, (d - 22) / 30 + .3) } })); }
+        }
+        prev = [g.x, g.y, g.z];
+      });
+    };
+    try {
+      var DM = window.DeviceMotionEvent, DO = window.DeviceOrientationEvent;
+      if (DM && typeof DM.requestPermission === 'function') {
+        var ps = [DM.requestPermission()];
+        if (DO && typeof DO.requestPermission === 'function') ps.push(DO.requestPermission());
+        Promise.all(ps).then(function (r) { if (r[0] === 'granted') go(); }).catch(function () {});
+      } else if (DM || DO) go();
+    } catch (e) {}
+  }
+  // shaking, where the wall has nothing of its own for it: a tap in the middle of the view
+  if (C.shake === 'tap') addEventListener('nunki:shake', function () {
+    if (document.hidden) return;
+    var x = innerWidth * (.5 + (Math.random() - .5) * .3), y = innerHeight * (.5 + (Math.random() - .5) * .3);
+    var el = document.elementFromPoint(x, y);
+    if (!el || (el.closest && el.closest('a,button,nav'))) return;
+    el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y }));
+  });
+  // every tap on the wall is a small tick you can feel
+  var tap = null;
+  addEventListener('touchstart', function (e) { var t = e.touches[0]; tap = e.touches.length === 1 ? { x: t.clientX, y: t.clientY, t: Date.now() } : null; }, { passive: true });
+  addEventListener('touchend', function (e) {
+    var t = e.changedTouches[0], d = tap; tap = null;
+    if (!d || !t || Date.now() - d.t > 600 || Math.hypot(t.clientX - d.x, t.clientY - d.y) > 12) return;
+    if (e.target && e.target.closest && e.target.closest('a,nav,input,select,textarea')) return;
+    buzz(6);
+  }, { passive: true });
+  // the first real tap on the wall may ask for motion (it has to come from a finger)
+  if (C.motion) addEventListener('touchend', function f(e) {
+    if (e.target && e.target.closest && e.target.closest('a,nav,.nunki-snd')) return;
+    removeEventListener('touchend', f);
+    motionOn();
+  }, { passive: true });
+})();
+</script>
+<!-- /nunki:touch -->
 <!-- nunki:seo -->
 <div style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0"><h1>ringen</h1><p>Ringen is een muur over een boom en zijn jaren. Elk jaar komt er iets bij en niets gaat weg; wat pijn deed blijft zichtbaar en groeit mee. Een berk geeft suiker aan wat in de schaduw staat. Een scrollende, levende tekening van jaarringen, groei en wat een boom met zich meedraagt.</p></div>
 <!-- /nunki:seo -->
@@ -985,6 +1223,18 @@ addEventListener('click',e=>{
   if(RINGS.length>4)RINGS.shift();
   trailDirty=true;
 });
+const TILT=()=>window.NUNKI&&NUNKI.tilt.on?NUNKI.tilt:null;
+// on a phone, shaking it shakes the sheet in view: what can fall, falls
+const SHAKE=[];
+addEventListener('nunki:shake',e=>{
+  if(document.hidden)return;
+  const now=performance.now(),cy=(scrollY+innerHeight/2)/CSSK,x=800+rd(Math.random,-300,300),y=(scrollY+innerHeight*rd(Math.random,.35,.65))/CSSK;
+  audio();TOUCHED++;
+  const s=SHAKE.find(S0=>cy>=S0.y0&&cy<S0.y1);
+  if(s&&s.fn(now,e.detail&&e.detail.power||.5)!==false)return;
+  const h=hitAt(x,y);if(h&&h.quiet&&h.fn(x,y-h.dy,now)!==false)return;
+  knock();RINGS.push({x,y,t:now,years:[{w:9,t:now},{w:3,t:now+160}],next:1e12,done:true,end:now+600,sd:Math.random()*99,mode:growAt(y)});
+});
 function twig(x,y,ang,mode,t,len){
   len=len??(mode==='root'?rd(VR,24,50):rd(VR,18,40));
   const tw={x,y,ang,len,t,mode,bend:rd(VR,-.55,.55),kids:[],leaf:null,node:false};
@@ -1357,13 +1607,14 @@ P.push(function(){
     const sp=.6+.4*Math.sin(now/300);c.globalAlpha=a*sp*(u<16?Math.max(0,1-u*3):1);c.drawImage(GLINT,ax+24-26,ay-68-26+(y-ay),52,52);c.globalAlpha=1;
   }});
   hit(740,560,860,720,(x,y,t)=>{if((t-AK.t)/1000<17.5)return;AK.t=t;AK.landed=0;knock()});
+  SHAKE.push({y0:GEN_DY,y1:GEN_DY+1200,fn(now,pw){if((now-AK.t)/1000>=17.5){AK.t=now;AK.landed=0}for(let k=0;k<4+pw*6;k++)FL.push({x:rd(Math.random,200,1400),y:rd(Math.random,90,300),vx:rd(Math.random,-60,60),r:rd(Math.random,0,TAU),k:ri(Math.random,0,4),t:now,sw:rd(Math.random,0,7),down:0});rustle(MASTER,.04)}});
   // leaves come down now and then, and your hand is a breeze
   const FL=[];
   live(60,80,1480,1000,{sc:.6,fps:30,frame(c,now,L){
     wipe(c,L);const h=hand(L,now,300);
     if(!L.n||now>L.n){L.n=now+rd(Math.random,2500,6000);if(FL.length<9)FL.push({x:rd(Math.random,200,1400),y:90,vx:0,r:rd(Math.random,0,TAU),k:ri(Math.random,0,4),t:now,sw:rd(Math.random,0,7),down:0})}
     for(let i=FL.length-1;i>=0;i--){const f=FL[i];
-      if(!f.down){const dt=1/30;f.y+=38*dt;f.x+=(Math.sin(now/700+f.sw)*28+f.vx)*dt;f.r+=Math.sin(now/500+f.sw)*.03;f.vx*=.97;
+      if(!f.down){const dt=1/30;f.y+=38*dt;f.x+=(Math.sin(now/700+f.sw)*28+f.vx+(TILT()?TILT().x*120:0))*dt;f.r+=Math.sin(now/500+f.sw)*.03;f.vx*=.97;
         if(h){const dx=f.x-h[0],dy=f.y-h[1],d=Math.hypot(dx,dy);if(d<160){f.vx+=dx/d*30;f.y-=1.2}}
         if(f.y>1020)f.down=now}
       const a=f.down?1-(now-f.down)/6000:Math.min(1,(now-f.t)/800);if(a<=0){FL.splice(i,1);continue}
@@ -1606,6 +1857,8 @@ P.push(function(){
       else if(i===2)rustle(MASTER,.06);
       else crunch(MASTER,.05)});
   });
+  SHAKE.push({y0:GEN_DY,y1:GEN_DY+1200,fn(now){SS.forEach((st,i)=>{st.t=now;if(i===0)for(let k=0;k<10;k++){const c0=centers[0];st.p.push({x:c0[0]-200+Math.random()*340,y:c0[1]-40,vx:rd(Math.random,-30,40),t:now})}
+    if(i===2)for(let k=0;k<8;k++)st.p.push({x:rd(Math.random,centers[2][0]-260,centers[2][0]+260),y:centers[2][1]-180,vx:0,t:now,k:2+ri(Math.random,0,2),r:rd(Math.random,0,TAU)})});rustle(MASTER,.05)}});
   ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',1500,.5,.015)},step(now,dt,A){every(A,now,9,22,()=>RA()<.5?chiff(A.g,.01):hopper(A.g,.012))}});
 });
 
@@ -1940,7 +2193,7 @@ P.push(function(){
   const ST=[[0,0],[8,-160],[-4,-330],[12,-460]],TIPS=[[1,.9],[2,-.9],[3,-1.5],[1.6,2.5]];
   live(380,330,840,780,{fps:30,frame(c,now,L){
     wipe(c,L);const h=hand(L,now,3000,300);
-    const tgt=h?clamp((h[0]-bx)/900,-.42,.42)+(h[1]<by-500?0:0):Math.sin(now/2600)*.035;
+    const tl=TILT(),tgt=h?clamp((h[0]-bx)/900,-.42,.42):tl?clamp(-tl.x*.5,-.42,.42):Math.sin(now/2600)*.035;
     L.b=(L.b||0)+(tgt-(L.b||0))*.025;const b=L.b;
     const P2=k=>{const f=k,i=Math.min(2,Math.floor(f)),u=f-i,a=ST[i],q=ST[i+1],x=a[0]+(q[0]-a[0])*u,y=a[1]+(q[1]-a[1])*u,hh=-y/460;return[bx+x+b*hh*hh*330+Math.sin(now/900)*3*hh,by+y+Math.abs(b)*hh*hh*60]};
     c.lineCap='round';c.strokeStyle=rgba(BARK,.9);

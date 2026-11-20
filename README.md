@@ -15,6 +15,7 @@ httpdocs/            wat live gaat (rsync-doel)
   sitemap.xml, robots.txt
 scripts/
   build.py           scant wanden, maakt OG-beelden, thumbs, pages.json, homepage, nav, SEO
+  touch.js           geluid, vinger-als-hand, kantelen/schudden en trillen op telefoon en iPad; build.py zet het inline in elke wand
   deploy.sh          build + rsync naar de VPS
   descriptions.json, seo.json, shots.json   beschrijvingen, SEO-teksten, screenshot-posities
 documentatie/        achtergrondmateriaal per wand (cel, film, one-6gmatrix, oude veld-wand)
