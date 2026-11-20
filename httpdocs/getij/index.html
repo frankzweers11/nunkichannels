@@ -35,7 +35,10 @@
   body{overflow-x:hidden}
   #wall{position:relative;width:100vw}
   #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #wall canvas.live{pointer-events:none;opacity:0;transition:opacity 1.4s ease}
+  #wall canvas.live.on{opacity:1}
   #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+  #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
 </style>
 </head>
 <body>
@@ -76,11 +79,21 @@
 // behind. every mark is laid down by a wandering hand while you watch;
 // nothing here is ruled. the engine (tiles, queued strokes, torn paper,
 // pencil lettering) follows the technique of the fable wall that inspired it.
+// every sheet has one living part and a sound of its own (after a first tap):
+// a wave that takes your footprints, a seal that comes when you keep still,
+// waders that peck and call, finds that do something and a bottle with post,
+// a lighthouse and a lamp for the keeper's log of 1953, a deep sea lit only by
+// you and a ping, lightning whose thunder you count, the moon and sun pulling
+// the water round a turning earth (today's moon, or a month under your hand),
+// a walker going far and lugworms in the slik, and what this tide was.
+// ?fast draws at full speed (the build's stills), ?still draws everything at
+// once, ?hud shows frame timing. localStorage 'nunki:getij' keeps your finds.
 // ---------------------------------------------------------------------------
 const TAU = Math.PI*2;
 const qs = new URLSearchParams(location.search);
 const SEED = +(qs.get('s')||7);
 const FAST = qs.has('fast');
+const STILL = qs.has('still');
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------------- rng ----------------
@@ -136,7 +149,8 @@ let GENDONE=false;
 let DIRECT=null, GEN_DY=0;
 function emit(y0,y1,fn){
   if(DIRECT){
-    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    const ds=DIRECT.sc||S;
+    DIRECT.cx.setTransform(ds,0,0,ds,-(DIRECT.x0||0)*ds,-DIRECT.y0*ds);
     if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
     else fn(DIRECT.cx);
     return;
@@ -497,6 +511,21 @@ G('·',.24,[[.08,.68],[.12,.72]]);
 G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
 G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
 G(' ',.42);
+// the rest of the numbers, and a few signs a log needs
+G('1',.4,[[.07,.3],[.23,.1],[.23,1]]);
+G('3',.52,[[.08,.2],[.22,.1],[.38,.12],[.44,.28],[.36,.46],[.22,.52],[.38,.58],[.47,.76],[.4,.94],[.22,1],[.05,.9]]);
+G('4',.54,[[.37,1],[.37,.1],[.05,.72],[.5,.72]]);
+G('5',.52,[[.44,.1],[.13,.1],[.1,.47],[.28,.43],[.44,.54],[.47,.76],[.36,.95],[.18,1],[.05,.9]]);
+G('7',.5,[[.05,.1],[.46,.1],[.18,1]]);
+G('9',.52,A_(.25,.33,.2,.22,-.2,-.2+TAU*.98,10),[[.45,.36],[.43,.72],[.3,1]]);
+G('é',.56,...GL['e'].s,[[.22,.36],[.36,.2]]);
+G('ë',.56,...GL['e'].s,[[.15,.3],[.18,.33]],[[.36,.3],[.39,.33]]);
+G(':',.24,[[.11,.52],[.13,.55]],[[.11,.92],[.13,.95]]);
+G('?',.5,[[.08,.2],[.2,.1],[.38,.14],[.42,.34],[.26,.58],[.24,.72]],[[.24,.94],[.27,.98]]);
+G('!',.24,[[.12,.1],[.12,.72]],[[.12,.94],[.13,.97]]);
+G('≈',.54,[[.05,.62],[.15,.56],[.27,.62],[.39,.68],[.49,.62]],[[.05,.82],[.15,.76],[.27,.82],[.39,.88],[.49,.82]]);
+G('…',.6,[[.08,.93],[.1,.97]],[[.28,.93],[.3,.97]],[[.48,.93],[.5,.97]]);
+G('/',.4,[[.34,.08],[.06,1.04]]);
 function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
 function write(R,t,x,y,sz,o={}){
   const a=o.a??.7,col=o.col;
@@ -647,7 +676,69 @@ function noteHead(R,x,y,up,col,a=.8){
 // ---------------- replay engine ----------------
 let CSSK=innerWidth/LW;
 addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+// living things: small canvases laid over the wall, switched on once the sheet
+// beneath them is drawn, and only moving while they are in view. they draw in
+// the sheet's own coordinates (0..1600 x 0..1200), like the sheet itself.
+const LIVE=[];
+function live(x,y,w,h,o){
+  const L={x,y:y+GEN_DY,w,h,dy:GEN_DY,sc:S,...o,cv:null,cx:null,on:false,last:0};
+  LIVE.push(L);
+  return L;
+}
+function makeLive(L){
+  const cv=document.createElement('canvas'),sc=L.sc;
+  cv.className='live';
+  cv.width=Math.round(L.w*sc);cv.height=Math.round(L.h*sc);
+  cv.style.left=(L.x/LW*100)+'%';cv.style.width=(L.w/LW*100)+'%';
+  cv.style.top=(L.y/LW*100)+'vw';cv.style.height=(L.h/LW*100)+'vw';
+  cv.style.zIndex=2;
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.setTransform(sc,0,0,sc,-L.x*sc,(L.dy-L.y)*sc);
+  cx.lineCap='round';cx.lineJoin='round';
+  L.cv=cv;L.cx=cx;L.on=true;
+  if(L.init)L.init(cx,L);
+  if(FAST||STILL){cv.style.transition='none';cv.classList.add('on');L.frame&&L.frame(cx,performance.now(),L)}
+  else requestAnimationFrame(()=>cv.classList.add('on'));
+}
+// wipe a live canvas: the whole of it, whatever the sheet coordinates are
+function wipe(c,L){c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,L.cv.width,L.cv.height);c.restore()}
+function liveReady(L){
+  const a=clamp(Math.floor(L.y/TILEH),0,NT-1),b=clamp(Math.floor((L.y+L.h)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++)if(!TILES[i].done)return false;
+  return true;
+}
+// a drawing made by the same hand, kept on a small canvas of its own so that
+// it can move: a bird, a crab, a line of writing. drawn in its own 0..w x 0..h.
+function sprite(w,h,fn,seed=1,sc=S){
+  const cv=document.createElement('canvas');
+  cv.width=Math.max(1,Math.ceil(w*sc));cv.height=Math.max(1,Math.ceil(h*sc));
+  const cx=cv.getContext('2d');cx.lineCap='round';cx.lineJoin='round';
+  const pD=DIRECT,pG=GEN_DY;DIRECT={cx,y0:0,x0:0,sc};GEN_DY=0;
+  try{fn(stream(seed))}finally{DIRECT=pD;GEN_DY=pG}
+  cv.w=w;cv.h=h;return cv;
+}
+// a line of pencil writing as a sprite; the same words are written only once
+const TXT=new Map();
+function textSpr(t,sz,col=INK,a=.85){
+  const k=t+'|'+sz+'|'+col+'|'+a;
+  let s=TXT.get(k);
+  if(!s){let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;
+    const w=measure(t,sz)+sz*.8;
+    s=sprite(w,sz*1.9,R=>write(R,t,sz*.4,sz*1.3,sz,{col,a}),h,Math.max(S,1.5));
+    s.ox=sz*.4;s.oy=sz*1.3;TXT.set(k,s)}
+  return s;
+}
+// put a line of writing down: x,y is the start of its baseline (or its middle, cen)
+function say(c,t,x,y,sz,col,a,alpha=1,cen=false){
+  const s=textSpr(t,sz,col,a);if(alpha<=0)return;
+  c.globalAlpha=alpha;c.drawImage(s,x-s.ox-(cen?(s.w-sz*.8)/2:0),y-s.oy,s.w,s.h);c.globalAlpha=1;
+}
+let HUD=null,hudN=0,hudT=0,hudBusy=0,hudMax=0;
+if(qs.has('hud')){HUD=document.createElement('div');HUD.id='hud';document.body.appendChild(HUD)}
+let lastNow=0;
 function tick(now){
+  const tb=performance.now(),dt=Math.min(.1,(now-(lastNow||now))/1000);lastNow=now;
   const sy=scrollY/CSSK, vh=innerHeight/CSSK;
   for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
   const budget=(FAST||RM)?200:7;
@@ -663,8 +754,30 @@ function tick(now){
     if(performance.now()-t0>budget)break;
   }
   runRestless(now);
+  for(const L of LIVE){
+    if(!L.on){if(GENDONE&&liveReady(L))makeLive(L);continue}
+    if(!L.frame||L.y+L.h<sy-60||L.y>sy+vh+60){L.seen=false;continue}
+    L.seen=true;
+    if(RM&&L.drawn)continue;
+    if(L.fps&&now-L.last<1000/L.fps)continue;
+    L.last=now;L.frame(L.cx,now,L);L.drawn=true;
+  }
+  runAmbient(now,dt);
   drawTrail(now);
+  if(HUD){
+    const busy=performance.now()-tb;hudBusy+=busy;hudMax=Math.max(hudMax,busy);hudN++;
+    if(now-hudT>1000){HUD.textContent=`${(hudN*1000/(now-hudT)).toFixed(0)} fps\n${(hudBusy/hudN).toFixed(1)} ms busy\n${hudMax.toFixed(1)} ms max`;hudN=0;hudBusy=0;hudMax=0;hudT=now}
+  }
   requestAnimationFrame(tick);
+}
+// for stills: draw every sheet at once, no animation at all
+function drawAllNow(){
+  for(const T of TILES){
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length)T.q[T.qi++](T.cx);
+    T.done=true;T.q=null;
+  }
+  for(const L of LIVE)makeLive(L);
 }
 
 // ---------------- restlessness ----------------
@@ -717,42 +830,115 @@ const VR=mul32(SEED*991+7);
 let RP=[],BL=[],DR=[],step=null,lastMove=0,speed=0,lastPt=null;
 // the light of the sea: a little glow, drawn once and laid down many times
 const SPARK=(()=>{const g=document.createElement('canvas');g.width=g.height=48;const c=g.getContext('2d');const r=c.createRadialGradient(24,24,0,24,24,24);r.addColorStop(0,'rgba(236,255,255,1)');r.addColorStop(.18,'rgba(140,240,255,.85)');r.addColorStop(.5,'rgba(70,200,230,.25)');r.addColorStop(1,'rgba(40,160,210,0)');c.fillStyle=r;c.fillRect(0,0,48,48);return g})();
-let AC=null,SW=null;
+// ---------------- sound ----------------
+// only ever after a tap or a click, and quiet. almost everything the sea says
+// is the same thing: noise, filtered, swelling and falling back.
+let AC=null,SW=null,MASTER=null,NB=null;
 function audio(){
   if(!AC){
     try{
       AC=new (window.AudioContext||window.webkitAudioContext)();
+      MASTER=AC.createGain();MASTER.gain.value=.9;
+      // a soft limiter, so that thunder never cracks the speakers
+      const comp=AC.createDynamicsCompressor();comp.threshold.value=-16;comp.knee.value=12;comp.ratio.value=5;comp.attack.value=.003;comp.release.value=.3;
+      MASTER.connect(comp);comp.connect(AC.destination);
+      const len=AC.sampleRate*3,bf=AC.createBuffer(1,len,AC.sampleRate),d=bf.getChannelData(0);
+      let b0=0,b1=0,b2=0;
+      for(let i=0;i<len;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0526;d[i]=(b0+b1+b2+w*.1848)*.12}
+      NB=bf;
       // the water round your hand: soft noise, only as loud as you move
-      const len=AC.sampleRate*2,b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);
-      let lp=0;for(let i=0;i<len;i++){lp=lp*.92+(Math.random()*2-1)*.08;d[i]=lp*3}
-      const n=AC.createBufferSource();n.buffer=b;n.loop=true;
+      const n=AC.createBufferSource();n.buffer=NB;n.loop=true;
       const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=700;bp.Q.value=.6;
       const g=AC.createGain();g.gain.value=0;
-      n.connect(bp);bp.connect(g);g.connect(AC.destination);n.start();
+      n.connect(bp);bp.connect(g);g.connect(MASTER);n.start();
       SW={g,bp};
     }catch(e){AC=null}
   }
-  if(AC&&AC.state==='suspended')AC.resume();
+  if(AC&&AC.state==='suspended'&&!document.hidden)AC.resume();
   return AC;
 }
-// a drop: a quick rising note and a softer one under it
-function plip(big){
-  const ac=audio();if(!ac)return;
-  const t=ac.currentTime+.01;
-  const voice=(f0,f1,dur,vol,dl)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';
-    o.frequency.setValueAtTime(f0,t+dl);o.frequency.exponentialRampToValueAtTime(f1,t+dl+dur*.5);
-    g.gain.setValueAtTime(0,t+dl);g.gain.linearRampToValueAtTime(vol,t+dl+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dl+dur);
-    o.connect(g);g.connect(ac.destination);o.start(t+dl);o.stop(t+dl+dur+.05)};
-  const f=big?420:560;
-  voice(f,f*2.4,.09,.16,0);voice(f*.55,f*1.1,.14,.06,.03);
-  if(big)voice(f*1.3,f*3,.07,.05,.16);
+// a page you cannot see makes no sound
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
+const RA=Math.random;
+// a short breath of noise through a filter
+function nz(t,dur,type,f0,f1,q,vol,att=.005,out=MASTER){
+  const n=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
+  n.buffer=NB;f.type=type;f.Q.value=q;f.frequency.setValueAtTime(f0,t);if(f1!==f0)f.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0004,t+dur);
+  n.connect(f);f.connect(g);g.connect(out);n.start(t,RA()*2.5);n.stop(t+dur+.03);
 }
+// one voice: a pitch that glides from f0 to f1, a quick rise and a long fall
+function vo(t,type,f0,f1,dur,vol,att=.005,out=MASTER,glide=1,vib=0){
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type;
+  o.frequency.setValueAtTime(f0,t);if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t+dur*glide);
+  if(vib){const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=vib[0];lg.gain.value=vib[1];l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(t+dur+.05)}
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0003,t+dur);
+  o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.05);
+  return o;
+}
+// a noise that keeps going, for a sheet's own sound
+function bed(out,type,f,q,vol){
+  const n=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();
+  n.buffer=NB;n.loop=true;fl.type=type;fl.frequency.value=f;fl.Q.value=q;g.gain.value=vol;
+  n.connect(fl);fl.connect(g);g.connect(out);n.start(0,RA()*2.5);
+  return {g,f:fl,v:vol};
+}
+const now_=()=>AC.currentTime+.01;
+
+// each sheet may have a sound of its own, heard while it is in view and fading
+// as you scroll away. made once, when first heard, and only after a first tap.
+const AMB=[];
+function ambient(y0,y1,o){AMB.push({y0:y0+GEN_DY,y1:y1+GEN_DY,dy:GEN_DY,vol:1,...o,v:0,g:null,next:0})}
+function runAmbient(now,dt){
+  if(!AC||AC.state!=='running'||RM)return;
+  const cy=(scrollY+innerHeight/2)/CSSK,half=innerHeight/2/CSSK;
+  for(const A of AMB){
+    const d=Math.max(A.y0-cy,0,cy-A.y1),v=clamp(1-(d-half*.35)/(half*.65+220),0,1);
+    A.v+=(v-A.v)*Math.min(1,dt*1.6);
+    if(A.v<.005&&!A.g)continue;
+    if(!A.g){A.g=AC.createGain();A.g.gain.value=0;A.g.connect(MASTER);if(A.make)A.make(A.g,A)}
+    A.g.gain.setTargetAtTime(A.v*A.vol,AC.currentTime,.2);
+    if(A.v>.03&&A.step)A.step(now,dt,A);
+  }
+}
+// a sound now and then: every a..b seconds while the sheet is heard
+function every(A,now,a,b,fn){if(now>A.next){if(A.next)fn();A.next=now+rd(RA,a,b)*1000}}
+
+// a drop: a quick rising note and a softer one under it
+function plip(big,out){
+  const ac=audio();if(!ac)return;
+  const t=now_(),f=big?420:560;
+  vo(t,'sine',f,f*2.4,.09,.16,.004,out||MASTER,.5);vo(t+.03,'sine',f*.55,f*1.1,.14,.06,.004,out||MASTER,.5);
+  if(big)vo(t+.16,'sine',f*1.3,f*3,.07,.05,.004,out||MASTER,.5);
+}
+
+// ---------------- the visitor's hand ----------------
 const wallXY=e=>[e.clientX/CSSK,(e.clientY+scrollY)/CSSK];
+// where the hand is, in wall coordinates; t is when it last moved
+const PTR={x:-1e4,y:-1e4,t:-1e9,tap:-1e9,in:false,spd:0};
+// how long the visitor has kept still (or kept away), in seconds
+const stillFor=now=>(now-PTR.t)/1000;
+// places on the wall that answer a tap. later ones lie on top of earlier ones;
+// a quiet one covers a whole sheet without turning the pointer into a hand
+const HITS=[];
+function hit(x0,y0,x1,y1,fn,quiet=false){const h={x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,dy:GEN_DY,fn,quiet};HITS.push(h);return h}
+const hitAt=(x,y)=>{for(let i=HITS.length-1;i>=0;i--){const h=HITS[i];if(x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1)return h}return null};
+let curHand=false;
+// what the wall remembers of you, between visits
+const MEM=(()=>{try{return JSON.parse(localStorage.getItem('nunki:getij'))||{}}catch(e){return{}}})();
+function memSave(){try{localStorage.setItem('nunki:getij',JSON.stringify(MEM))}catch(e){}}
+if(!FAST&&!STILL){MEM.visits=(MEM.visits||0)+1;memSave()}
+MEM.found=MEM.found||[];MEM.msgs=MEM.msgs||[];
+let TOUCHED=0;
+
 addEventListener('pointermove',e=>{
   if(e.pointerType==='touch')return;
   const [x,y]=wallXY(e),t=performance.now();
   if(lastPt){const dt=Math.max(1,t-lastPt.t);speed=speed*.7+.3*Math.hypot(e.clientX-lastPt.cx,e.clientY-lastPt.cy)/dt*1000}
   lastPt={cx:e.clientX,cy:e.clientY,t};lastMove=t;
+  PTR.x=x;PTR.y=y;PTR.t=t;PTR.in=true;PTR.spd=speed;
+  const h=hitAt(x,y),hand=!!(h&&!h.quiet);
+  if(hand!==curHand){curHand=hand;document.body.style.cursor=hand?'pointer':''}
   if(!step)step={x,y,d:0,db:0};
   const dd=Math.hypot(x-step.x,y-step.y);step.d+=dd;step.db+=dd;step.x=x;step.y=y;
   const s=sheetAt(y),deep=GLOWP.has(s);
@@ -760,16 +946,29 @@ addEventListener('pointermove',e=>{
   if(deep)while(step.db>5){step.db-=5;const a=rd(VR,0,TAU),r=Math.sqrt(VR())*20;BL.push({x:x+Math.cos(a)*r,y:y+Math.sin(a)*r*.8,t,life:rd(VR,1100,2400),s:rd(VR,4,11),dx:rd(VR,-6,6),dy:rd(VR,-8,2)});if(BL.length>420)BL.shift()}
   trailDirty=true;
 },{passive:true});
-addEventListener('click',e=>{
-  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
-  const [x,y]=wallXY(e),t=performance.now();
-  if(y>TOTALH)return;
+document.addEventListener('mouseout',e=>{if(!e.relatedTarget)PTR.in=false});
+// rings and a drop where the water is touched
+function drop(x,y){
+  const t=performance.now();
   plip(true);
   const s=sheetAt(y),deep=GLOWP.has(s),dark=DARKP.has(s);
   for(let k=0;k<3;k++)RP.push({x,y,t:t+k*170,spd:70-k*8,life:2800,a:dark?.6:.5,dark,big:true});
   for(let k=0;k<7;k++)DR.push({x,y,t,vx:rd(VR,-55,55),vy:-rd(VR,90,170),s:rd(VR,1.6,3),dark});
   if(deep)for(let k=0;k<70;k++){const a=k/70*TAU+rd(VR,-.05,.05);BL.push({x,y,t:t+rd(VR,0,200),life:rd(VR,1400,2600),s:rd(VR,5,12),dx:Math.cos(a)*rd(VR,40,70),dy:Math.sin(a)*rd(VR,28,50),ring:true})}
   trailDirty=true;
+}
+addEventListener('click',e=>{
+  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
+  const [x,y]=wallXY(e),t=performance.now();
+  if(y>TOTALH)return;
+  audio();
+  TOUCHED++;
+  // a finger has no hover: the tap is where the hand is, for a while
+  if(e.isTrusted===false||!PTR.in){PTR.x=x;PTR.y=y;PTR.t=t}
+  PTR.tap=t;
+  const h=hitAt(x,y);
+  if(h&&h.fn(x,y-h.dy,t)!==false)return;
+  drop(x,y);
 });
 function drawTrail(now){
   const c=trailCx;
@@ -952,6 +1151,62 @@ function fall(R,x,y0,y1,col,a){
   for(let y=y0;y<y1;y+=rd(R,34,52))dotF(R,x+Math.sin(y*.012)*9+rd(R,-3,3),y,rd(R,1.5,2.6),a*rd(R,.6,1),col);
 }
 
+// ---------------- the moon, today ----------------
+// the moon is about 29.53 days from new to new. at new and at full moon sun and
+// moon pull in one line and the tide runs high and low: springtij. at the
+// quarters they pull across each other: doodtij.
+const SYN=29.530588853;
+const moonAge=(ms=Date.now())=>{const d=(ms-Date.UTC(2000,0,6,18,14))/864e5;return((d%SYN)+SYN)%SYN};
+const AGE0=moonAge();
+function phaseName(a){
+  const q=x=>Math.abs(a-x)<1.85;
+  return(a<1.85||a>SYN-1.85)?'nieuwe maan':q(7.38)?'eerste kwartier':q(14.77)?'volle maan':q(22.15)?'laatste kwartier':a<14.77?'wassende maan':'afnemende maan';
+}
+function tideName(a){const c=Math.cos(2*TAU*a/SYN);return c>.5?'springtij':c<-.5?'doodtij':'tussen spring- en doodtij'}
+function ageLine(a){const n=Math.round(a);return a<1||a>SYN-1?'vandaag is het nieuwe maan':`de maan is ${n} ${n===1?'dag':'dagen'} oud`}
+
+// a warm glint, and a cold one: small glows drawn once and laid down many times
+function glowSpr(col,core=[255,250,236]){const g=document.createElement('canvas');g.width=g.height=64;const c=g.getContext('2d');const r=c.createRadialGradient(32,32,0,32,32,32);
+  r.addColorStop(0,rgba(core,1));r.addColorStop(.2,rgba(col,.8));r.addColorStop(.55,rgba(col,.22));r.addColorStop(1,rgba(col,0));c.fillStyle=r;c.fillRect(0,0,64,64);return g}
+const GLINT=glowSpr([255,214,120]),COLD=glowSpr([120,220,240],[236,255,255]),SOFT=glowSpr([236,242,236],[255,255,255]);
+// is the hand on this live canvas (or was it tapped there a moment ago)? then where, in sheet coordinates
+function hand(L,now,ms=2600,m=0){
+  if(!(PTR.in&&now-PTR.t<ms)&&now-PTR.tap>6000)return null;
+  const x=PTR.x,y=PTR.y-L.dy;
+  if(x<L.x-m||x>L.x+L.w+m||y<L.y-L.dy-m||y>L.y-L.dy+L.h+m)return null;
+  return[x,y];
+}
+const ease=u=>u<0?0:u>1?1:u*u*(3-2*u);
+const bump=u=>u<0||u>1?0:Math.sin(Math.PI*u);
+
+// ---------------- voices of the shore ----------------
+// a gull, far away
+function gull(out,vol){const t=now_();for(let i=0;i<ri(RA,2,4);i++){const s=t+i*rd(RA,.32,.42);vo(s,'triangle',1250,1750,.09,vol,.01,out,1,[9,30]);vo(s+.08,'triangle',1750,1050,.32,vol*.8,.01,out,1,[7,40])}}
+// the six waders, each its own call
+const CALLS=[
+  // scholekster: kliep kliep kliep, loud and piping
+  (out,v)=>{const t=now_();for(let i=0;i<4;i++){vo(t+i*.13,'sine',3300,2500,.1,v,.004,out);vo(t+i*.13,'sine',6600,5000,.06,v*.12,.004,out)}},
+  // wulp: the long rising cuur-lie, then a bubbling
+  (out,v)=>{const t=now_();vo(t,'sine',1500,2300,.55,v,.06,out,1,[5,20]);vo(t+.65,'sine',1800,2650,.7,v,.06,out,1,[6,26]);for(let i=0;i<7;i++)vo(t+1.45+i*.07,'sine',2700-i*40,2500-i*40,.07,v*.6,.006,out)},
+  // tureluur: tjuu tjuu tjuu, falling
+  (out,v)=>{const t=now_();for(let i=0;i<3;i++)vo(t+i*.17,'sine',2900-i*60,2050-i*60,.13,v,.006,out)},
+  // kluut: kluut, kluut, fluted
+  (out,v)=>{const t=now_();for(let i=0;i<3;i++){const s=t+i*.24,o=vo(s,'triangle',1900,2350,.12,v,.006,out,.4);o.frequency.exponentialRampToValueAtTime(1950,s+.12)}},
+  // grutto: grut-to, grut-to, nasal
+  (out,v)=>{if(!AC)return;const t=now_(),bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2100;bp.Q.value=2.5;bp.connect(out);
+    for(let i=0;i<2;i++){vo(t+i*.42,'sawtooth',1150,1550,.1,v*2.1,.006,bp);vo(t+i*.42+.14,'sawtooth',1600,1250,.14,v*2.1,.006,bp)}},
+  // kievit: kie-wiet, wheezy
+  (out,v)=>{if(!AC)return;const t=now_(),bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2400;bp.Q.value=1.4;bp.connect(out);
+    const o=vo(t,'sawtooth',900,2700,.42,v*2.6,.02,bp,.3);o.frequency.exponentialRampToValueAtTime(1500,t+.42);nz(t+.05,.35,'bandpass',2600,1800,4,v*.5,.04,out)}];
+// the sea, held to your ear in a shell
+function shellSea(out=MASTER){
+  if(!audio())return;const t=now_();
+  for(const [f,q,v] of[[520,1.8,.12],[1250,3,.06],[2600,5,.025]]){
+    const n=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();n.buffer=NB;n.loop=true;bp.type='bandpass';bp.frequency.value=f;bp.Q.value=q;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.6,t+.9);g.gain.linearRampToValueAtTime(v,t+2);g.gain.linearRampToValueAtTime(v*.7,t+3.3);g.gain.linearRampToValueAtTime(0,t+5);
+    n.connect(bp);bp.connect(g);g.connect(out);n.start(t,RA()*2);n.stop(t+5.1)}
+}
+
 // P0 · the first line ------------------------------------------------------
 P.push(function(){
   const R=stream(SEED*101+0);
@@ -977,6 +1232,21 @@ P.push(function(){
   whispers(R,700,1100,false,3);
   // a hint, in pencil, for whoever reads this far
   write(stream(SEED*101+77),'raak het water aan',800,472,19,{a:.55,cen:true});
+  // and what the moon is doing to the water today
+  write(stream(SEED*101+79),ageLine(AGE0)+' · '+tideName(AGE0),800,512,15,{a:.42,cen:true});
+  // the sun's road on the water glitters
+  const GL0=[];{const RG=stream(SEED*7+1);for(let i=0;i<34;i++){const row=ri(RG,0,9);GL0.push({row,y:740+row*26+rd(RG,-3,3),hw:66-row*4,ph:rd(RG,0,TAU),sp:rd(RG,.6,1.4)})}}
+  live(970,720,240,290,{fps:24,frame(c,now,L){
+    wipe(c,L);
+    for(const g of GL0){
+      const a=Math.sin(now/420*g.sp+g.ph);if(a<.35)continue;
+      const x=1090+Math.sin(now/2600*g.sp+g.ph*3)*g.hw,s=7+5*a-g.row*.4;
+      c.globalAlpha=(a-.35)*1.5*(1-g.row*.07);c.drawImage(GLINT,x-s,g.y-s,s*2,s*2);
+    }
+    c.globalAlpha=1;
+  }});
+  ambient(0,1200,{make(g,A){A.sea=bed(g,'lowpass',420,.6,.04)},
+    step(now,dt,A){A.sea.g.gain.setTargetAtTime(.02+.04*(.5+.5*Math.sin(now/1450)),AC.currentTime,.3);every(A,now,8,20,()=>gull(A.g,.012))}});
 });
 
 // P1 · what stays behind ---------------------------------------------------
@@ -1007,7 +1277,64 @@ P.push(function(){
   moth(R,1330,720,24,shade(SANDY,.6),.5);
   write(R,'niets blijft, maar alles laat iets',800,1130,22,{a:.7,cen:true});
   whispers(R,200,1100,false,4);
+  // a wave runs up the sand, and back. what you leave on it, it takes.
+  const FP=[];let fst=null;
+  live(60,165,1480,940,{sc:.75,fps:30,frame(c,now,L){
+    wipe(c,L);
+    const W=washAt(now),e=W.edge,ph=now/1000;
+    const edgeY=x=>e+Math.sin(x/95+ph*.9+W.k)*9+Math.sin(x/37+W.k*3)*3.5;
+    // the hand walks on the sand
+    const h=hand(L,now,400);
+    if(h){if(!fst)fst={x:h[0],y:h[1],d:0,side:1};
+      const dd=Math.hypot(h[0]-fst.x,h[1]-fst.y);
+      if(dd>34){const ang=Math.atan2(h[1]-fst.y,h[0]-fst.x);fst.side*=-1;
+        FP.push({x:h[0]+Math.cos(ang+Math.PI/2)*9*fst.side,y:h[1]+Math.sin(ang+Math.PI/2)*9*fst.side,ang,t:now,gone:0});if(FP.length>80)FP.shift();
+        fst.x=h[0];fst.y=h[1]}}else fst=null;
+    // wet sand where the wave has been
+    if(W.wet>.01){c.beginPath();c.moveTo(70,175);for(let x=70;x<=1530;x+=30)c.lineTo(x,W.reach+Math.sin(x/95+W.k)*9);c.lineTo(1530,175);c.closePath();c.fillStyle=rgba(shade(SANDY,.28),.32*W.wet);c.fill()}
+    // footprints, and the water taking them
+    for(let i=FP.length-1;i>=0;i--){const f=FP[i];
+      if(!f.gone&&edgeY(f.x)>f.y-4)f.gone=now;
+      const a=(f.gone?1-(now-f.gone)/700:1)*Math.min(1,(now-f.t)/200)*(1-clamp((now-f.t-40000)/8000,0,1));
+      if(a<=0){FP.splice(i,1);continue}
+      c.save();c.translate(f.x,f.y);c.rotate(f.ang);c.globalAlpha=a;
+      c.fillStyle=rgba(shade(SANDY,.42),.35);c.strokeStyle=rgba(shade(SANDY,.55),.6);c.lineWidth=1.6;
+      c.beginPath();c.ellipse(0,0,12,6,0,0,TAU);c.fill();c.stroke();
+      c.fillStyle=rgba(shade(SANDY,.5),.4);c.beginPath();c.ellipse(9,0,3.5,4,0,0,TAU);c.fill();
+      c.restore();}
+    c.globalAlpha=1;
+    // the water itself: a thin glassy sheet with a line of foam at its edge
+    if(e>178){
+      c.beginPath();c.moveTo(70,170);for(let x=70;x<=1530;x+=24)c.lineTo(x,edgeY(x));c.lineTo(1530,170);c.closePath();
+      const wg=c.createLinearGradient(0,172,0,Math.max(240,e));wg.addColorStop(0,rgba(tint(SEA,.5),0));wg.addColorStop(Math.min(1,70/Math.max(1,e-172)),rgba(tint(SEA,.5),.2));wg.addColorStop(1,rgba(tint(SEA,.55),.26));
+      c.fillStyle=wg;c.fill();
+      for(const [o,w,a] of[[0,3,.85],[-14,1.6,.45],[-30,1.1,.25]]){
+        c.beginPath();for(let x=70;x<=1530;x+=18){const y=edgeY(x)+o+Math.sin(x/23+ph*2)*1.5;x===70?c.moveTo(x,y):c.lineTo(x,y)}
+        c.strokeStyle=rgba(FOAM,a*(.6+.4*W.rush+.3*W.back));c.lineWidth=w;c.stroke();}
+      c.fillStyle=rgba(FOAM,.7);
+      for(let x=80;x<1530;x+=13){const b=Math.sin(x*12.9898+W.k*78.2)*43758.5;const f=b-Math.floor(b);if(f<.55)continue;c.beginPath();c.arc(x,edgeY(x)+4+f*8,1+f*1.6,0,TAU);c.fill()}
+    }
+    // the shell, when you listen to it
+    if(now-SHELL.t<5000){const u=(now-SHELL.t)/5000;c.strokeStyle=rgba(RUST,1);
+      for(let k=0;k<4;k++){const v=(u*2.4+k/4)%1;c.globalAlpha=(1-v)*.5*(1-u*.6);c.lineWidth=1.6;c.beginPath();c.arc(1180,870,92+v*120,-1.2,.4);c.stroke();c.beginPath();c.arc(1180,870,92+v*120,1.9,3.5);c.stroke()}
+      c.globalAlpha=1}
+  }});
+  hit(1090,780,1275,960,(x,y,t)=>{SHELL.t=t;shellSea()});
+  ambient(0,1200,{make(g,A){A.rush=bed(g,'bandpass',820,.5,0);A.fizz=bed(g,'highpass',3200,.4,0);A.low=bed(g,'lowpass',300,.7,.02)},
+    step(now,dt,A){const W=washAt(now),t=AC.currentTime;A.rush.g.gain.setTargetAtTime(.11*W.rush,t,.12);A.fizz.g.gain.setTargetAtTime(.05*W.back,t,.15);A.rush.f.frequency.setTargetAtTime(600+500*W.rush,t,.2)}});
 });
+// one wave on the sand: up quickly, back slowly, then a moment of nothing.
+// each wave reaches its own height.
+const SHELL={t:-1e9};
+function washAt(now){
+  const T=11000,c=Math.floor(now/T),p=(now/T)%1,R=mul32(c*7919+13);R();
+  const reach=rd(R,330,640),k=rd(R,0,TAU);
+  let edge,rush=0,back=0,wet=0;
+  if(p<.32){const u=p/.32;edge=172+(reach-172)*(1-Math.pow(1-u,2.2));rush=bump(Math.min(1,u*1.3))}
+  else if(p<.8){const u=(p-.32)/.48;edge=reach-(reach-172)*ease(u);back=bump(Math.min(1,u*1.1))*.9;wet=1-u*.3}
+  else{edge=172;wet=.7*(1-(p-.8)/.2)}
+  return{edge,reach,rush,back,wet,k};
+}
 
 // P2 · comes, goes ---------------------------------------------------------
 P.push(function(){
@@ -1030,60 +1357,224 @@ P.push(function(){
   restless(300,240,500,170,RR=>{for(let i=0;i<4;i++)birdM(RR,rd(RR,330,760),rd(RR,260,380),rd(RR,8,16),FOAM,.7)});
   write(R,'twee keer per dag, zonder ooit te weten waarheen',800,1090,24,{col:FOAM,a:.8,cen:true});
   whispers(R,100,1100,true,4);
+  // the water goes one way and then the other. who keeps still, gets a visitor.
+  const ROWS=[];for(let y=150,k=0;y<1080;y+=rd(R,62,84),k++)if(y<560||y>760)ROWS.push({y,amp:rd(R,6,13),len:rd(R,60,95),ph:rd(R,0,TAU),a:rd(R,.18,.4)});
+  const SEAL=sprite(140,130,RR=>sealHead(RR,70,70),SEED*31+2);
+  const SPOTS=[[320,360],[1250,330],[690,960],[1120,990],[470,880],[960,300],[1380,880]];
+  const SL={st:'gone',t:0,next:performance.now()+9000,x:0,y:0,look:1,said:0};
+  const L2=live(60,40,1480,1120,{sc:.6,fps:30,frame(c,now,L){
+    wipe(c,L);
+    const fl=Math.sin(now/7000),drift=-Math.cos(now/7000)*7000/1000*38; // the position of a flow that turns every 22 s
+    const h=hand(L,now,500);
+    c.lineCap='round';
+    for(const r of ROWS){
+      c.beginPath();
+      for(let x=100;x<=1500;x+=26){
+        let y=r.y+Math.sin((x+drift)/r.len+r.ph)*r.amp;
+        if(h){const dx=x-h[0],dy=r.y-h[1],d2=dx*dx+dy*dy;y+=Math.sign(dy||1)*28*Math.exp(-d2/9000)}
+        x===100?c.moveTo(x,y):c.lineTo(x,y);
+      }
+      c.strokeStyle=rgba(FOAM,r.a);c.lineWidth=1.7;c.stroke();
+    }
+    // the word that is happening now, and its arrow, light up
+    const k=Math.max(0,fl),g=Math.max(0,-fl);
+    for(const [w,x,ax0,ax1] of[[k,420,560,744],[g,1180,1040,856]]){
+      if(w<.05)continue;
+      c.globalAlpha=w*.35;c.drawImage(SOFT,x-170,560,340,170);
+      c.globalAlpha=w*.9;c.strokeStyle=rgba(FOAM,1);c.lineWidth=4;c.beginPath();c.moveTo(ax0,700);c.lineTo(ax0+(ax1-ax0)*(.2+.8*w),700);c.stroke();
+    }
+    c.globalAlpha=1;
+    // the seal
+    const t=now-SL.t;
+    if(SL.st==='gone'){
+      if(now>SL.next&&(stillFor(now)>3.5||!PTR.in)&&L.seen){const sp=pk(Math.random,SPOTS);SL.x=sp[0];SL.y=sp[1];SL.st='up';SL.t=now;SL.look=1;sealSay('up');}
+    }else{
+      if(SL.st==='up'&&t>900&&(PTR.in&&now-PTR.t<120&&PTR.spd>500&&h&&Math.hypot(h[0]-SL.x,h[1]-SL.y)<420||t>9000))sealDive(now);
+      const rise=SL.st==='up'?ease(t/900):1-ease(t/500);
+      if(SL.st==='down'&&t>500){SL.st='gone';SL.next=now+rd(Math.random,16000,30000);
+        if(!SL.said){SL.said=now}}
+      if(SL.st==='up'&&Math.floor(t/2300)%2===1)SL.look=-1;else SL.look=1;
+      const wy=SL.y;c.save();c.beginPath();c.rect(SL.x-80,wy-140,160,140);c.clip();
+      c.translate(SL.x,wy+60-rise*62);c.scale(SL.look,1);c.drawImage(SEAL,-70,-70,140,130);c.restore();
+      c.strokeStyle=rgba(FOAM,.7*rise);c.lineWidth=1.6;
+      for(let i=0;i<3;i++){const v=((now/1400)+i/3)%1;c.globalAlpha=(1-v)*rise;c.beginPath();c.ellipse(SL.x,wy,46+v*70,8+v*12,0,0,TAU);c.stroke()}
+      c.globalAlpha=1;
+      if(SL.st==='down'&&t<500){c.fillStyle=rgba(FOAM,.8*(1-t/500));for(let i=0;i<9;i++){const a=-Math.PI*(i+.5)/9,v=t/500;c.beginPath();c.arc(SL.x+Math.cos(a)*50*v,wy+Math.sin(a)*70*v+90*v*v,3,0,TAU);c.fill()}}
+    }
+    // after it has gone: why it came
+    if(SL.said&&now-SL.said<6500){const a=Math.min(1,(now-SL.said)/600)*Math.min(1,(6500-(now-SL.said))/900);
+      say(c,'een zeehond. hij kwam kijken omdat je stil was',800,1030,19,FOAM,.85,a,true)}
+  }});
+  function sealDive(now){SL.st='down';SL.t=now;if(AC&&AC.state==='running'){nz(now_(),.55,'bandpass',1400,380,1.2,.08);plip(true)}}
+  function sealSay(){if(AC&&AC.state==='running')nz(now_()+.5,.4,'bandpass',900,700,1.5,.035,.05)}
+  hit(60,40,1540,1160,(x,y,t)=>{if(SL.st==='up'&&Math.hypot(x-SL.x,y-SL.y)<90){sealDive(t);return}return false},true);
+  ambient(0,1200,{make(g,A){A.a=bed(g,'lowpass',380,.6,.05);A.b=bed(g,'bandpass',900,.7,.02)},
+    step(now,dt,A){const s=Math.abs(Math.sin(now/7000)),t=AC.currentTime;A.a.g.gain.setTargetAtTime(.03+.05*s,t,.4);A.b.g.gain.setTargetAtTime(.01+.025*(.5+.5*Math.sin(now/2300)),t,.3)}});
 });
+// a seal's head: round, dark, two big eyes and whiskers
+function sealHead(R,x,y){
+  const hb=hblob(R,x,y,40,34);
+  fillPoly(hb,[74,80,84],.92);scribFill(R,hb,3.4,.35,{col:[40,44,48],w:1});
+  sk(R,hb.concat([hb[0]]),{col:[214,222,220],w:1.4,a:.6,amp:.5});
+  const sn=hblob(R,x+26,y+10,18,13);fillPoly(sn,[96,102,106],.95);
+  for(const sd of[-1,1]){dotF(R,x+6+sd*12,y-8,5.4,.95,[20,22,26]);dotF(R,x+8+sd*12,y-10,1.4,.9,[240,240,236])}
+  dotF(R,x+36,y+6,3.5,.9,[30,30,32]);
+  for(let k=0;k<3;k++)for(const sd of[-1,1])sk(R,[[x+30,y+12+k*3],[x+30+sd*24+12,y+8+k*6-sd*4]],{col:[226,230,228],w:.8,a:.6,amp:.2});
+  const neck=[[x-34,y+18],[x-36,y+64],[x+36,y+64],[x+30,y+20]];fillPoly(neck,[74,80,84],.92);
+}
 
 // P3 · the waders ----------------------------------------------------------
+// each one pecks in its own time. come close and it steps away; tap it and it calls.
+function wader(R,i,bx,by,s){
+  if(i===0)return oyster(R,bx,by,70,INK);
+  const body=hblob(R,bx,by,s*.9,s*.46);
+  fillPoly(body,[120,104,86],.25);scribFill(R,body,3.4,.45,{col:[110,92,70],w:1});
+  sk(R,body.concat([body[0]]),{col:INK,w:1.5,a:.8,amp:.6});
+  const head=hblob(R,bx+s*.9,by-s*.4,s*.24,s*.22);
+  sk(R,head.concat([head[0]]),{col:INK,w:1.4,a:.8,amp:.4});
+  const bl=WBEAK[i];
+  sk(R,[[bx+s*1.1,by-s*.42],[bx+s*(1.1+bl*.8),by-s*(.2+bl*.12)],[bx+s*(1.1+bl*1.5),by-s*(.05+bl*.28)]],{col:INK,w:3.2,a:.85,taper:'out',amp:.5});
+  dotF(R,bx+s,by-s*.46,2.3,.95,INK);
+  for(const lx of[bx-s*.1,bx+s*.3])sk(R,[[lx,by+s*.35],[lx+rd(R,-3,3),by+s*1.5]],{col:INK,w:1.6,a:.7,amp:.5});
+  for(let k=0;k<6;k++)sk(R,[[bx-s*.6+k*s*.3,by-s*.2],[bx-s*.7+k*s*.3,by+s*.2]],{col:INK,w:.9,a:.3,amp:.3});
+}
+const WBEAK=[1.5,2.4,1.2,1.6,1.8,.8];
 P.push(function(){
   const R=stream(SEED*101+3);
   const names=['scholekster','wulp','tureluur','kluut','grutto','kievit'];
   const cols=[[240,232,210],[232,222,196],[226,232,214],[240,226,206],[228,228,222],[244,236,216]];
+  const B=[];
   for(let i=0;i<6;i++){
     const cx0=330+(i%3)*470,cy0=300+Math.floor(i/3)*560;
     scrap(R,cx0,cy0,400,420,cols[i],rd(R,-.04,.04));
-    const bx=cx0-60,by=cy0-10;
-    if(i===0)oyster(R,bx,by,70,INK);
-    else{
-      // other waders: same body language, longer or shorter beaks, leaner legs
-      const s=62+rd(R,-6,10);
-      const body=hblob(R,bx,by,s*.9,s*.46);
-      fillPoly(body,[120,104,86],.25);scribFill(R,body,3.4,.45,{col:[110,92,70],w:1});
-      sk(R,body.concat([body[0]]),{col:INK,w:1.5,a:.8,amp:.6});
-      const head=hblob(R,bx+s*.9,by-s*.4,s*.24,s*.22);
-      sk(R,head.concat([head[0]]),{col:INK,w:1.4,a:.8,amp:.4});
-      const bl=[1.5,2.4,1.2,1.6,1.8,.8][i];
-      sk(R,[[bx+s*1.1,by-s*.42],[bx+s*(1.1+bl*.8),by-s*(.2+bl*.12)],[bx+s*(1.1+bl*1.5),by-s*(.05+bl*.28)]],{col:INK,w:3.2,a:.85,taper:'out',amp:.5});
-      dotF(R,bx+s,by-s*.46,2.3,.95,INK);
-      for(const lx of[bx-s*.1,bx+s*.3])sk(R,[[lx,by+s*.35],[lx+rd(R,-3,3),by+s*1.5]],{col:INK,w:1.6,a:.7,amp:.5});
-      for(let k=0;k<6;k++)sk(R,[[bx-s*.6+k*s*.3,by-s*.2],[bx-s*.7+k*s*.3,by+s*.2]],{col:INK,w:.9,a:.3,amp:.3});
-    }
+    const bx=cx0-60,by=cy0-10,s=i===0?70:62+rd(R,-6,10);
+    const spr=sprite(450,230,RR=>wader(RR,i,140,100,s),SEED*53+i);
+    const tip=i===0?[bx+s*2.1,by-s*.3]:[bx+s*(1.1+WBEAK[i]*1.5),by-s*(.05+WBEAK[i]*.28)];
+    const foot=[bx+s*.1,by+s*1.48];
+    const left=bx-s*1.6,right=Math.max(tip[0],bx+s*1.3)+6;
+    B.push({i,cx0,cy0,bx,by,s,spr,tip,foot,dx:0,tdx:0,min:Math.min(0,(cx0-232)-left),max:Math.max(0,(cx0+232)-right),
+      peck:-1e9,next:performance.now()+rd(Math.random,800,5000),hop:-1e9,start:-1e9,back:0,said:-1e9,rip:[]});
     sk(R,wave(R,cx0-150,cx0+150,cy0+120,2,18,6),{col:SEA,w:1.2,a:.45,amp:.7});
     caption(R,names[i],cx0,cy0+180,22,false);
   }
+  for(const b of B){
+    live(b.cx0-235,b.cy0-200,470,345,{fps:40,frame(c,now,L){
+      wipe(c,L);
+      const h=hand(L,now,250);
+      // startled: step away from the hand
+      if(h&&Math.hypot(h[0]-(b.bx+b.s*.6),h[1]-b.by)<170&&now-b.start>900){
+        b.start=now;b.tdx=clamp(b.dx+Math.sign((b.bx+b.s*.6)-h[0]||1)*48,b.min,b.max);
+        if(AC&&AC.state==='running'&&now-b.said>3500){b.said=now;CALLS[b.i](MASTER,.018)}
+      }
+      if(now-b.start>4500&&Math.abs(b.tdx)>.5)b.tdx*=.985;
+      const mv=b.tdx-b.dx;b.dx+=mv*.09;
+      // a peck now and then
+      if(now>b.next&&Math.abs(mv)<1){b.peck=now;b.next=now+rd(Math.random,2200,7000)}
+      const pu=(now-b.peck)/520,tilt=pu<0||pu>1?0:.32*(pu<.25?pu/.25:pu<.6?1:1-(pu-.6)/.4);
+      if(pu>.3&&pu<.33&&!b.rip.some(r=>now-r.t<300)){const a=tilt,fx=b.foot[0],fy=b.foot[1],tx=b.tip[0]-fx,ty=b.tip[1]-fy;
+        b.rip.push({x:fx+tx*Math.cos(a)-ty*Math.sin(a)+b.dx,y:fy+tx*Math.sin(a)+ty*Math.cos(a)+4,t:now})}
+      const hu=(now-b.hop)/380,hop=hu<0||hu>1?0:Math.sin(Math.PI*hu)*16;
+      const walk=Math.abs(mv)>1?Math.abs(Math.sin(now/55))*2.2:Math.sin(now/700+b.i)*1.1;
+      const stretch=now-b.start<450?1+.05*bump((now-b.start)/450):1;
+      // ripples where the beak went in
+      c.strokeStyle=rgba(SEA,1);c.lineWidth=1.2;
+      for(let k=b.rip.length-1;k>=0;k--){const r=b.rip[k],u=(now-r.t)/1600;if(u>1){b.rip.splice(k,1);continue}
+        c.globalAlpha=(1-u)*.6;c.beginPath();c.ellipse(r.x,r.y,4+u*26,1.5+u*7,0,0,TAU);c.stroke()}
+      c.globalAlpha=1;
+      c.save();c.translate(b.foot[0]+b.dx,b.foot[1]-walk-hop);c.rotate(tilt);c.scale(1,stretch);
+      c.drawImage(b.spr,b.bx-140-b.foot[0],b.by-100-b.foot[1],450,230);c.restore();
+    }});
+    hit(b.cx0-200,b.cy0-200,b.cx0+200,b.cy0+200,(x,y,t)=>{b.hop=t;audio();CALLS[b.i](MASTER,.05)});
+  }
   whispers(R,100,1100,false,4);
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',480,.4,.018);A.s=bed(g,'lowpass',320,.6,.02)},
+    step(now,dt,A){every(A,now,4,11,()=>CALLS[ri(RA,0,5)](A.g,.012))}});
 });
 
 // P4 · found things --------------------------------------------------------
+// every find does one thing when you touch it. the bottle has post in it.
+const BOTTLE=[
+  ['wie dit vindt:','ik was hier ook'],
+  ['gegooid bij vloed,','gevonden bij eb'],
+  ['de zee leest niet,','maar ze bewaart alles'],
+  ['1906 gegooid, 2015 gevonden','op amrum: 108 jaar onderweg'],
+  ['hier was ik gelukkig.','dat wilde ik even kwijt'],
+  ['schrijf terug.','de zee bezorgt het, ooit']];
+function itemSound(i){
+  if(!audio())return;const t=now_();
+  if(i===1){nz(t,.5,'bandpass',700,300,1.2,.11,.02);nz(t+.08,.3,'highpass',2500,2500,.5,.035,.01)}
+  else if(i===2){for(let k=0;k<16;k++)nz(t+k*.07+rd(RA,0,.03),.025,'bandpass',3000,3000,1.2,.12,.001)}
+  else if(i===3){vo(t,'sine',260,520,.32,.09,.01,MASTER,.6);vo(t+.05,'sine',130,180,.4,.05,.02)}
+  else if(i===4){nz(t,.9,'bandpass',1800,500,1.4,.1,.12)}
+  else if(i===5){vo(t,'triangle',392,392,2.4,.035,.03);vo(t+.12,'triangle',587,587,2.2,.022,.03)}
+  else if(i===6){for(let k=0;k<2;k++){const s=t+k*.55,bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=650;bp.Q.value=6;bp.connect(MASTER);vo(s,'sawtooth',85,70,.45,.12,.08,bp,1,[11,9])}}
+  else if(i===7){vo(t,'sine',620,140,.07,.12,.002);nz(t,.03,'highpass',3000,3000,.7,.06,.001);for(let k=0;k<5;k++)nz(t+.35+k*.09,.07,'bandpass',3200,2600,.8,.025,.01)}
+}
 P.push(function(){
   const R=stream(SEED*101+4);
   sheet(R,44,40,1558,1170,BLUSH,{rough:13,rot:.004});
   write(R,'wat ik tegenkwam',800,125,32,{a:.85,cen:true});
   const names=['schelp','zeewier','krab','kwal','veer','zeester','touw','fles'];
   const items=[
-    (x,y)=>shellSpiral(R,x,y,70,RUST),
-    (x,y)=>{for(const k of[-1,0,1])fern(R,x+k*34,y+90,170,WEED)},
-    (x,y)=>crab(R,x,y,60,INK),
-    (x,y)=>jelly(R,x,y-40,64,SLATE,.8),
-    (x,y)=>feather(R,x,y,100,INK),
-    (x,y)=>starfish(R,x,y,76,INK),
-    (x,y)=>rope(R,x,y,78,INK),
-    (x,y)=>bottle(R,x,y-20,80,INK)];
+    (R,x,y)=>shellSpiral(R,x,y,70,RUST),
+    (R,x,y)=>{for(const k of[-1,0,1])fern(R,x+k*34,y+90,170,WEED)},
+    (R,x,y)=>crab(R,x,y,60,INK),
+    (R,x,y)=>jelly(R,x,y-40,64,SLATE,.8),
+    (R,x,y)=>feather(R,x,y,100,INK),
+    (R,x,y)=>starfish(R,x,y,76,INK),
+    (R,x,y)=>rope(R,x,y,78,INK),
+    (R,x,y)=>bottle(R,x,y-20,80,INK)];
+  // where each thing turns about, in its own sprite (300 x 340, middle 150,170)
+  const PIV=[[150,170],[150,262],[150,170],[150,130],[150,170],[150,170],[150,170],[150,240]];
+  const NOTE=sprite(300,120,RR=>{const P0=sheet(RR,10,10,290,110,[248,242,226],{rough:6});},SEED*61);
   for(let i=0;i<8;i++){
     const cx0=250+(i%4)*368,cy0=420+Math.floor(i/4)*480;
     scrap(R,cx0,cy0,310,360,pk(R,[CREAM,SAGEP,[240,230,210]]),rd(R,-.05,.05));
-    items[i](cx0,cy0-6);
     caption(R,names[i],cx0,cy0+150,20,false);
+    const spr=sprite(300,340,RR=>items[i](RR,150,170),SEED*67+i);
+    const it={i,cx0,cy0,spr,t:-1e9,next:performance.now()+rd(Math.random,3000,9000),idle:-1e9,msg:-1};
+    live(cx0-155,cy0-186,310,322,{fps:40,frame(c,now,L){
+      wipe(c,L);
+      const u=(now-it.t)/1000,px=PIV[i][0],py=PIV[i][1];
+      let dx=0,dy=0,rot=0,sx=1,sy=1;
+      if(i===0&&u<4.6){c.strokeStyle=rgba(RUST,1);c.lineWidth=1.4;for(let k=0;k<3;k++){const v=(u*.6+k/3)%1;c.globalAlpha=(1-v)*.5*(1-u/4.6);c.beginPath();c.arc(cx0,cy0-6,76+v*60,-.9,.9);c.stroke();c.beginPath();c.arc(cx0,cy0-6,76+v*60,Math.PI-.9,Math.PI+.9);c.stroke()}c.globalAlpha=1}
+      if(i===1)rot=Math.sin(now/1300+1)*.035+(u<6?.22*Math.exp(-u*.9)*Math.sin(u*6.5):0);
+      if(i===2){if(now>it.next){it.idle=now;it.next=now+rd(Math.random,4000,9000)}
+        const iu=(now-it.idle)/600;dx=bump(iu)*7*(it.next%2?1:-1);
+        if(u<2.4){dx=u<.7?62*ease(u/.7):u<1.7?62-124*ease(u-.7):-62+62*ease((u-1.7)/.7);dy=-Math.abs(Math.sin(u*28))*2.4}}
+      if(i===3){const pul=Math.sin(now/650);sy=1+.04*pul;sx=1-.025*pul;
+        if(u<4){dy=-55*(u<.9?ease(u/.9):1-ease((u-.9)/3.1));const p2=u<1.2?Math.sin(u*14)*.08:0;sy+=p2;sx-=p2*.6}}
+      if(i===4&&u<2.8){dy=-130*Math.sin(Math.PI*Math.min(1,u/2.8));dx=Math.sin(u*3.4)*30*(1-u/2.8);rot=u*5.4*(1-u/3.6)}
+      if(i===5&&u<3.2)rot=TAU/5*ease(u/3.2);
+      if(i===6&&u<1.8)rot=-Math.PI*ease(u/1.8);
+      if(i===7&&u<.6)rot=Math.sin(u*30)*.06*(1-u/.6);
+      if(i===5||i===6){const D=i===5?3.2:1.8;if(u>=D&&it.pend){it.base=(it.base||0)+it.pend;it.pend=0}rot=(u<D?rot:0)+(it.base||0)}
+      c.save();c.translate(cx0-150+px+dx,cy0-176+py+dy);c.rotate(rot);c.scale(sx,sy);c.drawImage(spr,-px,-py,300,340);c.restore();
+      // the post from the bottle
+      if(i===7&&it.msg>=0&&u<9){const a=Math.min(1,u/.5)*Math.min(1,(9-u)/.8),lift=(1-ease(u/.6))*30;
+        c.globalAlpha=a;c.drawImage(NOTE,cx0-150,cy0-186+lift,300,120);
+        say(c,BOTTLE[it.msg][0],cx0,cy0-132+lift,15,INK,.85,a,true);say(c,BOTTLE[it.msg][1],cx0,cy0-104+lift,15,INK,.85,a,true);c.globalAlpha=1}
+    }});
+    hit(cx0-150,cy0-180,cx0+150,cy0+170,(x,y,t)=>{
+      const u=(t-it.t)/1000;
+      if((i===5&&u<3.2)||(i===6&&u<1.8))return;
+      if(i===5)it.pend=TAU/5;
+      if(i===6)it.pend=-Math.PI;
+      if(i===7){let n=BOTTLE.findIndex((m,k)=>!MEM.msgs.includes(k));if(n<0)n=(it.msg+1)%BOTTLE.length;it.msg=n;if(!MEM.msgs.includes(n))MEM.msgs.push(n)}
+      it.t=t;
+      if(i===0)shellSea();else itemSound(i);
+      if(!MEM.found.includes(i))MEM.found.push(i);
+      memSave();
+    });
   }
+  // what you found, counted, and kept for next time
+  live(1150,72,380,80,{fps:4,frame(c,now,L){
+    const n=MEM.found.length;if(L.n===n&&L.drawn)return;L.n=n;wipe(c,L);
+    const t=n<8?`gevonden: ${n} van 8`:'alle acht gevonden',sp=textSpr(t,17,INK,.7);
+    if(n)say(c,t,1520-(sp.w-17*.8),118,17,INK,.7);
+  }});
   whispers(R,160,1130,false,4);
+  ambient(0,1200,{make(g,A){A.s=bed(g,'lowpass',600,.6,.03)},step(now,dt,A){A.s.g.gain.setTargetAtTime(.015+.03*(.5+.5*Math.sin(now/1900)),AC.currentTime,.3)}});
 });
 
 // P5 · the dike ------------------------------------------------------------
@@ -1098,7 +1589,8 @@ P.push(function(){
   hatchFill(R,dike,13,-.7,.18,{col:CINK,w:1});
   sk(R,dike.slice(0,5),{col:CINK,w:2.4,a:.7,amp:1.8});
   // sheep, sleeping on the dike
-  for(let i=0;i<7;i++)sheepM(R,rd(R,300,1000)+i*25,rd(R,790,1040),rd(R,15,26),CINK);
+  const SH=[];
+  for(let i=0;i<7;i++){const x=rd(R,300,1000)+i*25,y=rd(R,790,1040),z=rd(R,15,26);sheepM(R,x,y,z,CINK);SH.push([x,y,z])}
   // the light
   const tw=[[1180,720],[1260,720],[1240,380],[1200,380]];
   fillPoly(tw,[236,230,214],.95);
@@ -1108,16 +1600,54 @@ P.push(function(){
   fillPoly(lamp,LAMP,.9);
   sk(R,lamp.concat([lamp[0]]),{col:CINK,w:1.4,a:.8,amp:.5});
   sk(R,[[1180,330],[1220,290],[1260,330]],{col:CINK,w:2,a:.8,amp:.6});
-  const beam=[[1190,350],[60,250],[60,470]];
-  fillPoly(beam,LAMP,.1);scribFill(R,beam,6,.12,{col:LAMP,w:1});
   spark(R,1220,355,20,{col:LAMP,a:.95,w:2,nR:9});
   restless(1170,300,100,100,RR=>spark(RR,1220,355,20,{col:LAMP,a:.95,w:2,nR:ri(RR,7,11)}));
   write(R,'de dijk houdt',380,230,38,{col:CINK,a:.85,cen:true});
   write(R,'tot hij het niet meer hoeft',380,285,20,{col:CINK,a:.7,cen:true});
   // the log: asemic writing, a ship's diary nobody can read
   for(let y=900,k=0;k<7;k++,y+=34)atext(R,380,1100,y+rd(R,-2,2),14,{col:CINK,a:.4,w:1.1});
+  write(R,'houd je licht bij het logboek',740,862,14,{col:CINK,a:.38,cen:true});
   whispers(R,100,700,true,3);
+  // the light turns: a beam that sweeps the dark, and flashes when it looks at you
+  live(40,150,1520,420,{sc:.5,fps:30,frame(c,now,L){
+    wipe(c,L);
+    const al=TAU*now/10000,dx=Math.cos(al),tw=Math.sin(al),lx=1220,ly=355;
+    const len=dx<0?1160*Math.pow(-dx,.8):330*Math.pow(dx,.8),sp=26+90*Math.abs(dx);
+    if(len>8){const ex=lx+Math.sign(dx)*len,g=c.createLinearGradient(lx,0,ex,0);
+      g.addColorStop(0,rgba(LAMP,.34));g.addColorStop(.7,rgba(LAMP,.1));g.addColorStop(1,rgba(LAMP,0));
+      c.fillStyle=g;c.beginPath();c.moveTo(lx,ly-6);c.lineTo(ex,ly-sp);c.lineTo(ex,ly+sp*1.15);c.lineTo(lx,ly+6);c.closePath();c.fill()}
+    if(tw>.75){const k=(tw-.75)/.25,s=40+260*k*k;c.globalAlpha=Math.min(1,k*1.3);c.drawImage(GLINT,lx-s,ly-s,s*2,s*2);c.globalAlpha=1}
+  }});
+  // a lamp in your hand makes the keeper's log readable
+  const LOG=['31 januari 1953, avond: noordwest, storm','springtij en storm komen samen','nacht: het water staat tegen de kruin',
+    '1 februari: elders breken de dijken','1836 mensen komen om','daarna: de deltawerken','vannacht: kalm. de schapen slapen.'];
+  live(360,868,780,290,{fps:30,frame(c,now,L){
+    const h=hand(L,now,2600,90);
+    L.k=(L.k||0)+((h?1:0)-(L.k||0))*.12;
+    if(h)L.h=h;
+    if(L.k<.01){if(L.was){wipe(c,L);L.was=false}return}
+    L.was=true;wipe(c,L);
+    c.fillStyle=rgba([38,50,38],.9);c.fillRect(360,868,780,290);
+    LOG.forEach((t,k)=>say(c,t,382,900+k*34+2,15,CINK,.9));
+    const [x,y]=L.h,g=c.createRadialGradient(x,y,0,x,y,240);
+    g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.6,'rgba(0,0,0,.92)');g.addColorStop(1,'rgba(0,0,0,0)');
+    c.globalCompositeOperation='destination-in';c.globalAlpha=L.k;c.fillStyle=g;c.fillRect(360,868,780,290);
+    c.globalCompositeOperation='source-over';c.globalAlpha=1;
+  }});
+  hit(1170,280,1275,725,()=>foghorn());
+  for(const [x,y,z] of SH)hit(x-z*1.3,y-z*.9,x+z*1.5,y+z*1.1,()=>bleat(MASTER,.06));
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',380,.7,.03);A.s=bed(g,'lowpass',260,.7,.03)},
+    step(now,dt,A){const t=AC.currentTime;A.w.g.gain.setTargetAtTime(.015+.035*fbm(now/4000,1,5,2),t,.4);A.w.f.frequency.setTargetAtTime(280+300*fbm(now/3000,2,6,2),t,.5);
+      every(A,now,14,30,()=>bleat(A.g,.012))}});
 });
+// the foghorn: two long low blasts
+function foghorn(){if(!audio())return;const t=now_(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=700;lp.connect(MASTER);
+  for(let k=0;k<2;k++){const s=t+k*2.6;for(const f of[146,147.2,219]){const o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';o.frequency.value=f;
+    g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(f>200?.014:.028,s+.25);g.gain.setValueAtTime(f>200?.014:.028,s+1.6);g.gain.linearRampToValueAtTime(0,s+2.1);o.connect(g);g.connect(lp);o.start(s);o.stop(s+2.2)}}}
+// a sheep that wakes up, a little
+function bleat(out,v){if(!AC)return;const t=now_(),f=rd(RA,330,420);
+  for(const [ff,q] of[[700,4],[1250,6]]){const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=ff;bp.Q.value=q;bp.connect(out);
+    vo(t,'sawtooth',f,f*.88,.75,v*1.7,.06,bp,1,[7.5,f*.06]);}}
 
 // P6 · the depth -----------------------------------------------------------
 P.push(function(){
@@ -1150,7 +1680,42 @@ P.push(function(){
   write(R,'tot waar het licht ophoudt',930,150,30,{col:CINK,a:.8,cen:true});
   write(R,'en dan nog verder',1160,1000,20,{col:CINK,a:.6,cen:true});
   whispers(R,100,1100,true,4);
+  // down here the only light is yours, and the lamp of the one who waits.
+  // tap, and a ping goes out; what it touches answers.
+  const VALS=[0,20,60,80,200,600,800];
+  const depthAt=y=>{const f=(y-100)/170,i=clamp(Math.floor(f),0,5),u=clamp(f-i,0,1.6);return VALS[i]+(VALS[Math.min(6,i+1)]-VALS[i])*u};
+  const WHO=[[600,330,90],[1130,230,50],[1280,640,66],[560,830,90],[1100,500,70],[860,960,90]];
+  const SON=[];
+  live(40,30,1520,1140,{sc:.5,fps:30,frame(c,now,L){
+    wipe(c,L);
+    const g=c.createLinearGradient(0,330,0,1150);g.addColorStop(0,'rgba(6,12,20,0)');g.addColorStop(.55,'rgba(6,12,20,.55)');g.addColorStop(1,'rgba(6,12,20,.86)');
+    c.fillStyle=g;c.fillRect(40,330,1520,840);
+    const h=hand(L,now,3000);
+    const lure=.75+.25*Math.sin(now/530)*Math.sin(now/1700);
+    c.globalCompositeOperation='destination-out';
+    c.globalAlpha=lure;c.drawImage(SOFT,1012-110,810-110,220,220);
+    if(h){L.k=Math.min(1,(L.k||0)+.08)}else L.k=Math.max(0,(L.k||0)-.04);
+    if(L.k>0&&(h||L.h)){if(h)L.h=h;c.globalAlpha=L.k;c.drawImage(SOFT,L.h[0]-230,L.h[1]-230,460,460);c.drawImage(SOFT,L.h[0]-150,L.h[1]-150,300,300)}
+    c.globalCompositeOperation='lighter';c.globalAlpha=lure;c.drawImage(GLINT,1012-34,810-34,68,68);
+    // the ping and its echoes
+    for(let i=SON.length-1;i>=0;i--){const S0=SON[i],r=(now-S0.t)*.7;if(r>1700){SON.splice(i,1);continue}
+      c.globalAlpha=.55*(1-r/1700);c.strokeStyle=rgba([150,230,240],1);c.lineWidth=2.4;c.beginPath();c.arc(S0.x,S0.y,r,0,TAU);c.stroke();
+      for(const w of WHO){const d=Math.hypot(w[0]-S0.x,w[1]-S0.y),k=(r-d)/260;if(k<0||k>1)continue;
+        if(!S0.hit.includes(w)){S0.hit.push(w);if(AC&&AC.state==='running')echo(d)}
+        c.globalAlpha=(1-k)*.8;c.drawImage(COLD,w[0]-w[2]*1.3,w[1]-w[2]*1.3,w[2]*2.6,w[2]*2.6)}}
+    c.globalCompositeOperation='source-over';c.globalAlpha=1;
+    // how deep the hand is
+    if(h&&L.k>.5){const d=depthAt(h[1]);say(c,(d<15?'':'≈ ')+Math.round(d/10)*10+' m',h[0]+26,h[1]-16,15,CINK,.75,L.k)}
+  }});
+  hit(40,30,1560,1170,(x,y,t)=>{SON.push({x,y,t,hit:[]});if(SON.length>3)SON.shift();ping()},true);
+  ambient(0,1200,{make(g,A){A.d=bed(g,'lowpass',110,.8,.07);A.m=bed(g,'lowpass',320,.6,.012)},
+    step(now,dt,A){every(A,now,16,34,()=>whale(A.g));if(RA()<dt*.25)bubble(A.g)}});
 });
+function ping(){if(!audio())return;const t=now_();vo(t,'sine',1480,1460,1.3,.07,.004);vo(t,'sine',2960,2900,.5,.012,.004)}
+function echo(d){const t=now_()+d/700;vo(t,'sine',1380,1360,.8,.045*(1-Math.min(.8,d/1600)),.004)}
+// far off, something large sings
+function whale(out){const t=now_(),f=rd(RA,150,210),o=vo(t,'sine',f,f*1.4,3.4,.016,.8,out,.4,[3,4]);o.frequency.exponentialRampToValueAtTime(f*.8,t+3.3)}
+function bubble(out){const t=now_();for(let k=0;k<ri(RA,2,5);k++)vo(t+k*rd(RA,.06,.14),'sine',rd(RA,500,900),rd(RA,1200,1800),.06,.012,.003,out,.6)}
 
 // P7 · the storm -----------------------------------------------------------
 P.push(function(){
@@ -1177,8 +1742,44 @@ P.push(function(){
   spatter(R,800,850,700,350,FOAM,.5);
   write(R,'alles beweegt',800,640,70,{col:FOAM,a:.9,cen:true});
   write(R,'ook wat vastzat',800,700,24,{col:FOAM,a:.7,cen:true});
+  write(R,'tel de seconden tot de donder: drie tellen is ongeveer een kilometer',800,770,16,{col:FOAM,a:.55,cen:true});
   whispers(R,100,1100,true,4);
+  // rain that leans with your hand, lightning, and the thunder that follows it
+  const RAIN=[];{const RG=stream(SEED*9+7);for(let i=0;i<130;i++)RAIN.push({x:rd(RG,80,1520),y:rd(RG,430,1120),l:rd(RG,22,52),v:rd(RG,700,1000),a:rd(RG,.18,.45)})}
+  const FL={t:-1e9,x:1000,km:1,pts:null,next:performance.now()+6000};
+  let wind=-.35,gust=0,lx=null;
+  const flash=(x,now)=>{const km=pk(Math.random,[1,1,2,2,3]);const pts=[[x,440]];let px=x,y=440;while(y<830){px+=rd(Math.random,-60,60);y+=rd(Math.random,40,80);pts.push([px,y])}
+    Object.assign(FL,{t:now,x,km,pts,next:now+rd(Math.random,14000,26000)});
+    if(AC&&AC.state==='running')thunder(km);};
+  live(60,40,1480,1120,{sc:.5,fps:30,frame(c,now,L){
+    wipe(c,L);
+    const h=hand(L,now,200),dt=Math.min(.1,(now-(L.pt||now))/1000);L.pt=now;
+    if(h){if(lx!==null)gust+=clamp((h[0]-lx)/Math.max(dt,.016)/1600,-1,1)*.2;lx=h[0]}else lx=null;
+    gust*=.96;wind=-.35+clamp(gust,-.9,.9);
+    if(now>FL.next&&L.seen&&!STILL)flash(rd(Math.random,300,1300),now);
+    const fu=(now-FL.t);
+    if(fu<420){const k=Math.exp(-fu/90)+(fu>110&&fu<200?.6:0);c.fillStyle=rgba([236,240,250],.32*Math.min(1,k));c.fillRect(60,40,1480,1120)}
+    c.strokeStyle=rgba(SKYB,1);c.lineWidth=1.3;c.beginPath();
+    for(const r of RAIN){r.y+=r.v*dt;r.x+=r.v*dt*wind;if(r.y>1130){r.y=430;r.x=rd(Math.random,80,1520)}if(r.x<70)r.x+=1450;if(r.x>1530)r.x-=1450;
+      c.moveTo(r.x,r.y);c.lineTo(r.x-r.l*wind,r.y-r.l)}
+    c.globalAlpha=.4;c.stroke();c.globalAlpha=1;
+    if(FL.pts&&fu<700){const a=fu<80?1:Math.max(0,1-(fu-80)/620);c.globalAlpha=a;
+      for(const [w,col] of[[7,LAMP],[1.8,FOAM]]){c.strokeStyle=rgba(col,1);c.lineWidth=w;c.beginPath();FL.pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke()}c.globalAlpha=1}
+    // counting
+    if(FL.pts&&fu<FL.km*2900+4000){const n=Math.floor(fu/1000),D=FL.km*2900,bx=clamp(FL.x+40,150,1250);
+      for(let k=1;k<=Math.min(n,Math.ceil(D/1000));k++){const a=Math.min(1,(fu-k*1000)/300)*(fu>D+2500?1-(fu-D-2500)/1500:1);say(c,String(k),bx+(k-1)*34,560,26,FOAM,.9,a)}
+      if(fu>D){const a=Math.min(1,(fu-D)/400)*(fu>D+2500?1-(fu-D-2500)/1500:1);say(c,'≈ '+FL.km+' km',bx,604,22,FOAM,.85,a)}}
+  }});
+  hit(60,40,1540,1160,(x,y,t)=>{flash(x,t)},true);
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',500,2.2,.05);A.r=bed(g,'highpass',3600,.5,.03);A.l=bed(g,'lowpass',180,.7,.06)},
+    step(now,dt,A){const t=AC.currentTime,f=fbm(now/2500,3,9,2);A.w.f.frequency.setTargetAtTime(260+700*f,t,.3);A.w.g.gain.setTargetAtTime(.02+.07*f,t,.3);
+      every(A,now,3,6.5,()=>nz(now_(),rd(RA,1.6,2.6),'lowpass',1000,280,.7,rd(RA,.05,.09),.25,A.g))}});
 });
+// thunder: the crack if it is near, the long roll, later the further it is
+function thunder(km){const t=now_()+km*2.9,v=1/(.7+km*.45);
+  if(km<2)nz(t,.25,'highpass',1800,900,.7,.09*v,.003);
+  nz(t+.02,rd(RA,3,4.2),'lowpass',260,70,.8,.32*v,.12);
+  nz(t+rd(RA,.4,1),2.6,'lowpass',180,60,.9,.22*v,.35);}
 
 // P8 · the moon pulls ------------------------------------------------------
 P.push(function(){
@@ -1194,20 +1795,60 @@ P.push(function(){
   const eb=blob(R,420,700,90,90);
   fillPoly(eb,SLATE,.5);scribFill(R,eb,5,.45,{col:SLATE,w:1.2});
   sk(R,eb.concat([eb[0]]),{col:INK,w:1.8,a:.8,amp:.8});
-  const bul=[];
-  for(let i=0;i<=48;i++){const t=i/48*TAU;const r=118+62*Math.cos(2*t);const a=-.35;const x=Math.cos(t)*r,y=Math.sin(t)*r*.8;bul.push([420+x*Math.cos(a)-y*Math.sin(a),700+x*Math.sin(a)+y*Math.cos(a)])}
-  sk(R,bul,{col:SEA,w:2.6,a:.8,amp:1.2,passes:2});
-  sk(R,bul.map(p=>[420+(p[0]-420)*1.1,700+(p[1]-700)*1.1]),{col:SEA,w:1,a:.45,amp:1.6});
   for(let k=0;k<4;k++){
     sk(R,[[560+k*60,640+k*14],[1000-k*30,420+k*30]],{col:INK,w:1,a:.4,amp:2,gap:.25});
   }
   arrowHead(R,1010,415,-.42,14,.6,INK,1.4);
   // orbit: ellipses within ellipses
   for(let i=0;i<6;i++)ell(R,800,700,520+i*46,200+i*20,{col:shade(SAND2,.35+i*.05),w:1,a:.5-i*.06,amp:2});
-  atext(R,200,700,950,15,{a:.45});atext(R,200,640,985,15,{a:.4});atext(R,200,720,1020,15,{a:.4});
-  write(R,'ademt de zee',1100,1020,34,{a:.8,cen:true});
+  write(R,'ademt de zee',1220,1060,34,{a:.8,cen:true});
+  write(R,'hier draait door twee bulten water: twee keer hoog, twee keer laag',470,925,15,{a:.5,cen:true});
+  write(R,'hoog',150,965,13,{a:.45});write(R,'laag',150,1050,13,{a:.45});
+  sk(R,[[200,1007],[770,1007]],{w:1,a:.25,amp:.6,gap:.2});
+  write(R,'beweeg opzij: een maand in één keer',1220,1110,15,{a:.45,cen:true});
   whispers(R,100,1100,false,4);
+  // the earth turns under the water the moon holds up. the sun pulls too:
+  // with it (new and full moon) the tide runs big, across it, small.
+  const E=[420,700],ER=90,TM=Math.atan2(360-700,1180-420),DAY=16000;
+  TIDE.age=AGE0;
+  live(120,150,1380,960,{sc:.7,fps:30,frame(c,now,L){
+    wipe(c,L);
+    const h=hand(L,now,4000);
+    const tgt=h?clamp((h[0]-140)/1340,0,1)*SYN:AGE0;
+    let d=tgt-TIDE.age;if(d>SYN/2)d-=SYN;if(d<-SYN/2)d+=SYN;TIDE.age=((TIDE.age+d*.08)%SYN+SYN)%SYN;
+    const TS=TM-TAU*TIDE.age/SYN;TIDE.ts=TS;
+    // sunlight
+    const sx=Math.cos(TS),sy=Math.sin(TS),qx=-sy,qy=sx;
+    c.strokeStyle=rgba(OCHRE,1);c.lineWidth=1.3;
+    for(let k=-5;k<=5;k++){const ox=E[0]+qx*k*30,oy=E[1]+qy*k*30;c.globalAlpha=.32-Math.abs(k)*.03;c.beginPath();c.moveTo(ox+sx*560,oy+sy*560);c.lineTo(ox+sx*(ER+150),oy+sy*(ER+150));c.stroke()}
+    c.globalAlpha=1;
+    say(c,'zonlicht',E[0]+sx*600,E[1]+sy*600,14,OCHRE,.8,.9,true);
+    // night on the earth and on the moon: the halves turned from the sun
+    c.fillStyle=rgba([22,30,44],.3);
+    c.beginPath();c.arc(E[0],E[1],ER-8,TS+Math.PI/2,TS+Math.PI*1.5);c.closePath();c.fill();
+    c.fillStyle=rgba([22,30,44],.22);c.beginPath();c.arc(1180,360,136,TS+Math.PI/2,TS+Math.PI*1.5);c.closePath();c.fill();
+    // the water
+    const lev=f=>(Math.cos(2*(f-TM))+.46*Math.cos(2*(f-TS)))/1.46;
+    c.beginPath();for(let i=0;i<=72;i++){const f=i/72*TAU,r=124+30*lev(f);const x=E[0]+Math.cos(f)*r,y=E[1]+Math.sin(f)*r;i?c.lineTo(x,y):c.moveTo(x,y)}
+    c.closePath();c.fillStyle=rgba(SEA,.14);c.fill();c.strokeStyle=rgba(SEA,.85);c.lineWidth=2.6;c.stroke();
+    // here: a harbour on the turning earth
+    const ph=TAU*now/DAY,hx=E[0]+Math.cos(ph)*(ER+2),hy=E[1]+Math.sin(ph)*(ER+2);
+    c.fillStyle=rgba(RUST,1);c.beginPath();c.arc(hx,hy,6,0,TAU);c.fill();
+    c.strokeStyle=rgba(INK,.6);c.lineWidth=1.2;c.beginPath();c.moveTo(hx,hy);c.lineTo(hx+Math.cos(ph)*22,hy+Math.sin(ph)*22);c.stroke();
+    say(c,'hier',hx+Math.cos(ph)*40,hy+Math.sin(ph)*40+5,14,INK,.8,1,true);
+    TIDE.h=lev(ph);
+    // the last two days of water, here
+    c.beginPath();for(let i=0;i<=140;i++){const tt=now-(140-i)/140*DAY*2,v=lev(TAU*tt/DAY);const x=200+i/140*570,y=1007-v*40;i?c.lineTo(x,y):c.moveTo(x,y)}
+    c.strokeStyle=rgba(SEA,.9);c.lineWidth=2.2;c.stroke();
+    c.fillStyle=rgba(RUST,1);c.beginPath();c.arc(770,1007-TIDE.h*40,5,0,TAU);c.fill();
+    // what day of the moon this is
+    const today=Math.abs(d)<.6&&!h;
+    say(c,(today?'vandaag: ':'')+phaseName(TIDE.age),800,975,17,INK,.85);
+    say(c,tideName(TIDE.age),800,1002,17,SEA,.95);
+  }});
+  ambient(0,1200,{make(g,A){A.s=bed(g,'lowpass',480,.6,.03)},step(now,dt,A){A.s.g.gain.setTargetAtTime(.01+.04*(.5+.5*(TIDE.h||0)),AC.currentTime,.25)}});
 });
+const TIDE={age:0,h:0,ts:0};
 
 // P9 · low water -----------------------------------------------------------
 P.push(function(){
@@ -1228,20 +1869,51 @@ P.push(function(){
   sk(R,wave(R,70,1530,340,2,200,6),{col:INK,w:2.2,a:.7,amp:1.4});
   const sy=160,sx=1260;
   fillPoly([[sx-14,340],[sx+14,340],[sx+8,sy],[sx-8,sy]],RUST,.7);
-  // a walker with a very long shadow
+  // a walker with a very long shadow (they walk, see below)
   const wx=700,wy=820;
-  dotF(R,wx,wy-84,10,.9,INK);
-  sk(R,[[wx,wy-72],[wx,wy-22],[wx-14,wy+20],[wx-26,wy+20]],{col:INK,w:3,a:.9,amp:.4});
-  sk(R,[[wx,wy-22],[wx+14,wy+20],[wx+26,wy+20]],{col:INK,w:3,a:.9,amp:.4});
-  sk(R,[[wx,wy-60],[wx-22,wy-34]],{col:INK,w:2.5,a:.85,amp:.3});
-  sk(R,[[wx,wy-60],[wx+22,wy-36]],{col:INK,w:2.5,a:.85,amp:.3});
-  sk(R,[[wx,wy+20],[wx+420,wy+70],[wx+620,wy+60]],{col:INK,w:5,a:.22,amp:3,taper:'out'});
   // the way they came
   for(let i=0;i<15;i++){const t=i/14;ell(R,wx-60-t*500,wy+14+t*10+(i%2?8:-8),11,6,{col:shade(MUD,.5),w:1.8,a:.7-t*.5,amp:.4})}
   write(R,'ver weg is ook thuis',800,230,40,{a:.85,cen:true});
   for(let i=0;i<5;i++)birdM(R,rd(R,300,900),rd(R,200,300),rd(R,8,14),INK,.5);
+  write(R,'tik op het slik',1330,1125,14,{a:.42,cen:true});
   whispers(R,430,1100,false,4);
+  // the walker goes on toward the far line, smaller and smaller, and leaves prints
+  const WALK=[0,1,2,3].map(k=>sprite(90,140,RR=>{
+    const x=45,y=120,sw=Math.sin(k/4*TAU);
+    dotF(RR,x,y-104,10,.9,INK);
+    sk(RR,[[x,y-92],[x,y-42]],{col:INK,w:3,a:.9,amp:.4});
+    sk(RR,[[x,y-42],[x+sw*10,y-20],[x+sw*16,y],[x+sw*16+10,y]],{col:INK,w:3,a:.9,amp:.4});
+    sk(RR,[[x,y-42],[x-sw*10,y-20],[x-sw*16,y],[x-sw*16+10,y]],{col:INK,w:3,a:.9,amp:.4});
+    sk(RR,[[x,y-80],[x-sw*14-8,y-56]],{col:INK,w:2.5,a:.85,amp:.3});
+    sk(RR,[[x,y-80],[x+sw*14+8,y-56]],{col:INK,w:2.5,a:.85,amp:.3});
+  },SEED*71+k));
+  const CAST=[0,1,2].map(k=>sprite(60,40,RR=>{const pts=[];let x=8,y=30;for(let i=0;i<26;i++){const a=i*.9;pts.push([x+i*1.6+Math.cos(a)*6,y-i*.5+Math.sin(a)*5])}
+    sk(RR,pts,{col:shade(MUD,.45),w:3.4,a:.85,amp:.6});sk(RR,pts,{col:tint(MUD,.25),w:1.2,a:.6,amp:.4})},SEED*73+k));
+  const PR=[],CS=[];
+  live(50,340,1500,820,{sc:.7,fps:24,frame(c,now,L){
+    wipe(c,L);
+    // a day out on the flats: about eighty seconds, then a pause, then again
+    if(!L.t0)L.t0=now;
+    const cyc=95000,u=((now-L.t0)%cyc)/80000,z=1+Math.min(u,1)*7,s=1/z;
+    const x=1260+(wx-1260)*s,y=340+(wy+20-340)*s;
+    const fade=u>1?0:u<.03?u/.03:u>.94?(1-u)/.06:1;
+    if(u<1){const L0=PR[PR.length-1];if(!L0||Math.hypot(x-L0.x,y-L0.y)>16*s+2)PR.push({x:x+(PR.length%2?5:-5)*s,y:y+(PR.length%2?3:-3)*s,s,t:now})}
+    if(u>1&&PR.length&&now-PR[PR.length-1].t>14000)PR.length=0;
+    for(const p of PR){const a=.6*(1-clamp((now-p.t)/50000,0,1));if(a<=0)continue;c.strokeStyle=rgba(shade(MUD,.5),a);c.lineWidth=1.8*p.s+.4;c.beginPath();c.ellipse(p.x,p.y,11*p.s,5.5*p.s,0,0,TAU);c.stroke()}
+    if(fade>0){c.globalAlpha=fade;
+      c.fillStyle=rgba(INK,.2);c.beginPath();c.moveTo(x-6*s,y);c.lineTo(x+430*s,y+50*s);c.lineTo(x+620*s,y+44*s);c.lineTo(x+6*s,y-4*s);c.closePath();c.fill();
+      c.drawImage(WALK[Math.floor(now/260)%4],x-45*s,y-120*s,90*s,140*s);c.globalAlpha=1}
+    // lugworms answer a tap
+    for(const k of CS){const g=clamp((now-k.t)/1200,0,1);c.save();c.beginPath();c.rect(k.x-48,k.y-40,96*g,72);c.clip();c.drawImage(CAST[k.v],k.x-48,k.y-35,96,64);c.restore();
+      c.fillStyle=rgba(shade(MUD,.55),.7*g);c.beginPath();c.ellipse(k.x-72,k.y+10,9,4.5,0,0,TAU);c.fill()}
+  }});
+  hit(50,360,1550,1160,(x,y,t)=>{CS.push({x,y,t,v:ri(Math.random,0,2)});if(CS.length>14)CS.shift();plop()},true);
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',700,.4,.02)},
+    step(now,dt,A){const n=Math.floor(dt*rd(RA,6,16)+RA());const t=now_();for(let k=0;k<n;k++)nz(t+RA()*dt,.012,'highpass',rd(RA,2500,6000),3000,1,rd(RA,.004,.014),.001,A.g);
+      every(A,now,10,22,()=>CALLS[1](A.g,.01))}});
 });
+// the slik answers: a bubble and a little suck
+function plop(){if(!audio())return;const t=now_();vo(t,'sine',240,620,.08,.12,.003,MASTER,.7);nz(t+.03,.14,'bandpass',420,260,2,.06,.01)}
 
 // P10 · the tide turns -----------------------------------------------------
 P.push(function(){
@@ -1259,6 +1931,21 @@ P.push(function(){
   spark(R,800,388,30,{col:LAMP,a:.95,w:2.4,nR:8});
   write(R,'het water komt terug',800,700,40,{col:FOAM,a:.9,cen:true});
   write(R,'zoals altijd, niet precies hetzelfde',800,752,22,{col:FOAM,a:.7,cen:true});
+  // the water comes in, row on row
+  const IN=[];for(let k=0;k<7;k++)IN.push({k,len:rd(R,50,80),ph:rd(R,0,7),amp:rd(R,5,11)});
+  live(40,500,1520,660,{sc:.8,fps:30,frame(c,now,L){
+    wipe(c,L);
+    for(const r of IN){const u=((now/1000+r.k*2.4)%16.8)/16.8,y=1140-u*560,a=Math.sin(Math.PI*u)*.5;
+      c.beginPath();for(let x=90;x<=1510;x+=24){const yy=y+Math.sin(x/r.len+r.ph+now/1600)*r.amp;x===90?c.moveTo(x,yy):c.lineTo(x,yy)}
+      c.strokeStyle=rgba(FOAM,a);c.lineWidth=1.8;c.stroke()}
+    // what this tide was
+    const v=MEM.visits||1,lines=[v<2?'dit was je eerste getij hier':`dit is je ${v}e getij hier`,
+      TOUCHED?`je raakte het water ${TOUCHED} keer aan`:'je hebt het water nog niet aangeraakt'];
+    if(MEM.found.length)lines.push(`je vond ${MEM.found.length} van de 8 dingen`+(MEM.msgs.length?` en las ${MEM.msgs.length} keer flessenpost`:''));
+    lines.forEach((t,i)=>say(c,t,800,840+i*30,17,CINK,.75,1,true));
+  }});
+  ambient(0,1200,{make(g,A){A.s=bed(g,'bandpass',700,.5,0);A.l=bed(g,'lowpass',300,.7,.025)},
+    step(now,dt,A){const u=((now/1000)%2.4)/2.4;A.s.g.gain.setTargetAtTime(.012+.05*bump(Math.min(1,u*1.6)),AC.currentTime,.15)}});
   write(R,'getij · van binnenuit · 2026',800,1000,18,{col:CINK,a:.8,cen:true});
   aword(R,690,1040,13,5,{col:CINK,a:.6});
   write(R,'(mijn echte handtekening)',830,1046,12,{col:CINK,a:.6});
@@ -1277,10 +1964,12 @@ function genStep(){
   if(pi<P.length)setTimeout(genStep,0);
   else{
     GENDONE=true;
+    if(STILL)drawAllNow();
     if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
   }
 }
-genStep();
+if(STILL){while(pi<P.length){GEN_DY=pi*PH;P[pi]();GEN_DY=0;pi++}GENDONE=true;drawAllNow()}
+else genStep();
 requestAnimationFrame(tick);
 </script>
 <script>
