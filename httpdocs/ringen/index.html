@@ -35,7 +35,10 @@
   body{overflow-x:hidden}
   #wall{position:relative;width:100vw}
   #wall canvas{position:absolute;left:0;width:100%;display:block}
+  #wall canvas.live{pointer-events:none;opacity:0;transition:opacity 1.4s ease}
+  #wall canvas.live.on{opacity:1}
   #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+  #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
 </style>
 </head>
 <body>
@@ -77,11 +80,22 @@
 // you watch; nothing here is ruled. the engine (tiles, queued strokes,
 // torn paper, pencil lettering) follows the technique of the fable wall
 // that inspired it.
+// every sheet has one living part and a sound of its own (after a first tap):
+// an acorn you let fall and sprout, roots that grow toward the water you drop,
+// a trunk whose rings are real years and that plays itself as a record (after
+// traubeck's 'years'), four seasons that move, eight who live here (a nest that
+// hatches and is empty next time, a water bear in the moss), sugar that travels
+// through the threads, rain on dry ground, a fire that moves, the work under the
+// fallen log, a sapling that turns to your light with a robin on it, and at the
+// end your own rings: one for every visit, as wide as you stayed.
+// ?fast draws at full speed (the build's stills), ?still draws everything at
+// once, ?hud shows frame timing. localStorage 'nunki:ringen' keeps your rings.
 // ---------------------------------------------------------------------------
 const TAU = Math.PI*2;
 const qs = new URLSearchParams(location.search);
 const SEED = +(qs.get('s')||7);
 const FAST = qs.has('fast');
+const STILL = qs.has('still');
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------------- rng ----------------
@@ -137,7 +151,8 @@ let GENDONE=false;
 let DIRECT=null, GEN_DY=0;
 function emit(y0,y1,fn){
   if(DIRECT){
-    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    const ds=DIRECT.sc||S;
+    DIRECT.cx.setTransform(ds,0,0,ds,-(DIRECT.x0||0)*ds,-DIRECT.y0*ds);
     if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
     else fn(DIRECT.cx);
     return;
@@ -498,6 +513,21 @@ G('·',.24,[[.08,.68],[.12,.72]]);
 G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
 G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
 G(' ',.42);
+// the rest of the numbers, and a few signs
+G('1',.4,[[.07,.3],[.23,.1],[.23,1]]);
+G('3',.52,[[.08,.2],[.22,.1],[.38,.12],[.44,.28],[.36,.46],[.22,.52],[.38,.58],[.47,.76],[.4,.94],[.22,1],[.05,.9]]);
+G('4',.54,[[.37,1],[.37,.1],[.05,.72],[.5,.72]]);
+G('5',.52,[[.44,.1],[.13,.1],[.1,.47],[.28,.43],[.44,.54],[.47,.76],[.36,.95],[.18,1],[.05,.9]]);
+G('7',.5,[[.05,.1],[.46,.1],[.18,1]]);
+G('9',.52,A_(.25,.33,.2,.22,-.2,-.2+TAU*.98,10),[[.45,.36],[.43,.72],[.3,1]]);
+G('é',.56,...GL['e'].s,[[.22,.36],[.36,.2]]);
+G('ë',.56,...GL['e'].s,[[.15,.3],[.18,.33]],[[.36,.3],[.39,.33]]);
+G(':',.24,[[.11,.52],[.13,.55]],[[.11,.92],[.13,.95]]);
+G('?',.5,[[.08,.2],[.2,.1],[.38,.14],[.42,.34],[.26,.58],[.24,.72]],[[.24,.94],[.27,.98]]);
+G('!',.24,[[.12,.1],[.12,.72]],[[.12,.94],[.13,.97]]);
+G('≈',.54,[[.05,.62],[.15,.56],[.27,.62],[.39,.68],[.49,.62]],[[.05,.82],[.15,.76],[.27,.82],[.39,.88],[.49,.82]]);
+G('…',.6,[[.08,.93],[.1,.97]],[[.28,.93],[.3,.97]],[[.48,.93],[.5,.97]]);
+G('/',.4,[[.34,.08],[.06,1.04]]);
 function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
 function write(R,t,x,y,sz,o={}){
   const a=o.a??.7,col=o.col;
@@ -648,7 +678,69 @@ function noteHead(R,x,y,up,col,a=.8){
 // ---------------- replay engine ----------------
 let CSSK=innerWidth/LW;
 addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
+// living things: small canvases laid over the wall, switched on once the sheet
+// beneath them is drawn, and only moving while they are in view. they draw in
+// the sheet's own coordinates (0..1600 x 0..1200), like the sheet itself.
+const LIVE=[];
+function live(x,y,w,h,o){
+  const L={x,y:y+GEN_DY,w,h,dy:GEN_DY,sc:S,...o,cv:null,cx:null,on:false,last:0};
+  LIVE.push(L);
+  return L;
+}
+function makeLive(L){
+  const cv=document.createElement('canvas'),sc=L.sc;
+  cv.className='live';
+  cv.width=Math.round(L.w*sc);cv.height=Math.round(L.h*sc);
+  cv.style.left=(L.x/LW*100)+'%';cv.style.width=(L.w/LW*100)+'%';
+  cv.style.top=(L.y/LW*100)+'vw';cv.style.height=(L.h/LW*100)+'vw';
+  cv.style.zIndex=2;
+  wallEl.appendChild(cv);
+  const cx=cv.getContext('2d');
+  cx.setTransform(sc,0,0,sc,-L.x*sc,(L.dy-L.y)*sc);
+  cx.lineCap='round';cx.lineJoin='round';
+  L.cv=cv;L.cx=cx;L.on=true;
+  if(L.init)L.init(cx,L);
+  if(FAST||STILL){cv.style.transition='none';cv.classList.add('on');L.frame&&L.frame(cx,performance.now(),L)}
+  else requestAnimationFrame(()=>cv.classList.add('on'));
+}
+// wipe a live canvas: the whole of it, whatever the sheet coordinates are
+function wipe(c,L){c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,L.cv.width,L.cv.height);c.restore()}
+function liveReady(L){
+  const a=clamp(Math.floor(L.y/TILEH),0,NT-1),b=clamp(Math.floor((L.y+L.h)/TILEH),0,NT-1);
+  for(let i=a;i<=b;i++)if(!TILES[i].done)return false;
+  return true;
+}
+// a drawing made by the same hand, kept on a small canvas of its own so that
+// it can move: a bird, a crab, a line of writing. drawn in its own 0..w x 0..h.
+function sprite(w,h,fn,seed=1,sc=S){
+  const cv=document.createElement('canvas');
+  cv.width=Math.max(1,Math.ceil(w*sc));cv.height=Math.max(1,Math.ceil(h*sc));
+  const cx=cv.getContext('2d');cx.lineCap='round';cx.lineJoin='round';
+  const pD=DIRECT,pG=GEN_DY;DIRECT={cx,y0:0,x0:0,sc};GEN_DY=0;
+  try{fn(stream(seed))}finally{DIRECT=pD;GEN_DY=pG}
+  cv.w=w;cv.h=h;return cv;
+}
+// a line of pencil writing as a sprite; the same words are written only once
+const TXT=new Map();
+function textSpr(t,sz,col=INK,a=.85){
+  const k=t+'|'+sz+'|'+col+'|'+a;
+  let s=TXT.get(k);
+  if(!s){let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;
+    const w=measure(t,sz)+sz*.8;
+    s=sprite(w,sz*1.9,R=>write(R,t,sz*.4,sz*1.3,sz,{col,a}),h,Math.max(S,1.5));
+    s.ox=sz*.4;s.oy=sz*1.3;TXT.set(k,s)}
+  return s;
+}
+// put a line of writing down: x,y is the start of its baseline (or its middle, cen)
+function say(c,t,x,y,sz,col,a,alpha=1,cen=false){
+  const s=textSpr(t,sz,col,a);if(alpha<=0)return;
+  c.globalAlpha=alpha;c.drawImage(s,x-s.ox-(cen?(s.w-sz*.8)/2:0),y-s.oy,s.w,s.h);c.globalAlpha=1;
+}
+let HUD=null,hudN=0,hudT=0,hudBusy=0,hudMax=0;
+if(qs.has('hud')){HUD=document.createElement('div');HUD.id='hud';document.body.appendChild(HUD)}
+let lastNow=0;
 function tick(now){
+  const tb=performance.now(),dt=Math.min(.1,(now-(lastNow||now))/1000);lastNow=now;
   const sy=scrollY/CSSK, vh=innerHeight/CSSK;
   for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
   const budget=(FAST||RM)?200:7;
@@ -664,8 +756,30 @@ function tick(now){
     if(performance.now()-t0>budget)break;
   }
   runRestless(now);
+  for(const L of LIVE){
+    if(!L.on){if(GENDONE&&liveReady(L))makeLive(L);continue}
+    if(!L.frame||L.y+L.h<sy-60||L.y>sy+vh+60){L.seen=false;continue}
+    L.seen=true;
+    if(RM&&L.drawn)continue;
+    if(L.fps&&now-L.last<1000/L.fps)continue;
+    L.last=now;L.frame(L.cx,now,L);L.drawn=true;
+  }
+  runAmbient(now,dt);
   drawTrail(now);
+  if(HUD){
+    const busy=performance.now()-tb;hudBusy+=busy;hudMax=Math.max(hudMax,busy);hudN++;
+    if(now-hudT>1000){HUD.textContent=`${(hudN*1000/(now-hudT)).toFixed(0)} fps\n${(hudBusy/hudN).toFixed(1)} ms busy\n${hudMax.toFixed(1)} ms max`;hudN=0;hudBusy=0;hudMax=0;hudT=now}
+  }
   requestAnimationFrame(tick);
+}
+// for stills: draw every sheet at once, no animation at all
+function drawAllNow(){
+  for(const T of TILES){
+    T.cx.setTransform(S,0,0,S,0,-T.y0*S);
+    while(T.qi<T.q.length)T.q[T.qi++](T.cx);
+    T.done=true;T.q=null;
+  }
+  for(const L of LIVE)makeLive(L);
 }
 
 // ---------------- restlessness ----------------
@@ -717,13 +831,76 @@ const GROW=['leaf','root','leaf','leaf','leaf','root','dry','ember','leaf','leaf
 const growAt=y=>GROW[clamp(Math.floor(y/TILEH),0,GROW.length-1)];
 const BARKC=[96,70,48],ROOTC=[232,220,192],GLOWC=[236,214,150];
 const VR=mul32(SEED*991+5);
-let TP=[],TW=[],FX=[],RINGS=[],step=null,lastMove=0,PTR={x:0,y:0,cx:0,cy:0,in:false,touch:false};
+let TP=[],TW=[],FX=[],RINGS=[],step=null,lastMove=0,PTR={x:-1e4,y:-1e4,cx:0,cy:0,in:false,touch:false,t:-1e9,tap:-1e9,spd:0};
 let AC=null;
+// ---------------- sound ----------------
+// only ever after a tap or a click, and quiet. wind, rain and
+// leaves are all the same thing: noise, filtered.
+let MASTER=null,NB=null;
 function audio(){
-  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}
-  if(AC&&AC.state==='suspended')AC.resume();
+  if(!AC){
+    try{
+      AC=new (window.AudioContext||window.webkitAudioContext)();
+      MASTER=AC.createGain();MASTER.gain.value=.9;
+      // a soft limiter, so that nothing ever cracks the speakers
+      const comp=AC.createDynamicsCompressor();comp.threshold.value=-16;comp.knee.value=12;comp.ratio.value=5;comp.attack.value=.003;comp.release.value=.3;
+      MASTER.connect(comp);comp.connect(AC.destination);
+      const len=AC.sampleRate*3,bf=AC.createBuffer(1,len,AC.sampleRate),d=bf.getChannelData(0);
+      let b0=0,b1=0,b2=0;
+      for(let i=0;i<len;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0526;d[i]=(b0+b1+b2+w*.1848)*.12}
+      NB=bf;
+    }catch(e){AC=null}
+  }
+  if(AC&&AC.state==='suspended'&&!document.hidden)AC.resume();
   return AC;
 }
+// a page you cannot see makes no sound
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
+const RA=Math.random;
+// a short breath of noise through a filter
+function nz(t,dur,type,f0,f1,q,vol,att=.005,out=MASTER){
+  const n=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
+  n.buffer=NB;f.type=type;f.Q.value=q;f.frequency.setValueAtTime(f0,t);if(f1!==f0)f.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0004,t+dur);
+  n.connect(f);f.connect(g);g.connect(out);n.start(t,RA()*2.5);n.stop(t+dur+.03);
+}
+// one voice: a pitch that glides from f0 to f1, a quick rise and a long fall
+function vo(t,type,f0,f1,dur,vol,att=.005,out=MASTER,glide=1,vib=0){
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type;
+  o.frequency.setValueAtTime(f0,t);if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t+dur*glide);
+  if(vib){const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=vib[0];lg.gain.value=vib[1];l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(t+dur+.05)}
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0003,t+dur);
+  o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.05);
+  return o;
+}
+// a noise that keeps going, for a sheet's own sound
+function bed(out,type,f,q,vol){
+  const n=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();
+  n.buffer=NB;n.loop=true;fl.type=type;fl.frequency.value=f;fl.Q.value=q;g.gain.value=vol;
+  n.connect(fl);fl.connect(g);g.connect(out);n.start(0,RA()*2.5);
+  return {g,f:fl,v:vol};
+}
+const now_=()=>AC.currentTime+.01;
+
+// each sheet may have a sound of its own, heard while it is in view and fading
+// as you scroll away. made once, when first heard, and only after a first tap.
+const AMB=[];
+function ambient(y0,y1,o){AMB.push({y0:y0+GEN_DY,y1:y1+GEN_DY,dy:GEN_DY,vol:1,...o,v:0,g:null,next:0})}
+function runAmbient(now,dt){
+  if(!AC||AC.state!=='running'||RM)return;
+  const cy=(scrollY+innerHeight/2)/CSSK,half=innerHeight/2/CSSK;
+  for(const A of AMB){
+    const d=Math.max(A.y0-cy,0,cy-A.y1),v=clamp(1-(d-half*.35)/(half*.65+220),0,1);
+    A.v+=(v-A.v)*Math.min(1,dt*1.6);
+    if(A.v<.005&&!A.g)continue;
+    if(!A.g){A.g=AC.createGain();A.g.gain.value=0;A.g.connect(MASTER);if(A.make)A.make(A.g,A)}
+    A.g.gain.setTargetAtTime(A.v*A.vol,AC.currentTime,.2);
+    if(A.v>.03&&A.step)A.step(now,dt,A);
+  }
+}
+// a sound now and then: every a..b seconds while the sheet is heard
+function every(A,now,a,b,fn){if(now>A.next){if(A.next)fn();A.next=now+rd(RA,a,b)*1000}}
+
 // a soft wooden note, like a marimba bar
 function woodTone(f,vol=.05){
   if(!AC)return;
@@ -731,7 +908,7 @@ function woodTone(f,vol=.05){
   for(const [m,v,d] of[[1,1,1.2],[4,.16,.28],[9.8,.05,.09]]){
     const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f*m;
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol*v,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+d);
-    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05);
+    o.connect(g);g.connect(MASTER);o.start(t);o.stop(t+d+.05);
   }
 }
 // knuckles on a trunk
@@ -740,27 +917,49 @@ function knock(){
   const t=ac.currentTime+.01,len=Math.floor(ac.sampleRate*.06),b=ac.createBuffer(1,len,ac.sampleRate),d=b.getChannelData(0);
   for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,4);
   const n=ac.createBufferSource(),bp=ac.createBiquadFilter(),g=ac.createGain();
-  n.buffer=b;bp.type='bandpass';bp.frequency.value=900;bp.Q.value=1.4;g.gain.value=.5;
-  n.connect(bp);bp.connect(g);g.connect(ac.destination);n.start(t);
-  woodTone(140+Math.random()*30,.14);
+  n.buffer=b;bp.type='bandpass';bp.frequency.value=900;bp.Q.value=1.4;g.gain.value=.28;
+  n.connect(bp);bp.connect(g);g.connect(MASTER);n.start(t);
+  woodTone(140+Math.random()*30,.07);
 }
 const PENTA=[392,330,294,262,220,196,165,147,131,110,98,82,73,65];
 const wallXY=e=>[e.clientX/CSSK,(e.clientY+scrollY)/CSSK];
+// how long the visitor has kept still (or kept away), in seconds
+const stillFor=now=>(now-PTR.t)/1000;
+// places on the wall that answer a tap. later ones lie on top of earlier ones;
+// a quiet one covers a whole sheet without turning the pointer into a hand
+const HITS=[];
+function hit(x0,y0,x1,y1,fn,quiet=false){const h={x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,dy:GEN_DY,fn,quiet};HITS.push(h);return h}
+const hitAt=(x,y)=>{for(let i=HITS.length-1;i>=0;i--){const h=HITS[i];if(x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1)return h}return null};
+let curHand=false;
+// what the wall remembers of you, between visits
+const MEM=(()=>{try{return JSON.parse(localStorage.getItem('nunki:ringen'))||{}}catch(e){return{}}})();
+function memSave(){try{localStorage.setItem('nunki:ringen',JSON.stringify(MEM))}catch(e){}}
+if(!FAST&&!STILL){MEM.visits=(MEM.visits||0)+1;memSave()}
+MEM.found=MEM.found||[];MEM.stays=MEM.stays||[];
+let TOUCHED=0;
+
 addEventListener('pointermove',e=>{
   if(e.pointerType==='touch'){PTR.touch=true;return}
   const [x,y]=wallXY(e),t=performance.now();
-  PTR.x=x;PTR.y=y;PTR.cx=e.clientX;PTR.cy=e.clientY;PTR.in=true;lastMove=t;
+  PTR.spd=PTR.spd*.7+.3*Math.hypot(x-PTR.x,y-PTR.y)*CSSK/Math.max(1,t-PTR.t)*1000;
+  PTR.x=x;PTR.y=y;PTR.cx=e.clientX;PTR.cy=e.clientY;PTR.in=true;lastMove=t;PTR.t=t;
+  const h=hitAt(x,y),hd=!!(h&&!h.quiet);
+  if(hd!==curHand){curHand=hd;document.body.style.cursor=hd?'pointer':''}
   for(const R0 of RINGS)if(!R0.done&&Math.hypot(x-R0.x,y-R0.y)>12){R0.done=true;R0.end=t}
   const L=TP[TP.length-1];
   if(L&&Math.hypot(x-L.x,y-L.y)*CSSK<3)return;
-  TP.push({x,y,t});if(TP.length>320)TP.shift();
+  // where a sheet has something of its own to touch, the line stays a faint
+  // pencil line and grows nothing: the drawing has the word there
+  const busy=!!h;
+  TP.push({x,y,t,busy});if(TP.length>320)TP.shift();
   trailDirty=true;
   if(!step)step={x,y,d:0,side:1};
+  if(busy){step.d=0;step.x=x;step.y=y;return}
   step.d+=Math.hypot(x-step.x,y-step.y);step.x=x;step.y=y;
   const mode=growAt(y);
   if(mode==='ember'){
-    while(step.d>5){step.d-=5;FX.push({k:'ember',x:x+rd(VR,-7,7),y:y+rd(VR,-5,5),t,vx:rd(VR,-18,18),vy:-rd(VR,45,110),life:rd(VR,1200,2600),s:rd(VR,1.4,3.4)})}
-  }else if(step.d>32){
+    while(step.d>9){step.d-=9;FX.push({k:'ember',x:x+rd(VR,-7,7),y:y+rd(VR,-5,5),t,vx:rd(VR,-18,18),vy:-rd(VR,45,110),life:rd(VR,1200,2600),s:rd(VR,1.4,3.4)})}
+  }else if(step.d>(mode==='root'?56:64)){
     step.d=0;step.side*=-1;
     const P0=TP[Math.max(0,TP.length-5)],dir=Math.atan2(y-P0.y,x-P0.x);
     const ang=mode==='root'?dir+step.side*rd(VR,.5,1.3)+(Math.PI/2-dir)*.25:dir+step.side*rd(VR,.6,1.2);
@@ -773,17 +972,23 @@ addEventListener('click',e=>{
   if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
   const [x,y]=wallXY(e),t=performance.now();
   if(y>TOTALH)return;
+  audio();
+  TOUCHED++;
+  // a finger has no hover: the tap is where the hand is, for a while
+  if(e.isTrusted===false||!PTR.in){PTR.x=x;PTR.y=y;PTR.t=t}
+  PTR.tap=t;
+  const h=hitAt(x,y);
+  if(h&&h.fn(x,y-h.dy,t)!==false)return;
+  // bare paper: a soft knock, and the wood answers with one ring
   knock();
-  const mode=growAt(y);
-  if(mode==='ember')for(let i=0;i<46;i++){const a=rd(VR,0,TAU),v=rd(VR,30,140);FX.push({k:'ember',x,y,t,vx:Math.cos(a)*v,vy:Math.sin(a)*v-60,life:rd(VR,900,2200),s:rd(VR,1.2,2.8)})}
-  else if(mode==='root')for(let i=0;i<7;i++)twig(x,y,Math.PI/2+rd(VR,-1.1,1.1),'root',t+i*60,rd(VR,40,90));
-  else FX.push({k:'sapling',x,y,t,mode,h:rd(VR,90,140),lean:rd(VR,-.22,.22),sd:VR()*99});
+  RINGS.push({x,y,t,years:[{w:rd(VR,7,11),t},{w:rd(VR,2.5,4),t:t+160}],next:1e12,done:true,end:t+600,sd:VR()*99,mode:growAt(y)});
+  if(RINGS.length>4)RINGS.shift();
   trailDirty=true;
 });
 function twig(x,y,ang,mode,t,len){
   len=len??(mode==='root'?rd(VR,24,50):rd(VR,18,40));
   const tw={x,y,ang,len,t,mode,bend:rd(VR,-.55,.55),kids:[],leaf:null,node:false};
-  const nk=mode==='root'?ri(VR,1,2):ch_(VR,.45)?1:0;
+  const nk=mode==='root'?ri(VR,0,1):ch_(VR,.2)?1:0;
   for(let i=0;i<nk;i++)tw.kids.push({at:rd(VR,.4,.75),ang:rd(VR,-1,1),len:len*rd(VR,.4,.65),bend:rd(VR,-.6,.6)});
   if(mode==='leaf'||mode==='dry'||mode==='glow')tw.leaf={s:rd(VR,6,11),rot:rd(VR,-.5,.5),fall:mode==='dry'?rd(VR,1300,2000):rd(VR,2600,3800),vx:rd(VR,-12,12),sw:rd(VR,0,7)};
   if(mode==='root')tw.node=ch_(VR,.6);
@@ -809,15 +1014,15 @@ function leafCol(mode,age,fall){
 function drawTrail(now){
   const c=trailCx;
   // stand still, and a year grows round you
-  if(!RM&&PTR.in&&!PTR.touch&&now-lastMove>650&&!RINGS.some(R0=>!R0.done)&&PTR.y<TOTALH){
+  if(!RM&&PTR.in&&!PTR.touch&&now-lastMove>1300&&!RINGS.some(R0=>!R0.done)&&PTR.y<TOTALH&&!hitAt(PTR.x,PTR.y)){
     RINGS.push({x:PTR.x,y:PTR.y,t:now,years:[],next:now,done:false,end:0,sd:VR()*99,mode:growAt(PTR.y)});
     if(RINGS.length>4)RINGS.shift();
   }
   for(const R0 of RINGS){
-    if(!R0.done&&now>=R0.next&&R0.years.length<14){
+    if(!R0.done&&now>=R0.next&&R0.years.length<10){
       const k=R0.years.length,w=ch_(VR,.18)?rd(VR,2.5,4):rd(VR,6,13);
       R0.years.push({w,t:now});R0.next=now+(k?820:300);
-      woodTone(PENTA[k],.045);
+      woodTone(PENTA[k],.022);
     }
   }
   RINGS=RINGS.filter(R0=>!R0.done||now-R0.end<3600);
@@ -835,7 +1040,7 @@ function drawTrail(now){
   const px=1/CSSK;
   // rings first, under everything
   for(const R0 of RINGS){
-    const fade=R0.done?1-(now-R0.end)/3600:1,dark=R0.mode==='root'||R0.mode==='glow'||R0.mode==='ember';
+    const fade=R0.done?clamp(1-(now-R0.end)/3600,0,1):1,dark=R0.mode==='root'||R0.mode==='glow'||R0.mode==='ember';
     const col=dark?GLOWC:[150,104,60];
     let r=5;
     R0.years.forEach((yr,k)=>{
@@ -853,7 +1058,8 @@ function drawTrail(now){
     const a=TP[i-1],b=TP[i];if(b.t-a.t>110)continue;
     const k=1-(now-b.t)/3000,mode=growAt(b.y);
     const col=mode==='root'?ROOTC:mode==='glow'?GLOWC:mode==='ember'?mix([255,170,70],[110,104,100],1-k):BARKC;
-    c.strokeStyle=rgba(col,(mode==='leaf'||mode==='dry'?.42:.5)*k*k);c.lineWidth=(.9+2.2*k)*px;
+    const q=b.busy?.3:1;
+    c.strokeStyle=rgba(col,(mode==='leaf'||mode==='dry'?.42:.5)*k*k*q);c.lineWidth=(.9+2.2*k)*px*(b.busy?.6:1);
     c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
   }
   // twigs, roots, leaves
@@ -1041,12 +1247,12 @@ function snail(R,x,y,s,col){
 }
 const SEA0=[130,150,150];
 function wave0(x0,x1,y,amp,f){const p=[];for(let x=x0;x<=x1;x+=6)p.push([x,y+Math.sin(x*f)*amp]);return p}
-function nest(R,x,y,s,col){
+function nest(R,x,y,s,col,eggs=true){
   for(let k=0;k<26;k++){
     const a0=rd(R,.1,Math.PI-.1),a1=a0+rd(R,.4,1),r=s*rd(R,.7,1.05);
     sk(R,A_(x,y,r,r*.55,a0,a1,5),{col:BARK,w:rd(R,1,2.2),a:rd(R,.4,.8),amp:.5});
   }
-  for(const dx of[-s*.35,0,s*.35]){
+  if(eggs)for(const dx of[-s*.35,0,s*.35]){
     const e=hblob(R,x+dx,y-s*.12,s*.24,s*.32);
     fillPoly(e,[190,214,206],.85);sk(R,e.concat([e[0]]),{col,w:1.3,a:.8,amp:.3});
     for(let k=0;k<4;k++)dotF(R,x+dx+rd(R,-8,8),y-s*.12+rd(R,-12,12),1.2,.6,BARK);
@@ -1071,23 +1277,101 @@ function barkpiece(R,x,y,s,col){
   sk(R,p.concat([p[0]]),{col,w:1.5,a:.7,amp:.8});
 }
 
+// ---------------- small lights and helpers for the living parts ----------------
+function glowSpr(col,core=[255,250,236]){const g=document.createElement('canvas');g.width=g.height=64;const c=g.getContext('2d');const r=c.createRadialGradient(32,32,0,32,32,32);
+  r.addColorStop(0,rgba(core,1));r.addColorStop(.2,rgba(col,.8));r.addColorStop(.55,rgba(col,.22));r.addColorStop(1,rgba(col,0));c.fillStyle=r;c.fillRect(0,0,64,64);return g}
+const GLINT=glowSpr([255,200,110]),SOFT=glowSpr([255,250,236],[255,255,255]),SUNF=glowSpr([255,226,150],[255,246,210]);
+function hand(L,now,ms=2600,m=0){
+  if(!(PTR.in&&now-PTR.t<ms)&&now-PTR.tap>6000)return null;
+  const x=PTR.x,y=PTR.y-L.dy;
+  if(x<L.x-m||x>L.x+L.w+m||y<L.y-L.dy-m||y>L.y-L.dy+L.h+m)return null;
+  return[x,y];
+}
+const ease=u=>u<0?0:u>1?1:u*u*(3-2*u);
+const bump=u=>u<0||u>1?0:Math.sin(Math.PI*u);
+const audible=()=>AC&&AC.state==='running';
+// a leaf as a sprite, so it can fall and turn
+const LEAFSPR=[[150,184,100],[110,134,70],[228,164,62],[204,80,42],[196,130,50]].map((col,k)=>sprite(60,40,RR=>leaf(RR,6,20,48,0,col,.8,k>1),SEED*83+k));
+
+// how long you stay this time: kept as this visit's ring (see the last sheet)
+let STAY=0,stayT=performance.now();
+if(!FAST&&!STILL){
+  const vi=(MEM.visits||1)-1;
+  setInterval(()=>{if(!document.hidden){STAY+=(performance.now()-stayT)/1000}stayT=performance.now();MEM.stays[vi]=Math.round(STAY);memSave()},5000);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)STAY+=(performance.now()-stayT)/1000;stayT=performance.now()});
+}
+
+// ---------------- voices of the wood ----------------
+// tjiftjaf: the chiffchaff says its own name
+function chiff(out,v){if(!AC)return;const t=now_(),n=ri(RA,5,8);for(let i=0;i<n;i++){const s=t+i*rd(RA,.3,.38),hi=i%2===0;vo(s,'sine',hi?5600:4700,hi?4500:3900,.08,v,.004,out)}}
+// a robin: a quick tumbling of high notes, never twice the same
+function robin(out,v){if(!AC)return;let t=now_();for(let i=0;i<ri(RA,10,16);i++){const f=rd(RA,2800,7200),d=rd(RA,.04,.12);vo(t,'sine',f,f*rd(RA,.7,1.35),d,v*rd(RA,.5,1),.004,out);t+=d+rd(RA,.01,.06)}}
+// the tawny owl: hoe... hoe-hoe-hoe-oe
+function hoot(out,v){if(!AC)return;const t=now_();vo(t,'sine',430,400,.55,v,.05,out,1,[4,6]);
+  const o=vo(t+1.2,'sine',420,380,1.1,v*.9,.03,out,1,[9,22]);}
+// a woodpecker drums
+function drum(out,v){if(!AC)return;const t=now_();for(let i=0;i<18;i++){const s=t+i*(.045+i*.0012),k=1-i/22;nz(s,.03,'bandpass',1100,1100,3,v*k,.001,out);vo(s,'sine',240,200,.05,v*.4*k,.001,out)}}
+function cheep(out,v){if(!AC)return;const t=now_();for(let i=0;i<3;i++)vo(t+i*.11,'sine',4200,3300,.07,v,.003,out)}
+function puff(out,v){if(!AC)return;nz(now_(),.6,'lowpass',900,300,.7,v,.04,out)}
+function rustle(out,v){if(!AC)return;const t=now_();for(let i=0;i<9;i++)nz(t+i*rd(RA,.04,.09),rd(RA,.05,.12),'bandpass',2600,2600,.7,v*2*rd(RA,.4,1),.005,out)}
+function crunch(out,v){if(!AC)return;const t=now_();for(let i=0;i<3;i++)for(let k=0;k<5;k++)nz(t+i*.42+k*.02,.05,'bandpass',1500,1100,1.1,v*3,.003,out)}
+function buzz(out,v,dur=1.6){if(!AC)return;const t=now_(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;lp.connect(out);
+  const o=AC.createOscillator(),g=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();o.type='sawtooth';o.frequency.value=220;l.frequency.value=6;lg.gain.value=14;l.connect(lg);lg.connect(o.frequency);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.2);g.gain.linearRampToValueAtTime(v*.7,t+dur*.6);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(lp);o.start(t);l.start(t);o.stop(t+dur+.05);l.stop(t+dur+.05)}
+function hopper(out,v){if(!AC)return;const t=now_(),n=ri(RA,20,36);for(let i=0;i<n;i++)nz(t+i/28,.014,'bandpass',5200,5200,2,v*5*(.6+.4*Math.sin(i/3)),.003,out)}
+function drip(out,v,f=rd(RA,700,1200)){if(!AC)return;vo(now_(),'sine',f,f*2.2,.12,v,.002,out,.5)}
+
 // P0 · the seed ------------------------------------------------------------
 P.push(function(){
   const R=stream(SEED*101+0);
   sheet(R,-26,-40,1626,TOTALH+40,PAPER,{rough:14});
   write(R,'ringen',800,330,130,{a:.88,cen:true});
   write(R,'een muur over een boom en zijn jaren',800,420,24,{a:.7,cen:true});
-  // an acorn, the whole tree in a small closed hand
+  // an acorn, the whole tree in a small closed hand (it lives below: tap it)
   const ax=800,ay=640;
-  const nut=hblob(R,ax,ay+20,34,44);
-  fillPoly(nut,[170,128,70],.8);scribFill(R,nut,3.5,.5,{col:BARK,w:1.1});
-  sk(R,nut.concat([nut[0]]),{col:INK,w:2,a:.85,amp:.6});
-  const cap=[];for(let i=0;i<=12;i++){const t=Math.PI+i/12*Math.PI;cap.push([ax+Math.cos(t)*38,ay-6+Math.sin(t)*22])}
-  fillPoly(cap,BARK,.9);hatchFill(R,cap,5,.6,.6,{col:CHAR,w:1.1});
-  sk(R,cap.concat([cap[0]]),{col:INK,w:1.8,a:.85,amp:.5});
-  sk(R,[[ax,ay-28],[ax+6,ay-48]],{col:INK,w:3,a:.9,amp:.3});
-  spark(R,ax+24,ay-68,26,{col:AMBER,a:.95,w:2.4,nR:8});
-  restless(ax-20,ay-120,100,100,RR=>spark(RR,ax+24,ay-68,26,{col:AMBER,a:.95,w:2.4,nR:ri(RR,7,10)}));
+  const ACORN=sprite(120,140,RR=>{const x=60,y=80;
+    const nut=hblob(RR,x,y+20,34,44);
+    fillPoly(nut,[170,128,70],.8);scribFill(RR,nut,3.5,.5,{col:BARK,w:1.1});
+    sk(RR,nut.concat([nut[0]]),{col:INK,w:2,a:.85,amp:.6});
+    const cap=[];for(let i=0;i<=12;i++){const t=Math.PI+i/12*Math.PI;cap.push([x+Math.cos(t)*38,y-6+Math.sin(t)*22])}
+    fillPoly(cap,BARK,.9);hatchFill(RR,cap,5,.6,.6,{col:CHAR,w:1.1});
+    sk(RR,cap.concat([cap[0]]),{col:INK,w:1.8,a:.85,amp:.5});
+    sk(RR,[[x,y-28],[x+6,y-48]],{col:INK,w:3,a:.9,amp:.3})},SEED*91);
+  const AK={t:-1e9};
+  live(640,520,320,620,{fps:40,frame(c,now,L){
+    wipe(c,L);
+    const u=(now-AK.t)/1000,h=hand(L,now,300);
+    let y=ay,rot=Math.sin(now/900)*.05,sprout=0,a=1;
+    if(h&&u>16)rot+=Math.sin(now/90)*.06*clamp(1-Math.hypot(h[0]-ax,h[1]-ay)/160,0,1);
+    if(u<16){
+      const fu=Math.min(1,u/.75);y=ay+(1000-ay-60)*fu*fu;rot=u<.75?u*2.4:1.6+(u<1.1?Math.sin((u-.75)*30)*.1*(1-(u-.75)/.35):0);
+      if(u>.75&&!AK.landed){AK.landed=1;if(audible()){woodTone(196,.06);nz(now_(),.12,'lowpass',300,120,1,.06,.002)}}
+      sprout=ease((u-1.4)/3.2);a=u>14?1-(u-14)/2:1;
+    }else if(u<17.5){a=ease((u-16)/1.5)}
+    c.globalAlpha=a;
+    if(sprout>0){const bx=ax+18,by=1000;
+      c.strokeStyle=rgba([226,206,170],.9);c.lineWidth=2.4;c.beginPath();c.moveTo(bx,by+10);c.quadraticCurveTo(bx+8,by+40*sprout,bx+2,by+10+70*sprout);c.stroke();
+      c.strokeStyle=rgba(MOSS,.95);c.lineWidth=3;c.beginPath();c.moveTo(bx-6,by-10);c.quadraticCurveTo(bx-20,by-50*sprout,bx-10,by-10-110*sprout);c.stroke();
+      if(sprout>.6){const k=(sprout-.6)/.4;for(const sd of[-1,1]){c.save();c.translate(bx-10,by-10-110*sprout);c.rotate(-Math.PI/2+sd*.8);c.drawImage(LEAFSPR[0],-6*k,-20*k,60*k,40*k);c.restore()}}}
+    c.save();c.translate(ax,y);c.rotate(rot);c.drawImage(ACORN,-60,-80,120,140);c.restore();
+    const sp=.6+.4*Math.sin(now/300);c.globalAlpha=a*sp*(u<16?Math.max(0,1-u*3):1);c.drawImage(GLINT,ax+24-26,ay-68-26+(y-ay),52,52);c.globalAlpha=1;
+  }});
+  hit(740,560,860,720,(x,y,t)=>{if((t-AK.t)/1000<17.5)return;AK.t=t;AK.landed=0;knock()});
+  // leaves come down now and then, and your hand is a breeze
+  const FL=[];
+  live(60,80,1480,1000,{sc:.6,fps:30,frame(c,now,L){
+    wipe(c,L);const h=hand(L,now,300);
+    if(!L.n||now>L.n){L.n=now+rd(Math.random,2500,6000);if(FL.length<9)FL.push({x:rd(Math.random,200,1400),y:90,vx:0,r:rd(Math.random,0,TAU),k:ri(Math.random,0,4),t:now,sw:rd(Math.random,0,7),down:0})}
+    for(let i=FL.length-1;i>=0;i--){const f=FL[i];
+      if(!f.down){const dt=1/30;f.y+=38*dt;f.x+=(Math.sin(now/700+f.sw)*28+f.vx)*dt;f.r+=Math.sin(now/500+f.sw)*.03;f.vx*=.97;
+        if(h){const dx=f.x-h[0],dy=f.y-h[1],d=Math.hypot(dx,dy);if(d<160){f.vx+=dx/d*30;f.y-=1.2}}
+        if(f.y>1020)f.down=now}
+      const a=f.down?1-(now-f.down)/6000:Math.min(1,(now-f.t)/800);if(a<=0){FL.splice(i,1);continue}
+      c.globalAlpha=a;c.save();c.translate(f.x,f.y);c.rotate(f.r);c.drawImage(LEAFSPR[f.k],-30,-20,60,40);c.restore()}
+    c.globalAlpha=1;
+  }});
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',1300,.5,.02)},
+    step(now,dt,A){A.w.g.gain.setTargetAtTime(.008+.035*fbm(now/3000,1,7,2),AC.currentTime,.3);every(A,now,8,20,()=>chiff(A.g,.014))}});
   // falling toward the ground it does not yet know
   fall(R,806,760,1000,INK,.55);
   sk(R,wave0(100,1500,1040,2,.01),{col:INK,w:2.6,a:.7,amp:2});
@@ -1112,9 +1396,11 @@ P.push(function(){
   for(let i=0;i<14;i++){const b=hblob(R,rd(R,120,1480),rd(R,200,1120),rd(R,14,50),rd(R,10,32));fillPoly(b,[106,92,80],.55);sk(R,b.concat([b[0]]),{col:[150,138,120],w:1.2,a:.5,amp:.5})}
   for(let i=0;i<500;i++)dotF(R,rd(R,70,1530),rd(R,70,1150),rd(R,.5,1.4),.2,CINK);
   // the root: first one thread, then more, each doubting its way
+  const RP=[];
   const root=(x,y,ang,len,w,d)=>{
     const pts=[[x,y]];let px=x,py=y,a=ang;
     for(let t=0;t<len;t+=22){a+=rd(R,-.28,.28);px+=Math.cos(a)*22;py+=Math.sin(a)*22;pts.push([px,py]);if(py>1120||px<80||px>1520)break}
+    for(const q of pts)RP.push([q[0],q[1],w]);
     sk(R,pts,{col:[216,190,150],w,a:.85,amp:1.2,taper:'out',noDust:true});
     if(d>0&&pts.length>4){
       for(let k=0;k<ri(R,2,4);k++){const p=pts[ri(R,2,pts.length-2)];root(p[0],p[1],ang+rd(R,-1.2,1.2),len*.55,Math.max(1,w*.55),d-1)}
@@ -1131,7 +1417,45 @@ P.push(function(){
   spark(R,800,1100,20,{col:AMBER,a:.9,w:2,nR:7});
   write(R,'eerst naar beneden',800,160,36,{col:CINK,a:.85,cen:true});
   write(R,'de boom is al wat hij nog niet is',1130,1100,19,{col:CINK,a:.65,cen:true});
+  write(R,'tik: een druppel water',330,1100,15,{col:CINK,a:.42,cen:true});
   whispers(R,100,1100,true,4);
+  // a drop of water sinks in, and the nearest roots turn toward it.
+  // an earthworm goes its own slow way, and away from you.
+  const WT=[],GR=[];
+  const WORM={x:400,y:700,a:0,seg:[],back:0};
+  for(let i=0;i<22;i++)WORM.seg.push([400-i*7,700]);
+  live(50,40,1500,1120,{sc:.7,fps:30,frame(c,now,L){
+    wipe(c,L);
+    for(let i=WT.length-1;i>=0;i--){const w=WT[i],u=(now-w.t)/1000;if(u>14){WT.splice(i,1);continue}
+      const r=20+60*ease(u/1.6),a=.36*(u<10?1:1-(u-10)/4);
+      const g=c.createRadialGradient(w.x,w.y,0,w.x,w.y,r);g.addColorStop(0,`rgba(110,150,170,${a})`);g.addColorStop(1,'rgba(110,150,170,0)');c.fillStyle=g;c.fillRect(w.x-r,w.y-r,r*2,r*2)}
+    c.lineCap='round';
+    for(let i=GR.length-1;i>=0;i--){const g=GR[i],u=(now-g.t)/3800,age=(now-g.t)/1000;if(age>60){GR.splice(i,1);continue}
+      const n=Math.max(2,Math.floor(g.pts.length*ease(u)));const fade=age>45?1-(age-45)/15:1;
+      c.strokeStyle=rgba([226,204,160],.85*fade);
+      for(let k=1;k<n;k++){c.lineWidth=g.w*(1-k/g.pts.length*.7);c.beginPath();c.moveTo(g.pts[k-1][0],g.pts[k-1][1]);c.lineTo(g.pts[k][0],g.pts[k][1]);c.stroke()}
+      if(u>=1&&!g.arr){g.arr=1;if(audible())woodTone(PENTA[ri(Math.random,6,10)],.03)}}
+    // the worm
+    const h=hand(L,now,600),dt=1/30;
+    let sp=14;if(h&&Math.hypot(h[0]-WORM.x,h[1]-WORM.y)<150){WORM.back=now;WORM.a=Math.atan2(WORM.y-h[1],WORM.x-h[0]);}
+    if(now-WORM.back<2500)sp=55;else WORM.a+=Math.sin(now/2300)*.012+(WORM.y<300?.02:WORM.y>1050?-.02:0)+(WORM.x<160?.02:WORM.x>1440?.02:0);
+    WORM.x=clamp(WORM.x+Math.cos(WORM.a)*sp*dt,120,1480);WORM.y=clamp(WORM.y+Math.sin(WORM.a)*sp*dt,260,1090);
+    const sg=WORM.seg;sg[0]=[WORM.x,WORM.y];for(let k=1;k<sg.length;k++){const p=sg[k-1],q=sg[k],d=Math.hypot(q[0]-p[0],q[1]-p[1])||1,want=6.5+Math.sin(now/260-k*.5)*.9;sg[k]=[p[0]+(q[0]-p[0])/d*want,p[1]+(q[1]-p[1])/d*want]}
+    c.strokeStyle=rgba([196,120,110],.9);c.lineWidth=7;c.beginPath();sg.forEach((p,k)=>k?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+    c.strokeStyle=rgba([120,70,64],.55);c.lineWidth=1;for(let k=2;k<sg.length-1;k+=2){const p=sg[k],q=sg[k+1],a=Math.atan2(q[1]-p[1],q[0]-p[0])+Math.PI/2;c.beginPath();c.moveTo(p[0]+Math.cos(a)*3.4,p[1]+Math.sin(a)*3.4);c.lineTo(p[0]-Math.cos(a)*3.4,p[1]-Math.sin(a)*3.4);c.stroke()}
+    c.fillStyle=rgba([214,140,128],.9);c.beginPath();c.arc(sg[6][0],sg[6][1],4.6,0,TAU);c.fill();
+  }});
+  hit(50,200,1550,1160,(x,y,t)=>{
+    WT.push({x,y,t});if(WT.length>5)WT.shift();
+    const near=RP.map(p=>[p,Math.hypot(p[0]-x,p[1]-y)]).filter(q=>q[1]>30&&q[1]<520).sort((a,b)=>a[1]-b[1]);
+    const used=[];
+    for(const [p,d] of near){if(used.length>=3)break;if(used.some(u=>Math.hypot(u[0]-p[0],u[1]-p[1])<90))continue;used.push(p);
+      const pts=[[p[0],p[1]]];let px=p[0],py=p[1];const n=Math.max(4,Math.round(d/18));
+      for(let k=1;k<=n;k++){const u=k/n;px=p[0]+(x-p[0])*u+Math.sin(u*9+p[0])*14*(1-u);py=p[1]+(y-p[1])*u+Math.cos(u*7+p[1])*10*(1-u);pts.push([px,py])}
+      GR.push({pts,t:t+used.length*250,w:Math.max(1.4,Math.min(4,p[2]*.5))});if(GR.length>18)GR.shift()}
+    if(audible()){drip(MASTER,.06,900);nz(now_()+.08,.9,'lowpass',500,140,.8,.05,.05)}
+  },true);
+  ambient(0,1200,{make(g,A){A.d=bed(g,'lowpass',150,.7,.06)},step(now,dt,A){every(A,now,6,14,()=>{nz(now_(),rd(RA,.3,.7),'bandpass',rd(RA,300,700),200,3,.012,.08,A.g)})}});
 });
 const FOAM0=[236,240,230];
 
@@ -1141,10 +1465,13 @@ P.push(function(){
   const cx=800,cy=640;
   // the trunk, cut
   const widths=[];
+  // ring i is the year 1963+i: the outer one is this year. the narrow ones are
+  // the dry summers of 1976, 2003, 2018 and 2022; in 2002 the tree burned
+  const DRYY=[13,40,55,59];
   for(let i=0;i<64;i++){
     let w=3.6+fbm(i*.35,3,11,2)*6.4;
-    if(i>=26&&i<=30)w*=.36;       // dry years
-    if(i===44)w=1.6;
+    if(DRYY.includes(i))w=1.6+fbm(i,1,3,1);
+    if(i===40)w=1.8;
     widths.push(w);
   }
   let r=14,radii=[];
@@ -1155,7 +1482,7 @@ P.push(function(){
   const inner=ringPath(R,cx,cy,radii[radii.length-1],201,8,.04);
   fillPoly(inner,WOOD,.95);
   radii.forEach((rr,i)=>{
-    const dark=i>=26&&i<=30;
+    const dark=DRYY.includes(i);
     sk(R,ringPath(R,cx,cy,rr,i,5,.04),{col:dark?shade(WOOD,.6):shade(WOOD,.42),w:dark?1.8:1.1,a:dark?.75:.5,amp:.5,gap:.01});
   });
   // the fire year: a wound that the next rings grew over
@@ -1174,13 +1501,38 @@ P.push(function(){
     sk(R,[[x0,y0],[x0+dx*.5,y0+dy*.5],[x0+dx,y0+dy]],{w:1,a:.55,amp:.8,taper:'out'});
     write(R,txt,x0+dx+(dx>0?8:-8-measure(txt,18)),y0+dy+5,18,{a:.75});
   };
-  tag(2.5,4,'het eerste jaar',-190,70);
-  tag(3.6,radii[28],'een droog jaar',-230,-80);
+  tag(2.5,4,'1963, het eerste jaar',-250,70);
+  tag(3.6,radii[13],'1976, een droog jaar',-260,-80);
   tag(-.2,radii[41],'het vuur',260,-90);
-  tag(.9,radii[58],'dit jaar',250,150);
+  tag(.9,radii[63],'dit jaar',250,150);
   write(R,'elk jaar een lijn',800,140,40,{a:.88,cen:true});
   write(R,'ook wat pijn deed blijft zichtbaar, en groeit mee',800,1120,22,{a:.7,cen:true});
+  write(R,"tik op de stam en hij speelt zijn jaren af · naar 'years' van traubeck, 2011",800,1162,14,{a:.42,cen:true});
   whispers(R,100,1100,false,4);
+  // point at a ring and it tells its year. tap, and the trunk is a record.
+  const NOTE={1963:'het eerste jaar',1976:'droog',2003:'droog en heet',2018:'droog',2022:'droog',2002:'het vuur',2026:'dit jaar'};
+  const RG=radii[radii.length-1];
+  const ringAt=(x,y)=>{const r=Math.hypot(x-cx,(y-cy)/.96);if(r>RG+4)return -1;for(let i=0;i<radii.length;i++)if(r<=radii[i])return i;return radii.length-1};
+  const REC={t:-1e9,last:-1};
+  const PIVOT=[cx+430,cy-300],ANG=.62;
+  live(cx-RG-40,cy-RG-40,Math.min(RG*2+500,1590-(cx-RG-40)),RG*2+80,{fps:30,frame(c,now,L){
+    wipe(c,L);
+    const h=hand(L,now,1500);
+    let hi=h?ringAt(h[0],h[1]):-1;
+    const ru=(now-REC.t)/1000,playing=ru<18;
+    let ni=-1,np=null;
+    if(playing){const rr=14+(RG-14)*ru/18;np=[cx+Math.cos(ANG)*rr,cy+Math.sin(ANG)*rr*.96];ni=ringAt(np[0],np[1]);
+      if(ni!==REC.last&&ni>=0){REC.last=ni;if(audible()){const w=widths[ni],k=clamp(Math.round((10.5-w)/1.1),0,9);woodTone(PENTA[13-k],DRYY.includes(ni)?.05:.035);if(ni===39)nz(now_(),.4,'highpass',2500,1200,.7,.03,.005)}}}
+    for(const [i,col,a] of[[hi,AMBER,.9],[ni,[255,236,190],.95]]){if(i<0)continue;
+      c.strokeStyle=rgba(col,a);c.lineWidth=2.6;c.beginPath();ringPath(null,cx,cy,radii[i],i,5,.04).forEach((p,k)=>k?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke()}
+    if(playing){const a=ru<.6?ru/.6:ru>17.4?(18-ru)/.6:1;c.globalAlpha=a;
+      c.strokeStyle=rgba(INK,.75);c.lineWidth=4;c.beginPath();c.moveTo(PIVOT[0],PIVOT[1]);c.lineTo(np[0]+40,np[1]-26);c.lineTo(np[0],np[1]);c.stroke();
+      c.fillStyle=rgba(INK,.85);c.beginPath();c.arc(PIVOT[0],PIVOT[1],12,0,TAU);c.fill();c.drawImage(GLINT,np[0]-12,np[1]-12,24,24);c.globalAlpha=1;
+      if(ni>=0)say(c,String(1963+ni),np[0]+26,np[1]+34,18,INK,.8,a)}
+    if(h&&hi>=0){const yr=1963+hi;say(c,yr+(NOTE[yr]?' · '+NOTE[yr]:''),h[0]+22,h[1]-18,19,INK,.85)}
+  }});
+  hit(cx-RG,cy-RG,cx+RG,cy+RG,(x,y,t)=>{if(ringAt(x,y)<0)return false;if((t-REC.t)/1000<18){REC.t=-1e9;return}REC.t=t;REC.last=-1;knock()});
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',900,.5,.012)}});
 });
 
 // P3 · seasons --------------------------------------------------------------
@@ -1210,30 +1562,145 @@ P.push(function(){
     caption(R,names[i],cx0,cy0+158,22,false);
   }
   whispers(R,160,1130,false,4);
+  // each season moves in its own way; your hand makes it move more
+  const PET=sprite(24,24,RR=>{for(let k=0;k<5;k++){const a=k/5*TAU;dotF(RR,12+Math.cos(a)*5,12+Math.sin(a)*5,4,.9,[248,226,232])}dotF(RR,12,12,2,.9,AMBER)},SEED*97);
+  const SS=[{t:-1e9},{t:-1e9},{t:-1e9},{t:-1e9}];
+  centers.forEach(([cx0,cy0],i)=>{
+    const st=SS[i];st.p=[];st.pile=[];
+    const twig=u=>[cx0-200+u*340,cy0+105-u*150];
+    live(cx0-300,cy0-185,600,330,{sc:.8,fps:30,frame(c,now,L){
+      wipe(c,L);const h=hand(L,now,300),hot=!!h,tu=(now-st.t)/1000,dt=1/30;
+      c.save();c.beginPath();c.rect(cx0-292,cy0-178,584,318);c.clip();
+      if(i===0){
+        for(let k=0;k<9;k++){const u=k/8,q=twig(u),life=((now/1000+k*1.37)%12)/12,o=ease(life*4)*(life>.85?1-(life-.85)/.15:1);
+          c.globalAlpha=o;c.drawImage(PET,q[0]-12+Math.sin(k)*14,q[1]-26-Math.cos(k)*10,24*o,24*o)}
+        if(Math.random()<(hot?.4:.04)+(tu<1?.8:0)){const q=twig(Math.random());st.p.push({x:q[0],y:q[1]-20,vx:rd(Math.random,-20,30),t:now})}
+      }else if(i===1){
+        for(let k=0;k<12;k++){const x=cx0-200+fbm(now/9000+k*3,k,4,2)*400,y=cy0-120+fbm(k*5,now/9000+k,5,2)*240,a=.25+.25*Math.sin(now/700+k);c.globalAlpha=a;c.drawImage(SUNF,x-30,y-30,60,60)}
+        c.globalAlpha=1;const bt=now/1000;let bx=cx0+Math.sin(bt*.9)*170+Math.sin(bt*2.3)*30,by=cy0-60+Math.sin(bt*1.7)*60;
+        if(h){st.bx=(st.bx??bx)+(h[0]-(st.bx??bx))*.06;st.by=(st.by??by)+(h[1]-(st.by??by))*.06;bx=st.bx;by=st.by}else{st.bx=bx;st.by=by}
+        c.fillStyle=rgba([226,180,60],1);c.beginPath();c.ellipse(bx,by,8,5.5,0,0,TAU);c.fill();c.strokeStyle=rgba(INK,.8);c.lineWidth=1.6;c.beginPath();c.moveTo(bx-2,by-5);c.lineTo(bx-2,by+5);c.moveTo(bx+2,by-5);c.lineTo(bx+2,by+5);c.stroke();
+        c.fillStyle=rgba([240,246,250],.7);const wf=Math.sin(now/18)*3;c.beginPath();c.ellipse(bx-2,by-8-wf*.3,6,3+wf*.2,-.5,0,TAU);c.fill();c.beginPath();c.ellipse(bx+3,by-8+wf*.3,6,3-wf*.2,.5,0,TAU);c.fill();
+      }else if(i===2){
+        if(Math.random()<(hot?.25:.05)&&st.p.length<30)st.p.push({x:rd(Math.random,cx0-260,cx0+260),y:cy0-180,vx:0,t:now,k:2+ri(Math.random,0,2),r:rd(Math.random,0,TAU)});
+        for(const q of st.pile){c.save();c.translate(q.x,q.y+(tu<1.2?-60*bump(tu/1.2)*q.j:0));c.rotate(q.r);c.drawImage(LEAFSPR[q.k],-21,-14,42,28);c.restore()}
+      }else{
+        if(!st.snow){st.snow=[];for(let k=0;k<46;k++)st.snow.push({x:rd(Math.random,cx0-290,cx0+290),y:rd(Math.random,cy0-180,cy0+140),v:rd(Math.random,14,30),s:rd(Math.random,1.4,3)})}
+        c.fillStyle=rgba([250,252,255],.95);
+        for(const f of st.snow){f.y+=f.v*dt;f.x+=Math.sin(now/1100+f.v)*.3;
+          if(h){const dx=f.x-h[0],dy=f.y-h[1],d=Math.hypot(dx,dy);if(d<90){f.x+=dx/d*2.2;f.y+=dy/d*1.2}}
+          if(f.y>cy0+140){f.y=cy0-180;f.x=rd(Math.random,cx0-290,cx0+290)}
+          c.beginPath();c.arc(f.x,f.y,f.s,0,TAU);c.fill()}
+        if(tu<2.5){c.fillStyle=rgba([250,252,255],.8*(1-tu/2.5));for(let k=0;k<26;k++){const a=k*2.4,r=tu*90*(.4+(k%5)/5);c.beginPath();c.arc(cx0-60+Math.cos(a)*r,cy0-10+Math.sin(a)*r*.6+tu*tu*20,2.4,0,TAU);c.fill()}}
+      }
+      // falling things (petals, leaves)
+      for(let k=st.p.length-1;k>=0;k--){const q=st.p[k];q.y+=(i===0?26:44)*dt;q.x+=(q.vx+Math.sin(now/600+k)*20)*dt;if(q.r!==undefined)q.r+=.03;
+        if(q.y>cy0+120){st.p.splice(k,1);if(i===2){st.pile.push({x:q.x,y:cy0+120+rd(Math.random,-6,6),k:q.k,r:q.r,j:rd(Math.random,.4,1)});if(st.pile.length>34)st.pile.shift()}continue}
+        c.globalAlpha=Math.min(1,(now-q.t)/400);
+        if(i===0)c.drawImage(PET,q.x-8,q.y-8,16,16);else{c.save();c.translate(q.x,q.y);c.rotate(q.r);c.drawImage(LEAFSPR[q.k],-21,-14,42,28);c.restore()}}
+      c.globalAlpha=1;c.restore();
+    }});
+    hit(cx0-300,cy0-180,cx0+300,cy0+180,(x,y,t)=>{st.t=t;audio();
+      if(i===0){chiff(MASTER,.03);for(let k=0;k<14;k++){const q=twig(Math.random());st.p.push({x:q[0],y:q[1]-20,vx:rd(Math.random,-30,40),t})}}
+      else if(i===1){buzz(MASTER,.03);hopper(MASTER,.03)}
+      else if(i===2)rustle(MASTER,.06);
+      else crunch(MASTER,.05)});
+  });
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',1500,.5,.015)},step(now,dt,A){every(A,now,9,22,()=>RA()<.5?chiff(A.g,.01):hopper(A.g,.012))}});
 });
 
 // P4 · who lived here --------------------------------------------------------
+// everyone who lives here does one thing when you touch them
+function tardigrade(R,x,y,s){
+  const b=[];for(let i=0;i<=20;i++){const t=i/20*TAU;b.push([x+Math.cos(t)*s,y+Math.sin(t)*s*.48*(1+.08*Math.sin(t*6))])}
+  fillPoly(b,[214,196,160],.8);scribFill(R,b,3,.35,{col:[160,130,90],w:1});sk(R,b.concat([b[0]]),{col:INK,w:1.6,a:.8,amp:.5});
+  for(let k=1;k<4;k++)sk(R,[[x-s+k*s*.5,y-s*.44],[x-s+k*s*.5+3,y+s*.44]],{col:INK,w:1,a:.4,amp:.4});
+  for(let k=0;k<4;k++){const lx=x-s*.75+k*s*.5;sk(R,[[lx,y+s*.38],[lx+3,y+s*.68]],{col:INK,w:4,a:.75,amp:.3});for(const c of[-1,0,1])sk(R,[[lx+3,y+s*.68],[lx+3+c*5,y+s*.8]],{col:INK,w:1,a:.8,amp:.2})}
+  dotF(R,x+s*.82,y-s*.12,2.2,.9,INK);ell(R,x+s*.98,y+s*.04,4,3,{col:INK,w:1.2,a:.7,amp:.2});
+}
 P.push(function(){
   const R=stream(SEED*101+4);
   sheet(R,44,40,1558,1170,[226,214,184],{rough:13,rot:.004});
   write(R,'wie er woonde',800,125,32,{a:.85,cen:true});
   const names=['kever','uil','zwam','slak','nest','mos','mier','schors'];
+  const fledged=!!MEM.hatched;
   const items=[
-    (x,y)=>beetle(R,x-10,y,40,INK),
-    (x,y)=>owl(R,x,y,52,INK),
-    (x,y)=>shroom(R,x,y-20,62,INK),
-    (x,y)=>snail(R,x,y+14,46,INK),
-    (x,y)=>nest(R,x,y+20,86,INK),
-    (x,y)=>mosspatch(R,x,y,100,MOSS),
-    (x,y)=>ant(R,x+50,y,20,INK),
-    (x,y)=>barkpiece(R,x,y,84,INK)];
+    (R,x,y)=>beetle(R,x-10,y,40,INK),
+    (R,x,y)=>owl(R,x,y,52,INK),
+    (R,x,y)=>shroom(R,x,y-20,62,INK),
+    (R,x,y)=>snail(R,x,y+14,46,INK),
+    (R,x,y)=>nest(R,x,y+20,86,INK,!fledged),
+    (R,x,y)=>mosspatch(R,x,y,100,MOSS),
+    (R,x,y)=>ant(R,0,0,20,INK),
+    (R,x,y)=>barkpiece(R,x,y,84,INK)];
+  const ANT=sprite(60,40,RR=>ant(RR,40,20,9,INK),SEED*89);
+  const BEAR=sprite(160,110,RR=>tardigrade(RR,78,52,58),SEED*87);
+  const tally=()=>{};
   for(let i=0;i<8;i++){
     const cx0=250+(i%4)*368,cy0=420+Math.floor(i/4)*480;
     scrap(R,cx0,cy0,310,360,pk(R,[PAPER,[236,238,222],[244,232,208]]),rd(R,-.05,.05));
-    items[i](cx0,cy0-6);
-    caption(R,names[i],cx0,cy0+150,20,false);
+    caption(R,names[i]+(i===4&&fledged?' · uitgevlogen':''),cx0,cy0+150,20,false);
+    if(i===4&&fledged){for(let k=0;k<12;k++)sk(R,[[cx0+20+k*3,cy0-60+k*4],[cx0+40+k*3,cy0-56+k*4]],{col:STEEL,w:.9,a:.5,amp:.3});sk(R,[[cx0+10,cy0-70],[cx0+70,cy0-14]],{col:STEEL,w:1.4,a:.7,amp:.4})}
+    const spr=i===6?null:sprite(300,340,RR=>items[i](RR,150,170),SEED*67+i);
+    const it={i,t:-1e9,taps:0,blink:0,ants:[]};
+    if(i===6)for(let k=0;k<6;k++)it.ants.push({u:k/6,dx:0,dy:0,vx:0,vy:0});
+    live(cx0-155,cy0-186,310,322,{fps:30,frame(c,now,L){
+      wipe(c,L);
+      const u=(now-it.t)/1000,X=cx0,Y=cy0-6;
+      let dx=0,dy=0,rot=0,sx=1,sy=1;
+      if(i===0){const v=Math.cos(now/3200);dx=Math.sin(now/3200)*55;sx=v>=0?1:-1;if(u<2){dx+=Math.sin(u*Math.PI)*70*(v>=0?1:-1);dy=Math.sin(u*40)*1.5}}
+      if(i===1){if(u<1.4)rot=Math.sin(u*Math.PI*2)*.18*(1-u/1.4)}
+      if(i===3){dx=Math.sin(now/30000)*50;sx=Math.cos(now/30000)>=0?1:-1;if(u<2.2){sy=1-.12*bump(u/2.2);sx*=1-.18*bump(u/2.2)}
+        c.strokeStyle='rgba(200,214,220,.55)';c.lineWidth=3;c.beginPath();c.moveTo(X-60,Y+30);c.lineTo(X+dx-20*sx,Y+30);c.stroke()}
+      if(i===7&&u<1)dx=Math.sin(u*70)*2*(1-u);
+      if(spr){c.save();c.translate(X+dx,Y+dy);c.rotate(rot);c.scale(sx,sy);c.drawImage(spr,-150,-170,300,340);c.restore()}
+      // the owl blinks
+      if(i===1){if(now>it.blink+rd(Math.random,2500,6000)&&Math.random()<.03)it.blink=now;const b=(now-it.blink)/180;
+        if(b<1){c.save();c.translate(X,Y);c.rotate(rot);c.fillStyle=rgba([140,116,86],1);for(const sd of[-1,1]){c.beginPath();c.ellipse(sd*52*.33,-52*.35,52*.3,52*.3*bump(b),0,0,TAU);c.fill()}c.restore()}}
+      // spores
+      if(i===2&&u<3.5){for(let k=0;k<50;k++){const a=k*2.39,v=u*(20+(k%7)*8);c.fillStyle=rgba([200,180,150],.6*(1-u/3.5));c.beginPath();c.arc(X+Math.cos(a)*v,Y-80-u*30+Math.sin(a)*v*.5,1.6,0,TAU);c.fill()}}
+      // the nest: three taps and the eggs hatch
+      if(i===4&&!fledged){const n=Math.min(it.taps,3);c.strokeStyle=rgba(INK,.8);c.lineWidth=1.2;
+        for(const ex of[-30,0,30]){if(n>=1){c.beginPath();c.moveTo(X+ex-6,Y+2);c.lineTo(X+ex-1,Y+8);c.lineTo(X+ex+4,Y+1);c.stroke()}if(n>=2){c.beginPath();c.moveTo(X+ex-4,Y-12);c.lineTo(X+ex+3,Y-6);c.stroke()}}
+        if(it.taps>=3){const k=ease((now-it.hatch)/700);for(const [k2,ex] of[[0,-30],[1,0],[2,30]]){const hy=Y-14-26*k,open=Math.sin(now/120+k2*2)>.2;
+          c.fillStyle=rgba([150,130,100],1);c.beginPath();c.arc(X+ex,hy,11*k,0,TAU);c.fill();c.fillStyle=rgba(AMBER,1);c.beginPath();c.moveTo(X+ex-6,hy-4);c.lineTo(X+ex,hy-16-(open?6:0));c.lineTo(X+ex+6,hy-4);c.closePath();c.fill();
+          c.fillStyle=rgba(INK,1);c.beginPath();c.arc(X+ex+4,hy-2,1.6,0,TAU);c.fill()}}}
+      // in the moss lives a water bear
+      if(i===5&&u<6){const a=Math.min(1,u/.4)*Math.min(1,(6-u)/.6);c.globalAlpha=a;
+        c.fillStyle=rgba([250,246,232],.96);c.beginPath();c.arc(X,Y-40,84,0,TAU);c.fill();c.strokeStyle=rgba(INK,.8);c.lineWidth=5;c.stroke();
+        c.save();c.translate(X,Y-40);c.rotate(Math.sin(now/500)*.06);c.drawImage(BEAR,-72,-50,144,99);c.restore();
+        c.strokeStyle=rgba(INK,.8);c.lineWidth=8;c.beginPath();c.moveTo(X+60,Y+20);c.lineTo(X+100,Y+70);c.stroke();
+        say(c,'een beerdiertje',X,Y+80,15,INK,.85,a,true);say(c,'het overleeft bijna alles',X,Y+102,13,INK,.75,a,true);c.globalAlpha=1}
+      // ants on their road
+      if(i===6){for(const a of it.ants){a.u=(a.u+.0011)%1;const t=a.u*TAU,bx=X+Math.cos(t)*100,by=Y+Math.sin(t)*46;
+          if(u<.1&&!a.vx){a.vx=rd(Math.random,-160,160);a.vy=rd(Math.random,-160,160)}
+          a.dx+=a.vx/30;a.dy+=a.vy/30;a.vx*=.92;a.vy*=.92;if(u>1){a.dx*=.96;a.dy*=.96;a.vx=a.vx*.9}
+          const dir=t+Math.PI/2;c.save();c.translate(bx+a.dx,by+a.dy);c.rotate(dir);c.drawImage(ANT,-40,-20,60,40);c.restore()}
+        if(u>2)for(const a of it.ants){a.vx=0;a.vy=0}}
+      // bark chips when the woodpecker drums
+      if(i===7&&u<1.2){c.fillStyle=rgba(BARK,1);for(let k=0;k<12;k++){const a=k*1.9,v=u*120;c.beginPath();c.arc(X+40+Math.cos(a)*v,Y-20+Math.sin(a)*v*.5+u*u*140,2.6,0,TAU);c.fill()}}
+    }});
+    hit(cx0-150,cy0-180,cx0+150,cy0+170,(x,y,t)=>{
+      audio();it.t=t;
+      if(i===0)nz(now_(),.3,'highpass',4000,4000,1,.03,.002);
+      if(i===1)hoot(MASTER,.06);
+      if(i===2)puff(MASTER,.08);
+      if(i===3)vo(now_(),'sine',300,180,.15,.04,.005);
+      if(i===4){if(fledged)cheep(MASTER,.02);else{it.taps++;if(it.taps<3)knock();else{if(it.taps===3){it.hatch=t;MEM.hatched=1}cheep(MASTER,.05)}}}
+      if(i===5){vo(now_(),'sine',880,1320,.4,.03,.02);vo(now_()+.12,'sine',1320,1760,.4,.02,.02)}
+      if(i===6)rustle(MASTER,.03);
+      if(i===7)drum(MASTER,.12);
+      if(!MEM.found.includes(i))MEM.found.push(i);
+      memSave();
+    });
   }
+  live(1150,72,380,80,{fps:4,frame(c,now,L){
+    const n=MEM.found.filter(v=>typeof v==='number').length;if(L.n===n&&L.drawn)return;L.n=n;wipe(c,L);
+    const t=n<8?`ontmoet: ${n} van 8`:'iedereen ontmoet',sp=textSpr(t,17,INK,.7);
+    if(n)say(c,t,1520-(sp.w-17*.8),118,17,INK,.7);
+  }});
   whispers(R,160,1130,false,4);
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',1100,.5,.012)},step(now,dt,A){every(A,now,12,26,()=>RA()<.5?drum(A.g,.03):robin(A.g,.008))}});
 });
 
 // P5 · what they share underground -------------------------------------------
@@ -1259,9 +1726,11 @@ P.push(function(){
     const d=Math.hypot(nodes[i][0]-nodes[j][0],nodes[i][1]-nodes[j][1]);
     if(d<(i<7&&j<7?260:230)&&ch_(R,.7))E.push([i,j])
   }
+  const EP=[];
   for(const [i,j] of E){
     const a=nodes[i],b=nodes[j],mx=(a[0]+b[0])/2+rd(R,-30,30),my=(a[1]+b[1])/2+rd(R,-30,30);
     const pts=[];for(let t=0;t<=1;t+=.1)pts.push([(1-t)*(1-t)*a[0]+2*t*(1-t)*mx+t*t*b[0],(1-t)*(1-t)*a[1]+2*t*(1-t)*my+t*t*b[1]]);
+    EP.push({i,j,pts,len:Math.hypot(b[0]-a[0],b[1]-a[1])*1.08});
     sk(R,pts,{col:FOAM0,w:1.1,a:.55,amp:.8});
     if(ch_(R,.6))dotF(R,pts[ri(R,2,7)][0],pts[ri(R,2,7)][1],2,.8,AMBER);
   }
@@ -1269,7 +1738,32 @@ P.push(function(){
   restless(60,520,1480,640,RR=>{for(let k=0;k<4;k++)dotF(RR,rd(RR,200,1400),rd(RR,600,1100),2.4,.7,AMBER)});
   for(let y=500;y<1130;y+=rd(R,26,34))atext(R,rd(R,100,300),rd(R,700,1500),y,10,{col:CINK,a:.12,w:1});
   write(R,'een berk geeft suiker aan wat in de schaduw staat',800,1130,19,{col:CINK,a:.65,cen:true});
+  write(R,'zo werd het gemeten (simard, 1997). hoeveel bomen echt delen, is nog open',800,1160,13,{col:CINK,a:.42,cen:true});
+  write(R,'tik op een boom',1380,180,14,{col:CINK,a:.42,cen:true});
   whispers(R,500,1100,true,3);
+  // tap a tree: what it has goes out through the threads, and reaches the others
+  const ADJ=nodes.map(()=>[]);EP.forEach((e,k)=>{ADJ[e.i].push(k);ADJ[e.j].push(k)});
+  const WAVES=[];
+  const send=(src,t)=>{const at=nodes.map(()=>1e9);at[src]=0;const q=[src];
+    while(q.length){const n=q.shift();for(const k of ADJ[n]){const e=EP[k],m=e.i===n?e.j:e.i,d=at[n]+e.len/240;if(d<at[m]){at[m]=d;q.push(m)}}}
+    WAVES.push({t,at,src,done:new Set([src])});if(WAVES.length>3)WAVES.shift()};
+  live(40,150,1520,1000,{sc:.7,fps:30,frame(c,now,L){
+    wipe(c,L);
+    c.globalCompositeOperation='lighter';
+    for(let w=WAVES.length-1;w>=0;w--){const W=WAVES[w],u=(now-W.t)/1000;let alive=false;
+      for(const e of EP){const a0=W.at[e.i],b0=W.at[e.j];if(a0>9e8||b0>9e8)continue;
+        const from=a0<b0?e.i:e.j,t0=Math.min(a0,b0),t1=Math.max(a0,b0),k=(u-t0)/(t1-t0||1);
+        if(k<0||k>1.6)continue;alive=true;const kk=Math.min(1,k),pts=from===e.i?e.pts:e.pts.slice().reverse(),f=kk*(pts.length-1),i0=Math.floor(f),fr=f-i0,p0=pts[i0],p1=pts[Math.min(pts.length-1,i0+1)];
+        const x=p0[0]+(p1[0]-p0[0])*fr,y=p0[1]+(p1[1]-p0[1])*fr;c.globalAlpha=k>1?1.6-k:1;c.drawImage(GLINT,x-10,y-10,20,20)}
+      nodes.forEach((n,k)=>{const d=u-W.at[k];if(d<0||d>2.5)return;alive=true;c.globalAlpha=(1-d/2.5)*(k<7?1:.6);const s=k<7?70:26;c.drawImage(GLINT,n[0]-s/2,n[1]-s/2,s,s);
+        if(k<7){c.globalAlpha=(1-d/2.5)*.5;c.drawImage(SUNF,n[0]-90,n[1]-260,180,180)}
+        if(!W.done.has(k)){W.done.add(k);if(audible())k<7?woodTone(PENTA[3+k],.04):vo(now_(),'sine',1760+k*30,1700,.08,.006,.002)}});
+      if(!alive&&u>1)WAVES.splice(w,1)}
+    c.globalCompositeOperation='source-over';c.globalAlpha=1;
+  }});
+  trees.forEach((t,k)=>hit(t[0]-50,150,t[0]+50,t[1]+80,(x,y,tt)=>send(k,tt)));
+  hit(40,520,1560,1150,(x,y,t)=>{let b=0,bd=1e9;nodes.forEach((n,k)=>{const d=Math.hypot(n[0]-x,n[1]-y);if(d<bd){bd=d;b=k}});send(b,t)},true);
+  ambient(0,1200,{make(g,A){A.d=bed(g,'lowpass',170,.7,.05)},step(now,dt,A){if(RA()<dt*.4)vo(now_(),'sine',rd(RA,1500,2600),1400,.06,.004,.002,A.g)}});
 });
 
 // P6 · narrow years ---------------------------------------------------------
@@ -1296,8 +1790,30 @@ P.push(function(){
   // one ring, shown thin
   const rings=[[420,980,40],[420,980,52],[420,980,57],[420,980,60],[420,980,72]];
   write(R,'hij vraagt niets, hij wordt smal',800,1110,22,{a:.7,cen:true});
+  write(R,'tik: regen',1380,1080,14,{a:.42,cen:true});
   whispers(R,160,1100,false,4);
+  // heat trembles over the ground and the tree lets go of leaves; tap, and it rains
+  const RN={t:-1e9,said:0},DL=[];
+  live(60,40,1480,1120,{sc:.6,fps:30,frame(c,now,L){
+    wipe(c,L);const u=(now-RN.t)/1000,wet=u<20?(u<7?ease(u/2):1-ease((u-7)/13)):0,dt=1/30;
+    if(wet>0){c.fillStyle=rgba([70,54,34],.28*wet);c.fillRect(70,545,1460,600);c.fillStyle=rgba([90,96,104],.18*wet);c.fillRect(70,50,1460,495)}
+    if(wet<.5){c.strokeStyle=rgba([255,250,236],.2*(1-wet*2));c.lineWidth=1.4;for(let k=0;k<7;k++){const y0=520-((now/40+k*60)%300);c.beginPath();for(let x=500;x<=1500;x+=30){const y=y0+Math.sin(x/40+now/300+k)*5;x===500?c.moveTo(x,y):c.lineTo(x,y)}c.stroke()}}
+    if(wet<.3&&Math.random()<.02&&DL.length<8)DL.push({x:rd(Math.random,240,520),y:rd(Math.random,380,520),t:now,r:rd(Math.random,0,TAU),sw:rd(Math.random,0,7)});
+    for(let k=DL.length-1;k>=0;k--){const q=DL[k];if(q.y<1080){q.y+=40*dt;q.x+=Math.sin(now/500+q.sw)*.8;q.r+=.04}else if(!q.down)q.down=now;
+      const a=q.down?1-(now-q.down)/5000:1;if(a<=0){DL.splice(k,1);continue}c.globalAlpha=a;c.save();c.translate(q.x,q.y);c.rotate(q.r);c.drawImage(LEAFSPR[4],-18,-12,36,24);c.restore()}
+    c.globalAlpha=1;
+    if(u<7.5){const k=u<6.5?1:1-(u-6.5);c.strokeStyle=rgba([200,214,224],.55*k);c.lineWidth=1.3;c.beginPath();
+      for(let n=0;n<90;n++){const x=(n*137.5+now*.05)%1460+70,y=(n*91+now*.9)%1080+60;c.moveTo(x,y);c.lineTo(x-8,y+30)}c.stroke();
+      if(u>.4){c.fillStyle=rgba([200,214,224],.5*k);for(let n=0;n<14;n++){const x=(n*233+Math.floor(now/250)*71)%1440+80,y=560+(n*67)%540,r=(now/250%1)*14;c.beginPath();c.ellipse(x,y,r,r*.35,0,0,TAU);c.fill()}}}
+    if(RN.said&&now-RN.said<7000){const a=Math.min(1,(now-RN.said)/600)*Math.min(1,(7000-(now-RN.said))/900);say(c,'petrichor: zo ruikt regen op droge grond',800,1010,19,INK,.85,a,true)}
+  }});
+  hit(60,40,1540,1160,(x,y,t)=>{if((t-RN.t)/1000<6)return;RN.t=t;if(!RN.said)RN.said=t+2500;if(audio())rainSound()},true);
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',600,.6,.02)},step(now,dt,A){every(A,now,2.5,7,()=>hopper(A.g,.016))}});
 });
+function rainSound(){const t=now_(),n=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();n.buffer=NB;n.loop=true;f.type='highpass';f.frequency.value=1800;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.06,t+1.8);g.gain.setValueAtTime(.06,t+5.5);g.gain.linearRampToValueAtTime(0,t+8);n.connect(f);f.connect(g);g.connect(MASTER);n.start(t);n.stop(t+8.1);
+  for(let k=0;k<30;k++){const f=rd(RA,900,2400);vo(t+rd(RA,.1,6),'sine',f,f*2.2,.1,.02,.002,MASTER,.5)}
+  nz(t+1,3.5,'lowpass',200,70,.8,.12,.4)}
 
 // P7 · fire ---------------------------------------------------------------
 P.push(function(){
@@ -1319,6 +1835,25 @@ P.push(function(){
   write(R,'het litteken wordt hout',800,170,44,{col:CINK,a:.9,cen:true});
   write(R,'wat de boom niet kan weren, groeit hij omheen',800,225,20,{col:CINK,a:.7,cen:true});
   whispers(R,100,1100,true,3);
+  // the fire moves; tap and a trunk splits with a crack and a burst of sparks
+  const TONG=[];{const RG=stream(SEED*13+7);for(let k=0;k<16;k++)TONG.push({x:rd(RG,140,1460),h:rd(RG,140,330),w:rd(RG,14,30),ph:rd(RG,0,7),c:pk(RG,[FIRE,AMBER,[240,210,120]])})}
+  const SP=[];
+  live(40,300,1520,870,{sc:.6,fps:30,frame(c,now,L){
+    wipe(c,L);c.globalCompositeOperation='lighter';c.lineCap='round';
+    for(const f of TONG){const by=1130,h=f.h*(.75+.25*Math.sin(now/170+f.ph)*Math.sin(now/410+f.ph*2));
+      c.strokeStyle=rgba(f.c,.42);c.lineWidth=f.w*.5;c.beginPath();c.moveTo(f.x,by);
+      for(let k=1;k<=8;k++){const u=k/8;c.lineTo(f.x+Math.sin(u*5+now/150+f.ph)*f.w*u*1.4,by-u*h)}c.stroke();
+      c.globalAlpha=.4;c.drawImage(GLINT,f.x-f.w*3,by-f.w*4,f.w*6,f.w*6);c.globalAlpha=1}
+    if(Math.random()<.5)SP.push({x:rd(Math.random,140,1460),y:1100,vx:rd(Math.random,-20,20),vy:-rd(Math.random,80,200),t:now,l:rd(Math.random,1500,3200)});
+    for(let k=SP.length-1;k>=0;k--){const q=SP[k],u=(now-q.t)/q.l;if(u>1){SP.splice(k,1);continue}q.x+=q.vx/30+Math.sin(now/200+k)*.6;q.y+=q.vy/30;
+      c.globalAlpha=(1-u)*(.6+.4*Math.sin(now/40+k));c.drawImage(GLINT,q.x-5,q.y-5,10,10)}
+    c.globalAlpha=1;c.globalCompositeOperation='source-over';
+    if(SP.length>220)SP.splice(0,SP.length-220);
+  }});
+  hit(40,300,1560,1170,(x,y,t)=>{for(let k=0;k<60;k++){const a=rd(Math.random,0,TAU),v=rd(Math.random,60,260);SP.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,t,l:rd(Math.random,800,2200)})}
+    if(audio()){nz(now_(),.1,'bandpass',1500,800,.8,.6,.002);for(let k=0;k<10;k++)nz(now_()+k*rd(RA,.03,.09),.02,'bandpass',rd(RA,1500,4000),1500,2,.05,.001)}},true);
+  ambient(0,1200,{make(g,A){A.r=bed(g,'lowpass',260,.8,.07);A.h=bed(g,'bandpass',2600,.6,.01)},
+    step(now,dt,A){A.r.g.gain.setTargetAtTime(.04+.05*fbm(now/900,2,3,2),AC.currentTime,.15);const n=Math.floor(dt*rd(RA,6,20)+RA());for(let k=0;k<n;k++)nz(now_()+RA()*dt,.015,'bandpass',rd(RA,1200,4500),2000,2,rd(RA,.01,.04),.001,A.g)}});
 });
 
 // P8 · what falls becomes ground ---------------------------------------------
@@ -1344,9 +1879,34 @@ P.push(function(){
   for(let k=0;k<26;k++)dotF(R,rd(R,200,1400),rd(R,ly+120,1120),rd(R,1.5,4),.4,BARK);
   for(let y=ly+130;y<1140;y+=rd(R,24,34))sk(R,wave0(100,1500,y,rd(R,3,6),rd(R,.01,.02)),{col:BARK,w:1.1,a:.35,amp:1,gap:.05});
   for(let k=0;k<12;k++){const x=rd(R,200,1400),y=rd(R,ly+120,1100),pts=[[x,y]];let px=x,py=y,a=rd(R,0,TAU);for(let t=0;t<7;t++){a+=rd(R,-.7,.7);px+=Math.cos(a)*18;py+=Math.sin(a)*18;pts.push([px,py])}sk(R,pts,{col:BIRCH,w:.9,a:.6,amp:.5,taper:'out'})}
-  beetle(R,500,ly+190,18,INK);ant(R,980,ly+210,10,INK);
   write(R,'niets gaat weg, het wordt iets anders',800,1150,22,{a:.75,cen:true});
+  write(R,'tik onder de stam',1380,960,14,{a:.42,cen:true});
   whispers(R,160,500,false,3);
+  // the ones who do the work walk about; a woodlouse rolls up when you come;
+  // mushrooms grow while you watch; under the ground, the threads light up
+  const BTL=sprite(80,60,RR=>beetle(RR,36,30,16,INK),SEED*101+81),ANTS=sprite(60,40,RR=>ant(RR,40,20,9,INK),SEED*101+82);
+  const LOUSE=sprite(70,44,RR=>{const b=hblob(RR,35,24,26,14);fillPoly(b,[120,116,112],.9);sk(RR,b.concat([b[0]]),{col:INK,w:1.3,a:.8,amp:.4});for(let k=0;k<6;k++)sk(RR,[[14+k*8,12],[14+k*8,36]],{col:INK,w:.9,a:.5,amp:.2})},SEED*101+83);
+  const BALL=sprite(40,40,RR=>{ell(RR,20,20,14,14,{col:INK,w:1.4,a:.8,amp:.3});fillPoly(blob(RR,20,20,13,13),[120,116,112],.9);for(let k=0;k<4;k++)sk(RR,[[9+k*7,8],[9+k*7,32]],{col:INK,w:.8,a:.5,amp:.2})},SEED*101+84);
+  const SHR=[0,1,2].map(k=>sprite(80,90,RR=>shroom(RR,40,60,24,INK),SEED*101+85+k));
+  const MS=[[520,ly-84],[880,ly-88],[1210,ly-92]];
+  const MY=[],WK={x:900,ball:0};
+  live(60,ly-160,1480,1160-ly+160+40,{fps:30,frame(c,now,L){
+    wipe(c,L);if(!L.t0)L.t0=now;const age=(now-L.t0)/1000;
+    MS.forEach(([x,y],k)=>{const g=ease((age-k*6)/20);if(g<=0)return;c.drawImage(SHR[k],x-40*g,y-75*g,80*g,90*g)});
+    for(let k=MY.length-1;k>=0;k--){const m=MY[k],u=(now-m.t)/1000;if(u>6){MY.splice(k,1);continue}
+      c.strokeStyle=rgba([170,120,60],.75*(1-u/6));c.lineWidth=1.6;for(const br of m.b){const n=Math.min(br.length,Math.floor(u*20));c.beginPath();for(let i=0;i<n;i++)i?c.lineTo(br[i][0],br[i][1]):c.moveTo(br[i][0],br[i][1]);c.stroke()}
+      c.globalAlpha=(1-u/6)*.8;c.drawImage(GLINT,m.x-30,m.y-30,60,60);c.globalAlpha=1}
+    const bx=700+Math.sin(now/5200)*420,by=ly+190+Math.sin(now/1900)*24,bd=Math.cos(now/5200)>=0?1:-1;
+    c.save();c.translate(bx,by);c.scale(bd,1);c.drawImage(BTL,-40,-30,80,60);c.restore();
+    for(let k=0;k<5;k++){const u=((now/16000)+k/5)%1,x=1450-u*900,y=ly+250+Math.sin(u*9+k)*14;c.save();c.translate(x,y);c.scale(-1,1);c.drawImage(ANTS,-40,-20,60,40);c.restore()}
+    const h=hand(L,now,1500),near=h&&Math.hypot(h[0]-WK.x,h[1]-(ly+330))<130;
+    if(!near&&!WK.ball)WK.x=WK.x>1350?400:WK.x+.35;
+    WK.ball+=((near?1:0)-WK.ball)*.15;if(WK.ball<.02)WK.ball=0;
+    if(WK.ball>.5){c.save();c.translate(WK.x,ly+330);c.rotate(now/600*0);c.drawImage(BALL,-20,-20,40,40);c.restore()}else c.drawImage(LOUSE,WK.x-35,ly+308,70,44);
+  }});
+  hit(60,ly+100,1540,1170,(x,y,t)=>{const b=[];for(let k=0;k<7;k++){const br=[[x,y]];let px=x,py=y,a=k/7*TAU;for(let i=0;i<60;i++){a+=rd(Math.random,-.5,.5);px+=Math.cos(a)*6;py+=Math.sin(a)*4;br.push([px,py])}b.push(br)}
+    MY.push({x,y,t,b});if(MY.length>4)MY.shift();if(audio()){for(let k=0;k<6;k++)vo(now_()+k*.09,'sine',1200+k*180,1400+k*180,.25,.008,.02)}},true);
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',800,.5,.012)},step(now,dt,A){if(RA()<dt/3)drip(A.g,.02);if(RA()<dt/16)robin(A.g,.008)}});
 });
 
 // P9 · and again ----------------------------------------------------------
@@ -1356,22 +1916,52 @@ P.push(function(){
   // the light comes in slanted
   for(let k=0;k<16;k++){const x=300+k*60;sk(R,[[x,40],[x-260,1160]],{col:AMBER,w:rd(R,1,3),a:rd(R,.1,.25),amp:2,taper:'out',noDust:true})}
   write(R,'en weer een eerste lijn',800,140,40,{a:.88,cen:true});
-  // a sapling, still thin, with a ring not yet counted
+  // a sapling, still thin, with a ring not yet counted. it lives below: it
+  // turns toward the light, and the light is your hand.
   const bx=800,by=1000;
-  sk(R,[[bx,by],[bx+8,by-160],[bx-4,by-330],[bx+12,by-460]],{col:BARK,w:9,a:.85,amp:1.6,taper:'out'});
-  const tips=[[bx+8,by-160,.9],[bx-4,by-330,-.9],[bx+12,by-460,-1.5],[bx+8,by-250,2.5]];
-  for(const [x,y,a] of tips){sk(R,[[x,y],[x+Math.cos(a)*90,y+Math.sin(a)*90*.6-20]],{col:BARK,w:4,a:.8,amp:1,taper:'out'});
-    for(let k=0;k<4;k++)leaf(R,x+Math.cos(a)*30*k,y+Math.sin(a)*18*k-10,rd(R,34,50),a+rd(R,-.6,.6),[150,184,100],.8)}
-  for(let k=0;k<4;k++)leaf(R,bx+10+rd(R,-20,20),by-460+rd(R,-20,20),rd(R,30,44),rd(R,-2,-1),[150,184,100],.8);
   // on the log that was the old tree
   const lg=[[260,by+4],[1340,by-6],[1360,by+120],[240,by+130]];
   fillPoly(lg,BARK,.9);
   for(let k=0;k<9;k++){const y=by+4+k*14;sk(R,[[270,y],[800,y+rd(R,-6,6)],[1340,y]],{col:shade(BARK,.55),w:1.4,a:.6,amp:2.2,gap:.05})}
   mosspatch(R,800,by-6,360,MOSS);
-  spark(R,bx+14,by-490,28,{col:AMBER,a:.95,w:2.4,nR:9});
-  restless(bx-40,by-560,110,110,RR=>spark(RR,bx+14,by-490,28,{col:AMBER,a:.95,w:2.4,nR:ri(RR,8,11)}));
   for(let k=0;k<8;k++)birdM(R,rd(R,200,1400),rd(R,200,400),rd(R,6,12),INK,.4);
+  write(R,'het boompje zoekt het licht: dat ben jij',1300,1120,14,{a:.42,cen:true});
   whispers(R,300,1100,false,4);
+  const LV=[0,1,2].map(k=>sprite(110,70,RR=>leaf(RR,8,35,rd(RR,70,95),0,[150,184,100],.8),SEED*61+k));
+  const RB=[0,1].map(k=>sprite(90,80,RR=>{const x=45,y=44;
+    const b=hblob(RR,x,y,24,19);fillPoly(b,[138,110,80],.95);scribFill(RR,b,3,.35,{col:BARK,w:1});
+    const br=hblob(RR,x+10,y+4,13,12);fillPoly(br,[222,120,62],.95);
+    sk(RR,b.concat([b[0]]),{col:INK,w:1.4,a:.8,amp:.4});
+    dotF(RR,x+16,y-8,2.2,.95,INK);sk(RR,[[x+22,y-4],[x+31,y-3]],{col:INK,w:2,a:.9,amp:.2});
+    sk(RR,[[x-20,y+2],[x-36,y-6]],{col:BARK,w:5,a:.85,amp:.4,taper:'out'});
+    if(k)for(const sd of[-1,1])sk(RR,[[x-4,y-6],[x-14,y-6-sd*26],[x-28,y-10-sd*30]],{col:BARK,w:3.5,a:.85,amp:.6,taper:'out'});
+    else{sk(RR,[[x-4,y+18],[x-4,y+30]],{col:INK,w:1.4,a:.8,amp:.2});sk(RR,[[x+6,y+18],[x+6,y+30]],{col:INK,w:1.4,a:.8,amp:.2})}},SEED*59+k));
+  const BR={t:-1e9};
+  const ST=[[0,0],[8,-160],[-4,-330],[12,-460]],TIPS=[[1,.9],[2,-.9],[3,-1.5],[1.6,2.5]];
+  live(380,330,840,780,{fps:30,frame(c,now,L){
+    wipe(c,L);const h=hand(L,now,3000,300);
+    const tgt=h?clamp((h[0]-bx)/900,-.42,.42)+(h[1]<by-500?0:0):Math.sin(now/2600)*.035;
+    L.b=(L.b||0)+(tgt-(L.b||0))*.025;const b=L.b;
+    const P2=k=>{const f=k,i=Math.min(2,Math.floor(f)),u=f-i,a=ST[i],q=ST[i+1],x=a[0]+(q[0]-a[0])*u,y=a[1]+(q[1]-a[1])*u,hh=-y/460;return[bx+x+b*hh*hh*330+Math.sin(now/900)*3*hh,by+y+Math.abs(b)*hh*hh*60]};
+    c.lineCap='round';c.strokeStyle=rgba(BARK,.9);
+    for(let k=0;k<12;k++){const p0=P2(k/4),p1=P2((k+1)/4);c.lineWidth=9-k*.6;c.beginPath();c.moveTo(p0[0],p0[1]);c.lineTo(p1[0],p1[1]);c.stroke()}
+    TIPS.forEach(([f,a],k)=>{const p=P2(f),aa=a+b*.9;const q=[p[0]+Math.cos(aa)*90,p[1]+Math.sin(aa)*54-20];
+      c.lineWidth=4;c.beginPath();c.moveTo(p[0],p[1]);c.quadraticCurveTo((p[0]+q[0])/2,(p[1]+q[1])/2-12,q[0],q[1]);c.stroke();
+      for(let j=0;j<4;j++){const lx=p[0]+(q[0]-p[0])*j/3.4,ly=p[1]+(q[1]-p[1])*j/3.4,la=aa+(j%2?.6:-.5)+Math.sin(now/1100+j+k)*.06+b*.6;
+        c.save();c.translate(lx,ly);c.rotate(la);c.drawImage(LV[(j+k)%3],-8,-35,110,70);c.restore()}});
+    const top=P2(3);
+    for(let j=0;j<4;j++){c.save();c.translate(top[0],top[1]);c.rotate(-1.5+b*.8+(j-1.5)*.5+Math.sin(now/1000+j)*.05);c.drawImage(LV[j%3],-8,-35,100,64);c.restore()}
+    c.globalAlpha=.7+.3*Math.sin(now/300);c.drawImage(GLINT,top[0]+14-28,top[1]-30-28,56,56);c.globalAlpha=1;
+    // the robin
+    const u=(now-BR.t)/1000;
+    if(u<9){const perch=P2(2.1),pp=[perch[0]+40,perch[1]-26];let x,y,fr;
+      if(u<1.2){const k=ease(u/1.2);x=1260+(pp[0]-1260)*k;y=380+(pp[1]-380)*k-Math.sin(k*Math.PI)*90;fr=Math.floor(now/90)%2}
+      else if(u<7.8){x=pp[0];y=pp[1]+Math.sin(now/400)*1.5;fr=0;if(!BR.sang&&u>1.5){BR.sang=1;if(audible())robin(MASTER,.035)}}
+      else{const k=ease((u-7.8)/1.2);x=pp[0]+(320-pp[0])*k;y=pp[1]+(360-pp[1])*k-Math.sin(k*Math.PI)*120;fr=Math.floor(now/90)%2}
+      c.save();c.translate(x,y);if(u>7.8)c.scale(-1,1);c.drawImage(RB[fr?1:0],-45,-40,90,80);c.restore()}
+  }});
+  hit(380,330,1220,1110,(x,y,t)=>{if((t-BR.t)/1000<9)return false;BR.t=t;BR.sang=0;knock()});
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',1400,.5,.015)},step(now,dt,A){every(A,now,7,16,()=>RA()<.5?chiff(A.g,.012):robin(A.g,.01))}});
 });
 
 // P10 · the first ring -----------------------------------------------------
@@ -1382,12 +1972,27 @@ P.push(function(){
   // rings spreading out, each a little different, none finished before the next
   for(let i=0;i<14;i++){
     const rr=18+i*20+(i>9?(i-9)*7:0);
-    sk(R,ringPath(R,cx,cy,rr,i,5,.02),{col:i<2?AMBER:tint([180,160,110],i*.02),w:i<2?3:1.6,a:.85-i*.04,amp:.8,gap:.02});
+    sk(R,ringPath(R,cx,cy,rr,i,5,.02),{col:i<2?AMBER:tint([180,160,110],i*.02),w:i<2?3:1.6,a:(.85-i*.04)*.45,amp:.8,gap:.02});
   }
   spark(R,cx,cy,16,{col:AMBER,a:.95,w:2.2,nR:8});
   restless(cx-30,cy-30,60,60,RR=>spark(RR,cx,cy,16,{col:AMBER,a:.95,w:2.2,nR:ri(RR,7,10)}));
   write(R,'elk jaar iets erbij, nooit iets weg',800,860,36,{col:CINK,a:.9,cen:true});
   write(R,'zelfs wat verloren ging staat er nog in',800,912,22,{col:CINK,a:.7,cen:true});
+  // and these are yours: one ring for every time you came, as wide as you stayed
+  const vis=Math.max(1,MEM.visits||1);
+  live(380,90,840,820,{fps:10,frame(c,now,L){
+    wipe(c,L);
+    const st=MEM.stays.slice(0,vis);st[vis-1]=Math.round(STAY+(document.hidden?0:(performance.now()-stayT)/1000));
+    const W=st.map(sec=>clamp(4+Math.sqrt(sec||0),4,30)),tot=W.reduce((a,b)=>a+b,0),f=Math.min(1,286/tot);
+    let r=14;
+    st.forEach((sec,k)=>{const w=W[k]*f,cur=k===vis-1;r+=w;
+      c.strokeStyle=rgba(cur?[255,214,130]:AMBER,cur?.55+.35*Math.sin(now/500):.75);c.lineWidth=cur?2.6:2;
+      c.beginPath();ringPath(null,cx,cy,r,k+40,9,.03).forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke()});
+    const m=Math.floor((st[vis-1]||0)/60);
+    say(c,vis<2?'jouw eerste ring: hij groeit zolang je blijft':`jouw ${vis} ringen: een voor elke keer dat je kwam`,800,128,17,CINK,.75,1,true);
+    say(c,m<1?'je bent hier net':`deze keer al ${m} ${m===1?'minuut':'minuten'}`,800,154,15,CINK,.6,1,true);
+  }});
+  ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',700,.5,.012);A.l=bed(g,'lowpass',220,.7,.02)},step(now,dt,A){every(A,now,14,30,()=>hoot(A.g,.012))}});
   write(R,'ringen · jaar na jaar · 2026',800,1040,18,{col:CINK,a:.8,cen:true});
   aword(R,690,1082,13,5,{col:CINK,a:.6});
   write(R,'(mijn echte handtekening)',830,1088,12,{col:CINK,a:.6});
@@ -1409,7 +2014,8 @@ function genStep(){
     if(qs.has('y'))scrollTo(0,(+qs.get('y'))*CSSK);
   }
 }
-genStep();
+if(STILL){while(pi<P.length){GEN_DY=pi*PH;P[pi]();GEN_DY=0;pi++}GENDONE=true;drawAllNow()}
+else genStep();
 requestAnimationFrame(tick);
 </script>
 <script>
