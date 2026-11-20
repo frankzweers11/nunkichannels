@@ -197,6 +197,9 @@
         sw.style.cssText = 'position:fixed;left:-99px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
         var i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1;
         sw.appendChild(i); document.body.appendChild(sw);
+        // the switch's own clicks must not reach the wall, or every tap counts three times
+        var stop = function (e) { e.stopPropagation(); };
+        sw.addEventListener('click', stop); i.addEventListener('click', stop);
       }
       sw.click();
     } catch (e) {}
