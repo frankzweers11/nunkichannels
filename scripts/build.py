@@ -49,6 +49,10 @@ MARK_END = "<!-- /nunki:mark -->"
 TOUCH_START = "<!-- nunki:touch -->"
 TOUCH_END = "<!-- /nunki:touch -->"
 TOUCH_JS = Path(__file__).resolve().parent / "touch.js"
+LEES_START = "<!-- nunki:lees -->"
+LEES_END = "<!-- /nunki:lees -->"
+LEES_JS = Path(__file__).resolve().parent / "lees.js"
+LEES_DIR = Path(__file__).resolve().parent / "lees"
 
 # De wanden staan in twee series: de zelfportretten van de modellen, en de andere wanden.
 SERIES = [
@@ -361,6 +365,9 @@ def clean_for_shot(html: str) -> str:
     )
     html = re.sub(
         re.escape(TOUCH_START) + r".*?" + re.escape(TOUCH_END), "", html, flags=re.DOTALL
+    )
+    html = re.sub(
+        re.escape(LEES_START) + r".*?" + re.escape(LEES_END), "", html, flags=re.DOTALL
     )
     return strip_julius(html)
 
@@ -757,6 +764,29 @@ def inject_touch(html: str, block: str) -> str:
     return html[:i] + "\n" + block + html[i:]
 
 
+def lees_block(page: dict) -> str:
+    """De leeslaag: de zinnen per vel in NL en EN, uit scripts/lees/<slug>.json."""
+    src = LEES_DIR / f"{page['slug']}.json"
+    if not src.is_file():
+        return ""
+    data = json.loads(src.read_text(encoding="utf-8"))
+    js = LEES_JS.read_text(encoding="utf-8")
+    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return f"{LEES_START}\n<script>window.NUNKI_LEES={payload};</script>\n<script>{js}</script>\n{LEES_END}"
+
+
+def inject_lees(html: str, block: str) -> str:
+    html = re.sub(r"\s*" + re.escape(LEES_START) + r".*?" + re.escape(LEES_END), "", html, flags=re.DOTALL)
+    if not block:
+        return html
+    i = html.find(NAV_START)
+    if i == -1:
+        i = html.lower().rfind("</body>")
+    if i == -1:
+        return html + "\n" + block
+    return html[:i] + block + "\n" + html[i:]
+
+
 def inject_nav(html: str, block: str) -> str:
     html = re.sub(
         r"\s*" + re.escape(NAV_START) + r".*?" + re.escape(NAV_END), "", html, flags=re.DOTALL
@@ -1019,7 +1049,8 @@ def main() -> None:
         html = inject_seo(html, seo_block(page, html, seo_text) if seo_text else "")
         html = inject_mark(html, mark_block(page))
         html = inject_touch(html, touch_block(page))
-        write_public(html_path, inject_nav(html, nav_block()))
+        html = inject_nav(html, nav_block())
+        write_public(html_path, inject_lees(html, lees_block(page)))
 
     public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]
     payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": public_pages}
