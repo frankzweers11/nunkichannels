@@ -345,17 +345,43 @@
     .go { opacity: 1; transform: none; }
   }
 
-  .lang-switch { position: absolute; top: clamp(14px, 2.4vw, 24px); right: clamp(14px, 2.4vw, 24px); z-index: 5; padding: 6px 12px; border: 0; border-radius: 16px; cursor: pointer;
-    font: 400 .9rem/1.2 "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: .04em; color: rgba(42,37,31,.55);
-    background: rgba(246,241,228,.85); box-shadow: 0 0 0 1px rgba(42,37,31,.08); -webkit-tap-highlight-color: transparent; }
-  .lang-switch b { font-weight: 600; color: #2a251f; }
-  .lang-switch:focus-visible { outline: 2px solid #ac5036; outline-offset: 2px; }
 </style>
-<!-- nunki:lang --><script>(function(){var D=document.documentElement,q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();</script><style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}</style><!-- /nunki:lang -->
+<!-- nunki:lang -->
+<script>(function(){var D=document.documentElement,q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();</script><style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
+.nunki-bar{position:fixed;z-index:61;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);display:flex;align-items:center;gap:8px;pointer-events:none}
+.nunki-bar>*{pointer-events:auto;position:relative!important;inset:auto!important;margin:0!important;flex:none}
+.nunki-lng{display:flex;align-items:center;height:34px;padding:0 13px;box-sizing:border-box;border:0;border-radius:17px;cursor:pointer;color:#2a251f;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+.nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
+.nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
+html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
+.nunki-lng:hover{background:rgba(251,248,239,.97)}
+.nunki-lng:hover span{opacity:.72}
+html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-lng:hover .l-en{opacity:1}
+.nunki-lng:focus-visible{outline:none;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+.nunki-bar .nunki-pill{display:flex!important;align-items:center;justify-content:center;gap:6px;height:34px!important;min-width:34px;padding:0 13px!important;box-sizing:border-box;
+  border:0!important;border-radius:17px!important;cursor:pointer;color:#2a251f!important;background:rgba(246,241,228,.93)!important;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55)!important;
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif!important;
+  letter-spacing:0!important;text-transform:lowercase!important;text-decoration:none!important;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease,color .3s ease,opacity .4s ease}
+.nunki-bar .nunki-pill:hover{background:rgba(251,248,239,.97)!important}
+.nunki-bar [hidden]{display:none!important}
+.nunki-bar .nunki-pill[aria-pressed="false"],.nunki-bar .nunki-pill.off{color:rgba(42,37,31,.52)!important}
+.nunki-bar .nunki-pill:focus-visible{outline:none!important;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)!important}
+@media (max-width:600px){.nunki-bar{gap:6px}.nunki-lng{padding:0 11px}.nunki-lng i{margin:2px 5px 0}.nunki-bar .nunki-pill{padding:0 11px!important;font-size:1rem!important}}
+@media (prefers-reduced-motion:reduce){.nunki-lng,.nunki-lng span{transition:none}}
+@media print{.nunki-bar{display:none}}
+</style>
+<!-- /nunki:lang -->
 </head>
 <body>
+<!-- nunki:bar --><div class="nunki-bar"><button class="nunki-lng" type="button"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div><script>(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');function lab(){var en=window.NUNKI_LANG==='en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script><!-- /nunki:bar -->
 <div class="wrap">
-  <button class="lang-switch" id="langSwitch" type="button"></button>
   <header class="masthead">
     <h1 class="site-title">
       <a class="home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, home">
@@ -377,7 +403,7 @@
       <li>
         <a class="card" href="/zelfportret-claude/" style="--i:0;--theme:#070a13">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-claude.jpg?v=76f6c581" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-claude.jpg?v=5a580b4f" alt="" width="800" height="420" loading="eager" decoding="async"></span>
           <span class="caption">
             <span class="no">01</span>
             <span class="name">claude</span>
@@ -437,7 +463,7 @@
       <li>
         <a class="card" href="/zelfportret-sonnet-5-5/" style="--i:5;--theme:#070d13">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=57e18819" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=5bbfc63d" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">06</span>
             <span class="name">sonnet 5.5</span>
@@ -459,7 +485,7 @@
       <li>
         <a class="card" href="/hart/" style="--i:6;--theme:#1a090f">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/hart.jpg?v=c32a0cee" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/hart.jpg?v=6cfdb971" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">07</span>
             <span class="name"><span class="t-nl">hart</span><span class="t-en" lang="en">heart</span></span>
@@ -471,7 +497,7 @@
       <li>
         <a class="card" href="/adem/" style="--i:7;--theme:#e3e9ee">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/adem.jpg?v=55e8b7bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/adem.jpg?v=58ac680e" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">08</span>
             <span class="name"><span class="t-nl">adem</span><span class="t-en" lang="en">breath</span></span>
@@ -483,7 +509,7 @@
       <li>
         <a class="card" href="/cel/" style="--i:8;--theme:#070b0e">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/cel.jpg?v=2f49d1c1" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/cel.jpg?v=5ca44392" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">09</span>
             <span class="name"><span class="t-nl">cel</span><span class="t-en" lang="en">cell</span></span>
@@ -495,7 +521,7 @@
       <li>
         <a class="card" href="/getij/" style="--i:9;--theme:#13202b">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=d2e3bdd0" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=cde8264d" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">10</span>
             <span class="name"><span class="t-nl">getij</span><span class="t-en" lang="en">tide</span></span>
@@ -531,7 +557,7 @@
       <li>
         <a class="card" href="/velden/" style="--i:12;--theme:#0e1020">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/velden.jpg?v=cf3a0b8e" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/velden.jpg?v=ef097ec7" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">13</span>
             <span class="name"><span class="t-nl">velden</span><span class="t-en" lang="en">fields</span></span>
@@ -543,7 +569,7 @@
       <li>
         <a class="card" href="/vuur/" style="--i:13;--theme:#160f0e">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/vuur.jpg?v=04627083" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/vuur.jpg?v=c8d34849" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">14</span>
             <span class="name"><span class="t-nl">vuur</span><span class="t-en" lang="en">fire</span></span>
@@ -567,17 +593,10 @@
   </footer>
 </div>
 <script>
-// the language of the whole site, chosen once (nunki:lang; the script in <head> sets it)
+// the language of the whole site, chosen once (nunki:lang; the switch top right is built by build.py)
 (function () {
-  var b = document.getElementById('langSwitch');
-  function paint() {
-    var en = window.NUNKI_LANG === 'en';
-    b.innerHTML = en ? 'nl · <b>en</b>' : '<b>nl</b> · en';
-    b.setAttribute('aria-label', en ? 'language: english. switch to dutch' : 'taal: nederlands. wissel naar engels');
-    document.documentElement.lang = en ? 'en' : 'nl';
-  }
+  function paint() { document.documentElement.lang = window.NUNKI_LANG === 'en' ? 'en' : 'nl'; }
   paint();
-  b.addEventListener('click', function () { window.NUNKI_SETLANG(window.NUNKI_LANG === 'en' ? 'nl' : 'en'); });
   addEventListener('nunki:lang', paint);
 })();
 </script>

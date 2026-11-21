@@ -4,10 +4,10 @@
 
    De leeslaag: de zinnen van het vel dat je ziet, in gewone, leesbare letters.
    - Taal kies je één keer voor de hele site: 'nunki:lang' (nl standaard, en),
-     ook via ?lang=en of ?lang=nl. Het knopje nl · en zit in de leeslaag.
-   - Op een telefoon (smal scherm) staat de laag aan: daar is de getekende
-     tekst te klein. Op een groot scherm alleen als je taal anders is dan de
-     taal van de wand. Inklappen kan; dat wordt onthouden ('nunki:lees').
+     met de knop rechtsboven (nunki:mark) of ?lang=en / ?lang=nl.
+   - Alleen op een telefoon (smal scherm): daar is de getekende tekst te klein.
+     Op grotere schermen vertaalt de wand zijn eigen tekst (nunki:taal).
+     Inklappen kan; dat wordt onthouden ('nunki:lees').
    - Welk vel in beeld is, vraagt de laag aan de wand: window.NUNKI_Y(py) geeft
      de hoogte in wandeenheden (1600 breed) op py pixels van de bovenkant van
      het scherm. Zonder die functie wordt hij berekend voor een wand die de
@@ -20,9 +20,7 @@
 (function () {
   'use strict';
   var D = window.NUNKI_LEES;
-  if (!D || !D.sheets) return;
-  // without sheets the layer is only the language switch, for walls whose own text changes language
-  var PILL = !D.sheets.length;
+  if (!D || !D.sheets || !D.sheets.length) return;
   var q = new URLSearchParams(location.search);
   if (q.has('fast') || q.has('still')) return;
   var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
@@ -43,15 +41,12 @@
     '@media (max-width:760px){.nunki-lees{font-size:14px;line-height:1.38;padding:7px 11px 9px}.nunki-lees .nl-t{font-size:.98rem}}' +
     '@media (min-width:900px){.nunki-lees:not(.touch){left:50%;transform:translateX(-50%)}.nunki-lees:not(.touch).gone{transform:translate(-50%,10px)}}' +
     '.nunki-lees.gone{opacity:0;transform:translateY(10px);pointer-events:none}' +
-    '.nunki-lees.pill{left:clamp(10px,1.5vw,22px)!important;transform:none!important}.nunki-lees.pill.gone{transform:translateY(10px)!important}' +
     '.nunki-lees .nl-h{display:flex;align-items:center;gap:8px;margin:0 0 3px}' +
     '.nunki-lees .nl-t{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;' +
       'font:400 1.02rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next",sans-serif;color:#ac5036}' +
     '.nunki-lees .nl-b p{margin:0}.nunki-lees .nl-b p+p{margin-top:3px}' +
     '.nunki-lees .nl-b{transition:opacity .3s ease}.nunki-lees .nl-b.swap{opacity:0}' +
     '.nunki-lees button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:3px 5px;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}' +
-    '.nunki-lees .nl-lang{font-size:.82rem;letter-spacing:.04em;color:rgba(42,37,31,.5)}' +
-    '.nunki-lees .nl-lang b{font-weight:600;color:#2a251f}' +
     '.nunki-lees .nl-x{font-size:1rem;line-height:1;color:rgba(42,37,31,.5);padding:3px 6px}' +
     '.nunki-lees button:focus-visible{outline:2px solid #ac5036;outline-offset:1px}' +
     '.nunki-lees.min{width:auto;padding:4px 6px;border-radius:17px}' +
@@ -64,17 +59,16 @@
   var box = document.createElement('aside');
   box.className = 'nunki-lees gone';
   box.setAttribute('aria-live', 'polite');
-  box.innerHTML = '<div class="nl-h"><span class="nl-t"></span><button type="button" class="nl-lang"></button>' +
-    '<button type="button" class="nl-x"></button></div><div class="nl-b"></div>';
-  var elT = box.querySelector('.nl-t'), elB = box.querySelector('.nl-b'), bL = box.querySelector('.nl-lang'), bX = box.querySelector('.nl-x');
+  box.innerHTML = '<div class="nl-h"><span class="nl-t"></span><button type="button" class="nl-x"></button></div><div class="nl-b"></div>';
+  var elT = box.querySelector('.nl-t'), elB = box.querySelector('.nl-b'), bX = box.querySelector('.nl-x');
   // nothing on this card reaches the wall beneath it
   ['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(function (t) {
     box.addEventListener(t, function (e) { e.stopPropagation(); }, { passive: true });
   });
 
   var UI = {
-    nl: { open: 'tekst', close: 'tekst inklappen', show: 'tekst tonen', lang: 'taal: nederlands. wissel naar engels' },
-    en: { open: 'text', close: 'fold the text away', show: 'show the text', lang: 'language: english. switch to dutch' }
+    nl: { close: 'tekst inklappen', show: 'tekst tonen' },
+    en: { close: 'fold the text away', show: 'show the text' }
   };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var narrow = function () { return Math.min(innerWidth, screen.width || innerWidth) < 760; };
@@ -98,16 +92,12 @@
     for (var i = 0; i < D.sheets.length; i++) if (y >= D.sheets[i].y) k = i;
     return k;
   }
-  function wanted() { return PILL || narrow() || lang !== (D.lang || 'nl'); }
+  function wanted() { return narrow(); }
   function head() {
-    bL.innerHTML = lang === 'nl' ? '<b>nl</b> · en' : 'nl · <b>en</b>';
-    bL.setAttribute('aria-label', UI[lang].lang);
     bX.textContent = min ? '▴' : '▾';
     bX.setAttribute('aria-label', min ? UI[lang].show : UI[lang].close);
     bX.title = min ? UI[lang].show : UI[lang].close;
-    box.classList.toggle('min', min || PILL);
-    box.classList.toggle('pill', PILL);
-    if (PILL) bX.style.display = 'none';
+    box.classList.toggle('min', min);
     box.classList.toggle('touch', touch && narrow());
   }
   function fill(k, swap) {
@@ -125,19 +115,13 @@
   function update() {
     // a wall that opens with a gate (a full-screen invitation) keeps the layer away until it is open
     var g = document.getElementById('gate'), gated = g && !g.classList.contains('off') && getComputedStyle(g).display !== 'none';
-    var k = PILL ? 0 : sheetAt(), on = wanted() && k >= 0 && !gated;
-    if (PILL && D.end && wallY(0) >= D.end) on = false;
-    if (on && !PILL && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
+    var k = sheetAt(), on = wanted() && k >= 0 && !gated;
+    if (on && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
   function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
-  bL.addEventListener('click', function () {
-    var v = lang === 'nl' ? 'en' : 'nl';
-    if (window.NUNKI_SETLANG) window.NUNKI_SETLANG(v);
-    else { store('nunki:lang', v); setLang(v); try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: v })); } catch (e) {} }
-  });
-  // the language can also change elsewhere: the switch under the wall, or the wall itself
+  // the language changes with the switch top right
   addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 
