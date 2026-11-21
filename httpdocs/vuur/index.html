@@ -69,8 +69,106 @@
 @media print{.nunki-mark{display:none}}
 </style>
 <a class="nunki-mark" href="/" title="alle wanden" aria-label="vuur, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name"><span class="t-nl">vuur</span><span class="t-en" lang="en">fire</span></span></a>
-<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
+<style>
+.nunki-bar{position:fixed;z-index:61;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);display:flex;align-items:center;gap:8px;pointer-events:none}
+.nunki-bar>*{pointer-events:auto;position:relative!important;inset:auto!important;margin:0!important;flex:none}
+.nunki-lng{display:flex;align-items:center;height:34px;padding:0 13px;box-sizing:border-box;border:0;border-radius:17px;cursor:pointer;color:#2a251f;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+.nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
+.nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
+html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
+.nunki-lng:hover{background:rgba(251,248,239,.97)}
+.nunki-lng:hover span{opacity:.72}
+html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-lng:hover .l-en{opacity:1}
+.nunki-lng:focus-visible{outline:none;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+.nunki-bar .nunki-pill{display:flex!important;align-items:center;justify-content:center;gap:6px;height:34px!important;min-width:34px;padding:0 13px!important;box-sizing:border-box;
+  border:0!important;border-radius:17px!important;cursor:pointer;color:#2a251f!important;background:rgba(246,241,228,.93)!important;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55)!important;
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif!important;
+  letter-spacing:0!important;text-transform:lowercase!important;text-decoration:none!important;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease,color .3s ease,opacity .4s ease}
+.nunki-bar .nunki-pill:hover{background:rgba(251,248,239,.97)!important}
+.nunki-bar [hidden]{display:none!important}
+.nunki-bar .nunki-pill[aria-pressed="false"],.nunki-bar .nunki-pill.off{color:rgba(42,37,31,.52)!important}
+.nunki-bar .nunki-pill:focus-visible{outline:none!important;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)!important}
+@media (max-width:600px){.nunki-bar{gap:6px}.nunki-lng{padding:0 11px}.nunki-lng i{margin:2px 5px 0}.nunki-bar .nunki-pill{padding:0 11px!important;font-size:1rem!important}}
+@media (prefers-reduced-motion:reduce){.nunki-lng,.nunki-lng span{transition:none}}
+@media print{.nunki-bar{display:none}}
+</style><div class="nunki-bar"><button class="nunki-lng" type="button"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');function lab(){var en=window.NUNKI_LANG==='en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script>
 <!-- /nunki:mark -->
+<!-- nunki:taal -->
+<script>window.NUNKI_TAAL={"lang":"nl","tr":{"vuur":"fire","een muur over wat ons aansteekt":"a wall about what sets us alight","(je draagt een gloeiend kooltje · tik: een vonk · houd vast: vuurwerk)":"(you carry a glowing coal · tap: a spark · hold: fireworks)","(breng je vlam bij het doosje)":"(bring your flame to the box)","alles begint met een vonk":"everything begins with a spark","vier manieren om vuur te maken":"four ways to make fire","slaan":"striking","wrijven":"rubbing","persen":"pressing","bundelen":"focusing","de vonk komt uit het staal:":"the spark comes from the steel:","een gloeiend splintertje ijzer":"a glowing splinter of iron","hout op hout, tot het rookt":"wood on wood, until it smokes","in één klap":"in a single stroke","pers lucht snel samen:":"squeeze air fast:","ze wordt zo heet dat tondel gloeit":"it gets so hot that tinder glows","(zuidoost-azië, en de dieselmotor)":"(southeast asia, and the diesel engine)","in olympia wordt het vuur voor de spelen":"in olympia the fire for the games","nog altijd met zonlicht aangestoken":"is still lit with sunlight","en dan de lucifer, 1826":"and then the match, 1826","lucifer betekent lichtdrager:":"lucifer means light-bearer:","zo heette ook de morgenster":"it was also the name of the morning star","de mens is het enige dier dat vuur maakt":"humans are the only animals that make fire","(tik op een vel om het te proberen · wrijf snel heen en weer over de boog)":"(tap a sheet to try it · rub fast back and forth over the bow)","vier driehoeken":"four triangles","plato maakte vuur van vier driehoeken. de brandweer ook.":"plato made fire from four triangles. so does the fire brigade.","plato: vuur is gemaakt van viervlakjes,":"plato: fire is made of little tetrahedra,","de scherpste vorm. daarom prikt het.":"the sharpest shape. that is why it stings.","uitgevouwen":"unfolded","warmte":"heat","brandstof":"fuel","zuurstof":"oxygen","en daaronder: de kettingreactie":"and underneath: the chain reaction","de brandweer tekent het ook zo:":"the fire brigade draws it like this too:","een driehoek, en een vierde kant":"a triangle, and a fourth side","koelen":"cooling","haal de warmte weg":"take away the heat","smoren":"smothering","haal de lucht weg":"take away the air","uithongeren":"starving","haal de brandstof weg":"take away the fuel","de keten breken":"breaking the chain","met bluspoeder":"with extinguishing powder","(tik op de emmer of de blusser · raak met je vlam een punt van plato aan)":"(tap the bucket or the extinguisher · touch one of plato's points with your flame)","haal er één weg, en het vuur gaat uit":"take one away, and the fire goes out","de kaars":"the candle","de rand: het heetst, en bijna onzichtbaar":"the edge: the hottest, and almost invisible","geel licht: gloeiend roet, zo'n 1200 graden":"yellow light: glowing soot, some 1200 degrees","het donkere hart: was die verdampt":"the dark heart: wax turning to vapour","blauw: hier brandt het gas":"blue: here the gas burns","de pit zuigt de was omhoog":"the wick draws the wax up","een kommetje gesmolten was":"a little bowl of melted wax","er is geen natuurwet":"no law of nature","die niet meedoet in een kaars":"is missing from a candle","michael faraday, kerstlezing, 1860":"michael faraday, christmas lecture, 1860","zonder zwaartekracht":"without gravity","is een vlam een blauwe bol":"a flame is a blue ball","(tik: blaas hem uit · houd dan je vlam in de rook)":"(tap: blow it out · then hold your flame in the smoke)","een vlam is geen ding, maar iets dat gebeurt":"a flame is not a thing, but something that happens","alles erin wordt steeds vervangen, en de vorm blijft. zoals bij jou.":"everything in it is replaced all the time, and the shape stays. like you.","de grot":"the cave","chauvet, zo'n 36.000 jaar geleden":"chauvet, some 36,000 years ago","diep in de grot, waar geen daglicht komt,":"deep in the cave, where no daylight comes,","getekend bij het licht van een vlam.":"drawn by the light of a flame.","iemand blies rode oker om een hand: ik was hier":"someone blew red ochre around a hand: i was here","de bizon heeft acht poten:":"the bison has eight legs:","in het flakkeren gaat hij rennen":"in the flicker it starts to run","(beweeg je vlam langs de wand · tik: laat je hand achter)":"(move your flame along the wall · tap: leave your hand)","wanden vol tekeningen: ooit zag je ze alleen bij vuurlicht":"walls full of drawings: once you only saw them by firelight","bij het vuur":"by the fire","de jager":"the hunter","de zeven zusters":"the seven sisters","de grote beer":"the great bear","polly wiessner luisterde bij de ju/'hoansi in de kalahari:":"polly wiessner listened among the ju/'hoansi in the kalahari:","overdag ging het over werk, klachten en roddel.":"by day the talk was of work, complaints and gossip.","'s avonds bij het vuur ging het vooral over verhalen.":"in the evening by the fire it was mostly stories.","overal ter wereld":"all over the world","vertelt men over zeven zusters":"people tell of seven sisters","aan de hemel":"in the sky","(tik op het vuur)":"(tap the fire)","overdag praten we over werk, bij het vuur vertellen we verhalen":"by day we talk about work, by the fire we tell stories","de vonk slaat over":"the spark leaps across","wie zijn kaars aansteekt aan de mijne,":"he who lights his candle at mine","krijgt licht zonder dat het bij mij donker wordt":"receives light without darkening me","thomas jefferson, 1813, over ideeën":"thomas jefferson, 1813, on ideas","gelijk als van een geweldigen gedreven wind":"as of a rushing mighty wind","... verdeelde tongen als van vuur":"... cloven tongues like as of fire","handelingen 2:2-3":"acts 2:2-3","(breng je vlam bij een pit · tik om uit te blazen)":"(bring your flame to a wick · tap to blow out)","enthousiasme komt van het grieks entheos:":"enthusiasm comes from the greek entheos:","met een god vanbinnen":"with a god inside","het oudste indo-europees had twee woorden voor vuur:":"the oldest indo-european had two words for fire:","vuur als ding (daar komt ons woord vuur van)":"fire as a thing (that is where our word fire comes from)","en vuur dat leeft: agni, ignis":"and fire that lives: agni, ignis","vuur wordt niet minder als je het doorgeeft":"fire does not grow less when you pass it on","het langzame vuur":"the slow fire","ijs":"ice","een cavia":"a guinea pig","smeltwater":"meltwater","lavoisier en laplace, 1782:":"lavoisier and laplace, 1782:","een cavia in een mantel van ijs.":"a guinea pig in a coat of ice.","zijn warmte smolt het ijs, als een klein vuur.":"its warmth melted the ice, like a small fire.","in rust geef je":"at rest you give off","zo'n honderd watt warmte":"some hundred watts of heat","je hart maakt het sterkste veld van je lijf":"your heart makes the strongest field in your body","(blaas je vlam in hart of buik · tik: het zingt)":"(blow your flame into heart or belly · tap: it sings)","munt":"mint","een kaars, uitgegaan":"a candle, gone out","17 augustus 1771: priestley zet munt":"17 august 1771: priestley puts mint","onder een stolp waarin een kaars uitging.":"under a bell jar where a candle went out.","op de 27ste brandt er weer een kaars in.":"on the 27th a candle burns in it again.","(tik op de kaars onder de stolp)":"(tap the candle under the bell jar)","ademen is een langzaam vuur":"breathing is a slow fire","lavoisier: de adem is een langzame verbranding, net als in een lamp of een kaars":"lavoisier: breath is a slow combustion, just like in a lamp or a candle","wat vuur maakt":"what fire makes","prometheus stal het vuur":"prometheus stole the fire","en droeg het weg":"and carried it away","in een holle venkelstengel":"in a hollow fennel stalk","hesiodos":"hesiod","alle kunsten van de mensen":"all the arts of mankind","komen van prometheus":"come from prometheus","aischylos":"aeschylus","het oudste gebakken beeldje,":"the oldest fired figurine,","zo'n 30.000 jaar oud: dolní věstonice.":"some 30,000 years old: dolní věstonice.","veel beeldjes daar sprongen in het vuur,":"many figurines there burst in the fire,","misschien met opzet":"perhaps on purpose","donkerrood":"dark red","kersrood":"cherry red","oranje":"orange","geel":"yellow","wit":"white","de smid leest de hitte af aan de kleur.":"the smith reads the heat from the colour.","het ijzer zelf werd ooit in een ster gesmeed.":"the iron itself was once forged in a star.","(houd je vlam op het ijzer, en tik om te smeden)":"(hold your flame to the iron, and tap to forge)","adem":"breath","glas: zand, vuur en adem":"glass: sand, fire and breath","(tik: blaas)":"(tap: blow)","vuur maakt het zachte hard, en het harde zacht":"fire makes the soft hard, and the hard soft","vuurwerk":"fireworks","(breng je vlam bij een lont, en kijk omhoog)":"(bring your flame to a fuse, and look up)","huo yao: vuurmedicijn":"huo yao: fire medicine","taoïstische alchemisten in china":"taoist alchemists in china","zochten een middel tegen de dood.":"were looking for a cure for death.","rond 850 waarschuwt een van hun boeken:":"around 850 one of their books warns:","wie zwavel, salpeter en honing verhit,":"whoever heats sulphur, saltpetre and honey","verbrandt zijn handen en zijn gezicht,":"burns their hands and face,","en soms brandt het hele huis af.":"and sometimes the whole house burns down.","het eerste buskruit":"the first gunpowder","vlamkleuren":"flame colours","elk metaal kleurt een vlam":"every metal colours a flame","op zijn eigen manier. zo vonden":"in its own way. that is how","bunsen en kirchhoff in 1860 en 1861":"bunsen and kirchhoff in 1860-61","twee nieuwe metalen, aan hun kleur:":"found two new metals by colour:","cesium (hemelsblauw)":"caesium (sky blue)","en rubidium (dieprood)":"and rubidium (deep red)","li":"li","na":"na","ca":"ca","sr":"sr","ba":"ba","cu":"cu","(houd je vlam boven een schaaltje)":"(hold your flame over a dish)","strontium":"strontium","rood":"red","barium":"barium","groen":"green","koper":"copper","blauw":"blue","natrium":"sodium","houtskool":"charcoal","goud":"gold","blauw is het moeilijkst: wordt het te heet, dan valt het blauw van koper uiteen":"blue is the hardest: get it too hot, and copper's blue falls apart","een sterretje: ijzervijlsel":"a sparkler: iron filings","op een draad. de vonken vertakken":"on a wire. the sparks branch","door de koolstof in het ijzer.":"because of the carbon in the iron.","(steek het aan, en schrijf in de lucht)":"(light it, and write in the air)","ze zochten het eeuwige leven, en vonden buskruit":"they looked for eternal life, and found gunpowder","de zingende buis":"the singing tube","leiden, 1859:":"leiden, 1859:","p.l. rijke verhit een gaasje":"p.l. rijke heats a little gauze","in een open glazen buis,":"in an open glass tube,","en de buis begint te zingen.":"and the tube begins to sing.","de lucht trilt":"the air vibrates","warme lucht stijgt":"warm air rises","het gaasje":"the gauze","georges kastner bouwde rond 1870":"around 1870 georges kastner built","een orgel van zingende vlammen:":"an organ of singing flames:","de pyrofoon, het vuurorgel":"the pyrophone, the fire organ","(houd je vlam onder een buis, of tik erop)":"(hold your flame under a tube, or tap it)","warmte wordt geluid":"heat becomes sound","na de brand":"after the fire","wilgenroosje bloeit het eerst op verbrande grond.":"fireweed is the first to bloom on burnt ground.","in londen bloeide het na de oorlog op de puinhopen":"in london it bloomed on the rubble after the war","de kegels van de draaiden zijn":"the cones of the lodgepole pine are","dichtgeplakt met hars. pas in de hitte":"sealed shut with resin. only in the heat","van een bosbrand gaan ze open.":"of a forest fire do they open.","(houd je vlam bij de kegel)":"(hold your flame to the cone)","shiva danst in een ring van vuur:":"shiva dances in a ring of fire:","in de ene hand de trommel waarmee alles begint,":"in one hand the drum with which all begins,","in de andere het vuur waarmee het eindigt":"in the other the fire with which it ends","1963: uit zee rijst":"1963: out of the sea rises","een nieuw eiland, van vuur.":"a new island, of fire.","surtsey, naar surtr, de vuurreus.":"surtsey, after surtr, the fire giant.","twee jaar later: de eerste plant.":"two years later: the first plant.","(tik op de vulkaan)":"(tap the volcano)","sommige zaden wachten op vuur":"some seeds wait for fire","koud licht":"cold light","een vuurvliegje maakt licht":"a firefly makes light","bijna zonder warmte: koud licht":"almost without heat: cold light","in de mangroven van maleisië":"in the mangroves of malaysia","knipperen ze met duizenden tegelijk":"they blink in their thousands at once","elk vliegje let op zijn buren.":"each fly watches its neighbours.","(kom je met je vlam te dichtbij, dan raken ze de tel kwijt)":"(bring your flame too close, and they lose count)","duizenden lichtjes, en niemand die de maat aangeeft":"thousands of lights, and no one keeping time","gloed":"glow","de zon brandt niet, ze smeedt.":"the sun does not burn, she forges.","en toch komt bijna al ons vuur van haar:":"and yet almost all our fire comes from her:","hout is zonlicht dat een boom bewaarde,":"wood is sunlight a tree kept,","steenkool is zonlicht van vóór de dinosaurussen.":"coal is sunlight from before the dinosaurs.","de wereld is een altijd levend vuur,":"the world is an ever-living fire,","dat in maten ontbrandt":"kindling in measures","en in maten dooft":"and going out in measures","heraclitus, 2500 jaar geleden":"heraclitus, 2500 years ago","het licht van al zijn zomers":"the light of all its summers","(blaas erop: beweeg er snel overheen)":"(blow on it: move quickly over it)","elk vuur gaat uit":"every fire goes out","en ergens slaat een vonk over":"and somewhere a spark leaps across","vuur · van vonk tot as · 2026":"fire · from spark to ash · 2026","(mijn echte handtekening)":"(my real signature)"},"re":[]};</script>
+<script>/* nunki:taal, door scripts/build.py direct na het label gezet in elke wand die
+   een vertaalbestand heeft in scripts/taal/<slug>.json. Niet in de wanden
+   bewerken, wel hier.
+
+   De getekende tekst van een wand in de gekozen taal. De wand haalt elke zin
+   die hij gaat tekenen door window.NUNKI_T(zin): is de gekozen taal (nunki:lang)
+   gelijk aan die van de wand, dan komt de zin ongewijzigd terug, anders de
+   vertaling. Een wand tekent zijn tekst één keer, dus bij een taalwissel laadt
+   de pagina opnieuw en springt terug naar dezelfde plek (tenzij live: true;
+   dan regelt de wand het zelf via het event 'nunki:lang').
+
+   Gegevens (window.NUNKI_TAAL):
+   { lang: 'nl', tr: { 'zin': 'sentence', ... },
+     re: [ ['^(\\d+) jaar$', '$1 years'], ... ],   // voor zinnen met een getal
+     live: false }
+   ?trmiss in het adres: window.NUNKI_TMISS houdt bij welke zinnen nog geen
+   vertaling hebben (om te testen). */
+(function () {
+  'use strict';
+  var D = window.NUNKI_TAAL || {}, W = D.lang || 'nl', M = D.tr || {}, V = {}, miss = {};
+  var X = (D.re || []).map(function (r) { return [new RegExp(r[0]), r[1]]; });
+  for (var k in M) V[M[k]] = 1;
+  var other = function () { return (window.NUNKI_LANG || 'nl') !== W; };
+  window.NUNKI_T = function (s) {
+    if (typeof s !== 'string' || !other() || V[s] === 1) return s;
+    var v = M[s];
+    if (v != null) return v;
+    var t = s.trim();
+    if (t && t !== s && M[t] != null) return s.replace(t, M[t]);
+    for (var i = 0; i < X.length; i++) if (X[i][0].test(s)) { var o = s.replace(X[i][0], X[i][1]); V[o] = 1; return o; }
+    // numbers without words: thousands and decimals the way the other language writes them (22.000 / 22,000, 1,618 / 1.618)
+    if (!/[a-z]/i.test(s) && /\d[.,]\d/.test(s)) { var n = s.replace(/(\d)([.,])(?=\d)/g, function (m, d, c) { return d + (c === '.' ? ',' : '.'); }); V[n] = 1; return n; }
+    if (/[a-zà-ÿ]{2}/i.test(s)) miss[s] = (miss[s] || 0) + 1;
+    return s;
+  };
+  window.NUNKI_TMISS = miss;
+  window.NUNKI_TWALL = W;
+
+  // the wall drew its words once: a new language means drawing it again, from the same place
+  var KEY = 'nunki:ry';
+  addEventListener('nunki:lang', function () {
+    if (D.live) return;
+    var h = Math.max(1, document.documentElement.scrollHeight);
+    try { sessionStorage.setItem(KEY, JSON.stringify({ p: location.pathname, f: scrollY / h })); } catch (e) {}
+    location.reload();
+  });
+  var r = null;
+  try { r = JSON.parse(sessionStorage.getItem(KEY)); sessionStorage.removeItem(KEY); } catch (e) {}
+  // the visitor was already inside: a wall with a gate can skip it
+  if (r && r.p === location.pathname) window.NUNKI_RELOADED = true;
+  if (r && r.p === location.pathname && r.f > 0) {
+    var moved = false, go = function () { if (!moved) scrollTo(0, r.f * document.documentElement.scrollHeight); };
+    var stop = function () { moved = true; };
+    addEventListener('load', function () {
+      go();
+      [120, 400, 900, 1600].forEach(function (t) { setTimeout(go, t); });
+      setTimeout(function () {
+        addEventListener('wheel', stop, { passive: true, once: true });
+        addEventListener('touchstart', stop, { passive: true, once: true });
+        addEventListener('keydown', stop, { once: true });
+      }, 0);
+    });
+  }
+})();
+</script>
+<!-- /nunki:taal -->
 <!-- nunki:touch -->
 <script>window.NUNKI_CFG={"hand": "move", "motion": true, "shake": "own"};</script>
 <script>/* nunki:touch, door scripts/build.py inline in elke wand gezet (direct na <body>,
@@ -782,8 +880,11 @@ G('·',.24,[[.08,.68],[.12,.72]]);
 G('(',.36,[[.3,.02],[.14,.36],[.13,.78],[.28,1.14]]);
 G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
 G(' ',.42);
-function measure(t,sz){let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+// the words in the chosen language (nunki:taal gives NUNKI_T; without it, as written)
+const TRL=s=>window.NUNKI_T?window.NUNKI_T(s):s;
+function measure(t,sz){t=TRL(t);let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
 function write(R,t,x,y,sz,o={}){
+  t=TRL(t);
   const a=o.a??.7,col=o.col;
   let px=o.cen?x-measure(t,sz)/2:x;
   const ph=rd(R,0,7);
@@ -3808,10 +3909,10 @@ if(!STILL)requestAnimationFrame(tick);
 
    De leeslaag: de zinnen van het vel dat je ziet, in gewone, leesbare letters.
    - Taal kies je één keer voor de hele site: 'nunki:lang' (nl standaard, en),
-     ook via ?lang=en of ?lang=nl. Het knopje nl · en zit in de leeslaag.
-   - Op een telefoon (smal scherm) staat de laag aan: daar is de getekende
-     tekst te klein. Op een groot scherm alleen als je taal anders is dan de
-     taal van de wand. Inklappen kan; dat wordt onthouden ('nunki:lees').
+     met de knop rechtsboven (nunki:mark) of ?lang=en / ?lang=nl.
+   - Alleen op een telefoon (smal scherm): daar is de getekende tekst te klein.
+     Op grotere schermen vertaalt de wand zijn eigen tekst (nunki:taal).
+     Inklappen kan; dat wordt onthouden ('nunki:lees').
    - Welk vel in beeld is, vraagt de laag aan de wand: window.NUNKI_Y(py) geeft
      de hoogte in wandeenheden (1600 breed) op py pixels van de bovenkant van
      het scherm. Zonder die functie wordt hij berekend voor een wand die de
@@ -3824,9 +3925,7 @@ if(!STILL)requestAnimationFrame(tick);
 (function () {
   'use strict';
   var D = window.NUNKI_LEES;
-  if (!D || !D.sheets) return;
-  // without sheets the layer is only the language switch, for walls whose own text changes language
-  var PILL = !D.sheets.length;
+  if (!D || !D.sheets || !D.sheets.length) return;
   var q = new URLSearchParams(location.search);
   if (q.has('fast') || q.has('still')) return;
   var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
@@ -3847,15 +3946,12 @@ if(!STILL)requestAnimationFrame(tick);
     '@media (max-width:760px){.nunki-lees{font-size:14px;line-height:1.38;padding:7px 11px 9px}.nunki-lees .nl-t{font-size:.98rem}}' +
     '@media (min-width:900px){.nunki-lees:not(.touch){left:50%;transform:translateX(-50%)}.nunki-lees:not(.touch).gone{transform:translate(-50%,10px)}}' +
     '.nunki-lees.gone{opacity:0;transform:translateY(10px);pointer-events:none}' +
-    '.nunki-lees.pill{left:clamp(10px,1.5vw,22px)!important;transform:none!important}.nunki-lees.pill.gone{transform:translateY(10px)!important}' +
     '.nunki-lees .nl-h{display:flex;align-items:center;gap:8px;margin:0 0 3px}' +
     '.nunki-lees .nl-t{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;' +
       'font:400 1.02rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next",sans-serif;color:#ac5036}' +
     '.nunki-lees .nl-b p{margin:0}.nunki-lees .nl-b p+p{margin-top:3px}' +
     '.nunki-lees .nl-b{transition:opacity .3s ease}.nunki-lees .nl-b.swap{opacity:0}' +
     '.nunki-lees button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:3px 5px;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}' +
-    '.nunki-lees .nl-lang{font-size:.82rem;letter-spacing:.04em;color:rgba(42,37,31,.5)}' +
-    '.nunki-lees .nl-lang b{font-weight:600;color:#2a251f}' +
     '.nunki-lees .nl-x{font-size:1rem;line-height:1;color:rgba(42,37,31,.5);padding:3px 6px}' +
     '.nunki-lees button:focus-visible{outline:2px solid #ac5036;outline-offset:1px}' +
     '.nunki-lees.min{width:auto;padding:4px 6px;border-radius:17px}' +
@@ -3868,17 +3964,16 @@ if(!STILL)requestAnimationFrame(tick);
   var box = document.createElement('aside');
   box.className = 'nunki-lees gone';
   box.setAttribute('aria-live', 'polite');
-  box.innerHTML = '<div class="nl-h"><span class="nl-t"></span><button type="button" class="nl-lang"></button>' +
-    '<button type="button" class="nl-x"></button></div><div class="nl-b"></div>';
-  var elT = box.querySelector('.nl-t'), elB = box.querySelector('.nl-b'), bL = box.querySelector('.nl-lang'), bX = box.querySelector('.nl-x');
+  box.innerHTML = '<div class="nl-h"><span class="nl-t"></span><button type="button" class="nl-x"></button></div><div class="nl-b"></div>';
+  var elT = box.querySelector('.nl-t'), elB = box.querySelector('.nl-b'), bX = box.querySelector('.nl-x');
   // nothing on this card reaches the wall beneath it
   ['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(function (t) {
     box.addEventListener(t, function (e) { e.stopPropagation(); }, { passive: true });
   });
 
   var UI = {
-    nl: { open: 'tekst', close: 'tekst inklappen', show: 'tekst tonen', lang: 'taal: nederlands. wissel naar engels' },
-    en: { open: 'text', close: 'fold the text away', show: 'show the text', lang: 'language: english. switch to dutch' }
+    nl: { close: 'tekst inklappen', show: 'tekst tonen' },
+    en: { close: 'fold the text away', show: 'show the text' }
   };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var narrow = function () { return Math.min(innerWidth, screen.width || innerWidth) < 760; };
@@ -3902,16 +3997,12 @@ if(!STILL)requestAnimationFrame(tick);
     for (var i = 0; i < D.sheets.length; i++) if (y >= D.sheets[i].y) k = i;
     return k;
   }
-  function wanted() { return PILL || narrow() || lang !== (D.lang || 'nl'); }
+  function wanted() { return narrow(); }
   function head() {
-    bL.innerHTML = lang === 'nl' ? '<b>nl</b> · en' : 'nl · <b>en</b>';
-    bL.setAttribute('aria-label', UI[lang].lang);
     bX.textContent = min ? '▴' : '▾';
     bX.setAttribute('aria-label', min ? UI[lang].show : UI[lang].close);
     bX.title = min ? UI[lang].show : UI[lang].close;
-    box.classList.toggle('min', min || PILL);
-    box.classList.toggle('pill', PILL);
-    if (PILL) bX.style.display = 'none';
+    box.classList.toggle('min', min);
     box.classList.toggle('touch', touch && narrow());
   }
   function fill(k, swap) {
@@ -3929,19 +4020,13 @@ if(!STILL)requestAnimationFrame(tick);
   function update() {
     // a wall that opens with a gate (a full-screen invitation) keeps the layer away until it is open
     var g = document.getElementById('gate'), gated = g && !g.classList.contains('off') && getComputedStyle(g).display !== 'none';
-    var k = PILL ? 0 : sheetAt(), on = wanted() && k >= 0 && !gated;
-    if (PILL && D.end && wallY(0) >= D.end) on = false;
-    if (on && !PILL && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
+    var k = sheetAt(), on = wanted() && k >= 0 && !gated;
+    if (on && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
   function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
-  bL.addEventListener('click', function () {
-    var v = lang === 'nl' ? 'en' : 'nl';
-    if (window.NUNKI_SETLANG) window.NUNKI_SETLANG(v);
-    else { store('nunki:lang', v); setLang(v); try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: v })); } catch (e) {} }
-  });
-  // the language can also change elsewhere: the switch under the wall, or the wall itself
+  // the language changes with the switch top right
   addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 

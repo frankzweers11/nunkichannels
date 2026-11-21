@@ -1,0 +1,157 @@
+{
+  "_comment": "Getekende tekst van getij in het Engels. Sleutel = de zin zoals de wand hem tekent (nl), waarde = de vertaling.",
+  "lang": "nl",
+  "tr": {
+    "getij": "tide",
+    "een muur van water, van binnenuit": "a wall of water, from the inside",
+    "raak het water aan": "touch the water",
+    "wat een golf achterlaat": "what a wave leaves behind",
+    "niets blijft, maar alles laat iets": "nothing stays, but everything leaves something",
+    "komt": "comes",
+    "gaat": "goes",
+    "twee keer per dag, zonder ooit te weten waarheen": "twice a day, never knowing where to",
+    "scholekster": "oystercatcher",
+    "wulp": "curlew",
+    "tureluur": "redshank",
+    "kluut": "avocet",
+    "grutto": "godwit",
+    "kievit": "lapwing",
+    "wat ik tegenkwam": "what i came across",
+    "schelp": "shell",
+    "zeewier": "seaweed",
+    "krab": "crab",
+    "kwal": "jellyfish",
+    "veer": "feather",
+    "zeester": "starfish",
+    "touw": "rope",
+    "fles": "bottle",
+    "de dijk houdt": "the dyke holds",
+    "tot hij het niet meer hoeft": "until it no longer has to",
+    "houd je licht bij het logboek": "hold your light to the logbook",
+    "tot waar het licht ophoudt": "down to where the light ends",
+    "en dan nog verder": "and further still",
+    "alles beweegt": "everything moves",
+    "ook wat vastzat": "even what was stuck",
+    "tel de seconden tot de donder: drie tellen is ongeveer een kilometer": "count the seconds to the thunder: three counts is about a kilometre",
+    "de maan trekt": "the moon pulls",
+    "ademt de zee": "the sea breathes",
+    "hier draait door twee bulten water: twee keer hoog, twee keer laag": "the earth turns through two bulges of water: twice high, twice low",
+    "hoog": "high",
+    "laag": "low",
+    "beweeg opzij: een maand in één keer": "move sideways: a month at once",
+    "ver weg is ook thuis": "far away is home too",
+    "tik op het slik": "tap the mud",
+    "het water komt terug": "the water comes back",
+    "zoals altijd, niet precies hetzelfde": "as always, never quite the same",
+    "getij · van binnenuit · 2026": "tide · from the inside · 2026",
+    "(mijn echte handtekening)": "(my real signature)",
+    "tussen spring- en doodtij": "between spring and neap tide",
+    "springtij": "spring tide",
+    "doodtij": "neap tide",
+    "nieuwe maan": "new moon",
+    "eerste kwartier": "first quarter",
+    "volle maan": "full moon",
+    "laatste kwartier": "last quarter",
+    "wassende maan": "waxing moon",
+    "afnemende maan": "waning moon",
+    "vandaag is het nieuwe maan": "today is new moon",
+    "een zeehond. hij kwam kijken omdat je stil was": "a seal. it came to look because you were still",
+    "wie dit vindt:": "whoever finds this:",
+    "ik was hier ook": "i was here too",
+    "gegooid bij vloed,": "thrown at high tide,",
+    "gevonden bij eb": "found at low tide",
+    "de zee leest niet,": "the sea does not read,",
+    "maar ze bewaart alles": "but she keeps everything",
+    "1906 gegooid, 2015 gevonden": "thrown 1906, found 2015",
+    "op amrum: 108 jaar onderweg": "on amrum: 108 years at sea",
+    "hier was ik gelukkig.": "i was happy here.",
+    "dat wilde ik even kwijt": "i just wanted to say so",
+    "schrijf terug.": "write back.",
+    "de zee bezorgt het, ooit": "the sea will deliver it, someday",
+    "alle acht gevonden": "all eight found",
+    "31 januari 1953, avond: noordwest, storm": "31 january 1953, evening: northwest, gale",
+    "springtij en storm komen samen": "spring tide and storm arrive together",
+    "nacht: het water staat tegen de kruin": "night: the water reaches the crest",
+    "1 februari: elders breken de dijken": "1 february: elsewhere the dykes break",
+    "1836 mensen komen om": "1836 people die",
+    "daarna: de deltawerken": "afterwards: the delta works",
+    "vannacht: kalm. de schapen slapen.": "tonight: calm. the sheep are asleep.",
+    "dit was je eerste getij hier": "this was your first tide here",
+    "je hebt het water nog niet aangeraakt": "you have not touched the water yet",
+    "hier": "here"
+  },
+  "re": [
+    [
+      "^vandaag is het nieuwe maan · springtij$",
+      "today is new moon · spring tide"
+    ],
+    [
+      "^de maan is 1 dag oud · springtij$",
+      "the moon is 1 day old · spring tide"
+    ],
+    [
+      "^de maan is (\\d+) dagen oud · springtij$",
+      "the moon is $1 days old · spring tide"
+    ],
+    [
+      "^vandaag is het nieuwe maan · doodtij$",
+      "today is new moon · neap tide"
+    ],
+    [
+      "^de maan is 1 dag oud · doodtij$",
+      "the moon is 1 day old · neap tide"
+    ],
+    [
+      "^de maan is (\\d+) dagen oud · doodtij$",
+      "the moon is $1 days old · neap tide"
+    ],
+    [
+      "^vandaag is het nieuwe maan · tussen spring- en doodtij$",
+      "today is new moon · between spring and neap tide"
+    ],
+    [
+      "^de maan is 1 dag oud · tussen spring- en doodtij$",
+      "the moon is 1 day old · between spring and neap tide"
+    ],
+    [
+      "^de maan is (\\d+) dagen oud · tussen spring- en doodtij$",
+      "the moon is $1 days old · between spring and neap tide"
+    ],
+    [
+      "^gevonden: (\\d+) van 8$",
+      "found: $1 of 8"
+    ],
+    [
+      "^vandaag: nieuwe maan$",
+      "today: new moon"
+    ],
+    [
+      "^vandaag: eerste kwartier$",
+      "today: first quarter"
+    ],
+    [
+      "^vandaag: volle maan$",
+      "today: full moon"
+    ],
+    [
+      "^vandaag: laatste kwartier$",
+      "today: last quarter"
+    ],
+    [
+      "^vandaag: wassende maan$",
+      "today: waxing moon"
+    ],
+    [
+      "^vandaag: afnemende maan$",
+      "today: waning moon"
+    ],
+    [
+      "^dit is je (\\d+)e getij hier$",
+      "this is tide number $1 for you here"
+    ],
+    [
+      "^je raakte het water (\\d+) keer aan$",
+      "you touched the water $1 times"
+    ]
+  ]
+}

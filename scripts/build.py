@@ -53,6 +53,10 @@ LEES_START = "<!-- nunki:lees -->"
 LEES_END = "<!-- /nunki:lees -->"
 LEES_JS = Path(__file__).resolve().parent / "lees.js"
 LEES_DIR = Path(__file__).resolve().parent / "lees"
+TAAL_START = "<!-- nunki:taal -->"
+TAAL_END = "<!-- /nunki:taal -->"
+TAAL_JS = Path(__file__).resolve().parent / "taal.js"
+TAAL_DIR = Path(__file__).resolve().parent / "taal"
 I18N_JSON = Path(__file__).resolve().parent / "i18n.json"
 I18N = json.loads(I18N_JSON.read_text(encoding="utf-8")) if I18N_JSON.is_file() else {"site": {}, "pages": {}}
 
@@ -413,6 +417,9 @@ def clean_for_shot(html: str) -> str:
     html = re.sub(
         re.escape(LEES_START) + r".*?" + re.escape(LEES_END), "", html, flags=re.DOTALL
     )
+    html = re.sub(
+        re.escape(TAAL_START) + r".*?" + re.escape(TAAL_END), "", html, flags=re.DOTALL
+    )
     # the language still has to be known (?lang= in the shot's address), so that script stays
     html = re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + f"<script>{LANG_JS}</script>", html, count=1, flags=re.IGNORECASE)
     return strip_julius(html)
@@ -584,10 +591,6 @@ NAV_CSS = """
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
 .nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
 .nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
-.nunki-lang{display:block;margin:14px auto 0;padding:4px 10px;border:0;border-radius:12px;background:none;cursor:pointer;
-  font:400 .86rem/1.2 "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.04em;color:var(--muted);-webkit-tap-highlight-color:transparent}
-.nunki-lang b{font-weight:600;color:var(--ink)}
-.nunki-lang:focus-visible{outline:2px solid var(--clay);outline-offset:1px}
 __LANGCSS__
 .nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
   color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);
@@ -690,23 +693,9 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     a.innerHTML = LOGO + '<span class="nm-name"></span>';
     a.querySelector('.nm-name').textContent = DATA.name;
     home.appendChild(a);
-    // the language of the whole site, chosen once
-    var sw = el('button', 'nunki-lang');
-    sw.type = 'button';
-    var paint = function () {
-      var en = window.NUNKI_LANG === 'en';
-      sw.innerHTML = en ? 'nl · <b>en</b>' : '<b>nl</b> · en';
-      sw.setAttribute('aria-label', T('lang')[en ? 'en' : 'nl']);
-      nav.setAttribute('aria-label', T('nav')[en ? 'en' : 'nl']);
-    };
+    var paint = function () { nav.setAttribute('aria-label', T('nav')[window.NUNKI_LANG === 'en' ? 'en' : 'nl']); };
     paint();
-    sw.addEventListener('click', function () {
-      var v = window.NUNKI_LANG === 'en' ? 'nl' : 'en';
-      if (window.NUNKI_SETLANG) window.NUNKI_SETLANG(v);
-      else { try { localStorage.setItem('nunki:lang', v); } catch (e) {} location.reload(); }
-    });
     addEventListener('nunki:lang', paint);
-    home.appendChild(sw);
     sheet.appendChild(home);
     nav.appendChild(sheet);
     document.body.appendChild(nav);
@@ -781,6 +770,59 @@ MARK_JS = (
 )
 
 
+# Rechtsboven, op dezelfde hoogte en in dezelfde stijl als het label linksboven:
+# de taalwissel, en daarnaast de eigen knoppen van een wand (geluid, film, bewaard).
+# Een wand zet data-nunki-bar op zo'n knop, of roept NUNKI_BAR(el) aan; de knop
+# schuift dan links naast de taalwissel in de rij.
+BAR_CSS = """
+.nunki-bar{position:fixed;z-index:61;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);display:flex;align-items:center;gap:8px;pointer-events:none}
+.nunki-bar>*{pointer-events:auto;position:relative!important;inset:auto!important;margin:0!important;flex:none}
+.nunki-lng{display:flex;align-items:center;height:34px;padding:0 13px;box-sizing:border-box;border:0;border-radius:17px;cursor:pointer;color:#2a251f;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+.nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
+.nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
+html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
+.nunki-lng:hover{background:rgba(251,248,239,.97)}
+.nunki-lng:hover span{opacity:.72}
+html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-lng:hover .l-en{opacity:1}
+.nunki-lng:focus-visible{outline:none;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+.nunki-bar .nunki-pill{display:flex!important;align-items:center;justify-content:center;gap:6px;height:34px!important;min-width:34px;padding:0 13px!important;box-sizing:border-box;
+  border:0!important;border-radius:17px!important;cursor:pointer;color:#2a251f!important;background:rgba(246,241,228,.93)!important;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55)!important;
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif!important;
+  letter-spacing:0!important;text-transform:lowercase!important;text-decoration:none!important;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease,color .3s ease,opacity .4s ease}
+.nunki-bar .nunki-pill:hover{background:rgba(251,248,239,.97)!important}
+.nunki-bar [hidden]{display:none!important}
+.nunki-bar .nunki-pill[aria-pressed="false"],.nunki-bar .nunki-pill.off{color:rgba(42,37,31,.52)!important}
+.nunki-bar .nunki-pill:focus-visible{outline:none!important;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)!important}
+@media (max-width:600px){.nunki-bar{gap:6px}.nunki-lng{padding:0 11px}.nunki-lng i{margin:2px 5px 0}.nunki-bar .nunki-pill{padding:0 11px!important;font-size:1rem!important}}
+@media (prefers-reduced-motion:reduce){.nunki-lng,.nunki-lng span{transition:none}}
+@media print{.nunki-bar{display:none}}
+"""
+
+BAR_HTML = (
+    '<div class="nunki-bar"><button class="nunki-lng" type="button">'
+    '<span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div>'
+)
+
+BAR_JS = (
+    "(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');"
+    "function lab(){var en=window.NUNKI_LANG==='en';"
+    "k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');"
+    "k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);"
+    "k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});"
+    "['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});"
+    "window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};"
+    "function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}"
+    "if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();"
+)
+
+
 def mark_block(page: dict) -> str:
     """Het vaste label linksboven: het logo en de naam van de wand, en een weg naar huis."""
     name = esc(page["title"])
@@ -789,7 +831,8 @@ def mark_block(page: dict) -> str:
         f"{MARK_START}\n<script>{LANG_JS}</script>\n<style>{MARK_CSS}</style>\n"
         f'<a class="nunki-mark" href="/" title="alle wanden" aria-label="{name}, op nunkichannels. naar alle wanden">'
         f'{LOGO_SVG}<span class="nm-name">{bi(b["nl"]["title"], b["en"]["title"])}</span></a>\n'
-        f"<script>{MARK_JS}</script>\n{MARK_END}"
+        f"<style>{BAR_CSS}</style>{BAR_HTML}\n"
+        f"<script>{MARK_JS}{BAR_JS}</script>\n{MARK_END}"
     )
 
 
@@ -840,6 +883,30 @@ def inject_touch(html: str, block: str) -> str:
         if not m:
             return html
         i = m.end()
+    return html[:i] + "\n" + block + html[i:]
+
+
+def taal_block(page: dict) -> str:
+    """De getekende tekst van een wand in de andere taal, uit scripts/taal/<slug>.json."""
+    src = TAAL_DIR / f"{page['slug']}.json"
+    if not src.is_file():
+        return ""
+    data = json.loads(src.read_text(encoding="utf-8"))
+    data = {k: v for k, v in data.items() if not k.startswith("_")}
+    js = TAAL_JS.read_text(encoding="utf-8")
+    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return f"{TAAL_START}\n<script>window.NUNKI_TAAL={payload};</script>\n<script>{js}</script>\n{TAAL_END}"
+
+
+def inject_taal(html: str, block: str) -> str:
+    """Direct na het label, vóór de eigen scripts van de wand."""
+    html = re.sub(r"\s*" + re.escape(TAAL_START) + r".*?" + re.escape(TAAL_END), "", html, flags=re.DOTALL)
+    if not block:
+        return html
+    i = html.find(MARK_END)
+    if i == -1:
+        return html
+    i += len(MARK_END)
     return html[:i] + "\n" + block + html[i:]
 
 
@@ -1129,6 +1196,7 @@ def main() -> None:
         html = inject_seo(html, seo_block(page, html, seo_text) if seo_text else "")
         html = inject_mark(html, mark_block(page))
         html = inject_touch(html, touch_block(page))
+        html = inject_taal(html, taal_block(page))
         html = inject_nav(html, nav_block())
         write_public(html_path, inject_lees(html, lees_block(page)))
 
@@ -1162,7 +1230,8 @@ def main() -> None:
             start += len(items)
             counts.append(bi(f"{len(items)} {series_label(key, 'nl')}", f"{len(items)} {series_label(key, 'en')}"))
         html = replace_block(html, "count", " · ".join(counts))
-        html = replace_block(html, "lang", f"<script>{LANG_JS}</script><style>{LANG_CSS}</style>")
+        html = replace_block(html, "lang", f"<script>{LANG_JS}</script><style>{LANG_CSS}{BAR_CSS}</style>")
+        html = replace_block(html, "bar", f"{BAR_HTML}<script>{BAR_JS}</script>")
         write_public(
             index_path,
             inject_social(html, social_block(home, site, is_home=True)),

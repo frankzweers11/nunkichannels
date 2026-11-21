@@ -51,10 +51,6 @@
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
 .nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
 .nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
-.nunki-lang{display:block;margin:14px auto 0;padding:4px 10px;border:0;border-radius:12px;background:none;cursor:pointer;
-  font:400 .86rem/1.2 "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.04em;color:var(--muted);-webkit-tap-highlight-color:transparent}
-.nunki-lang b{font-weight:600;color:var(--ink)}
-.nunki-lang:focus-visible{outline:2px solid var(--clay);outline-offset:1px}
 html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
 .nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
   color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);

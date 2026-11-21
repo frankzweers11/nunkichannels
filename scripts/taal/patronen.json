@@ -1,0 +1,313 @@
+{
+  "_comment": "Getekende tekst van patronen in het Engels. Sleutel = de zin zoals de wand hem tekent (nl), waarde = de vertaling.",
+  "lang": "nl",
+  "tr": {
+    "patronen": "patterns",
+    "een muur over getal en vorm": "a wall about number and shape",
+    "één": "one",
+    "zes keer past de straal erin": "the radius fits six times",
+    "alles begint met een punt": "everything begins with a point",
+    "een punt is wat geen delen heeft · euclides": "a point is that which has no part · euclid",
+    "tik op het zwart: een punt wordt een bloem · elk getal heeft een toon": "tap the black: a point becomes a flower · every number has a tone",
+    "twee": "two",
+    "het oog": "the eye",
+    "de vis": "the fish",
+    "een cel wordt twee": "one cell becomes two",
+    "plus en min": "plus and minus",
+    "twee cirkels, elk door het hart van de ander": "two circles, each through the heart of the other",
+    "(beweeg over de twee cirkels: ze klinken samen)": "(move over the two circles: they sound together)",
+    "drie": "three",
+    "de eerste vorm": "the first shape",
+    "die een ruimte omsluit": "that encloses a space",
+    "euclides, boek één, stelling één": "euclid, book one, proposition one",
+    "vier driehoeken: vuur": "four triangles: fire",
+    "staat altijd stil": "always stands still",
+    "drie in één": "three in one",
+    "tel ze op: 1 + 2 + 3 + 4 = 10": "add them up: 1 + 2 + 3 + 4 = 10",
+    "met drie poten wiebelt niets": "on three legs nothing wobbles",
+    "(tik erop)": "(tap it)",
+    "vier poten": "four legs",
+    "(leun erop, of tik)": "(lean on it, or tap)",
+    "vier": "four",
+    "3960 mijl": "3960 miles",
+    "1080 mijl": "1080 miles",
+    "aarde": "earth",
+    "maan": "moon",
+    "en de cirkel is bijna precies zo lang als het vierkant": "and the circle is almost exactly as long as the square",
+    "vuur": "fire",
+    "lucht": "air",
+    "water": "water",
+    "zout groeit in kubussen": "salt grows in cubes",
+    "lente": "spring",
+    "zomer": "summer",
+    "herfst": "autumn",
+    "winter": "winter",
+    "de mens past in allebei": "a human fits in both",
+    "de hemel is rond, de aarde is vierkant": "heaven is round, the earth is square",
+    "(tik: een wedren)": "(tap: a race)",
+    "vijf": "five",
+    "het grote stuk staat tot het kleine als het geheel tot het grote": "the large part is to the small as the whole is to the large",
+    "snijd hem dwars door": "cut it across",
+    "(tik op de appel)": "(tap the apple)",
+    "appelbloesem": "apple blossom",
+    "zeester": "starfish",
+    "zanddollar": "sand dollar",
+    "in elke appel zit een ster": "in every apple there is a star",
+    "elk vierkant zo breed als de twee ervoor": "each square as wide as the two before it",
+    "spiralen de ene kant op,": "spirals one way,",
+    "de andere": "the other way",
+    "(beweeg over het hart: elke pit een andere hoek verder)": "(move over the heart: each seed turned a different angle)",
+    "groeien zonder je vorm te verliezen": "growing without losing your shape",
+    "elk getal is de som van de twee ervoor": "each number is the sum of the two before",
+    "de zon": "the sun",
+    "(tik: zet de zon in het midden)": "(tap: put the sun in the middle)",
+    "vijf · acht · dertien": "five · eight · thirteen",
+    "in acht jaar gaat venus": "in eight years venus goes",
+    "dertien keer om de zon": "thirteen times around the sun",
+    "en staat ze vijf keer": "and five times she stands",
+    "precies tussen ons en de zon": "exactly between us and the sun",
+    "zo ziet het eruit": "this is what it looks like",
+    "als je vanaf de aarde kijkt": "seen from the earth",
+    "in acht jaar tekent venus een roos": "in eight years venus draws a rose",
+    "vijf, acht en dertien: weer fibonacci": "five, eight and thirteen: fibonacci again",
+    "zes": "six",
+    "zo boven, zo beneden": "as above, so below",
+    "de bloem van het leven": "the flower of life",
+    "de bij bouwt in zessen": "the bee builds in sixes",
+    "nooit twee dezelfde": "never two the same",
+    "(tik op het papier)": "(tap the paper)",
+    "kekulé zag in een droom een slang": "kekulé saw a snake in a dream",
+    "die in zijn eigen staart beet": "biting its own tail",
+    "saturnus draagt een zeshoek": "saturn wears a hexagon",
+    "geen sneeuwvlok is gelijk, en toch telt elke tot zes": "no snowflake is alike, and yet each counts to six",
+    "dertien cirkels,": "thirteen circles,",
+    "elk middelpunt": "every centre",
+    "met elk ander verbonden:": "joined to every other:",
+    "78 lijnen": "78 lines",
+    "kijk goed:": "look closely:",
+    "er zit een kubus in": "there is a cube inside",
+    "tetraëder": "tetrahedron",
+    "kubus": "cube",
+    "octaëder": "octahedron",
+    "icosaëder": "icosahedron",
+    "dodecaëder": "dodecahedron",
+    "ether": "ether",
+    "(tik op een vorm: hij telt zijn vlakken)": "(tap a shape: it counts its faces)",
+    "vijf vormen, en meer zijn er niet": "five shapes, and there are no more",
+    "leonardo tekende ze zo voor het boek van pacioli, 1509": "leonardo drew them like this for pacioli's book, 1509",
+    "zeven": "seven",
+    "zaterdag": "saturday",
+    "donderdag": "thursday",
+    "dinsdag": "tuesday",
+    "zondag": "sunday",
+    "vrijdag": "friday",
+    "woensdag": "wednesday",
+    "maandag": "monday",
+    "zeven kleuren": "seven colours",
+    "do": "do",
+    "re": "re",
+    "mi": "mi",
+    "fa": "fa",
+    "sol": "sol",
+    "la": "la",
+    "si": "ti",
+    "zeven tonen": "seven tones",
+    "zeven centra": "seven centres",
+    "met passer en liniaal": "with compass and ruler",
+    "sluit de zevenhoek nooit": "the heptagon never closes",
+    "de week is een ster": "the week is a star",
+    "acht": "eight",
+    "octaaf": "octave",
+    "kwint": "fifth",
+    "kwart": "fourth",
+    "pluk een snaar": "pluck a string",
+    "heel": "whole",
+    "in helften": "in halves",
+    "in derden": "in thirds",
+    "in kwarten": "in quarters",
+    "geluid wordt vorm": "sound becomes shape",
+    "(tik op de plaat)": "(tap the plate)",
+    "het laatste stukje ontbreekt altijd": "the last little piece is always missing",
+    "halveer een snaar en hij zingt hetzelfde lied, hoger": "halve a string and it sings the same song, higher",
+    "negen": "nine",
+    "wie de 3, de 6 en de 9 begrijpt, heeft een sleutel — zo wordt tesla geciteerd": "whoever understands 3, 6 and 9 holds a key — so tesla is quoted",
+    "driehoek 180°": "triangle 180°",
+    "vierkant 360°": "square 360°",
+    "vijfhoek 540°": "pentagon 540°",
+    "zeshoek 720°": "hexagon 720°",
+    "achthoek 1080°": "octagon 1080°",
+    "steeds weer 9": "9 every time",
+    "de negen komt altijd terug": "the nine always comes back",
+    "(tik in de cirkel: verdubbel · tik op een getal: begin daar)": "(tap in the circle: double · tap a number: start there)",
+    "tien": "ten",
+    "1 · het punt": "1 · the point",
+    "2 · de lijn": "2 · the line",
+    "3 · het vlak": "3 · the plane",
+    "4 · de ruimte": "4 · space",
+    "de pythagoreeërs zwoeren erbij": "the pythagoreans swore by it",
+    "zijn": "being",
+    "actie": "action",
+    "reactie": "reaction",
+    "vreugde": "joy",
+    "overgave": "surrender",
+    "kracht": "power",
+    "liefde": "love",
+    "sterkte": "strength",
+    "genade": "grace",
+    "vrede": "peace",
+    "begrip": "understanding",
+    "wijsheid": "wisdom",
+    "bewust": "aware",
+    "de levensboom in de bloem": "the tree of life in the flower",
+    "naar franks dertien bloemen": "after frank's thirteen flowers",
+    "(tik op de stenen: elke steen is een boventoon)": "(tap the stones: each stone is an overtone)",
+    "(tik: terug naar één)": "(tap: back to one)",
+    "tien is weer één": "ten is one again",
+    "patronen · van één tot tien · 2026": "patterns · from one to ten · 2026",
+    "(mijn echte handtekening)": "(my real signature)",
+    "een cirkel, en nog een": "a circle, and another",
+    "in het oog staat een driehoek": "in the eye stands a triangle",
+    "en ook de rechte hoek": "and the right angle too",
+    "uit een vierkant volgt φ": "from a square follows φ",
+    "φ verstopt zich in een rij getallen": "φ hides in a row of numbers",
+    "en de hemel telt mee": "and the sky counts along",
+    "de bloem draagt vrucht": "the flower bears fruit",
+    "aan de oude hemel: zeven dwaalsterren": "in the old sky: seven wandering stars",
+    "de achtste toon is weer do": "the eighth tone is do again",
+    "blijf verdubbelen, tel de cijfers op": "keep doubling, add up the digits",
+    "na negen begint het opnieuw": "after nine it begins again",
+    "1 : 1 · één toon": "1 : 1 · one tone",
+    "1 : 2 · een octaaf": "1 : 2 · an octave",
+    "2 : 3 · een kwint": "2 : 3 · a fifth",
+    "acht spaken": "eight spokes",
+    "twaalf spaken": "twelve spokes",
+    "vijf armen": "five arms",
+    "drie armen, en gaten ertussen": "three arms, and gaps between",
+    "geen gaten": "no gaps",
+    "de 3 en de 6 wisselen elkaar af": "the 3 and the 6 take turns",
+    "en zo voort, altijd weer:": "and so on, over and over:",
+    "en de zevende boventoon staat op geen enkele piano": "and the seventh overtone is on no piano at all",
+    "het scheelt 13 mijl": "13 miles apart",
+    "op 31.680": "in 31,680",
+    "samen thuis": "at home together",
+    "vandaag": "today",
+    "welkom terug": "welcome back",
+    "alle tien · tik, en ze worden weer één": "all ten · tap, and they become one again",
+    "alle tien boventonen · tik, en ze klinken samen": "all ten overtones · tap, and they sound together",
+    "de boventonen die je hoorde": "the overtones you heard"
+  },
+  "re": [
+    [
+      "^welkom terug · je hoorde al één van de tien tonen$",
+      "welcome back · you already heard one of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al twee van de tien tonen$",
+      "welcome back · you already heard two of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al drie van de tien tonen$",
+      "welcome back · you already heard three of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al vier van de tien tonen$",
+      "welcome back · you already heard four of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al vijf van de tien tonen$",
+      "welcome back · you already heard five of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al zes van de tien tonen$",
+      "welcome back · you already heard six of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al zeven van de tien tonen$",
+      "welcome back · you already heard seven of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al acht van de tien tonen$",
+      "welcome back · you already heard eight of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al negen van de tien tonen$",
+      "welcome back · you already heard nine of the ten tones"
+    ],
+    [
+      "^welkom terug · je hoorde al tien van de tien tonen$",
+      "welcome back · you already heard ten of the ten tones"
+    ],
+    [
+      "^je hoorde er nog geen van de tien$",
+      "you heard none of the ten"
+    ],
+    [
+      "^je hoorde er één van de tien$",
+      "you heard one of the ten"
+    ],
+    [
+      "^je hoorde er twee van de tien$",
+      "you heard two of the ten"
+    ],
+    [
+      "^je hoorde er drie van de tien$",
+      "you heard three of the ten"
+    ],
+    [
+      "^je hoorde er vier van de tien$",
+      "you heard four of the ten"
+    ],
+    [
+      "^je hoorde er vijf van de tien$",
+      "you heard five of the ten"
+    ],
+    [
+      "^je hoorde er zes van de tien$",
+      "you heard six of the ten"
+    ],
+    [
+      "^je hoorde er zeven van de tien$",
+      "you heard seven of the ten"
+    ],
+    [
+      "^je hoorde er acht van de tien$",
+      "you heard eight of the ten"
+    ],
+    [
+      "^je hoorde er negen van de tien$",
+      "you heard nine of the ten"
+    ],
+    [
+      "^de aarde (\\d+) keer rond · venus (\\d+) keer · één keer samen$",
+      "the earth around $1 times · venus $2 times · together one time"
+    ],
+    [
+      "^de aarde (\\d+) keer rond · venus (\\d+) keer · twee keer samen$",
+      "the earth around $1 times · venus $2 times · together two times"
+    ],
+    [
+      "^de aarde (\\d+) keer rond · venus (\\d+) keer · drie keer samen$",
+      "the earth around $1 times · venus $2 times · together three times"
+    ],
+    [
+      "^de aarde (\\d+) keer rond · venus (\\d+) keer · vier keer samen$",
+      "the earth around $1 times · venus $2 times · together four times"
+    ],
+    [
+      "^de aarde (\\d+) keer rond · venus (\\d+) keer · vijf keer samen$",
+      "the earth around $1 times · venus $2 times · together five times"
+    ],
+    [
+      "^nog stil: (.*)$",
+      "still silent: $1"
+    ],
+    [
+      "^begin bij (\\d+)$",
+      "start at $1"
+    ],
+    [
+      "^boventonen: (\\d+) van de tien · tik, en ze klinken samen$",
+      "overtones: $1 of ten · tap, and they sound together"
+    ]
+  ]
+}

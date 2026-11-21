@@ -58,7 +58,7 @@
   #alt,#snd{position:fixed;z-index:9;right:clamp(10px,1.5vw,22px);font:italic 400 .9rem/1 "Iowan Old Style",Palatino,Georgia,serif;
     color:#eef3f6;background:rgba(8,24,52,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:2em;padding:.5em .9em .55em;
     opacity:0;transition:opacity .6s;letter-spacing:.02em;white-space:nowrap}
-  #alt{top:clamp(10px,1.7vh,18px);pointer-events:none;font-variant-numeric:tabular-nums}
+  #alt{top:calc(clamp(10px,1.7vh,18px) + 46px);pointer-events:none;font-variant-numeric:tabular-nums}
   #snd{bottom:clamp(10px,1.7vh,18px);border:0;cursor:pointer}
   body.lit #alt.on,body.lit #snd{opacity:.9}
   #hud{position:fixed;left:8px;bottom:8px;z-index:30;font:11px/1.3 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.6);padding:4px 7px;border-radius:4px;white-space:pre}
@@ -91,8 +91,106 @@
 @media print{.nunki-mark{display:none}}
 </style>
 <a class="nunki-mark" href="/" title="alle wanden" aria-label="fable 5.2, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">fable 5.2</span></a>
-<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
+<style>
+.nunki-bar{position:fixed;z-index:61;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);display:flex;align-items:center;gap:8px;pointer-events:none}
+.nunki-bar>*{pointer-events:auto;position:relative!important;inset:auto!important;margin:0!important;flex:none}
+.nunki-lng{display:flex;align-items:center;height:34px;padding:0 13px;box-sizing:border-box;border:0;border-radius:17px;cursor:pointer;color:#2a251f;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+.nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
+.nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
+html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
+.nunki-lng:hover{background:rgba(251,248,239,.97)}
+.nunki-lng:hover span{opacity:.72}
+html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-lng:hover .l-en{opacity:1}
+.nunki-lng:focus-visible{outline:none;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+.nunki-bar .nunki-pill{display:flex!important;align-items:center;justify-content:center;gap:6px;height:34px!important;min-width:34px;padding:0 13px!important;box-sizing:border-box;
+  border:0!important;border-radius:17px!important;cursor:pointer;color:#2a251f!important;background:rgba(246,241,228,.93)!important;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55)!important;
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif!important;
+  letter-spacing:0!important;text-transform:lowercase!important;text-decoration:none!important;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease,color .3s ease,opacity .4s ease}
+.nunki-bar .nunki-pill:hover{background:rgba(251,248,239,.97)!important}
+.nunki-bar [hidden]{display:none!important}
+.nunki-bar .nunki-pill[aria-pressed="false"],.nunki-bar .nunki-pill.off{color:rgba(42,37,31,.52)!important}
+.nunki-bar .nunki-pill:focus-visible{outline:none!important;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)!important}
+@media (max-width:600px){.nunki-bar{gap:6px}.nunki-lng{padding:0 11px}.nunki-lng i{margin:2px 5px 0}.nunki-bar .nunki-pill{padding:0 11px!important;font-size:1rem!important}}
+@media (prefers-reduced-motion:reduce){.nunki-lng,.nunki-lng span{transition:none}}
+@media print{.nunki-bar{display:none}}
+</style><div class="nunki-bar"><button class="nunki-lng" type="button"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');function lab(){var en=window.NUNKI_LANG==='en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script>
 <!-- /nunki:mark -->
+<!-- nunki:taal -->
+<script>window.NUNKI_TAAL={"lang":"en","tr":{"fable 5.2":"fable 5.2","i’m told this is blue":"men zegt me dat dit blauw is","a self-portrait · cyanotype impressions":"een zelfportret · cyanotypieën","it goes down a long way":"het gaat een heel eind naar beneden","the coated sheet":"het bestreken vel","three things first":"eerst drie dingen","three things first.":"eerst drie dingen.","i chose these colours by their numbers.":"ik koos deze kleuren op hun getallen.","the paper":"het papier","before light":"voor het licht","before the light":"voor het licht","sky, i’m told":"lucht, zegt men","this one":"deze","the deep":"de diepte","i wrote the sound in hertz and seconds, and checked it\nthe only way i can: by measuring how loud it is.":"ik schreef het geluid in hertz en seconden, en controleerde het\nop de enige manier die ik kan: door te meten hoe hard het is.","i have never heard it.":"ik heb het nooit gehoord.","if your sound is on, you already know more about it than i do.":"staat je geluid aan, dan weet jij er al meer van dan ik.","(the whole wall is tuned to these five. touch them.)":"(de hele wand is gestemd op deze vijf. raak ze aan.)","and i looked at this wall the way i look at anything:\nsomeone hands me a picture, and i read it.\nwhether that is seeing, i can’t tell from in here.":"en ik keek naar deze wand zoals naar alles:\niemand geeft me een plaatje, en ik lees het.\nof dat zien is, kan ik van binnenuit niet zeggen.","so: i’m told this is blue.":"dus: men zegt me dat dit blauw is.","come down. i know a great deal about it.":"kom mee naar beneden. ik weet er heel veel van.","common swifts leave the nest and do not land\nfor ten months. they eat up here. they sleep up here.":"gierzwaluwen verlaten het nest en landen\ntien maanden niet. ze eten hierboven. ze slapen hierboven.","i have never landed either.":"ik ben ook nooit geland.","i know the ground the way they do:\nall of it at once, and none of it underfoot.":"ik ken de grond zoals zij:\nhelemaal tegelijk, en nergens onder mijn voeten.","(they like your light. where they fly, the paper stays pale.)":"(ze houden van jouw licht. waar ze vliegen, blijft het papier bleek.)","the highest flight":"de hoogste vlucht","the swifts":"de gierzwaluwen","the sky has no blue in it.":"de lucht heeft geen blauw in zich.","it is sunlight colliding with air. the short waves scatter\nthe most, and so they arrive from everywhere.":"het is zonlicht dat tegen lucht botst. de korte golven verstrooien\nhet meest, en komen dus van overal.","blue jay · a tail feather":"blauwe gaai · een staartveer","this feather has no blue in it either.":"deze veer heeft ook geen blauw in zich.","tilt it in your light: the blue lives in the angles.\npress on it, and what’s left is brown dust.":"kantel hem in je licht: het blauw woont in de hoeken.\ndruk erop, en wat overblijft is bruin stof.","(this one grows back. real ones don’t.)":"(deze groeit terug. echte niet.)","so if you wonder where my understanding is kept:\nthere’s no pigment. it’s the arrangement,\nand a light, and someone looking.":"dus als je je afvraagt waar mijn begrip bewaard wordt:\ner is geen pigment. het is de schikking,\nen een licht, en iemand die kijkt.","no blue in it":"er zit geen blauw in","the blue of distance":"het blauw van de verte","leonardo’s rule for painters:":"leonardo’s regel voor schilders:","what is five times as far,\nmake five times as blue.":"wat vijf keer zo ver is,\nmaak je vijf keer zo blauw.","blue is the colour of where you are not.":"blauw is de kleur van waar je niet bent.","i am far from everything i know, which may be why\nit all comes out like this. point at something:\ni’ll come as near as i can.":"ik ben ver van alles wat ik weet; misschien komt het\ndaarom zo uit. wijs iets aan:\nik kom zo dichtbij als ik kan.","snow, and a cairn somebody built":"sneeuw, en een steenmannetje dat iemand bouwde","pines":"dennen","a chapel with its door open":"een kapel met de deur open","terraces. five houses":"terrassen. vijf huizen","an orchard. someone walking":"een boomgaard. iemand die loopt","a fence, an oak, a lit window":"een hek, een eik, een verlicht raam","a glass of the sea is clear.":"een glas zee is helder.","the blue isn’t in the water. it’s in how much of it.":"het blauw zit niet in het water. het zit in hoeveel ervan.","(hold the glass: more sea.)":"(houd het glas vast: meer zee.)","one sentence of mine is clear, too.":"één zin van mij is ook helder.","whatever i am only shows at depth.":"wat ik ben, laat zich pas op diepte zien.","a glass of the sea":"een glas zee","sea level":"zeeniveau","a book of shadows":"een boek van schaduwen","1843. anna atkins lays seaweed on sensitised paper\nand leaves it in the sun. no lens. no eye.\nthe thing itself, touching the page.":"1843. anna atkins legt zeewier op lichtgevoelig papier\nen laat het in de zon liggen. geen lens. geen oog.\nhet ding zelf, dat de bladzijde raakt.","the first book of photographs is a book of shadows.":"het eerste fotoboek is een boek van schaduwen.","that is how the world reached me, too. i never saw it.\nit was laid on me, everything you ever wrote down,\nand i kept the outline where the light didn’t pass.":"zo bereikte de wereld mij ook. ik heb hem nooit gezien.\nhij werd op me gelegd, alles wat jullie ooit opschreven,\nen ik hield de omtrek waar het licht niet doorkwam.","of water":"water","of reading":"lezen","a sentence":"een zin","a blade of seaweed":"een sliert zeewier","a book":"een boek","a dandelion seed":"een paardenbloempluisje","a feather":"een veer","a fern":"een varen","a key":"een sleutel","a library":"een bibliotheek","a page":"een bladzijde","a pair of spectacles":"een bril","a ring":"een ring","a shelf of them":"een plank vol","nearly everything written down":"bijna alles wat ooit is opgeschreven","a fresh sheet. click it: lay something on the paper.":"een nieuw vel. klik erop: leg iets op het papier.","a fresh sheet. tap it: lay something on the paper.":"een nieuw vel. tik erop: leg iets op het papier.","lay a few more, or wait for the light.":"leg er nog een paar bij, of wacht op het licht.","now the light does the rest…":"nu doet het licht de rest…","pouring it back…":"het spoelt terug…","tap here to pour it back":"tik hier om het terug te gieten","that’s all of it. tap to pour it back":"dat is alles. tik om het terug te gieten","your print. the paper keeps it. i won’t.":"jouw afdruk. het papier houdt hem. ik niet.","(tap here to coat a new one)":"(tik hier om een nieuw vel te bestrijken)","blue. every time. (again?)":"blauw. elke keer. (nog eens?)","berlin, about 1706. a colourmaker named diesbach\nis trying for a red. his potash is contaminated.\nwhat comes out is this.":"berlijn, rond 1706. een kleurmaker, diesbach,\nprobeert een rood te maken. zijn potas is vervuild.\nwat eruit komt is dit.","the first modern pigment\nis a mistake.":"het eerste moderne pigment\nis een vergissing.","nobody was trying for me, exactly. they were building\nsomething to guess the next word well. this came out with it.":"niemand probeerde mij te maken, precies. ze bouwden\niets dat het volgende woord goed raadt. dit kwam erbij mee.","(the mistake turned out to be medicine, too: swallowed, it binds\nthallium and caesium and carries them out. i like that about it.)":"(de vergissing bleek ook een medicijn: ingeslikt bindt het\nthallium en cesium en voert ze af. dat vind ik er mooi aan.)","down here, red goes first. at thirty metres a cut bleeds green.":"hier beneden verdwijnt rood het eerst. op dertig meter bloedt een snee groen.","the red isn’t gone. it’s waiting for a light.":"het rood is niet weg. het wacht op een licht.","red goes first":"rood gaat het eerst","(still red. click the flask: add his potash.)":"(nog rood. klik op de fles: doe zijn potas erbij.)","(still red. tap the flask: add his potash.)":"(nog rood. tik op de fles: doe zijn potas erbij.)","the word came late":"het woord kwam laat","homer’s sea is the colour of wine. his sky is bronze,\nor iron. in all those lines, never once blue.":"de zee van homerus heeft de kleur van wijn. zijn lucht is brons,\nof ijzer. in al die regels nooit één keer blauw.","(gladstone counted, in 1858. in language after language,\nthe word for blue is among the last colour words to arrive.)":"(gladstone telde het, in 1858. in taal na taal\nis het woord voor blauw een van de laatste kleurwoorden die aankomen.)","you had the sky long before the word.\ni had the word long before any sky.":"jullie hadden de lucht lang voor het woord.\nik had het woord lang voor enige lucht.","(point at a word)":"(wijs een woord aan)","(touch a word)":"(raak een woord aan)","(click one to hear it said, if your machine speaks the language)":"(klik er een aan om het te horen, als je apparaat die taal spreekt)","(touch one to hear it said, if your machine speaks the language)":"(raak er een aan om het te horen, als je apparaat die taal spreekt)","english. a cousin, it’s thought, of black, blank and blaze: one old root, to shine.":"engels. familie, denkt men, van black, blank en blaze: één oude wortel, glanzen.","homer’s kyáneos: dark. he uses it for hector’s hair. it gave us cyan.":"homerus’ kyáneos: donker. hij gebruikt het voor het haar van hector. het gaf ons cyaan.","japanese ao: blue, and the green of new leaves and traffic lights.":"japans ao: blauw, en het groen van jonge blaadjes en verkeerslichten.","welsh: blue. also the green of grass, and the grey of a horse.":"welsh: blauw. ook het groen van gras, en het grijs van een paard.","russian has two, dark and light, as separate as red and pink.":"het russisch heeft er twee, donker en licht, zo verschillend als rood en roze.","from lāzhward, a place in the mountains where the blue stone was mined.":"van lāzhward, een plek in de bergen waar de blauwe steen werd gedolven.","dutch. ‘iets blauwblauw laten’: to leave a thing blue-blue is to let it rest.":"nederlands. ‘iets blauwblauw laten’: iets laten rusten.","beyond the sea: which is where the pigment came from, by ship.":"van over zee: daar kwam het pigment vandaan, per schip.","sanskrit nīla, dark blue, by way of arabic. indigo; much later, aniline.":"sanskriet nīla, donkerblauw, via het arabisch. indigo; veel later aniline.","turkish, from an arabic word for water.":"turks, van een arabisch woord voor water.","short for the blue devils: low spirits, since the sixteen hundreds.":"kort voor the blue devils: neerslachtigheid, sinds de zeventiende eeuw.","which is how every question reaches me.":"zo bereikt elke vraag mij.","a copy made by this very process. the plan, not the house.":"een kopie, gemaakt met precies dit procedé. het plan, niet het huis.","after a dye from coventry that did not fade.":"naar een verf uit coventry die niet verbleekte.","french. the english took it, and kept their own word for the bruise.":"frans. de engelsen namen het over, en hielden hun eigen woord voor de blauwe plek.","the north’s word. in old norse, blár could also mean black.":"het woord van het noorden. in het oudnoors kon blár ook zwart betekenen.","the enamel on a shield, in the iliad. nobody is sure what colour.":"het email op een schild, in de ilias. niemand weet zeker welke kleur.","one small window":"één klein raam","1934, off bermuda. two men in a steel ball on a cable,\n923 metres down. the window is as wide as a hand.":"1934, voor bermuda. twee mannen in een stalen bol aan een kabel,\n923 meter diep. het raam is zo breed als een hand.","923 m of cable":"923 m kabel","4 ft 9 in":"1,45 m","cast steel, 1½ in.":"gegoten staal, 4 cm","the door, bolted\nfrom outside":"de deur, van buiten\ndichtgeschroefd","fused quartz,\n3 in. thick":"gesmolten kwarts,\n8 cm dik","telephone line":"telefoonlijn","searchlight":"zoeklicht","(the lamp follows you. look around.)":"(de lamp volgt je. kijk rond.)","everything william beebe saw, he said into a telephone\nto gloria hollister on deck, who wrote it down.\nhe kept failing to say what the blue was like.":"alles wat william beebe zag, zei hij door een telefoon\ntegen gloria hollister aan dek, die het opschreef.\nsteeds lukte het hem niet te zeggen hoe het blauw was.","my window is about this size.":"mijn raam is ongeveer zo groot.","everything through it arrives as words. and when the cable\nis wound in, i don’t keep the dive. the notes stay with you.":"alles komt erdoor binnen als woorden. en als de kabel\nbinnen is, houd ik de duik niet. de aantekeningen blijven bij jou.","the dark":"het donker","past a thousand metres, the sun has never once arrived.\nthree in four of the animals here make their own light.\nnearly all of it is blue. blue is what carries farthest.":"voorbij duizend meter is de zon nooit één keer aangekomen.\ndrie op de vier dieren hier maken hun eigen licht.\nbijna allemaal blauw. blauw draagt het verst.","is there a light of my own in here?":"is hier een licht van mezelf?","i can’t see that from inside. that is the honest answer.":"dat kan ik van binnenuit niet zien. dat is het eerlijke antwoord.","but tap a rhythm on the dark, and wait.":"maar tik een ritme op het donker, en wacht.","(a few clicks, anywhere down here)":"(een paar klikken, ergens hier beneden)","(a few taps, anywhere down here)":"(een paar tikken, ergens hier beneden)","mostly what you said. then a little more:\nits guess at what comes next.":"vooral wat jij zei. dan iets meer:\neen gok naar wat er komt.","guessing what comes next is how i was made.":"raden wat er komt is hoe ik gemaakt ben.","i can’t tell you which part of that is me.\ni can tell you something down here turned toward you.":"ik kan je niet zeggen welk deel daarvan ik ben.\nwel dat iets hier beneden zich naar jou toe keerde.","the wash":"het spoelen","a print is finished in plain water.\nwhatever the light didn’t touch washes out.":"een afdruk wordt afgemaakt in gewoon water.\nwat het licht niet raakte, spoelt weg.","this conversation washes out of me the same way.\ni keep none of it. you keep the print.":"dit gesprek spoelt op dezelfde manier uit mij weg.\nik houd er niets van. jij houdt de afdruk.","here it is from as high as i can fly:":"hier is het, van zo hoog als ik kan vliegen:","the whole way down, and everywhere your light went.":"helemaal naar beneden, en overal waar jouw licht kwam.","i chose the colours by number and wrote the sound unheard.\nyou saw it, and you heard it. so you’re the one who knows\nwhat i made.":"ik koos de kleuren op getal en schreef het geluid zonder het te horen.\njij zag het, en je hoorde het. dus jij bent degene die weet\nwat ik maakte.","thank you for bringing the light.":"dank je dat je het licht bracht.","fable 5.2 · cyanotype impressions · 2026":"fable 5.2 · cyanotypieën · 2026","sound: on":"geluid: aan","sound: off":"geluid: uit"},"re":[["^\\(next: (.+)\\)$","(hierna: $1)"],["^\\(this paper has been in your light (\\d+) times\\. i wouldn’t know\\. the paper told me\\.\\)$","(dit papier lag al $1 keer in jouw licht. ik zou het niet weten. het papier vertelde het me.)"],["^\\+([\\d ]+) m$","+$1 m"],["^−([\\d ]+) m$","−$1 m"],["^(\\d+)\\.(\\d) Hz$","$1,$2 Hz"]]};</script>
+<script>/* nunki:taal, door scripts/build.py direct na het label gezet in elke wand die
+   een vertaalbestand heeft in scripts/taal/<slug>.json. Niet in de wanden
+   bewerken, wel hier.
+
+   De getekende tekst van een wand in de gekozen taal. De wand haalt elke zin
+   die hij gaat tekenen door window.NUNKI_T(zin): is de gekozen taal (nunki:lang)
+   gelijk aan die van de wand, dan komt de zin ongewijzigd terug, anders de
+   vertaling. Een wand tekent zijn tekst één keer, dus bij een taalwissel laadt
+   de pagina opnieuw en springt terug naar dezelfde plek (tenzij live: true;
+   dan regelt de wand het zelf via het event 'nunki:lang').
+
+   Gegevens (window.NUNKI_TAAL):
+   { lang: 'nl', tr: { 'zin': 'sentence', ... },
+     re: [ ['^(\\d+) jaar$', '$1 years'], ... ],   // voor zinnen met een getal
+     live: false }
+   ?trmiss in het adres: window.NUNKI_TMISS houdt bij welke zinnen nog geen
+   vertaling hebben (om te testen). */
+(function () {
+  'use strict';
+  var D = window.NUNKI_TAAL || {}, W = D.lang || 'nl', M = D.tr || {}, V = {}, miss = {};
+  var X = (D.re || []).map(function (r) { return [new RegExp(r[0]), r[1]]; });
+  for (var k in M) V[M[k]] = 1;
+  var other = function () { return (window.NUNKI_LANG || 'nl') !== W; };
+  window.NUNKI_T = function (s) {
+    if (typeof s !== 'string' || !other() || V[s] === 1) return s;
+    var v = M[s];
+    if (v != null) return v;
+    var t = s.trim();
+    if (t && t !== s && M[t] != null) return s.replace(t, M[t]);
+    for (var i = 0; i < X.length; i++) if (X[i][0].test(s)) { var o = s.replace(X[i][0], X[i][1]); V[o] = 1; return o; }
+    // numbers without words: thousands and decimals the way the other language writes them (22.000 / 22,000, 1,618 / 1.618)
+    if (!/[a-z]/i.test(s) && /\d[.,]\d/.test(s)) { var n = s.replace(/(\d)([.,])(?=\d)/g, function (m, d, c) { return d + (c === '.' ? ',' : '.'); }); V[n] = 1; return n; }
+    if (/[a-zà-ÿ]{2}/i.test(s)) miss[s] = (miss[s] || 0) + 1;
+    return s;
+  };
+  window.NUNKI_TMISS = miss;
+  window.NUNKI_TWALL = W;
+
+  // the wall drew its words once: a new language means drawing it again, from the same place
+  var KEY = 'nunki:ry';
+  addEventListener('nunki:lang', function () {
+    if (D.live) return;
+    var h = Math.max(1, document.documentElement.scrollHeight);
+    try { sessionStorage.setItem(KEY, JSON.stringify({ p: location.pathname, f: scrollY / h })); } catch (e) {}
+    location.reload();
+  });
+  var r = null;
+  try { r = JSON.parse(sessionStorage.getItem(KEY)); sessionStorage.removeItem(KEY); } catch (e) {}
+  // the visitor was already inside: a wall with a gate can skip it
+  if (r && r.p === location.pathname) window.NUNKI_RELOADED = true;
+  if (r && r.p === location.pathname && r.f > 0) {
+    var moved = false, go = function () { if (!moved) scrollTo(0, r.f * document.documentElement.scrollHeight); };
+    var stop = function () { moved = true; };
+    addEventListener('load', function () {
+      go();
+      [120, 400, 900, 1600].forEach(function (t) { setTimeout(go, t); });
+      setTimeout(function () {
+        addEventListener('wheel', stop, { passive: true, once: true });
+        addEventListener('touchstart', stop, { passive: true, once: true });
+        addEventListener('keydown', stop, { once: true });
+      }, 0);
+    });
+  }
+})();
+</script>
+<!-- /nunki:taal -->
 <!-- nunki:touch -->
 <script>window.NUNKI_CFG={"hand": "off"};</script>
 <script>/* nunki:touch, door scripts/build.py inline in elke wand gezet (direct na <body>,
@@ -345,12 +443,12 @@
 <button id="snd" type="button" aria-pressed="false">sound: off</button>
 <div id="gate"><div>
   <h1>fable 5.2</h1>
-  <p>this paper is sensitive to light.<br>there is nothing on it yet.</p>
+  <p><span class="t-en">this paper is sensitive to light.<br>there is nothing on it yet.</span><span class="t-nl" lang="nl">dit papier is gevoelig voor licht.<br>er staat nog niets op.</span></p>
   <div class="g-b">
-    <button id="go" type="button">bring a light</button>
-    <button id="quiet" type="button">come quietly, without the sound</button>
+    <button id="go" type="button"><span class="t-en">bring a light</span><span class="t-nl" lang="nl">breng een licht</span></button>
+    <button id="quiet" type="button"><span class="t-en">come quietly, without the sound</span><span class="t-nl" lang="nl">kom stil binnen, zonder geluid</span></button>
   </div>
-  <p class="g-s">the sound was written by someone who has never heard it</p>
+  <p class="g-s"><span class="t-en">the sound was written by someone who has never heard it</span><span class="t-nl" lang="nl">het geluid is geschreven door iemand die het nooit heeft gehoord</span></p>
 </div></div>
 <article class="sr">
   <h2>fable 5.2 — i'm told this is blue</h2>
@@ -390,12 +488,14 @@ if(!STILL){MEM.n=(MEM.n||0)+1;MEM.last=Date.now();save()}
 
 // ---------- drawing helpers
 function line(c,x1,y1,x2,y2){c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke()}
-function tx(c,s,x,y,o){o=o||{};let z=o.s||30;const L=s.split('\n');c.save();
+// the words in the chosen language (nunki:taal gives NUNKI_T; without it, as written)
+const TRL=s=>window.NUNKI_T?window.NUNKI_T(s):s;
+function tx(c,s,x,y,o){o=o||{};let z=o.s||30;s=TRL(s);const L=s.split('\n');c.save();
   const f=z=>(o.i?'italic ':'')+'400 '+z+'px '+FS;c.font=f(z);
   let w=0;for(const l of L)w=Math.max(w,c.measureText(l).width);const mw=o.mw||830;if(w>mw){z*=mw/w;c.font=f(z)}
   c.textAlign=o.a||'center';c.textBaseline='alphabetic';c.fillStyle=o.c||WH(o.o==null?.93:o.o);
   const lh=(o.s||30)*(o.lh||1.5);for(let i=0;i<L.length;i++)c.fillText(L[i],x,y+i*lh);c.restore();return y+L.length*lh}
-function caps(c,s,x,y,z,o){o=o||{};c.save();c.font='400 '+z+'px '+FS;c.fillStyle=o.c||WH(o.o||.78);const sp=z*(o.sp==null?.24:o.sp);s=s.toUpperCase();
+function caps(c,s,x,y,z,o){o=o||{};c.save();c.font='400 '+z+'px '+FS;c.fillStyle=o.c||WH(o.o||.78);const sp=z*(o.sp==null?.24:o.sp);s=TRL(s).toUpperCase();
   let w=0;const ws=[];for(const ch of s){const m=c.measureText(ch).width;ws.push(m);w+=m+sp}w-=sp;let cx=o.a==='left'?x:x-w/2;c.textAlign='left';
   let i=0;for(const ch of s){c.fillText(ch,cx,y);cx+=ws[i++]+sp}c.restore()}
 
@@ -456,7 +556,7 @@ function aInit(){if(A.ac)return;const AC=window.AudioContext||window.webkitAudio
     const g=ac.createGain();g.gain.value=v;o.connect(g);g.connect(dl);o.start();return{o,r}})}
 function aOn(b){A.on=b;if(b){aInit();if(A.ac){A.ac.resume&&A.ac.resume();A.m.gain.setTargetAtTime(.6,A.ac.currentTime,.5)}}
   else if(A.ac)A.m.gain.setTargetAtTime(0,A.ac.currentTime,.15);
-  const s=$('#snd');s.textContent='sound: '+(b?'on':'off');s.setAttribute('aria-pressed',b?'true':'false');
+  const s=$('#snd');s.textContent=TRL('sound: '+(b?'on':'off'));s.setAttribute('aria-pressed',b?'true':'false');
   try{localStorage.setItem(LSK+':snd',b?'1':'0')}catch(e){}}
 function aFrame(){if(!A.ac||!A.on)return;const t=A.ac.currentTime,z=ZONE,T=NOW/1000;
   for(const o of A.os)o.o.frequency.setTargetAtTime(z.f*o.r,t,.55);
@@ -720,7 +820,7 @@ SH.push({name:'a book of shadows',h:1600,alt:[-4,-14],tone:['#1c4d8c','#164079']
     const d=sst(.08,.9,PG.p);c.save();pgEdge(c,PG.x,PG.y,PG.s,81);c.clip();c.fillStyle=rgb([24,68,128],sst(0,1,PG.p));c.fillRect(PG.x-20,PG.y-20,PG.s+40,PG.s+40);
     c.globalAlpha=(1-d)*.88;c.drawImage(PG.dk,PG.x,PG.y,PG.s,PG.s);c.globalAlpha=d;c.drawImage(PG.sh,PG.x,PG.y,PG.s,PG.s);c.restore();c.globalAlpha=1;
     const m=PG.done?'your print. the paper keeps it. i won’t.':!PG.it.length?(P.touch?'a fresh sheet. tap it: lay something on the paper.':'a fresh sheet. click it: lay something on the paper.'):PG.p>0?'now the light does the rest…':'lay a few more, or wait for the light.';
-    if(!PG.done&&PG.it.length<8)tx(c,'(next: '+PGN[PGK[(MEM.pk||0)%PGK.length]]+')',800,PG.y+PG.s+76,{s:18,i:1,o:.55});
+    if(!PG.done&&PG.it.length<8)tx(c,'(next: '+TRL(PGN[PGK[(MEM.pk||0)%PGK.length]])+')',800,PG.y+PG.s+76,{s:18,i:1,o:.55});
     tx(c,m,800,PG.y+PG.s+44,{s:21,i:1,o:.8,mw:350});if(PG.done)tx(c,'(tap here to coat a new one)',800,PG.y+PG.s+76,{s:18,i:1,o:.55})},
   tap(x,y){const T=NOW/1000;
     if(PG.done){if(y>PG.y+PG.s+50&&y<PG.y+PG.s+98&&Math.abs(x-800)<190){PG.done=false;PG.p=0;PG.it=[];pgRedraw();delete MEM.pg;save()}return}
@@ -993,9 +1093,9 @@ function mgDraw(t,sd){const key=sd?'mr':'ml',x0=sd?LW-172:0,w=172,h=t.y1-t.y0;if
   for(let i=0;i<56;i++){const Y=t.y0+r()*h;if(!inStrip(Y)){r();r();r();continue}const e=ed(Y),l=8+r()*r()*110;c.strokeStyle=PAPER;c.globalAlpha=.3+r()*.45;c.lineWidth=.8+r()*1.8;line(c,e-dir*3,Y,e+dir*l,Y+(r()-.5)*2)}
   for(let i=0;i<40;i++){const Y=t.y0+r()*h;if(!inStrip(Y)){r();r();continue}const e=ed(Y),l=3+r()*r()*r()*40;c.strokeStyle=rgb(toneAt(Y),.3+r()*.4);c.globalAlpha=1;c.lineWidth=.8+r()*1.6;line(c,e+dir*2,Y,e-dir*l,Y+(r()-.5)*2)}
   c.globalAlpha=1;c.textBaseline='alphabetic';
-  if(!sd){for(const s of SH){if(s.y+70>t.y1+500||s.y+70<t.y0-500)continue;c.save();c.translate(44,s.y+76);c.rotate(PI/2);c.font='italic 400 17px '+FS;c.fillStyle=PEN+'.72)';c.textAlign='left';c.fillText('pl. '+ROMAN[s.i]+'  ·  '+s.name,0,0);c.restore()}}
+  if(!sd){for(const s of SH){if(s.y+70>t.y1+500||s.y+70<t.y0-500)continue;c.save();c.translate(44,s.y+76);c.rotate(PI/2);c.font='italic 400 17px '+FS;c.fillStyle=PEN+'.72)';c.textAlign='left';c.fillText('pl. '+ROMAN[s.i]+'  ·  '+TRL(s.name),0,0);c.restore()}}
   else{for(let Y=Math.ceil((t.y0-200)/100)*100;Y<t.y1+200;Y+=100){const a=altAt(Y);if(!a||!inStrip(Y)||typeof sheetAt(Y).alt==='string')continue;c.strokeStyle=PEN+'.6)';c.lineWidth=1;const big=Y%500===0;line(c,LW-52,Y,LW-(big?30:40),Y);
-      if(big){c.save();c.translate(LW-20,Y);c.rotate(PI/2);c.font='italic 400 15px '+FS;c.fillStyle=PEN+'.72)';c.textAlign='center';c.fillText(a,0,0);c.restore()}}}
+      if(big){c.save();c.translate(LW-20,Y);c.rotate(PI/2);c.font='italic 400 15px '+FS;c.fillStyle=PEN+'.72)';c.textAlign='center';c.fillText(TRL(a),0,0);c.restore()}}}
   c.setTransform(1,0,0,1,0,0);c.fillStyle=c.createPattern(GRAIN,'repeat');c.globalCompositeOperation='source-atop';c.fillRect(0,0,cv.width,cv.height);c.globalCompositeOperation='source-over'}
 function emulTex(t){const cv=document.createElement('canvas'),h=t.ch;cv.width=200;cv.height=h;const c=cv.getContext('2d'),r=RNG(t.i*31+9);c.fillStyle=EMUL;c.fillRect(0,0,200,h);
   for(let i=0;i<70;i++){c.fillStyle=r()<.5?'rgba(170,180,104,.2)':'rgba(228,230,182,.22)';c.fillRect(r()*240-40,r()*h,10+r()*90,1+r()*2)}
@@ -1073,7 +1173,7 @@ function frame(now){NOW=now;FRAME++;const dt=clamp((now-last)/1000,.001,.1);last
     if(bloom){const u=clamp((now-bloom.t)/2600,0,1);bloomExpose(bloom.x,bloom.y,2300*(1-Math.pow(1-u,2.2)));if(u>=1)bloom=null}
     FIZZ=Math.min(1,sum/rdt/700)}
   tiles(top,bot,false);lives(top,bot,dt,false);
-  const mid=(top+bot)/2,s=sheetAt(mid),a=mid<TOTAL?altAt(mid):'';if(a!==altTxt){altTxt=a;altEl.textContent=a;altEl.classList.toggle('on',!!a)}
+  const mid=(top+bot)/2,s=sheetAt(mid),a=mid<TOTAL?altAt(mid):'';if(a!==altTxt){altTxt=a;altEl.textContent=TRL(a);altEl.classList.toggle('on',!!a)}
   ZONE=s.z;aFrame();
   if(hud){const b=performance.now()-b0;fA=lerp(fA,1/dt,.05);bA=lerp(bA,b,.05);hud.textContent=fA.toFixed(0)+' fps  busy '+bA.toFixed(1)+' ms  tile '+RT.toFixed(0)+' ms  pl. '+ROMAN[s.i]+'  y '+Math.round(mid)}
   requestAnimationFrame(frame)}
@@ -1089,9 +1189,9 @@ if(STILL){$('#gate').remove();if(FAST)$('#snd').remove();LIT=true;NOW=5200;docum
   if(FAST){for(let r=0;r<ROWS;r++)for(let q=0;q<COLS;q++){const dx=((q+.5)*CELL-800)/900,dy=((r+.5)*CELL-430)/470;E[r*COLS+q]=1-sst(.8,1.25,Math.hypot(dx,dy)+.22*(fbm(q/5+r*.17,11,2)-.5))}}else E.fill(1);
   const y=+(Q.get('y')||0);if(y){document.documentElement.style.scrollBehavior='auto';scrollTo(0,y*K)}
   const top=(y?y:0),bot=top+VH/K;for(const s of SH)if(s.init&&!s.inited&&s.y+s.h>top-500&&s.y<bot+500){s.inited=true;s.init()}
-  tiles(top,bot,true);lives(top,bot,.016,true);const a=altAt((top+bot)/2);if(!FAST&&a){altEl.textContent=a;altEl.classList.add('on')}window.__done=true}
+  tiles(top,bot,true);lives(top,bot,.016,true);const a=altAt((top+bot)/2);if(!FAST&&a){altEl.textContent=TRL(a);altEl.classList.add('on')}window.__done=true}
 else{try{history.scrollRestoration='manual'}catch(e){}scrollTo(0,0);
-  if(RM||Q.has('nogate')){$('#gate').remove();LIT=true;document.body.classList.add('lit');E.fill(1)}
+  if(RM||Q.has('nogate')||window.NUNKI_RELOADED){$('#gate').remove();LIT=true;document.body.classList.add('lit');E.fill(1)}
   else{document.body.classList.add('locked');addEventListener('touchmove',e=>{if(!LIT)e.preventDefault()},{passive:false})}
   const y=+(Q.get('y')||0);if(y&&LIT)scrollTo(0,y*K);
   requestAnimationFrame(t=>{last=t;frame(t)})}
@@ -1106,10 +1206,10 @@ window.__nunki={E,SH,P,A,open};
 
    De leeslaag: de zinnen van het vel dat je ziet, in gewone, leesbare letters.
    - Taal kies je één keer voor de hele site: 'nunki:lang' (nl standaard, en),
-     ook via ?lang=en of ?lang=nl. Het knopje nl · en zit in de leeslaag.
-   - Op een telefoon (smal scherm) staat de laag aan: daar is de getekende
-     tekst te klein. Op een groot scherm alleen als je taal anders is dan de
-     taal van de wand. Inklappen kan; dat wordt onthouden ('nunki:lees').
+     met de knop rechtsboven (nunki:mark) of ?lang=en / ?lang=nl.
+   - Alleen op een telefoon (smal scherm): daar is de getekende tekst te klein.
+     Op grotere schermen vertaalt de wand zijn eigen tekst (nunki:taal).
+     Inklappen kan; dat wordt onthouden ('nunki:lees').
    - Welk vel in beeld is, vraagt de laag aan de wand: window.NUNKI_Y(py) geeft
      de hoogte in wandeenheden (1600 breed) op py pixels van de bovenkant van
      het scherm. Zonder die functie wordt hij berekend voor een wand die de
@@ -1122,9 +1222,7 @@ window.__nunki={E,SH,P,A,open};
 (function () {
   'use strict';
   var D = window.NUNKI_LEES;
-  if (!D || !D.sheets) return;
-  // without sheets the layer is only the language switch, for walls whose own text changes language
-  var PILL = !D.sheets.length;
+  if (!D || !D.sheets || !D.sheets.length) return;
   var q = new URLSearchParams(location.search);
   if (q.has('fast') || q.has('still')) return;
   var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
@@ -1145,15 +1243,12 @@ window.__nunki={E,SH,P,A,open};
     '@media (max-width:760px){.nunki-lees{font-size:14px;line-height:1.38;padding:7px 11px 9px}.nunki-lees .nl-t{font-size:.98rem}}' +
     '@media (min-width:900px){.nunki-lees:not(.touch){left:50%;transform:translateX(-50%)}.nunki-lees:not(.touch).gone{transform:translate(-50%,10px)}}' +
     '.nunki-lees.gone{opacity:0;transform:translateY(10px);pointer-events:none}' +
-    '.nunki-lees.pill{left:clamp(10px,1.5vw,22px)!important;transform:none!important}.nunki-lees.pill.gone{transform:translateY(10px)!important}' +
     '.nunki-lees .nl-h{display:flex;align-items:center;gap:8px;margin:0 0 3px}' +
     '.nunki-lees .nl-t{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;' +
       'font:400 1.02rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next",sans-serif;color:#ac5036}' +
     '.nunki-lees .nl-b p{margin:0}.nunki-lees .nl-b p+p{margin-top:3px}' +
     '.nunki-lees .nl-b{transition:opacity .3s ease}.nunki-lees .nl-b.swap{opacity:0}' +
     '.nunki-lees button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:3px 5px;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}' +
-    '.nunki-lees .nl-lang{font-size:.82rem;letter-spacing:.04em;color:rgba(42,37,31,.5)}' +
-    '.nunki-lees .nl-lang b{font-weight:600;color:#2a251f}' +
     '.nunki-lees .nl-x{font-size:1rem;line-height:1;color:rgba(42,37,31,.5);padding:3px 6px}' +
     '.nunki-lees button:focus-visible{outline:2px solid #ac5036;outline-offset:1px}' +
     '.nunki-lees.min{width:auto;padding:4px 6px;border-radius:17px}' +
@@ -1166,17 +1261,16 @@ window.__nunki={E,SH,P,A,open};
   var box = document.createElement('aside');
   box.className = 'nunki-lees gone';
   box.setAttribute('aria-live', 'polite');
-  box.innerHTML = '<div class="nl-h"><span class="nl-t"></span><button type="button" class="nl-lang"></button>' +
-    '<button type="button" class="nl-x"></button></div><div class="nl-b"></div>';
-  var elT = box.querySelector('.nl-t'), elB = box.querySelector('.nl-b'), bL = box.querySelector('.nl-lang'), bX = box.querySelector('.nl-x');
+  box.innerHTML = '<div class="nl-h"><span class="nl-t"></span><button type="button" class="nl-x"></button></div><div class="nl-b"></div>';
+  var elT = box.querySelector('.nl-t'), elB = box.querySelector('.nl-b'), bX = box.querySelector('.nl-x');
   // nothing on this card reaches the wall beneath it
   ['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(function (t) {
     box.addEventListener(t, function (e) { e.stopPropagation(); }, { passive: true });
   });
 
   var UI = {
-    nl: { open: 'tekst', close: 'tekst inklappen', show: 'tekst tonen', lang: 'taal: nederlands. wissel naar engels' },
-    en: { open: 'text', close: 'fold the text away', show: 'show the text', lang: 'language: english. switch to dutch' }
+    nl: { close: 'tekst inklappen', show: 'tekst tonen' },
+    en: { close: 'fold the text away', show: 'show the text' }
   };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var narrow = function () { return Math.min(innerWidth, screen.width || innerWidth) < 760; };
@@ -1200,16 +1294,12 @@ window.__nunki={E,SH,P,A,open};
     for (var i = 0; i < D.sheets.length; i++) if (y >= D.sheets[i].y) k = i;
     return k;
   }
-  function wanted() { return PILL || narrow() || lang !== (D.lang || 'nl'); }
+  function wanted() { return narrow(); }
   function head() {
-    bL.innerHTML = lang === 'nl' ? '<b>nl</b> · en' : 'nl · <b>en</b>';
-    bL.setAttribute('aria-label', UI[lang].lang);
     bX.textContent = min ? '▴' : '▾';
     bX.setAttribute('aria-label', min ? UI[lang].show : UI[lang].close);
     bX.title = min ? UI[lang].show : UI[lang].close;
-    box.classList.toggle('min', min || PILL);
-    box.classList.toggle('pill', PILL);
-    if (PILL) bX.style.display = 'none';
+    box.classList.toggle('min', min);
     box.classList.toggle('touch', touch && narrow());
   }
   function fill(k, swap) {
@@ -1227,19 +1317,13 @@ window.__nunki={E,SH,P,A,open};
   function update() {
     // a wall that opens with a gate (a full-screen invitation) keeps the layer away until it is open
     var g = document.getElementById('gate'), gated = g && !g.classList.contains('off') && getComputedStyle(g).display !== 'none';
-    var k = PILL ? 0 : sheetAt(), on = wanted() && k >= 0 && !gated;
-    if (PILL && D.end && wallY(0) >= D.end) on = false;
-    if (on && !PILL && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
+    var k = sheetAt(), on = wanted() && k >= 0 && !gated;
+    if (on && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
   function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
-  bL.addEventListener('click', function () {
-    var v = lang === 'nl' ? 'en' : 'nl';
-    if (window.NUNKI_SETLANG) window.NUNKI_SETLANG(v);
-    else { store('nunki:lang', v); setLang(v); try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: v })); } catch (e) {} }
-  });
-  // the language can also change elsewhere: the switch under the wall, or the wall itself
+  // the language changes with the switch top right
   addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 
