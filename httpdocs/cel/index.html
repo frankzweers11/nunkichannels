@@ -51,7 +51,8 @@
 </head>
 <body>
 <!-- nunki:mark -->
-<style>
+<script>(function(){var D=document.documentElement,q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();</script>
+<style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
 .nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
   height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
   background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
@@ -71,7 +72,7 @@
 @media (prefers-reduced-motion:reduce){.nunki-mark,.nunki-mark svg,.nunki-mark .nm-name{transition:none}}
 @media print{.nunki-mark{display:none}}
 </style>
-<a class="nunki-mark" href="/" title="alle wanden" aria-label="cel, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name">cel</span></a>
+<a class="nunki-mark" href="/" title="alle wanden" aria-label="cel, op nunkichannels. naar alle wanden"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg><span class="nm-name"><span class="t-nl">cel</span><span class="t-en" lang="en">cell</span></span></a>
 <script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();</script>
 <!-- /nunki:mark -->
 <!-- nunki:touch -->
@@ -95,6 +96,8 @@
           naar 'nunki:shake'. */
 (function () {
   'use strict';
+  // the words, in the language chosen for the site (set by the mark block, nunki:lang)
+  var W = function (nl, en) { return window.NUNKI_LANG === 'en' ? en : nl; };
   var C = window.NUNKI_CFG || {};
   var N = window.NUNKI = { tilt: { x: 0, y: 0, on: false }, heading: null, muted: false, ctx: [], hand: false, buzz: buzz, motion: motionOn };
   var coarse = matchMedia('(pointer:coarse)').matches || (navigator.maxTouchPoints > 0 && 'ontouchstart' in window);
@@ -164,7 +167,7 @@
     btn = document.createElement('button');
     btn.className = 'nunki-snd';
     btn.type = 'button';
-    btn.setAttribute('aria-label', 'geluid aan of uit');
+    btn.setAttribute('aria-label', W('geluid aan of uit', 'sound on or off'));
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       '<path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" fill-opacity=".12"/>' +
       '<g class="w"><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18 6.8a7.4 7.4 0 0 1 0 10.4"/></g>' +
@@ -185,7 +188,7 @@
       } else {
         if (typeof window.audio === 'function') { try { window.audio(); } catch (x) {} }
         N.ctx.forEach(function (c) { c._nunkiResume(); });
-        if (!N.ctx.length) say('tik op de wand, dan klinkt hij', 3500);
+        if (!N.ctx.length) say(W('tik op de wand, dan klinkt hij', 'tap the wall, and it sounds'), 3500);
       }
       buzz(8);
       motionOn();
@@ -202,8 +205,8 @@
   var seen = +(store('nunki:touchtip') || 0);
   if (seen < 2 && btn) {
     store('nunki:touchtip', String(seen + 1));
-    setTimeout(function () { if (!playing()) say('tik voor geluid', 3800); }, 2200);
-    if (C.hand && C.hand !== 'off') setTimeout(function () { say('houd je vinger even stil en beweeg: dan voelt de wand je hand', 5200); }, 6800);
+    setTimeout(function () { if (!playing()) say(W('tik voor geluid', 'tap for sound'), 3800); }, 2200);
+    if (C.hand && C.hand !== 'off') setTimeout(function () { say(W('houd je vinger even stil en beweeg: dan voelt de wand je hand', 'hold your finger still for a moment, then move: the wall feels your hand'), 5200); }, 6800);
   }
 
   // ---- 3. a finger that is held still becomes the hand ----
@@ -1226,13 +1229,15 @@ window.__nunki={SHEETS,P,FILM};
 (function () {
   'use strict';
   var D = window.NUNKI_LEES;
-  if (!D || !D.sheets || !D.sheets.length) return;
+  if (!D || !D.sheets) return;
+  // without sheets the layer is only the language switch, for walls whose own text changes language
+  var PILL = !D.sheets.length;
   var q = new URLSearchParams(location.search);
   if (q.has('fast') || q.has('still')) return;
   var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
   var N = window.NUNKI = window.NUNKI || {};
-  var lang = q.get('lang');
-  if (lang === 'nl' || lang === 'en') store('nunki:lang', lang); else lang = store('nunki:lang');
+  var lang = window.NUNKI_LANG || q.get('lang');
+  if (!window.NUNKI_LANG) { if (lang === 'nl' || lang === 'en') store('nunki:lang', lang); else lang = store('nunki:lang'); }
   if (lang !== 'en') lang = 'nl';
   N.lang = lang;
 
@@ -1247,6 +1252,7 @@ window.__nunki={SHEETS,P,FILM};
     '@media (max-width:760px){.nunki-lees{font-size:14px;line-height:1.38;padding:7px 11px 9px}.nunki-lees .nl-t{font-size:.98rem}}' +
     '@media (min-width:900px){.nunki-lees:not(.touch){left:50%;transform:translateX(-50%)}.nunki-lees:not(.touch).gone{transform:translate(-50%,10px)}}' +
     '.nunki-lees.gone{opacity:0;transform:translateY(10px);pointer-events:none}' +
+    '.nunki-lees.pill{left:clamp(10px,1.5vw,22px)!important;transform:none!important}.nunki-lees.pill.gone{transform:translateY(10px)!important}' +
     '.nunki-lees .nl-h{display:flex;align-items:center;gap:8px;margin:0 0 3px}' +
     '.nunki-lees .nl-t{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;' +
       'font:400 1.02rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next",sans-serif;color:#ac5036}' +
@@ -1301,14 +1307,16 @@ window.__nunki={SHEETS,P,FILM};
     for (var i = 0; i < D.sheets.length; i++) if (y >= D.sheets[i].y) k = i;
     return k;
   }
-  function wanted() { return narrow() || lang !== (D.lang || 'nl'); }
+  function wanted() { return PILL || narrow() || lang !== (D.lang || 'nl'); }
   function head() {
     bL.innerHTML = lang === 'nl' ? '<b>nl</b> · en' : 'nl · <b>en</b>';
     bL.setAttribute('aria-label', UI[lang].lang);
     bX.textContent = min ? '▴' : '▾';
     bX.setAttribute('aria-label', min ? UI[lang].show : UI[lang].close);
     bX.title = min ? UI[lang].show : UI[lang].close;
-    box.classList.toggle('min', min);
+    box.classList.toggle('min', min || PILL);
+    box.classList.toggle('pill', PILL);
+    if (PILL) bX.style.display = 'none';
     box.classList.toggle('touch', touch && narrow());
   }
   function fill(k, swap) {
@@ -1326,16 +1334,20 @@ window.__nunki={SHEETS,P,FILM};
   function update() {
     // a wall that opens with a gate (a full-screen invitation) keeps the layer away until it is open
     var g = document.getElementById('gate'), gated = g && !g.classList.contains('off') && getComputedStyle(g).display !== 'none';
-    var k = sheetAt(), on = wanted() && k >= 0 && !gated;
-    if (on && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
+    var k = PILL ? 0 : sheetAt(), on = wanted() && k >= 0 && !gated;
+    if (PILL && D.end && wallY(0) >= D.end) on = false;
+    if (on && !PILL && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
+  function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
   bL.addEventListener('click', function () {
-    lang = lang === 'nl' ? 'en' : 'nl'; N.lang = lang; store('nunki:lang', lang);
-    head(); update();
-    try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: lang })); } catch (e) {}
+    var v = lang === 'nl' ? 'en' : 'nl';
+    if (window.NUNKI_SETLANG) window.NUNKI_SETLANG(v);
+    else { store('nunki:lang', v); setLang(v); try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: v })); } catch (e) {} }
   });
+  // the language can also change elsewhere: the switch under the wall, or the wall itself
+  addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 
   function start() {

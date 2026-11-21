@@ -20,13 +20,15 @@
 (function () {
   'use strict';
   var D = window.NUNKI_LEES;
-  if (!D || !D.sheets || !D.sheets.length) return;
+  if (!D || !D.sheets) return;
+  // without sheets the layer is only the language switch, for walls whose own text changes language
+  var PILL = !D.sheets.length;
   var q = new URLSearchParams(location.search);
   if (q.has('fast') || q.has('still')) return;
   var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
   var N = window.NUNKI = window.NUNKI || {};
-  var lang = q.get('lang');
-  if (lang === 'nl' || lang === 'en') store('nunki:lang', lang); else lang = store('nunki:lang');
+  var lang = window.NUNKI_LANG || q.get('lang');
+  if (!window.NUNKI_LANG) { if (lang === 'nl' || lang === 'en') store('nunki:lang', lang); else lang = store('nunki:lang'); }
   if (lang !== 'en') lang = 'nl';
   N.lang = lang;
 
@@ -41,6 +43,7 @@
     '@media (max-width:760px){.nunki-lees{font-size:14px;line-height:1.38;padding:7px 11px 9px}.nunki-lees .nl-t{font-size:.98rem}}' +
     '@media (min-width:900px){.nunki-lees:not(.touch){left:50%;transform:translateX(-50%)}.nunki-lees:not(.touch).gone{transform:translate(-50%,10px)}}' +
     '.nunki-lees.gone{opacity:0;transform:translateY(10px);pointer-events:none}' +
+    '.nunki-lees.pill{left:clamp(10px,1.5vw,22px)!important;transform:none!important}.nunki-lees.pill.gone{transform:translateY(10px)!important}' +
     '.nunki-lees .nl-h{display:flex;align-items:center;gap:8px;margin:0 0 3px}' +
     '.nunki-lees .nl-t{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;' +
       'font:400 1.02rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next",sans-serif;color:#ac5036}' +
@@ -95,14 +98,16 @@
     for (var i = 0; i < D.sheets.length; i++) if (y >= D.sheets[i].y) k = i;
     return k;
   }
-  function wanted() { return narrow() || lang !== (D.lang || 'nl'); }
+  function wanted() { return PILL || narrow() || lang !== (D.lang || 'nl'); }
   function head() {
     bL.innerHTML = lang === 'nl' ? '<b>nl</b> · en' : 'nl · <b>en</b>';
     bL.setAttribute('aria-label', UI[lang].lang);
     bX.textContent = min ? '▴' : '▾';
     bX.setAttribute('aria-label', min ? UI[lang].show : UI[lang].close);
     bX.title = min ? UI[lang].show : UI[lang].close;
-    box.classList.toggle('min', min);
+    box.classList.toggle('min', min || PILL);
+    box.classList.toggle('pill', PILL);
+    if (PILL) bX.style.display = 'none';
     box.classList.toggle('touch', touch && narrow());
   }
   function fill(k, swap) {
@@ -120,16 +125,20 @@
   function update() {
     // a wall that opens with a gate (a full-screen invitation) keeps the layer away until it is open
     var g = document.getElementById('gate'), gated = g && !g.classList.contains('off') && getComputedStyle(g).display !== 'none';
-    var k = sheetAt(), on = wanted() && k >= 0 && !gated;
-    if (on && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
+    var k = PILL ? 0 : sheetAt(), on = wanted() && k >= 0 && !gated;
+    if (PILL && D.end && wallY(0) >= D.end) on = false;
+    if (on && !PILL && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
+  function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
   bL.addEventListener('click', function () {
-    lang = lang === 'nl' ? 'en' : 'nl'; N.lang = lang; store('nunki:lang', lang);
-    head(); update();
-    try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: lang })); } catch (e) {}
+    var v = lang === 'nl' ? 'en' : 'nl';
+    if (window.NUNKI_SETLANG) window.NUNKI_SETLANG(v);
+    else { store('nunki:lang', v); setLang(v); try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: v })); } catch (e) {} }
   });
+  // the language can also change elsewhere: the switch under the wall, or the wall itself
+  addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 
   function start() {
