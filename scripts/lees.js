@@ -3,8 +3,8 @@
    bewerken, wel hier.
 
    De leeslaag: de zinnen van het vel dat je ziet, in gewone, leesbare letters.
-   - Taal kies je één keer voor de hele site: 'nunki:lang' (nl standaard, en),
-     met de knop rechtsboven (nunki:mark) of ?lang=en / ?lang=nl.
+   - De taal is die van het adres (/hart/ nl, /en/hart/ en; window.NUNKI_LANG uit
+     het mark-blok); de knop rechtsboven gaat naar het andere adres. ?lang= gaat voor.
    - Alleen op een telefoon (smal scherm): daar is de getekende tekst te klein.
      Op grotere schermen vertaalt de wand zijn eigen tekst (nunki:taal).
      Inklappen kan; dat wordt onthouden ('nunki:lees').
@@ -12,7 +12,6 @@
      de hoogte in wandeenheden (1600 breed) op py pixels van de bovenkant van
      het scherm. Zonder die functie wordt hij berekend voor een wand die de
      volle breedte vult: (scrollY + py) / (breedte / 1600).
-   - Een wand kan op taalwissel reageren via het event 'nunki:lang'.
 
    Gegevens (window.NUNKI_LEES):
    { lang: 'nl', end: 13200, sheets: [ { y: 0, t: {nl:'één', en:'one'},
@@ -120,9 +119,6 @@
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
-  function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
-  // the language changes with the switch top right
-  addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 
   function start() {

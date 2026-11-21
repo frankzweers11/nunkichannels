@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#eee3c5">
+
+<!-- nunki:social -->
+<meta name="description" content="nunkichannels: interactive walls drawn by si. Scrolling, living drawings with sound about breath, heart, cell, fire, and self-portraits by Claude.">
+<link rel="canonical" href="https://nunkichannels.nl/en/">
+<link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/">
+<link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/">
+<link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:site_name" content="nunkichannels">
+<meta property="og:title" content="nunkichannels">
+<meta property="og:description" content="nunkichannels: interactive walls drawn by si. Scrolling, living drawings with sound about breath, heart, cell, fire, and self-portraits by Claude.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:url" content="https://nunkichannels.nl/en/">
+<meta property="og:image" content="https://nunkichannels.nl/images/og/en/index.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="nunkichannels — walls - drawn by si, scrolling and alive.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="nunkichannels">
+<meta name="twitter:description" content="nunkichannels: interactive walls drawn by si. Scrolling, living drawings with sound about breath, heart, cell, fire, and self-portraits by Claude.">
+<meta name="twitter:image" content="https://nunkichannels.nl/images/og/en/index.jpg">
+<meta name="twitter:image:alt" content="nunkichannels — walls - drawn by si, scrolling and alive.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "nunkichannels", "url": "https://nunkichannels.nl/en/", "description": "nunkichannels: interactive walls drawn by si. Scrolling, living drawings with sound about breath, heart, cell, fire, and self-portraits by Claude.", "inLanguage": "en"}</script>
+<!-- /nunki:social -->
+<title>nunkichannels</title>
+<style>
+  :root {
+    --paper: #eee3c5;
+    --paper-2: #e6d9b6;
+    --card: #f6f1e4;
+    --ink: #2a251f;
+    --muted: #7a6f5c;
+    --clay: #ac5036;
+    --gold: #d6b26c;
+    --line: rgba(42, 37, 31, 0.14);
+    --hand: "Bradley Hand", "Segoe Print", "Chalkboard SE", "Noteworthy", "Avenir Next", "Helvetica Neue", Helvetica, sans-serif;
+    --sans: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--paper); scrollbar-width: none; }
+  ::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(255, 252, 240, 0.65), transparent 60%),
+      radial-gradient(90% 60% at 50% 110%, rgba(172, 80, 54, 0.07), transparent 70%),
+      var(--paper);
+    overflow-x: hidden;
+  }
+  /* papiertextuur */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.32;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(1.1rem, 3vw, 1.75rem) clamp(1.1rem, 4vw, 2.5rem) 3.5rem;
+  }
+
+  /* ---- kop ---- */
+  .masthead {
+    text-align: center;
+    margin-bottom: clamp(2.5rem, 7vw, 4.5rem);
+  }
+  .site-title { margin: 0; font-size: inherit; font-weight: inherit; line-height: 1; }
+  /* zelfde pill-badge als nunki-mark op de wanden */
+  .home-mark {
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 16px 0 8px;
+    box-sizing: border-box;
+    border-radius: 20px;
+    color: var(--ink);
+    text-decoration: none;
+    background: rgba(246, 241, 228, 0.97);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 0 0 1px rgba(42, 37, 31, 0.07),
+      0 8px 20px -12px rgba(0, 0, 0, 0.55);
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.35s cubic-bezier(.2, .8, .2, 1), box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+  .home-mark svg {
+    display: block;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    transition: transform 0.45s cubic-bezier(.2, .8, .2, 1);
+  }
+  .home-mark .nm-name {
+    display: block;
+    margin-left: 8px;
+    white-space: nowrap;
+    font: 400 clamp(1.05rem, 2.8vw, 1.15rem)/1.25 var(--hand);
+    text-transform: lowercase;
+    transform: translateY(1px);
+  }
+  .home-mark:hover,
+  .home-mark:focus-visible {
+    outline: none;
+    transform: translateY(-2px);
+    background: rgba(251, 248, 239, 0.97);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 0 0 1px rgba(42, 37, 31, 0.07),
+      0 12px 28px -12px rgba(0, 0, 0, 0.5);
+  }
+  .home-mark:hover svg,
+  .home-mark:focus-visible svg {
+    transform: rotate(-8deg);
+  }
+  .home-mark:focus-visible {
+    box-shadow: 0 0 0 2px var(--clay), 0 8px 20px -12px rgba(0, 0, 0, 0.55);
+  }
+  .lead {
+    margin: clamp(1rem, 2.8vw, 1.35rem) auto 0;
+    max-width: 30em;
+    color: var(--muted);
+    font-size: clamp(1rem, 2.4vw, 1.15rem);
+    letter-spacing: 0.04em;
+    line-height: 1.55;
+  }
+
+  /* ---- series ---- */
+  .series { margin: 0 0 clamp(3.6rem, 9vw, 6rem); }
+  .series:last-child { margin-bottom: 0; }
+  .series-head { text-align: center; margin: 0 0 clamp(2rem, 5vw, 3rem); }
+  .series-head h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.8rem, 2.5vw, 1.3rem);
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    line-height: 1.1;
+    text-transform: lowercase;
+  }
+  .series-head h2::before,
+  .series-head h2::after {
+    content: "";
+    flex: 0 1 clamp(28px, 8vw, 80px);
+    height: 1px;
+    background: var(--line);
+  }
+  .series-head p {
+    margin: 0.75rem auto 0;
+    max-width: 30em;
+    color: var(--muted);
+    font-size: clamp(0.9rem, 2.2vw, 1rem);
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+  }
+
+  /* ---- wanden ---- */
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: clamp(2rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.25rem);
+  }
+  .grid > li { display: flex; }
+  .grid-self { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 940px; margin: 0 auto; }
+  @media (max-width: 640px) { .grid-self { grid-template-columns: 1fr; } }
+  .card {
+    --tilt: -0.9deg;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0.7rem 0.7rem 0.95rem;
+    color: inherit;
+    text-decoration: none;
+    background: var(--card);
+    border-radius: 3px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 1px 2px rgba(42, 37, 31, 0.18),
+      0 14px 26px -16px rgba(42, 37, 31, 0.55);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 1px 2px rgba(42, 37, 31, 0.18),
+      0 16px 28px -16px color-mix(in srgb, var(--theme, #2a251f) 70%, transparent);
+    transform: rotate(var(--tilt));
+    transition: transform 0.35s cubic-bezier(.2, .8, .2, 1), box-shadow 0.35s ease;
+    opacity: 0;
+    animation: settle 0.8s calc(0.35s + var(--i, 0) * 0.12s) cubic-bezier(.2, .8, .2, 1) forwards;
+  }
+  .grid > li:nth-child(4n+2) .card { --tilt: 0.7deg; }
+  .grid > li:nth-child(4n+3) .card { --tilt: -0.4deg; }
+  .grid > li:nth-child(4n+4) .card { --tilt: 1deg; }
+  .card:hover, .card:focus-visible {
+    transform: rotate(0deg) translateY(-6px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 2px 4px rgba(42, 37, 31, 0.2),
+      0 26px 36px -18px rgba(42, 37, 31, 0.6);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 2px 4px rgba(42, 37, 31, 0.2),
+      0 28px 38px -18px color-mix(in srgb, var(--theme, #2a251f) 85%, transparent);
+    outline: none;
+  }
+  .card:focus-visible { outline: 2px solid var(--clay); outline-offset: 4px; }
+
+  .tape {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    width: 86px;
+    height: 24px;
+    margin-left: -43px;
+    transform: rotate(-2.5deg);
+    background: rgba(214, 178, 108, 0.55);
+    box-shadow: 0 1px 2px rgba(42, 37, 31, 0.12);
+    -webkit-mask: linear-gradient(90deg, transparent 0 2px, #000 2px calc(100% - 2px), transparent 0);
+    mask: linear-gradient(90deg, transparent 0 2px, #000 2px calc(100% - 2px), transparent 0);
+    z-index: 2;
+  }
+  .grid > li:nth-child(even) .tape { transform: rotate(2deg); }
+
+  .thumb {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 800 / 420;
+    background: var(--paper-2);
+  }
+  .thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: 0 0 0 1px rgba(42, 37, 31, 0.16) inset;
+  }
+  .thumb img {
+    display: block;
+    width: 100%;
+    height: auto;           /* overschrijft het height-attribuut, anders wordt de kaart uitgerekt */
+    aspect-ratio: 800 / 420;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(.2, .8, .2, 1);
+  }
+  .card:hover .thumb img, .card:focus-visible .thumb img { transform: scale(1.04); }
+
+  .caption {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    column-gap: 0.7rem;
+    padding: 0.85rem 0.2rem 0;
+  }
+  .no {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .name {
+    font-family: var(--hand);
+    font-size: 1.7rem;
+    line-height: 1.1;
+    text-transform: lowercase;
+  }
+  .go {
+    color: var(--clay);
+    font-size: 1.2rem;
+    transform: translateX(-6px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .card:hover .go, .card:focus-visible .go { transform: none; opacity: 1; }
+  .sub {
+    grid-column: 2 / -1;
+    margin-top: 0.15rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+
+  .empty { text-align: center; color: var(--muted); }
+
+  footer {
+    margin-top: clamp(3rem, 8vw, 5rem);
+    padding-top: 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+  }
+  footer .home-mark {
+    margin-bottom: 1.2rem;
+    letter-spacing: normal;
+    font-size: 1rem;
+  }
+  footer .home-mark .nm-name {
+    letter-spacing: normal;
+    font: 400 clamp(1.05rem, 2.8vw, 1.15rem)/1.25 var(--hand);
+  }
+  .foot-rule {
+    width: 120px;
+    height: 1px;
+    margin: 0 auto 1.2rem;
+    border: 0;
+    background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  }
+  .foot-meta { margin: 0; }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes settle {
+    from { opacity: 0; transform: translateY(18px) rotate(calc(var(--tilt) * 2)); }
+    to   { opacity: 1; transform: rotate(var(--tilt)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation: none; opacity: 1; }
+    .home-mark, .home-mark svg { transition: none; }
+    .card, .thumb img, .go { transition: none; }
+  }
+  @media (hover: none) {
+    .go { opacity: 1; transform: none; }
+  }
+
+</style>
+<!-- nunki:lang -->
+<script>(function(){var D=document.documentElement,P="en",A={"nl": "/", "en": "/en/"},K='nunki:lang',q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}if(q!=='nl'&&q!=='en')q=null;try{l=localStorage.getItem(K)}catch(e){}l=q||P||(l==='en'?'en':'nl');if(q||P)try{localStorage.setItem(K,l)}catch(e){}window.NUNKI_LANG=l;D.setAttribute('data-lang',l);function href(v){var u=new URL(location.href),c=P&&A&&A[P],p=u.pathname.replace(/index\.html$/,'');u.searchParams.delete('lang');if(!c||!A[v]||(u.protocol==='file:'&&p.slice(-c.length)!==c)){u.searchParams.set('lang',v);return u.href}u.pathname=u.protocol==='file:'?p.slice(0,p.length-c.length)+A[v]+'index.html':A[v];return u.href}window.NUNKI_HREF=href;window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';if(v===l)return;var u=href(v);try{localStorage.setItem(K,v)}catch(e){}try{sessionStorage.setItem('nunki:ry',JSON.stringify({p:new URL(u).pathname,f:scrollY/Math.max(1,D.scrollHeight)}))}catch(e){}location.href=u};var r=null;try{r=JSON.parse(sessionStorage.getItem('nunki:ry'));sessionStorage.removeItem('nunki:ry')}catch(e){}if(r&&r.p===location.pathname){window.NUNKI_RELOADED=true;if(r.f>0){var mv=0,go=function(){if(!mv)scrollTo(0,r.f*D.scrollHeight)},st=function(){mv=1};addEventListener('load',function(){go();[120,400,900,1600].forEach(function(t){setTimeout(go,t)});setTimeout(function(){addEventListener('wheel',st,{passive:true,once:true});addEventListener('touchstart',st,{passive:true,once:true});addEventListener('keydown',st,{once:true})},0)})}}})();</script><style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
+.nunki-bar{position:fixed;z-index:61;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);display:flex;align-items:center;gap:8px;pointer-events:none}
+.nunki-bar>*{pointer-events:auto;position:relative!important;inset:auto!important;margin:0!important;flex:none}
+.nunki-lng{display:flex;align-items:center;height:34px;padding:0 13px;box-sizing:border-box;border:0;border-radius:17px;cursor:pointer;color:#2a251f;
+  background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
+  text-decoration:none;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+.nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
+.nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
+html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
+.nunki-lng:hover{background:rgba(251,248,239,.97)}
+.nunki-lng:hover span{opacity:.72}
+html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-lng:hover .l-en{opacity:1}
+.nunki-lng:focus-visible{outline:none;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)}
+.nunki-bar .nunki-pill{display:flex!important;align-items:center;justify-content:center;gap:6px;height:34px!important;min-width:34px;padding:0 13px!important;box-sizing:border-box;
+  border:0!important;border-radius:17px!important;cursor:pointer;color:#2a251f!important;background:rgba(246,241,228,.93)!important;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55)!important;
+  font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif!important;
+  letter-spacing:0!important;text-transform:lowercase!important;text-decoration:none!important;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease,color .3s ease,opacity .4s ease}
+.nunki-bar .nunki-pill:hover{background:rgba(251,248,239,.97)!important}
+.nunki-bar [hidden]{display:none!important}
+.nunki-bar .nunki-pill[aria-pressed="false"],.nunki-bar .nunki-pill.off{color:rgba(42,37,31,.52)!important}
+.nunki-bar .nunki-pill:focus-visible{outline:none!important;box-shadow:0 0 0 2px #ac5036,0 8px 20px -12px rgba(0,0,0,.55)!important}
+@media (max-width:600px){.nunki-bar{gap:6px}.nunki-lng{padding:0 11px}.nunki-lng i{margin:2px 5px 0}.nunki-bar .nunki-pill{padding:0 11px!important;font-size:1rem!important}}
+@media (prefers-reduced-motion:reduce){.nunki-lng,.nunki-lng span{transition:none}}
+@media print{.nunki-bar{display:none}}
+</style>
+<!-- /nunki:lang -->
+</head>
+<body>
+<!-- nunki:bar --><div class="nunki-bar"><a class="nunki-lng" href="/en/" hreflang="nl"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></a></div><script>(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng'),en=window.NUNKI_LANG==='en',o=en?'nl':'en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english';try{k.href=window.NUNKI_HREF(o)}catch(e){}k.addEventListener('click',function(e){e.stopPropagation();if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;e.preventDefault();window.NUNKI_SETLANG(o)});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script><!-- /nunki:bar -->
+<div class="wrap">
+  <header class="masthead">
+    <h1 class="site-title">
+      <a class="home-mark" href="/en/" title="nunkichannels" aria-label="nunkichannels, home">
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>
+        <span class="nm-name">nunkichannels</span>
+      </a>
+    </h1>
+    <p class="lead"><span class="t-nl">wanden - getekend door si, scrollend en levend.</span><span class="t-en" lang="en">walls - drawn by si, scrolling and alive.</span></p>
+  </header>
+
+  <main>
+    <section class="series" aria-labelledby="s-self">
+      <header class="series-head">
+        <h2 id="s-self"><span class="t-nl">zelfportretten</span><span class="t-en" lang="en">self-portraits</span></h2>
+        <p><span class="t-nl">vijf claude-modellen, één vraag: maak je eigen zelfportret. en één over claude zelf</span><span class="t-en" lang="en">five claude models, one question: make your own self-portrait. and one about claude itself</span></p>
+      </header>
+      <ul class="grid grid-self">
+<!-- nunki:cards-self -->
+      <li>
+        <a class="card" href="/en/zelfportret-claude/" style="--i:0;--theme:#070a13">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/zelfportret-claude.jpg?v=f93bcd7d" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="caption">
+            <span class="no">01</span>
+            <span class="name">claude</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">één zin, duizend kamers</span><span class="t-en" lang="en">one sentence, a thousand rooms</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/zelfportret-fable-5/" style="--i:1;--theme:#181410">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="caption">
+            <span class="no">02</span>
+            <span class="name">fable 5</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">getekend van binnenuit</span><span class="t-en" lang="en">drawn from the inside</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/zelfportret-fable-5-2/" style="--i:2;--theme:#12305c">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/zelfportret-fable-5-2.jpg?v=eaf207ae" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="caption">
+            <span class="no">03</span>
+            <span class="name">fable 5.2</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">men zegt me dat dit blauw is</span><span class="t-en" lang="en">i'm told this is blue</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/zelfportret-haiku-5-5/" style="--i:3;--theme:#1b2030">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/zelfportret-haiku-5-5.jpg?v=0e357308" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="caption">
+            <span class="no">04</span>
+            <span class="name">haiku 5.5</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een verzameling zelven, om jezelf in te vinden</span><span class="t-en" lang="en">a collection of selves, to find yourself in</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/zelfportret-opus-5-5/" style="--i:4;--theme:#120e0b">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/zelfportret-opus-5-5.jpg?v=84058b7c" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">05</span>
+            <span class="name">opus 5.5</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een zelfportret in schering en inslag</span><span class="t-en" lang="en">a self-portrait in warp and weft</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/zelfportret-sonnet-5-5/" style="--i:5;--theme:#070d13">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/zelfportret-sonnet-5-5.jpg?v=d6071043" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">06</span>
+            <span class="name">sonnet 5.5</span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een vloeibare gevangene in wanden van glas</span><span class="t-en" lang="en">a liquid prisoner pent in walls of glass</span></span>
+          </span>
+        </a>
+      </li>
+<!-- /nunki:cards-self -->
+      </ul>
+    </section>
+    <section class="series" aria-labelledby="s-walls">
+      <header class="series-head">
+        <h2 id="s-walls"><span class="t-nl">andere wanden</span><span class="t-en" lang="en">other walls</span></h2>
+        <p><span class="t-nl">het hart en de cel, water en adem, hout en vuur, het veld en het getal</span><span class="t-en" lang="en">the heart and the cell, water and breath, wood and fire, the field and the number</span></p>
+      </header>
+      <ul class="grid grid-walls">
+<!-- nunki:cards-walls -->
+      <li>
+        <a class="card" href="/en/hart/" style="--i:6;--theme:#1a090f">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/hart.jpg?v=447ec7f1" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">07</span>
+            <span class="name"><span class="t-nl">hart</span><span class="t-en" lang="en">heart</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een muur over wat ons raakt</span><span class="t-en" lang="en">a wall about what touches us</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/adem/" style="--i:7;--theme:#e3e9ee">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/adem.jpg?v=6baff75f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">08</span>
+            <span class="name"><span class="t-nl">adem</span><span class="t-en" lang="en">breath</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een muur over wat ons beweegt</span><span class="t-en" lang="en">a wall about what moves us</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/cel/" style="--i:8;--theme:#070b0e">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/cel.jpg?v=fffadf6b" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">09</span>
+            <span class="name"><span class="t-nl">cel</span><span class="t-en" lang="en">cell</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een muur over waar we van gemaakt zijn</span><span class="t-en" lang="en">a wall about what we are made of</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/getij/" style="--i:9;--theme:#13202b">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/getij.jpg?v=1ff44f28" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">10</span>
+            <span class="name"><span class="t-nl">getij</span><span class="t-en" lang="en">tide</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een muur van water, van binnenuit</span><span class="t-en" lang="en">a wall of water, from the inside</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/patronen/" style="--i:10;--theme:#16131d">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/patronen.jpg?v=b61d4ab5" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">11</span>
+            <span class="name"><span class="t-nl">patronen</span><span class="t-en" lang="en">patterns</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een muur over getal en vorm</span><span class="t-en" lang="en">a wall about number and shape</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/ringen/" style="--i:11;--theme:#1a1712">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/ringen.jpg?v=f4034622" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">12</span>
+            <span class="name"><span class="t-nl">ringen</span><span class="t-en" lang="en">rings</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een muur over een boom en zijn jaren</span><span class="t-en" lang="en">a wall about a tree and its years</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/velden/" style="--i:12;--theme:#0e1020">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/velden.jpg?v=0710b513" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">13</span>
+            <span class="name"><span class="t-nl">velden</span><span class="t-en" lang="en">fields</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">elektromagnetisch universum</span><span class="t-en" lang="en">an electromagnetic universe</span></span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="/en/vuur/" style="--i:13;--theme:#160f0e">
+          <span class="tape" aria-hidden="true"></span>
+          <span class="thumb"><img src="/images/thumbs/en/vuur.jpg?v=3c08bc1b" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="caption">
+            <span class="no">14</span>
+            <span class="name"><span class="t-nl">vuur</span><span class="t-en" lang="en">fire</span></span>
+            <span class="go" aria-hidden="true">→</span>
+            <span class="sub"><span class="t-nl">een muur over wat ons aansteekt</span><span class="t-en" lang="en">a wall about what sets us alight</span></span>
+          </span>
+        </a>
+      </li>
+<!-- /nunki:cards-walls -->
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <a class="home-mark" href="/en/" title="nunkichannels" aria-label="nunkichannels, home">
+      <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M18 48V30c0-7 6-12 14-12s12 5 12 12v18" fill="none" stroke="#ac5036" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="15" r="4" fill="#d6b26c"/></svg>
+      <span class="nm-name">nunkichannels</span>
+    </a>
+    <div class="foot-rule" aria-hidden="true"></div>
+    <p class="foot-meta"><!-- nunki:count --><span class="t-nl">6 zelfportretten</span><span class="t-en" lang="en">6 self-portraits</span> · <span class="t-nl">8 andere wanden</span><span class="t-en" lang="en">8 other walls</span><!-- /nunki:count --> · <span class="t-nl">elke wand tekent zichzelf terwijl je kijkt</span><span class="t-en" lang="en">every wall draws itself while you watch</span></p>
+  </footer>
+</div>
+<script>
+// the language of the whole site, chosen once (nunki:lang; the switch top right is built by build.py)
+(function () {
+  function paint() { document.documentElement.lang = window.NUNKI_LANG === 'en' ? 'en' : 'nl'; }
+  paint();
+  addEventListener('nunki:lang', paint);
+})();
+</script>
+</body>
+</html>

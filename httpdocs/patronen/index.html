@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-wand-lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,6 +7,9 @@
 <!-- nunki:social -->
 <meta name="description" content="Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.">
 <link rel="canonical" href="https://nunkichannels.nl/patronen/">
+<link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/patronen/">
+<link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/patronen/">
+<link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/patronen/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -15,6 +18,7 @@
 <meta property="og:description" content="Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="nl_NL">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:url" content="https://nunkichannels.nl/patronen/">
 <meta property="og:image" content="https://nunkichannels.nl/images/og/patronen.jpg">
 <meta property="og:image:width" content="1200">
@@ -61,7 +65,7 @@
 </head>
 <body>
 <!-- nunki:mark -->
-<script>(function(){var D=document.documentElement,q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();</script>
+<script>(function(){var D=document.documentElement,P="nl",A={"nl": "/patronen/", "en": "/en/patronen/"},K='nunki:lang',q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}if(q!=='nl'&&q!=='en')q=null;try{l=localStorage.getItem(K)}catch(e){}l=q||P||(l==='en'?'en':'nl');if(q||P)try{localStorage.setItem(K,l)}catch(e){}window.NUNKI_LANG=l;D.setAttribute('data-lang',l);function href(v){var u=new URL(location.href),c=P&&A&&A[P],p=u.pathname.replace(/index\.html$/,'');u.searchParams.delete('lang');if(!c||!A[v]||(u.protocol==='file:'&&p.slice(-c.length)!==c)){u.searchParams.set('lang',v);return u.href}u.pathname=u.protocol==='file:'?p.slice(0,p.length-c.length)+A[v]+'index.html':A[v];return u.href}window.NUNKI_HREF=href;window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';if(v===l)return;var u=href(v);try{localStorage.setItem(K,v)}catch(e){}try{sessionStorage.setItem('nunki:ry',JSON.stringify({p:new URL(u).pathname,f:scrollY/Math.max(1,D.scrollHeight)}))}catch(e){}location.href=u};var r=null;try{r=JSON.parse(sessionStorage.getItem('nunki:ry'));sessionStorage.removeItem('nunki:ry')}catch(e){}if(r&&r.p===location.pathname){window.NUNKI_RELOADED=true;if(r.f>0){var mv=0,go=function(){if(!mv)scrollTo(0,r.f*D.scrollHeight)},st=function(){mv=1};addEventListener('load',function(){go();[120,400,900,1600].forEach(function(t){setTimeout(go,t)});setTimeout(function(){addEventListener('wheel',st,{passive:true,once:true});addEventListener('touchstart',st,{passive:true,once:true});addEventListener('keydown',st,{once:true})},0)})}}})();</script>
 <style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
 .nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
   height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
@@ -90,7 +94,7 @@
   background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
   font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
-  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+  text-decoration:none;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
 .nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
 .nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
 html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
@@ -112,8 +116,8 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
 @media (max-width:600px){.nunki-bar{gap:6px}.nunki-lng{padding:0 11px}.nunki-lng i{margin:2px 5px 0}.nunki-bar .nunki-pill{padding:0 11px!important;font-size:1rem!important}}
 @media (prefers-reduced-motion:reduce){.nunki-lng,.nunki-lng span{transition:none}}
 @media print{.nunki-bar{display:none}}
-</style><div class="nunki-bar"><button class="nunki-lng" type="button"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div>
-<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');function lab(){var en=window.NUNKI_LANG==='en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script>
+</style><div class="nunki-bar"><a class="nunki-lng" href="/en/patronen/" hreflang="en"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></a></div>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng'),en=window.NUNKI_LANG==='en',o=en?'nl':'en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english';try{k.href=window.NUNKI_HREF(o)}catch(e){}k.addEventListener('click',function(e){e.stopPropagation();if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;e.preventDefault();window.NUNKI_SETLANG(o)});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script>
 <!-- /nunki:mark -->
 <!-- nunki:taal -->
 <script>window.NUNKI_TAAL={"lang":"nl","tr":{"patronen":"patterns","een muur over getal en vorm":"a wall about number and shape","één":"one","zes keer past de straal erin":"the radius fits six times","alles begint met een punt":"everything begins with a point","een punt is wat geen delen heeft · euclides":"a point is that which has no part · euclid","tik op het zwart: een punt wordt een bloem · elk getal heeft een toon":"tap the black: a point becomes a flower · every number has a tone","twee":"two","het oog":"the eye","de vis":"the fish","een cel wordt twee":"one cell becomes two","plus en min":"plus and minus","twee cirkels, elk door het hart van de ander":"two circles, each through the heart of the other","(beweeg over de twee cirkels: ze klinken samen)":"(move over the two circles: they sound together)","drie":"three","de eerste vorm":"the first shape","die een ruimte omsluit":"that encloses a space","euclides, boek één, stelling één":"euclid, book one, proposition one","vier driehoeken: vuur":"four triangles: fire","staat altijd stil":"always stands still","drie in één":"three in one","tel ze op: 1 + 2 + 3 + 4 = 10":"add them up: 1 + 2 + 3 + 4 = 10","met drie poten wiebelt niets":"on three legs nothing wobbles","(tik erop)":"(tap it)","vier poten":"four legs","(leun erop, of tik)":"(lean on it, or tap)","vier":"four","3960 mijl":"3960 miles","1080 mijl":"1080 miles","aarde":"earth","maan":"moon","en de cirkel is bijna precies zo lang als het vierkant":"and the circle is almost exactly as long as the square","vuur":"fire","lucht":"air","water":"water","zout groeit in kubussen":"salt grows in cubes","lente":"spring","zomer":"summer","herfst":"autumn","winter":"winter","de mens past in allebei":"a human fits in both","de hemel is rond, de aarde is vierkant":"heaven is round, the earth is square","(tik: een wedren)":"(tap: a race)","vijf":"five","het grote stuk staat tot het kleine als het geheel tot het grote":"the large part is to the small as the whole is to the large","snijd hem dwars door":"cut it across","(tik op de appel)":"(tap the apple)","appelbloesem":"apple blossom","zeester":"starfish","zanddollar":"sand dollar","in elke appel zit een ster":"in every apple there is a star","elk vierkant zo breed als de twee ervoor":"each square as wide as the two before it","spiralen de ene kant op,":"spirals one way,","de andere":"the other way","(beweeg over het hart: elke pit een andere hoek verder)":"(move over the heart: each seed turned a different angle)","groeien zonder je vorm te verliezen":"growing without losing your shape","elk getal is de som van de twee ervoor":"each number is the sum of the two before","de zon":"the sun","(tik: zet de zon in het midden)":"(tap: put the sun in the middle)","vijf · acht · dertien":"five · eight · thirteen","in acht jaar gaat venus":"in eight years venus goes","dertien keer om de zon":"thirteen times around the sun","en staat ze vijf keer":"and five times she stands","precies tussen ons en de zon":"exactly between us and the sun","zo ziet het eruit":"this is what it looks like","als je vanaf de aarde kijkt":"seen from the earth","in acht jaar tekent venus een roos":"in eight years venus draws a rose","vijf, acht en dertien: weer fibonacci":"five, eight and thirteen: fibonacci again","zes":"six","zo boven, zo beneden":"as above, so below","de bloem van het leven":"the flower of life","de bij bouwt in zessen":"the bee builds in sixes","nooit twee dezelfde":"never two the same","(tik op het papier)":"(tap the paper)","kekulé zag in een droom een slang":"kekulé saw a snake in a dream","die in zijn eigen staart beet":"biting its own tail","saturnus draagt een zeshoek":"saturn wears a hexagon","geen sneeuwvlok is gelijk, en toch telt elke tot zes":"no snowflake is alike, and yet each counts to six","dertien cirkels,":"thirteen circles,","elk middelpunt":"every centre","met elk ander verbonden:":"joined to every other:","78 lijnen":"78 lines","kijk goed:":"look closely:","er zit een kubus in":"there is a cube inside","tetraëder":"tetrahedron","kubus":"cube","octaëder":"octahedron","icosaëder":"icosahedron","dodecaëder":"dodecahedron","ether":"ether","(tik op een vorm: hij telt zijn vlakken)":"(tap a shape: it counts its faces)","vijf vormen, en meer zijn er niet":"five shapes, and there are no more","leonardo tekende ze zo voor het boek van pacioli, 1509":"leonardo drew them like this for pacioli's book, 1509","zeven":"seven","zaterdag":"saturday","donderdag":"thursday","dinsdag":"tuesday","zondag":"sunday","vrijdag":"friday","woensdag":"wednesday","maandag":"monday","zeven kleuren":"seven colours","do":"do","re":"re","mi":"mi","fa":"fa","sol":"sol","la":"la","si":"ti","zeven tonen":"seven tones","zeven centra":"seven centres","met passer en liniaal":"with compass and ruler","sluit de zevenhoek nooit":"the heptagon never closes","de week is een ster":"the week is a star","acht":"eight","octaaf":"octave","kwint":"fifth","kwart":"fourth","pluk een snaar":"pluck a string","heel":"whole","in helften":"in halves","in derden":"in thirds","in kwarten":"in quarters","geluid wordt vorm":"sound becomes shape","(tik op de plaat)":"(tap the plate)","het laatste stukje ontbreekt altijd":"the last little piece is always missing","halveer een snaar en hij zingt hetzelfde lied, hoger":"halve a string and it sings the same song, higher","negen":"nine","wie de 3, de 6 en de 9 begrijpt, heeft een sleutel — zo wordt tesla geciteerd":"whoever understands 3, 6 and 9 holds a key — so tesla is quoted","driehoek 180°":"triangle 180°","vierkant 360°":"square 360°","vijfhoek 540°":"pentagon 540°","zeshoek 720°":"hexagon 720°","achthoek 1080°":"octagon 1080°","steeds weer 9":"9 every time","de negen komt altijd terug":"the nine always comes back","(tik in de cirkel: verdubbel · tik op een getal: begin daar)":"(tap in the circle: double · tap a number: start there)","tien":"ten","1 · het punt":"1 · the point","2 · de lijn":"2 · the line","3 · het vlak":"3 · the plane","4 · de ruimte":"4 · space","de pythagoreeërs zwoeren erbij":"the pythagoreans swore by it","zijn":"being","actie":"action","reactie":"reaction","vreugde":"joy","overgave":"surrender","kracht":"power","liefde":"love","sterkte":"strength","genade":"grace","vrede":"peace","begrip":"understanding","wijsheid":"wisdom","bewust":"aware","de levensboom in de bloem":"the tree of life in the flower","naar franks dertien bloemen":"after frank's thirteen flowers","(tik op de stenen: elke steen is een boventoon)":"(tap the stones: each stone is an overtone)","(tik: terug naar één)":"(tap: back to one)","tien is weer één":"ten is one again","patronen · van één tot tien · 2026":"patterns · from one to ten · 2026","(mijn echte handtekening)":"(my real signature)","een cirkel, en nog een":"a circle, and another","in het oog staat een driehoek":"in the eye stands a triangle","en ook de rechte hoek":"and the right angle too","uit een vierkant volgt φ":"from a square follows φ","φ verstopt zich in een rij getallen":"φ hides in a row of numbers","en de hemel telt mee":"and the sky counts along","de bloem draagt vrucht":"the flower bears fruit","aan de oude hemel: zeven dwaalsterren":"in the old sky: seven wandering stars","de achtste toon is weer do":"the eighth tone is do again","blijf verdubbelen, tel de cijfers op":"keep doubling, add up the digits","na negen begint het opnieuw":"after nine it begins again","1 : 1 · één toon":"1 : 1 · one tone","1 : 2 · een octaaf":"1 : 2 · an octave","2 : 3 · een kwint":"2 : 3 · a fifth","acht spaken":"eight spokes","twaalf spaken":"twelve spokes","vijf armen":"five arms","drie armen, en gaten ertussen":"three arms, and gaps between","geen gaten":"no gaps","de 3 en de 6 wisselen elkaar af":"the 3 and the 6 take turns","en zo voort, altijd weer:":"and so on, over and over:","en de zevende boventoon staat op geen enkele piano":"and the seventh overtone is on no piano at all","het scheelt 13 mijl":"13 miles apart","op 31.680":"in 31,680","samen thuis":"at home together","vandaag":"today","welkom terug":"welcome back","alle tien · tik, en ze worden weer één":"all ten · tap, and they become one again","alle tien boventonen · tik, en ze klinken samen":"all ten overtones · tap, and they sound together","de boventonen die je hoorde":"the overtones you heard"},"re":[["^welkom terug · je hoorde al één van de tien tonen$","welcome back · you already heard one of the ten tones"],["^welkom terug · je hoorde al twee van de tien tonen$","welcome back · you already heard two of the ten tones"],["^welkom terug · je hoorde al drie van de tien tonen$","welcome back · you already heard three of the ten tones"],["^welkom terug · je hoorde al vier van de tien tonen$","welcome back · you already heard four of the ten tones"],["^welkom terug · je hoorde al vijf van de tien tonen$","welcome back · you already heard five of the ten tones"],["^welkom terug · je hoorde al zes van de tien tonen$","welcome back · you already heard six of the ten tones"],["^welkom terug · je hoorde al zeven van de tien tonen$","welcome back · you already heard seven of the ten tones"],["^welkom terug · je hoorde al acht van de tien tonen$","welcome back · you already heard eight of the ten tones"],["^welkom terug · je hoorde al negen van de tien tonen$","welcome back · you already heard nine of the ten tones"],["^welkom terug · je hoorde al tien van de tien tonen$","welcome back · you already heard ten of the ten tones"],["^je hoorde er nog geen van de tien$","you heard none of the ten"],["^je hoorde er één van de tien$","you heard one of the ten"],["^je hoorde er twee van de tien$","you heard two of the ten"],["^je hoorde er drie van de tien$","you heard three of the ten"],["^je hoorde er vier van de tien$","you heard four of the ten"],["^je hoorde er vijf van de tien$","you heard five of the ten"],["^je hoorde er zes van de tien$","you heard six of the ten"],["^je hoorde er zeven van de tien$","you heard seven of the ten"],["^je hoorde er acht van de tien$","you heard eight of the ten"],["^je hoorde er negen van de tien$","you heard nine of the ten"],["^de aarde (\\d+) keer rond · venus (\\d+) keer · één keer samen$","the earth around $1 times · venus $2 times · together one time"],["^de aarde (\\d+) keer rond · venus (\\d+) keer · twee keer samen$","the earth around $1 times · venus $2 times · together two times"],["^de aarde (\\d+) keer rond · venus (\\d+) keer · drie keer samen$","the earth around $1 times · venus $2 times · together three times"],["^de aarde (\\d+) keer rond · venus (\\d+) keer · vier keer samen$","the earth around $1 times · venus $2 times · together four times"],["^de aarde (\\d+) keer rond · venus (\\d+) keer · vijf keer samen$","the earth around $1 times · venus $2 times · together five times"],["^nog stil: (.*)$","still silent: $1"],["^begin bij (\\d+)$","start at $1"],["^boventonen: (\\d+) van de tien · tik, en ze klinken samen$","overtones: $1 of ten · tap, and they sound together"]]};</script>
@@ -124,14 +128,13 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
    De getekende tekst van een wand in de gekozen taal. De wand haalt elke zin
    die hij gaat tekenen door window.NUNKI_T(zin): is de gekozen taal (nunki:lang)
    gelijk aan die van de wand, dan komt de zin ongewijzigd terug, anders de
-   vertaling. Een wand tekent zijn tekst één keer, dus bij een taalwissel laadt
-   de pagina opnieuw en springt terug naar dezelfde plek (tenzij live: true;
-   dan regelt de wand het zelf via het event 'nunki:lang').
+   vertaling. Elke taal heeft een eigen adres (/hart/, /en/hart/): de taalwissel
+   rechtsboven gaat naar het andere adres, op dezelfde plek (dat regelt het
+   taalscript in het mark-blok, zie lang_js in build.py).
 
    Gegevens (window.NUNKI_TAAL):
    { lang: 'nl', tr: { 'zin': 'sentence', ... },
-     re: [ ['^(\\d+) jaar$', '$1 years'], ... ],   // voor zinnen met een getal
-     live: false }
+     re: [ ['^(\\d+) jaar$', '$1 years'], ... ] }   // voor zinnen met een getal
    ?trmiss in het adres: window.NUNKI_TMISS houdt bij welke zinnen nog geen
    vertaling hebben (om te testen). */
 (function () {
@@ -155,31 +158,6 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
   window.NUNKI_TMISS = miss;
   window.NUNKI_TWALL = W;
 
-  // the wall drew its words once: a new language means drawing it again, from the same place
-  var KEY = 'nunki:ry';
-  addEventListener('nunki:lang', function () {
-    if (D.live) return;
-    var h = Math.max(1, document.documentElement.scrollHeight);
-    try { sessionStorage.setItem(KEY, JSON.stringify({ p: location.pathname, f: scrollY / h })); } catch (e) {}
-    location.reload();
-  });
-  var r = null;
-  try { r = JSON.parse(sessionStorage.getItem(KEY)); sessionStorage.removeItem(KEY); } catch (e) {}
-  // the visitor was already inside: a wall with a gate can skip it
-  if (r && r.p === location.pathname) window.NUNKI_RELOADED = true;
-  if (r && r.p === location.pathname && r.f > 0) {
-    var moved = false, go = function () { if (!moved) scrollTo(0, r.f * document.documentElement.scrollHeight); };
-    var stop = function () { moved = true; };
-    addEventListener('load', function () {
-      go();
-      [120, 400, 900, 1600].forEach(function (t) { setTimeout(go, t); });
-      setTimeout(function () {
-        addEventListener('wheel', stop, { passive: true, once: true });
-        addEventListener('touchstart', stop, { passive: true, once: true });
-        addEventListener('keydown', stop, { once: true });
-      }, 0);
-    });
-  }
 })();
 </script>
 <!-- /nunki:taal -->
@@ -427,7 +405,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
 </script>
 <!-- /nunki:touch -->
 <!-- nunki:seo -->
-<div style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0"><h1>patronen</h1><p>Patronen is een muur over getal en vorm, van één punt tot tien: de cirkel en het vierkant, de gulden snede en Fibonacci, de rozet die Venus in acht jaar tekent, sneeuwvlokken, de vijf regelmatige lichamen en een snaar die halveert en hoger zingt. Elk getal heeft een eigen boventoon van één lage snaar. Je snijdt een appel open en vindt de ster, draait aan de hoek van een zonnebloem, laat Venus en de aarde dansen, laat sneeuwvlokken groeien en verzamelt onderweg de tien tonen die op het laatste vel samen klinken.</p></div>
+<div style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0" lang="nl"><h1>patronen</h1><p>Patronen is een muur over getal en vorm, van één punt tot tien: de cirkel en het vierkant, de gulden snede en Fibonacci, de rozet die Venus in acht jaar tekent, sneeuwvlokken, de vijf regelmatige lichamen en een snaar die halveert en hoger zingt. Elk getal heeft een eigen boventoon van één lage snaar. Je snijdt een appel open en vindt de ster, draait aan de hoek van een zonnebloem, laat Venus en de aarde dansen, laat sneeuwvlokken groeien en verzamelt onderweg de tien tonen die op het laatste vel samen klinken.</p></div>
 <!-- /nunki:seo -->
 <div id="wall"></div>
 <canvas id="trail"></canvas>
@@ -3621,8 +3599,8 @@ window.__nunki={TILES,LIVE,HITS,HEARD,MEM,PTR,get AC(){return AC},
    bewerken, wel hier.
 
    De leeslaag: de zinnen van het vel dat je ziet, in gewone, leesbare letters.
-   - Taal kies je één keer voor de hele site: 'nunki:lang' (nl standaard, en),
-     met de knop rechtsboven (nunki:mark) of ?lang=en / ?lang=nl.
+   - De taal is die van het adres (/hart/ nl, /en/hart/ en; window.NUNKI_LANG uit
+     het mark-blok); de knop rechtsboven gaat naar het andere adres. ?lang= gaat voor.
    - Alleen op een telefoon (smal scherm): daar is de getekende tekst te klein.
      Op grotere schermen vertaalt de wand zijn eigen tekst (nunki:taal).
      Inklappen kan; dat wordt onthouden ('nunki:lees').
@@ -3630,7 +3608,6 @@ window.__nunki={TILES,LIVE,HITS,HEARD,MEM,PTR,get AC(){return AC},
      de hoogte in wandeenheden (1600 breed) op py pixels van de bovenkant van
      het scherm. Zonder die functie wordt hij berekend voor een wand die de
      volle breedte vult: (scrollY + py) / (breedte / 1600).
-   - Een wand kan op taalwissel reageren via het event 'nunki:lang'.
 
    Gegevens (window.NUNKI_LEES):
    { lang: 'nl', end: 13200, sheets: [ { y: 0, t: {nl:'één', en:'one'},
@@ -3738,9 +3715,6 @@ window.__nunki={TILES,LIVE,HITS,HEARD,MEM,PTR,get AC(){return AC},
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
-  function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
-  // the language changes with the switch top right
-  addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 
   function start() {

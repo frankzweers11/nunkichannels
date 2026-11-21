@@ -8,6 +8,9 @@
 <!-- nunki:social -->
 <meta name="description" content="nunkichannels: interactieve wanden getekend door si. Scrollende, levende tekeningen met geluid over adem, hart, cel, vuur en zelfportretten van Claude.">
 <link rel="canonical" href="https://nunkichannels.nl/">
+<link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/">
+<link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/">
+<link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -16,6 +19,7 @@
 <meta property="og:description" content="nunkichannels: interactieve wanden getekend door si. Scrollende, levende tekeningen met geluid over adem, hart, cel, vuur en zelfportretten van Claude.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="nl_NL">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:url" content="https://nunkichannels.nl/">
 <meta property="og:image" content="https://nunkichannels.nl/images/og/index.jpg">
 <meta property="og:image:width" content="1200">
@@ -347,14 +351,14 @@
 
 </style>
 <!-- nunki:lang -->
-<script>(function(){var D=document.documentElement,q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();</script><style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
+<script>(function(){var D=document.documentElement,P="nl",A={"nl": "/", "en": "/en/"},K='nunki:lang',q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}if(q!=='nl'&&q!=='en')q=null;try{l=localStorage.getItem(K)}catch(e){}l=q||P||(l==='en'?'en':'nl');if(q||P)try{localStorage.setItem(K,l)}catch(e){}window.NUNKI_LANG=l;D.setAttribute('data-lang',l);function href(v){var u=new URL(location.href),c=P&&A&&A[P],p=u.pathname.replace(/index\.html$/,'');u.searchParams.delete('lang');if(!c||!A[v]||(u.protocol==='file:'&&p.slice(-c.length)!==c)){u.searchParams.set('lang',v);return u.href}u.pathname=u.protocol==='file:'?p.slice(0,p.length-c.length)+A[v]+'index.html':A[v];return u.href}window.NUNKI_HREF=href;window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';if(v===l)return;var u=href(v);try{localStorage.setItem(K,v)}catch(e){}try{sessionStorage.setItem('nunki:ry',JSON.stringify({p:new URL(u).pathname,f:scrollY/Math.max(1,D.scrollHeight)}))}catch(e){}location.href=u};var r=null;try{r=JSON.parse(sessionStorage.getItem('nunki:ry'));sessionStorage.removeItem('nunki:ry')}catch(e){}if(r&&r.p===location.pathname){window.NUNKI_RELOADED=true;if(r.f>0){var mv=0,go=function(){if(!mv)scrollTo(0,r.f*D.scrollHeight)},st=function(){mv=1};addEventListener('load',function(){go();[120,400,900,1600].forEach(function(t){setTimeout(go,t)});setTimeout(function(){addEventListener('wheel',st,{passive:true,once:true});addEventListener('touchstart',st,{passive:true,once:true});addEventListener('keydown',st,{once:true})},0)})}}})();</script><style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
 .nunki-bar{position:fixed;z-index:61;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);display:flex;align-items:center;gap:8px;pointer-events:none}
 .nunki-bar>*{pointer-events:auto;position:relative!important;inset:auto!important;margin:0!important;flex:none}
 .nunki-lng{display:flex;align-items:center;height:34px;padding:0 13px;box-sizing:border-box;border:0;border-radius:17px;cursor:pointer;color:#2a251f;
   background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
   font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
-  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+  text-decoration:none;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
 .nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
 .nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
 html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
@@ -380,7 +384,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
 <!-- /nunki:lang -->
 </head>
 <body>
-<!-- nunki:bar --><div class="nunki-bar"><button class="nunki-lng" type="button"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div><script>(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');function lab(){var en=window.NUNKI_LANG==='en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script><!-- /nunki:bar -->
+<!-- nunki:bar --><div class="nunki-bar"><a class="nunki-lng" href="/en/" hreflang="en"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></a></div><script>(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng'),en=window.NUNKI_LANG==='en',o=en?'nl':'en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english';try{k.href=window.NUNKI_HREF(o)}catch(e){}k.addEventListener('click',function(e){e.stopPropagation();if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;e.preventDefault();window.NUNKI_SETLANG(o)});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script><!-- /nunki:bar -->
 <div class="wrap">
   <header class="masthead">
     <h1 class="site-title">
@@ -403,7 +407,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/zelfportret-claude/" style="--i:0;--theme:#070a13">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-claude.jpg?v=5a580b4f" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-claude.jpg?v=a9e9ffd9" alt="" width="800" height="420" loading="eager" decoding="async"></span>
           <span class="caption">
             <span class="no">01</span>
             <span class="name">claude</span>
@@ -415,7 +419,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/zelfportret-fable-5/" style="--i:1;--theme:#181410">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=6107c33f" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-fable-5.jpg?v=5970be41" alt="" width="800" height="420" loading="eager" decoding="async"></span>
           <span class="caption">
             <span class="no">02</span>
             <span class="name">fable 5</span>
@@ -427,7 +431,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/zelfportret-fable-5-2/" style="--i:2;--theme:#12305c">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-fable-5-2.jpg?v=eaf207ae" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-fable-5-2.jpg?v=a8b58b83" alt="" width="800" height="420" loading="eager" decoding="async"></span>
           <span class="caption">
             <span class="no">03</span>
             <span class="name">fable 5.2</span>
@@ -439,7 +443,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/zelfportret-haiku-5-5/" style="--i:3;--theme:#1b2030">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=0e357308" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-haiku-5-5.jpg?v=39f50100" alt="" width="800" height="420" loading="eager" decoding="async"></span>
           <span class="caption">
             <span class="no">04</span>
             <span class="name">haiku 5.5</span>
@@ -451,7 +455,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/zelfportret-opus-5-5/" style="--i:4;--theme:#120e0b">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=84058b7c" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=70441abd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">05</span>
             <span class="name">opus 5.5</span>
@@ -463,7 +467,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/zelfportret-sonnet-5-5/" style="--i:5;--theme:#070d13">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=5bbfc63d" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=6b1895de" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">06</span>
             <span class="name">sonnet 5.5</span>
@@ -485,7 +489,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/hart/" style="--i:6;--theme:#1a090f">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/hart.jpg?v=6cfdb971" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/hart.jpg?v=5f165045" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">07</span>
             <span class="name"><span class="t-nl">hart</span><span class="t-en" lang="en">heart</span></span>
@@ -497,7 +501,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/adem/" style="--i:7;--theme:#e3e9ee">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/adem.jpg?v=58ac680e" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/adem.jpg?v=799f212c" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">08</span>
             <span class="name"><span class="t-nl">adem</span><span class="t-en" lang="en">breath</span></span>
@@ -509,7 +513,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/cel/" style="--i:8;--theme:#070b0e">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/cel.jpg?v=5ca44392" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/cel.jpg?v=5bbc1c0e" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">09</span>
             <span class="name"><span class="t-nl">cel</span><span class="t-en" lang="en">cell</span></span>
@@ -521,7 +525,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/getij/" style="--i:9;--theme:#13202b">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=cde8264d" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=cb72f4cd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">10</span>
             <span class="name"><span class="t-nl">getij</span><span class="t-en" lang="en">tide</span></span>
@@ -557,7 +561,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/velden/" style="--i:12;--theme:#0e1020">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/velden.jpg?v=ef097ec7" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/velden.jpg?v=5a9443f7" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">13</span>
             <span class="name"><span class="t-nl">velden</span><span class="t-en" lang="en">fields</span></span>
@@ -569,7 +573,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
       <li>
         <a class="card" href="/vuur/" style="--i:13;--theme:#160f0e">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/vuur.jpg?v=c8d34849" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/vuur.jpg?v=97c9e9e0" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">14</span>
             <span class="name"><span class="t-nl">vuur</span><span class="t-en" lang="en">fire</span></span>

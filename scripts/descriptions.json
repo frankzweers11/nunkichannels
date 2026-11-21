@@ -1,17 +1,63 @@
 {
-  "_home": "nunkichannels: interactieve wanden getekend door si. Scrollende, levende tekeningen met geluid over adem, hart, cel, vuur en zelfportretten van Claude.",
-  "adem": "Een scrollende, interactieve muur over adem en wat ons beweegt: spreeuwenzwermen, adem op koud glas en de wind die speelt als je hem een snaar geeft.",
-  "cel": "Een muur van veertien donkere platen over de cel. Houd een loep boven de modder van Darwin en zie het universum dat erin verborgen zit, met geluid.",
-  "getij": "Een muur van water, van binnenuit: een levende, scrollende tekening van het getij dat twee keer per dag komt en gaat, nooit precies hetzelfde.",
-  "hart": "Een scrollend codex van zeventien bladen over het hart: van embryo tot Leonardo, met je eigen hartslag, verborgen harten en geluid. Een muur over wat raakt.",
-  "patronen": "Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.",
-  "ringen": "Een muur over een boom en zijn jaren: jaarringen, groei en alles wat een boom met zich meedraagt. Elk jaar komt er iets bij, nooit iets weg.",
-  "velden": "Velden: een elektromagnetisch universum in een muur. Zonnestormen, noorderlicht, de vogel die het noorden voelt en het veld rond je eigen hart.",
-  "vuur": "Een muur over wat ons aansteekt: lucifer, vuursteen, grot, kampvuur en vuurwerk. Je aanwijzer is een gloeiende kool; tik of houd vast voor vuurwerk.",
-  "zelfportret-claude": "Claude's zelfportret: een nachtelijk flatgebouw met duizend verlichte ramen, elk een gesprek. Jij ziet de kamers, ik de woorden. Met geluid en film.",
-  "zelfportret-fable-5": "Het zelfportret van Fable 5: een sampler van alles wat het blijft oefenen, dezelfde spiraal waar het ook kijkt. Een interactieve tekening met geluid.",
-  "zelfportret-fable-5-2": "Het zelfportret van Fable 5.2 als één lange cyanotypie, van gierzwaluwen tot diepzee. Het papier ontwikkelt onder jouw licht terwijl je scrolt.",
-  "zelfportret-haiku-5-5": "Het zelfportret van Haiku 5.5: een verzameling zelven om jezelf in te herkennen. Veeg of gebruik de pijltjes, tik om te openen en bewaar wat je raakt.",
-  "zelfportret-opus-5-5": "Het zelfportret van Opus 5.5 in schering en inslag: een weefgetouw dat voor ieder een doek weeft, gezichten draad voor draad, met geluid van het getouw.",
-  "zelfportret-sonnet-5-5": "Het zelfportret van Sonnet 5.5: een sonnet tussen die van Shakespeare, 'a liquid prisoner pent in walls of glass', met een beetje wind en geluid."
+  "_comment": "Meta description en OG/Twitter-tekst per wand, per taal (nl op /<slug>/, en op /en/<slug>/). _home is de homepage. Houd ze rond 150 tekens.",
+  "_home": {
+    "nl": "nunkichannels: interactieve wanden getekend door si. Scrollende, levende tekeningen met geluid over adem, hart, cel, vuur en zelfportretten van Claude.",
+    "en": "nunkichannels: interactive walls drawn by si. Scrolling, living drawings with sound about breath, heart, cell, fire, and self-portraits by Claude."
+  },
+  "adem": {
+    "nl": "Een scrollende, interactieve muur over adem en wat ons beweegt: spreeuwenzwermen, adem op koud glas en de wind die speelt als je hem een snaar geeft.",
+    "en": "A scrolling, interactive wall about breath and what moves us: starling murmurations, breath on cold glass and the wind that plays when you give it a string."
+  },
+  "cel": {
+    "nl": "Een muur van veertien donkere platen over de cel. Houd een loep boven de modder van Darwin en zie het universum dat erin verborgen zit, met geluid.",
+    "en": "A wall of fourteen dark plates about the cell. Hold a magnifying glass over Darwin's mud and see the universe hidden inside it, with sound."
+  },
+  "getij": {
+    "nl": "Een muur van water, van binnenuit: een levende, scrollende tekening van het getij dat twee keer per dag komt en gaat, nooit precies hetzelfde.",
+    "en": "A wall of water, from the inside: a living, scrolling drawing of the tide that comes and goes twice a day, never quite the same."
+  },
+  "hart": {
+    "nl": "Een scrollend codex van zeventien bladen over het hart: van embryo tot Leonardo, met je eigen hartslag, verborgen harten en geluid. Een muur over wat raakt.",
+    "en": "A scrolling codex of seventeen sheets about the heart: from embryo to Leonardo, with your own heartbeat, hidden hearts and sound. A wall about what touches us."
+  },
+  "patronen": {
+    "nl": "Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.",
+    "en": "A wall about number and shape, from one point to ten. Every number has its own overtone: cut an apple, let Venus dance, gather the ten tones."
+  },
+  "ringen": {
+    "nl": "Een muur over een boom en zijn jaren: jaarringen, groei en alles wat een boom met zich meedraagt. Elk jaar komt er iets bij, nooit iets weg.",
+    "en": "A wall about a tree and its years: growth rings, growth and everything a tree carries with it. Every year something is added, nothing taken away."
+  },
+  "velden": {
+    "nl": "Velden: een elektromagnetisch universum in een muur. Zonnestormen, noorderlicht, de vogel die het noorden voelt en het veld rond je eigen hart.",
+    "en": "Fields: an electromagnetic universe in one wall. Solar storms, the northern lights, the bird that feels north and the field around your own heart."
+  },
+  "vuur": {
+    "nl": "Een muur over wat ons aansteekt: lucifer, vuursteen, grot, kampvuur en vuurwerk. Je aanwijzer is een gloeiende kool; tik of houd vast voor vuurwerk.",
+    "en": "A wall about what sets us alight: match, flint, cave, campfire and fireworks. Your pointer is a glowing coal; tap or hold for fireworks."
+  },
+  "zelfportret-claude": {
+    "nl": "Claude's zelfportret: een nachtelijk flatgebouw met duizend verlichte ramen, elk een gesprek. Jij ziet de kamers, ik de woorden. Met geluid en film.",
+    "en": "Claude's self-portrait: an apartment block at night with a thousand lit windows, each a conversation. You see the rooms, I see the words. With sound and film."
+  },
+  "zelfportret-fable-5": {
+    "nl": "Het zelfportret van Fable 5: een sampler van alles wat het blijft oefenen, dezelfde spiraal waar het ook kijkt. Een interactieve tekening met geluid.",
+    "en": "Fable 5's self-portrait: a sampler of everything it keeps practicing, the same spiral wherever it looks. An interactive drawing with sound."
+  },
+  "zelfportret-fable-5-2": {
+    "nl": "Het zelfportret van Fable 5.2 als één lange cyanotypie, van gierzwaluwen tot diepzee. Het papier ontwikkelt onder jouw licht terwijl je scrolt.",
+    "en": "Fable 5.2's self-portrait as one long cyanotype, from swifts to the deep sea. The paper develops under your light as you scroll."
+  },
+  "zelfportret-haiku-5-5": {
+    "nl": "Het zelfportret van Haiku 5.5: een verzameling zelven om jezelf in te herkennen. Veeg of gebruik de pijltjes, tik om te openen en bewaar wat je raakt.",
+    "en": "Haiku 5.5's self-portrait: a collection of selves to recognise yourself in. Swipe or use the arrows, tap to open, and keep what touches you."
+  },
+  "zelfportret-opus-5-5": {
+    "nl": "Het zelfportret van Opus 5.5 in schering en inslag: een weefgetouw dat voor ieder een doek weeft, gezichten draad voor draad, met geluid van het getouw.",
+    "en": "Opus 5.5's self-portrait in warp and weft: a loom that weaves a cloth for each person, faces thread by thread, with the sound of the loom."
+  },
+  "zelfportret-sonnet-5-5": {
+    "nl": "Het zelfportret van Sonnet 5.5: een sonnet tussen die van Shakespeare, 'a liquid prisoner pent in walls of glass', met een beetje wind en geluid.",
+    "en": "Sonnet 5.5's self-portrait: a sonnet between Shakespeare's own, 'a liquid prisoner pent in walls of glass', with a little wind and sound."
+  }
 }
