@@ -912,21 +912,32 @@ G(')',.36,[[.06,.02],[.22,.36],[.23,.78],[.08,1.14]]);
 G(' ',.42);
 // the words in the chosen language (nunki:taal gives NUNKI_T; without it, as written)
 const TRL=s=>window.NUNKI_T?window.NUNKI_T(s):s;
-function measure(t,sz){t=TRL(t);let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+// (opus) small writing was too faint and too thin to read on a screen: below 19
+// it is set a little larger, with more ink, and light writing on a dark sheet
+// gets a soft shadow of the sheet under it, so a line behind it does not cut
+// through the letters
+const ZS=sz=>sz<19?19-(19-sz)*.55:sz;
+function measure(t,sz){t=TRL(t);sz=ZS(sz);let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
 function write(R,t,x,y,sz,o={}){
   t=TRL(t);
-  const a=o.a??.7,col=o.col;
   let px=o.cen?x-measure(t,sz)/2:x;
-  const ph=rd(R,0,7);
+  sz=ZS(sz);
+  const a0=o.a??.7,a=sz<21&&a0>=.3?Math.max(a0,Math.min(.68,a0+.2)):a0,col=o.col||CUR;
+  const ph=rd(R,0,7),all=[];
   for(let i=0;i<t.length;i++){
     const c=t[i],g=GL[c]||GL[' '];
     const yb=y+Math.sin(i*.8+ph)*sz*.045;
-    for(const st of(g.s||[])){
-      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
-      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
-    }
+    for(const st of(g.s||[]))all.push(st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]));
     px+=(g.w+.1)*sz;
   }
+  if(o.halo!==false&&!COMP&&sz<=34&&all.length){
+    const lt=lumOf(col)>.5,hc=lt?[14,10,24]:[252,248,238],ha=(lt?.62:.2)*Math.min(1,a/.7);
+    const path=new Path2D();for(const q of all){path.moveTo(q[0][0],q[0][1]);for(let k=1;k<q.length;k++)path.lineTo(q[k][0],q[k][1]);if(q.length<2)path.lineTo(q[0][0]+.01,q[0][1])}
+    emit(y-sz*1.25,y+sz*.6,cx=>{cx.save();cx.lineCap='round';cx.lineJoin='round';
+      cx.strokeStyle=rgba(hc,ha*.45);cx.lineWidth=Math.min(16,sz*.62);cx.stroke(path);
+      cx.strokeStyle=rgba(hc,ha);cx.lineWidth=Math.min(9,sz*.32);cx.stroke(path);cx.restore()});
+  }
+  for(const pts of all)sk(R,pts,{col,w:o.w??Math.max(1.15,sz*.08),a,amp:Math.min(.5,sz*.028)});
 }
 G('1',.4,[[.07,.3],[.23,.1],[.23,1]]);
 G('3',.52,[[.08,.2],[.22,.1],[.38,.12],[.44,.28],[.36,.46],[.22,.52],[.38,.58],[.47,.76],[.4,.94],[.22,1],[.05,.9]]);
@@ -1966,7 +1977,7 @@ P[0]=function(){
       // the number under the heart
       const shown=Math.round(HB.bpm);
       dtext(c,shown+' slagen per minuut',cx,cy+dy+s*1.28,22,CHALK,.62);
-      if(HL.msg&&now<HL.msgT)dtext(c,HL.msg,cx,cy+dy+s*1.28+30,17,GOLDL,.8*Math.min(1,(HL.msgT-now)/600));
+      if(HL.msg&&now<HL.msgT)dtext(c,HL.msg,cx,cy+dy+s*1.28+32,19,GOLDL,.8*Math.min(1,(HL.msgT-now)/600));
     }});
   // tap it out
   let taps=[],saveT=0,calmT=0,prev=0;
@@ -2411,7 +2422,6 @@ P[4]=function(){
   sk(R,[[650,470],[AVp[0]-40,AVp[1]+10],[AVp[0]-10,AVp[1]+3]],{col:GOLDL,w:1.3,a:.6,amp:.6,taper:'out',noDust:true});
   write(R,'purkinje-vezels',1040,690,20,{col:GOLDL,a:.9});write(R,'razendsnel naar de punt',1040,716,16,{col:CHALK,a:.6});
   sk(R,[[1036,684],[PUp[0]+100,PUp[1]+40],[PUp[0]+22,PUp[1]+10]],{col:GOLDL,w:1.3,a:.6,amp:.6,taper:'out',noDust:true});
-  write(R,'(tik op het hart: een extra slag. tik op de staart van een golf: het hart gaat trillen)',800,862,15,{col:CHALK,a:.46,cen:true});
   // the strip of an ecg, on pink graph paper
   const X0=380,X1=1220,Y0=902,Y1=1070,BY=1000;
   const paper=[[X0,Y0],[X1,Y0],[X1,Y1],[X0,Y1]];
@@ -2487,7 +2497,7 @@ P[4]=function(){
   // the world of the sheet: events, the trace, the state of the heart
   const ST={acc:0,lastBeat:0,pend:[],ev:[],trace:[],lastT:0,fibN:0,fib:false,fibAt:0,quietUntil:0,lastQRS:0,msg:'',msgT:0,holdOn:false,lastHold:0,shock:0,F:0,fcheck:0,sparkAt:0,nSeed:0};
   window.DBG=window.DBG||{};DBG.s4=ST;DBG.st4=()=>st;
-  const say4=(m,sec=3)=>{ST.msg=m;ST.msgT=performance.now()+sec*1000};
+  const say4=(m,sec=3)=>{ST.msg=m;ST.msgD=sec*1000;ST.msgT=performance.now()+sec*1000};
   const blip=(f,vol=.05,t0)=>{if(AC&&AC.state==='running')tone(f,t0??T0(),.11,vol,'sine',.12,3000)};
   function purkinje(now,kind){
     // the ventricles are lit from the apex strip, top down; a kind of beat is kept for the trace
@@ -2570,10 +2580,18 @@ P[4]=function(){
       if(last){glowAt(c,[230,60,80],xr,BY+dy0-last[1]*88,12,.7);c.fillStyle='rgba(120,20,40,1)';c.beginPath();c.arc(xr,BY+dy0-last[1]*88,3,0,TAU);c.fill()}
       c.restore();
       dtext(c,Math.round(ST.fib?220:HB.bpm)+(ST.fib?' ?':'')+' /min',X1-20,Y0+dy0+28,19,[150,50,64],.8,'right');
-      if(ST.msg&&now<ST.msgT)dtext(c,ST.msg,800,Y1+dy0+22+(ST.msg.length>60?0:0),17,GOLDL,Math.min(1,(ST.msgT-now)/700));
       // the shock: a flash over everything
       if(ST.shock&&now-ST.shock<500){const a=1-(now-ST.shock)/500;c.fillStyle=`rgba(255,250,240,${.6*a})`;c.fillRect(L.x,L.y,L.w,L.h)}
     }});
+  // (opus) what the heart says was written under the strip, outside its canvas, so
+  // it was never seen. it now takes the place of the hint above the strip
+  const HINT4=pencil(200,836,1200,42,()=>write(stream(SEED*101+44),'(tik op het hart: een extra slag. tik op de staart van een golf: het hart gaat trillen)',800,862,15,{col:CHALK,a:.46,cen:true}),2);
+  live(120,834,1360,48,{sc:Math.min(2.4,Math.max(1.5,S*1.5)),frame(c,now,L){
+    c.clearRect(L.x,L.y,L.w,L.h);
+    const k=ST.msg&&now<ST.msgT?Math.min(1,(ST.msgT-now)/700,(now-(ST.msgT-(ST.msgD||3000)))/300):0;
+    if(k<1){c.globalAlpha=1-k;c.drawImage(HINT4.cv,HINT4.x,HINT4.y+dy0,HINT4.w,HINT4.h);c.globalAlpha=1}
+    if(k>0)dtext(c,ST.msg,800,864+dy0,20,GOLDL,k);
+  }});
   function shock(now){
     ST.shock=now;ST.st0=0;st.fill(0);lingr.fill(0);ST.pend.length=0;ST.ev.length=0;ST.fib=false;ST.fibN=0;ST.quietUntil=now+1800;
     HB.volOver=null;HB.paused=now+1700;
@@ -2742,7 +2760,6 @@ P[6]=function(){
     ()=>{sk(R,spiralPts(IX[5],IY,2,26,2.6,0),{col:[200,180,255],w:1.6,a:.9,amp:.4,noDust:true});sk(R,spiralPts(IX[5],IY,2,26,2.6,Math.PI),{col:[200,180,255],w:1.6,a:.9,amp:.4,noDust:true})}];
   icon.forEach(f=>f());
   SCALES.forEach((sc,i)=>write(R,sc.id,IX[i],IY+54,17,{col:CHALK,a:.8,cen:true}));
-  write(R,'(tik op een teken)',800,1292-18,14,{col:CHALK,a:.4,cen:true});
   // the live torus
   const dy=dy0,LAY=[{R:222,r:136,n:640,col:[255,196,130],lw:1.5,om:.09},{R:222,r:90,n:430,col:[130,170,255],lw:1.4,om:.14},{R:222,r:48,n:260,col:[236,244,255],lw:1.3,om:.2}];
   const rings=[],rs=mul32(4242);
@@ -2796,8 +2813,16 @@ P[6]=function(){
       }
       // the hole: where the flow goes through
       glowAt(c,[255,236,200],cx,cy+dy,46+16*pk,.14+.12*pk);
-      if(ST.msg&&now<ST.msgT)dtext(c,ST.msg,800,L.y+L.h-12+0,17,GOLDL,Math.min(1,(ST.msgT-now)/600));
     }});
+  // (opus) what a sign says used to be written at the foot of the torus, right over
+  // the poem. it now takes the place of the hint under the signs, and gives it back
+  const HINT=pencil(560,1250,480,40,()=>write(stream(SEED*101+66),'(tik op een teken)',800,1278,15,{col:CHALK,a:.42,cen:true}),2);
+  live(120,1244,1360,52,{sc:Math.min(2.4,Math.max(1.5,S*1.5)),frame(c,now,L){
+    c.clearRect(L.x,L.y,L.w,L.h);
+    const k=ST.msg&&now<ST.msgT?Math.min(1,(ST.msgT-now)/600,(now-(ST.msgT-(ST.msgD||5200)))/300):0;
+    if(k<1){c.globalAlpha=1-k;c.drawImage(HINT.cv,HINT.x,HINT.y+dy0,HINT.w,HINT.h);c.globalAlpha=1}
+    if(k>0)dtext(c,ST.msg,800,1278+dy0,19,GOLDL,k);
+  }});
   // by hand
   const inside=(x,y)=>x>380&&x<1220&&y>PY[6]+320&&y<PY[6]+920;
   DOWNFN.push((x,y,e)=>{if(e.pointerType!=='touch'&&inside(x,y))ST.drag={x,y,yaw:ST.yaw,pitch:ST.pitch,t:performance.now(),lx:x,moved:false}});
@@ -2811,12 +2836,12 @@ P[6]=function(){
     if(performance.now()-(ST.dragged||0)<300)return;
     audio();
     if(Math.hypot(x-cx,y-(cy+dy0))<92){
-      ST.dirT=-ST.dirT;ST.msg=ST.dirT<0?'het gat is geen leegte: alles stroomt erdoor. nu de andere kant op.':'en weer terug.';ST.msgT=performance.now()+3200;
+      ST.dirT=-ST.dirT;ST.msg=ST.dirT<0?'het gat is geen leegte: alles stroomt erdoor. nu de andere kant op.':'en weer terug.';ST.msgD=3200;ST.msgT=performance.now()+3200;
       if(AC){const t=T0();noiseHit(t,{f:ST.dirT<0?1800:300,f1:ST.dirT<0?300:1800,q:1,dur:1.2,vol:.1,wet:.4,att:.2,pink:true});pad([146.83,220],t,3,.035,{att:.6,rel:2,lp:900})}
     }
   });
   SCALES.forEach((sc,i)=>hit(IX[i]-52,IY-46,IX[i]+52,IY+72,()=>{
-    audio();ST.tintT=sc.tint.slice();ST.msg=sc.cap;ST.msgT=performance.now()+5200;
+    audio();ST.tintT=sc.tint.slice();ST.msg=sc.cap;ST.msgD=5200;ST.msgT=performance.now()+5200;
     if(AC){const t=T0();chime(sc.f*2,t,.09,3.4,.5);pad([sc.f,sc.f*1.5,sc.f*2],t,3.6,.03,{att:.5,rel:2,lp:1100})}
   }));
   amb(6,{root:55,third:1.19,drone:.018,air:.004,fc:900,beat:.22,lp:640,vg:.12,vgc:[170,120,240]});
@@ -2902,7 +2927,7 @@ P[7]=function(){
       ST.shown+=(total-ST.shown)*Math.min(1,dt*5);
       dtext(c,'bij '+bpm+' slagen per minuut: ongeveer '+nl(Math.round(ST.shown/1e6)*1e6)+' slagen',800,SY+dy-58,22,[150,40,52],.95);
       const left=Math.max(0,3.0e9-total);
-      dtext(c,ST.age>=85?'je hebt ze bijna allemaal gebruikt, en elke slag was van jou.':(total>1.5e9?'je hebt de miljard van de gewone zoogdieren al ruim gehad.':'er komen er nog veel.'),800,SY+dy-33,16,SEPIA,.8);
+      dtext(c,ST.age>=85?'je hebt ze bijna allemaal gebruikt, en elke slag was van jou.':(total>1.5e9?'je hebt de miljard van de gewone zoogdieren al ruim gehad.':'er komen er nog veel.'),800,SY+dy-31,18,SEPIA,.8);
     }});
   // sound: every heart at its own speed
   const sched=()=>{
@@ -3043,8 +3068,8 @@ P[8]=function(){
         if(n.k===0){c.beginPath();c.ellipse(n.x,n.y+dy,4.2,3,-.4,0,TAU);c.fill();c.strokeStyle=rgba(col,.8*al);c.lineWidth=1.4;c.beginPath();c.moveTo(n.x+3.6,n.y+dy-1);c.lineTo(n.x+3.6,n.y+dy-14);c.stroke()}
         else{c.beginPath();c.arc(n.x,n.y+dy,3,0,TAU);c.fill()}
       }
-      if(ST.side&&!fl)dtext(c,'98 per minuut, zonder zenuwen',RX,CY+dy+120,17,GOLDL,.85);
-      if(ST.msg&&now<ST.msgT)dtext(c,ST.msg,800,CY+dy+250,17,GOLDL,Math.min(1,(ST.msgT-now)/600));
+      if(ST.side&&!fl)dtext(c,'98 per minuut, zonder zenuwen',RX,CY+dy+120,19,GOLDL,.85);
+      if(ST.msg&&now<ST.msgT)dtext(c,ST.msg,800,CY+dy+250,19,GOLDL,Math.min(1,(ST.msgT-now)/600));
     }});
   const land=()=>{
     const fl=ST.fly;ST.fly=null;ST.drag=false;ST.side=fl.to;ST.x=fl.x1;ST.y=fl.y1;
@@ -3862,7 +3887,7 @@ P[16]=function(){
       ST.count=beats;
       dtext(c,'sinds je hier kwam, sloeg je hart zo’n '.replace('’',"'")+nl(beats)+' keer.',800,916+dy,22,[220,226,255],.85);
       const nf=FOUND.size;
-      dtext(c,nf>=NSECRET?'je vond alle twaalf de verborgen harten. dank.':'je vond '+nf+' van de twaalf verborgen harten.'+(nf>=1?'':' (er zijn er twaalf.)'),800,950+dy,17,nf>=NSECRET?GOLDL:[200,214,255],.72);
+      dtext(c,nf>=NSECRET?'je vond alle twaalf de verborgen harten. dank.':'je vond '+nf+' van de twaalf verborgen harten.'+(nf>=1?'':' (er zijn er twaalf.)'),800,952+dy,19,nf>=NSECRET?GOLDL:[200,214,255],.72);
       if(sync>.9)dtext(c,'één ritme.',800,L.y+36,24,GOLDL,.8*Math.min(1,(sync-.9)*10));
     }});
   hit(300,300,1300,930,(x,y)=>{

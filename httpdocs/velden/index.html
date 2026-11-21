@@ -787,21 +787,32 @@ G('…',.6,[[.08,.93],[.1,.97]],[[.28,.93],[.3,.97]],[[.48,.93],[.5,.97]]);
 G('/',.4,[[.34,.08],[.06,1.04]]);
 // the words in the chosen language (nunki:taal gives NUNKI_T; without it, as written)
 const TRL=s=>window.NUNKI_T?window.NUNKI_T(s):s;
-function measure(t,sz){t=TRL(t);let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
+// (opus) small writing was too faint and too thin to read on a screen: below 19
+// it is set a little larger, with more ink, and light writing on a dark sheet
+// gets a soft shadow of the sheet under it, so a line of light behind it
+// does not cut through the letters
+const ZS=sz=>sz<19?19-(19-sz)*.55:sz;
+function measure(t,sz){t=TRL(t);sz=ZS(sz);let x=0;for(const c of t){const g=GL[c]||GL[' '];x+=(g.w+.1)*sz}return x-.1*sz}
 function write(R,t,x,y,sz,o={}){
   t=TRL(t);
-  const a=o.a??.7,col=o.col;
   let px=o.cen?x-measure(t,sz)/2:x;
-  const ph=rd(R,0,7);
+  sz=ZS(sz);
+  const a0=o.a??.7,a=sz<21&&a0>=.3?Math.max(a0,Math.min(.68,a0+.2)):a0,col=o.col||CUR;
+  const ph=rd(R,0,7),all=[];
   for(let i=0;i<t.length;i++){
     const c=t[i],g=GL[c]||GL[' '];
     const yb=y+Math.sin(i*.8+ph)*sz*.045;
-    for(const st of(g.s||[])){
-      const pts=st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]);
-      sk(R,pts,{col,w:o.w??Math.max(.85,sz*.075),a,amp:Math.min(.5,sz*.028)});
-    }
+    for(const st of(g.s||[]))all.push(st.map(p=>[px+p[0]*sz+rd(R,-.02,.02)*sz,yb+(p[1]-1)*sz+rd(R,-.02,.02)*sz]));
     px+=(g.w+.1)*sz;
   }
+  if(o.halo!==false&&!COMP&&sz<=34&&all.length){
+    const lt=(.299*col[0]+.587*col[1]+.114*col[2])/255>.5,hc=lt?[12,10,26]:[252,248,238],ha=(lt?.62:.2)*Math.min(1,a/.7);
+    const path=new Path2D();for(const q of all){path.moveTo(q[0][0],q[0][1]);for(let k=1;k<q.length;k++)path.lineTo(q[k][0],q[k][1]);if(q.length<2)path.lineTo(q[0][0]+.01,q[0][1])}
+    emit(y-sz*1.25,y+sz*.6,cx=>{cx.save();cx.lineCap='round';cx.lineJoin='round';
+      cx.strokeStyle=rgba(hc,ha*.45);cx.lineWidth=Math.min(16,sz*.62);cx.stroke(path);
+      cx.strokeStyle=rgba(hc,ha);cx.lineWidth=Math.min(9,sz*.32);cx.stroke(path);cx.restore()});
+  }
+  for(const pts of all)sk(R,pts,{col,w:o.w??Math.max(1.15,sz*.08),a,amp:Math.min(.5,sz*.028)});
 }
 
 // ---------------- small things ----------------
@@ -822,6 +833,27 @@ function live(x,y,w,h,o){
   LIVE.push(L);
   return L;
 }
+// (opus) the living canvases are drawn at half resolution or less: right for
+// light and glow, far too coarse for writing. so the words a living sheet
+// writes go to small sharp canvases of their own, laid over it: words:[[x,y,w,h],..]
+// in the sheet's coordinates, like live() itself
+const WSC=Math.min(2.4,Math.max(1.5,innerWidth*(window.devicePixelRatio||1)/LW));
+let WL=null;
+function runLive(L,now){
+  if(L.wds)for(const b of L.wds)if(b.dirty){b.cx.save();b.cx.setTransform(1,0,0,1,0,0);b.cx.clearRect(0,0,b.cv.width,b.cv.height);b.cx.restore();b.dirty=false}
+  WL=L;try{L.frame(L.cx,now,L)}finally{WL=null}
+}
+function makeWords(L){
+  L.wds=L.words.map(([x,y,w,h])=>{
+    const cv=document.createElement('canvas');cv.className='live';
+    cv.width=Math.round(w*WSC);cv.height=Math.round(h*WSC);
+    cv.style.left=(x/LW*100)+'%';cv.style.width=(w/LW*100)+'%';
+    cv.style.top=((y+L.dy)/LW*100)+'vw';cv.style.height=(h/LW*100)+'vw';cv.style.zIndex=3;
+    wallEl.appendChild(cv);
+    const cx=cv.getContext('2d');cx.setTransform(WSC,0,0,WSC,-x*WSC,-y*WSC);
+    return{x,y,w,h,cv,cx,dirty:false};
+  });
+}
 function makeLive(L){
   const cv=document.createElement('canvas'),sc=L.sc;
   cv.className='live';
@@ -835,8 +867,10 @@ function makeLive(L){
   cx.lineCap='round';cx.lineJoin='round';
   L.cv=cv;L.cx=cx;L.on=true;
   if(L.init)L.init(cx,L);
-  if(FAST||STILL){cv.style.transition='none';cv.classList.add('on');L.frame&&L.frame(cx,performance.now(),L)}
-  else requestAnimationFrame(()=>cv.classList.add('on'));
+  if(L.words)makeWords(L);
+  const cvs=[cv,...(L.wds||[]).map(b=>b.cv)];
+  if(FAST||STILL){cvs.forEach(v=>{v.style.transition='none';v.classList.add('on')});L.frame&&runLive(L,performance.now())}
+  else requestAnimationFrame(()=>cvs.forEach(v=>v.classList.add('on')));
 }
 // wipe a live canvas: the whole of it, whatever the sheet coordinates are
 function wipe(c,L){c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,L.cv.width,L.cv.height);c.restore()}
@@ -861,15 +895,18 @@ function textSpr(t,sz,col=INK,a=.85){
   const k=t+'|'+sz+'|'+col+'|'+a;
   let s=TXT.get(k);
   if(!s){let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;
-    const w=measure(t,sz)+sz*.8;
-    s=sprite(w,sz*1.9,R=>write(R,t,sz*.4,sz*1.3,sz,{col,a}),h,Math.max(S,1.5));
-    s.ox=sz*.4;s.oy=sz*1.3;TXT.set(k,s)}
+    const z=ZS(sz),m=measure(t,sz),w=m+z*1.2;
+    s=sprite(w,z*2.3,R=>write(R,t,z*.6,z*1.55,sz,{col,a}),h,WSC);
+    s.ox=z*.6;s.oy=z*1.55;s.m=m;TXT.set(k,s)}
   return s;
 }
-// put a line of writing down: x,y is the start of its baseline (or its middle, cen)
+// put a line of writing down: x,y is the start of its baseline (or its middle, cen).
+// (opus) inside a living sheet the words go to its sharp words canvas, see runLive
 function sayL(c,t,x,y,sz,col,a,alpha=1,cen=false){
-  const s=textSpr(t,sz,col,a);if(alpha<=0)return;
-  c.globalAlpha=alpha;c.drawImage(s,x-s.ox-(cen?(s.w-sz*.8)/2:0),y-s.oy,s.w,s.h);c.globalAlpha=1;
+  if(alpha<=0)return;
+  if(WL&&WL.wds){const b=WL.wds.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b){c=b.cx;b.dirty=true}}
+  const s=textSpr(t,sz,col,a);
+  c.globalAlpha=alpha;c.drawImage(s,x-s.ox-(cen?s.m/2:0),y-s.oy,s.w,s.h);c.globalAlpha=1;
 }
 let HUD=null,hudN=0,hudT=0,hudBusy=0,hudMax=0;
 if(qs.has('hud')){HUD=document.createElement('div');HUD.id='hud';document.body.appendChild(HUD)}
@@ -897,7 +934,7 @@ function tick(now){
     L.seen=true;
     if(RM&&L.drawn)continue;
     if(L.fps&&now-L.last<1000/L.fps)continue;
-    L.last=now;L.frame(L.cx,now,L);L.drawn=true;
+    L.last=now;runLive(L,now);L.drawn=true;
   }
   runAmbient(now,dt);
   drawTrail(now);
@@ -1846,7 +1883,7 @@ P.push(function(){
   motes(R,0,1020,1280,26,60);
   whispers(R,330,1000,true,2);
   // a hint, in pencil, for whoever reads this far
-  {const RH=stream(SEED*101+77);write(RH,'ook jij bent een veld',800,330,19,{col:CINK,a:.74,cen:true});write(RH,'(houd ingedrukt en teken)',800,356,14,{col:CINK,a:.55,cen:true})}
+  {const RH=stream(SEED*101+77);write(RH,'ook jij bent een veld',800,330,19,{col:CINK,a:.74,cen:true});write(RH,'(houd ingedrukt en teken)',800,358,17,{col:CINK,a:.68,cen:true})}
   // compass needles round the magnet: they follow its field, and yours.
   // tap the magnet and its poles change places, as the earth's have done
   const F=magField(cx,cy,d),MG={pol:1,t:-1e9,k:1},ND=[];
@@ -1857,7 +1894,7 @@ P.push(function(){
     c.fillStyle=rgba(MAGR,1);c.beginPath();c.moveTo(s,0);c.lineTo(0,-s*.22);c.lineTo(0,s*.22);c.closePath();c.fill();
     c.fillStyle=rgba(CINK,1);c.beginPath();c.moveTo(-s,0);c.lineTo(0,-s*.22);c.lineTo(0,s*.22);c.closePath();c.fill();
     c.fillStyle=rgba([40,36,60],1);c.beginPath();c.arc(0,0,s*.12,0,TAU);c.fill();c.restore()};
-  live(240,400,1120,720,{fps:30,frame(c,now,L){
+  live(240,400,1120,720,{fps:30,words:[[260,1000,1080,80],[1120,500,260,40]],frame(c,now,L){
     wipe(c,L);const h=hand(L,now,1500,200);
     MG.k+=(MG.pol-MG.k)*.06;
     for(const n of ND){const b=F(n.x,n.y);let tx=b[0]*MG.k,ty=b[1]*MG.k;
@@ -1869,10 +1906,10 @@ P.push(function(){
     // the magnet itself, while its poles change
         if(MG.pol<0||Math.abs(MG.k-1)>.02){const a=clamp((1-MG.k)/2,0,1);c.globalAlpha=a;
       c.fillStyle=rgba(ELEC,.95);c.fillRect(cx-hw,cy-ht,hw,ht*2);c.fillStyle=rgba(MAGR,.95);c.fillRect(cx,cy-ht,hw,ht*2);c.globalAlpha=1}
-    note(c,MG.t,now,['de aarde polde zo voor het laatst om','zo\'n 780.000 jaar geleden'],cx,cy+330,17,CINK);
+    note(c,MG.t,now,['de aarde polde zo voor het laatst om','zo\'n 780.000 jaar geleden'],cx,cy+330,20,CINK);
     // on a phone that knows where north is: one needle that points there
     const hd=window.NUNKI&&NUNKI.heading;
-    if(hd!=null){const a=-Math.PI/2-hd*Math.PI/180;c.fillStyle=rgba([20,22,40],.6);c.beginPath();c.arc(1250,470,34,0,TAU);c.fill();needle(c,1250,470,a,28);sayL(c,'het echte noorden',1250,530,14,CINK,.8,1,true)}
+    if(hd!=null){const a=-Math.PI/2-hd*Math.PI/180;c.fillStyle=rgba([20,22,40],.6);c.beginPath();c.arc(1250,470,34,0,TAU);c.fill();needle(c,1250,470,a,28);sayL(c,'het echte noorden',1250,530,18,CINK,.85,1,true)}
   }});
   hit(cx-hw,cy-ht-10,cx+hw,cy+ht+10,(x,y,t)=>{MG.pol*=-1;MG.t=t;clunk()});
   ambient(0,1200,{make(g,A){A.h=bed(g,'lowpass',140,.7,.035);A.s=bed(g,'bandpass',2400,4,.004)}});
@@ -1944,7 +1981,7 @@ P.push(function(){
     ['licht','380 tot 750 miljoenste millimeter',[255,250,230]],['uv','kort genoeg om je huid te verbranden',[178,128,248]],['röntgen','gaat dwars door je heen',[96,178,248]],['gamma','uit de kern van atomen',[140,140,238]]];
   const bandAt=x=>bands.findIndex(b=>x>=b[1]&&x<b[2]);
   const B1={t:-1e9,i:-1};
-  live(90,360,1440,560,{sc:.8,fps:30,frame(c,now,L){
+  live(90,360,1440,560,{sc:.8,fps:30,words:[[60,770,1480,145]],frame(c,now,L){
     wipe(c,L);c.globalCompositeOperation='lighter';
     for(let k=0;k<9;k++){const u=((now/9000)+k/9)%1,x=x0w+u*1400,y=yc+amp(x)*Math.sin(phs(x)-now/180);c.globalAlpha=bmp(u)*.9;c.drawImage(SOFT,x-9,y-9,18,18)}
     VIS.forEach((col,k)=>{c.strokeStyle=rgba(col,.45);c.lineWidth=2;c.beginPath();for(let x=862;x<=958;x+=3){const u=bump(x),y=yc+(k-3)*6*u+amp(x)*Math.sin(phs(x)-now/240+(k-3)*.1*u);x===862?c.moveTo(x,y):c.lineTo(x,y)}c.stroke()});
@@ -1953,8 +1990,8 @@ P.push(function(){
     if(h&&h[0]>100&&h[0]<1500){const i=bandAt(h[0]),y=yc+amp(h[0])*Math.sin(phs(h[0]));
       c.strokeStyle=rgba(CINK,.55);c.lineWidth=1.2;c.beginPath();c.moveTo(h[0],yc-120);c.lineTo(h[0],yc+104);c.stroke();
       c.drawImage(SOFT,h[0]-14,y-14,28,28);
-      if(i>=0){const xl=clamp(h[0],260,1340);sayL(c,BAND[i][0],xl,yc+262,22,BAND[i][2],.95,1,true);sayL(c,BAND[i][1],xl,yc+290,15,CINK,.8,1,true)}}
-    if(B1.i===3)note(c,B1.t,now,['licht, veertig octaven lager:','net geen octaaf, van rood tot violet'],910,yc+330,15,CINK,6000);
+      if(i>=0){const xl=clamp(h[0],260,1340);sayL(c,BAND[i][0],xl,yc+262,22,BAND[i][2],.95,1,true);sayL(c,BAND[i][1],xl,yc+292,19,CINK,.88,1,true)}}
+    if(B1.i===3)note(c,B1.t,now,['licht, veertig octaven lager:','net geen octaaf, van rood tot violet'],910,yc+334,19,CINK,6000);
   }});
   hit(100,yc-110,1500,yc+100,(x,y,t)=>{const i=bandAt(x);if(i<0)return false;B1.t=t;B1.i=i;bandSound(i)});
   ambient(0,1200,{make(g,A){A.h=bed(g,'lowpass',160,.7,.03)}});
@@ -1991,7 +2028,7 @@ P.push(function(){
   dustBatch(dust,[220,214,255]);
   COMP=null;
   say(R,'ook tussen de sterren zijn er elektrische stromen',true,true);
-  write(R,'aan de rand gaan de sterren even hard als binnenin (vera rubin, 1970)',800,980,14,{col:CINK,a:.45,cen:true});
+  write(R,'aan de rand gaan de sterren even hard als binnenin (vera rubin, 1970)',800,982,18,{col:CINK,a:.74,cen:true});
   spine(R,2,0,1230);
   motes(R,2,1090,1300,30,70);
   whispers(R,100,1000,true,2);
@@ -1999,7 +2036,7 @@ P.push(function(){
   // tap, and a pulsar shows itself, turning eleven times a second
   const ST=[];{const RS=stream(SEED*7+21);for(let k=0;k<300;k++){const th=rd(RS,1.2,9.6),arm=k%2,r=22*Math.exp(.3*th)*1.3+rd(RS,-1,1)*(10+th*5);ST.push({r,a:arm*Math.PI+th,s:rd(RS,.8,2.2),b:rd(RS,.3,.9)})}}
   const PU={t:-1e9,x:1060,y:430};
-  live(240,180,1120,760,{sc:.7,fps:30,frame(c,now,L){
+  live(240,180,1120,760,{sc:.7,fps:30,words:[[200,850,1200,90]],frame(c,now,L){
     wipe(c,L);c.globalCompositeOperation='lighter';c.fillStyle=rgba([236,230,255],1);
     for(const p of ST){const w=60/Math.max(60,p.r),q=G2(p.r,p.a+now/1000*w*.05);c.globalAlpha=p.b*(.6+.4*Math.sin(now/700+p.r));c.fillRect(q[0]-p.s/2,q[1]-p.s/2,p.s,p.s)}
     const u=(now-PU.t)/1000;
@@ -2008,7 +2045,7 @@ P.push(function(){
       c.globalAlpha=a*.5;c.strokeStyle=rgba([170,200,255],1);c.lineWidth=2;
       for(const sd of[-1,1]){const ang=ph/30+sd*Math.PI/2;c.beginPath();c.moveTo(PU.x,PU.y);c.lineTo(PU.x+Math.cos(ang)*160*sd,PU.y+Math.sin(ang)*160*sd);c.stroke()}}
     c.globalCompositeOperation='source-over';c.globalAlpha=1;
-    note(c,PU.t,now,['de vela-pulsar draait 11 keer per seconde rond','zo klinkt hij in een radiotelescoop'],800,880,16,CINK,6000);
+    note(c,PU.t,now,['de vela-pulsar draait 11 keer per seconde rond','zo klinkt hij in een radiotelescoop'],800,880,20,CINK,6000);
   }});
   hit(240,180,1360,940,(x,y,t)=>{PU.t=t;found('pulsar');if(audio()){const t0=now_();for(let k=0;k<62;k++)clk(MASTER,.06,t0+k/11.19)}},true);
   ambient(0,1200,{make(g,A){A.h=bed(g,'lowpass',120,.7,.035);A.s=bed(g,'bandpass',900,6,.003)}});
@@ -2085,7 +2122,7 @@ P.push(function(){
   COMP=null;
   restless(sx-10,sy-450,520,900,RR=>{COMP='lighter';for(let k=0;k<3;k++)loop(RR,rd(RR,-1.4,1.4),rd(RR,.25,.8),pk(RR,[SOL_Y,SOL_O,LAMPW]),rd(RR,1.8,3),.7,1.3);COMP=null});
   say(R,'een zonnestorm is een veld dat losbreekt',false,true);
-  write(R,'tik op de zon',250,815,15,{col:CINK,a:.5,cen:true});
+  write(R,'tik op de zon',150,935,19,{col:CINK,a:.74,cen:true});
   spine(R,3,0,1230);
   motes(R,3,1090,1300,30,70);
   whispers(R,100,1000,true,2);
@@ -2095,13 +2132,13 @@ P.push(function(){
   const at=u=>{const n=PATH.length-1,f=clamp(u,0,1)*n,i=Math.min(n-1,Math.floor(f)),k=f-i,p0=PATH[Math.max(0,i-1)],p1=PATH[i],p2=PATH[i+1],p3=PATH[Math.min(n,i+2)],k2=k*k,k3=k2*k;
     return[.5*(2*p1[0]+(-p0[0]+p2[0])*k+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*k2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*k3),.5*(2*p1[1]+(-p0[1]+p2[1])*k+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*k2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*k3)]};
   const CME=[];
-  live(40,200,1520,1900,{sc:.5,fps:30,frame(c,now,L){
+  live(40,200,1520,1900,{sc:.5,fps:30,words:[[600,300,940,80]],frame(c,now,L){
     wipe(c,L);c.globalCompositeOperation='lighter';
     for(let i=CME.length-1;i>=0;i--){const m=CME[i],u=(now-m.t)/8000;
       if(u>1){CME.splice(i,1);AUR.boost=1;AUR.t=now;AUR.said=now;continue}
       for(let k=0;k<16;k++){const uu=u-k*.012;if(uu<0)break;const q=at(uu),s=(70-k*3.5)*(1+u*.6);c.globalAlpha=(1-k/16)*.55;c.drawImage(k<4?GLINT:PINK,q[0]-s/2,q[1]-s/2,s,s)}}
     c.globalCompositeOperation='source-over';c.globalAlpha=1;
-    if(CME.length)note(c,CME[CME.length-1].t,now,['een zonnestorm, onderweg naar de aarde','(in het echt doet hij er een tot drie dagen over)'],620,330,16,CINK,7000,false);
+    if(CME.length)note(c,CME[CME.length-1].t,now,['een zonnestorm, onderweg naar de aarde','(in het echt doet hij er een tot drie dagen over)'],620,330,20,CINK,7000,false);
   }});
   hit(sx-sr,sy-sr,sx+sr,sy+sr,(x,y,t)=>{if(CME.length>2)return;CME.push({t});found('zonnestorm');if(audio()){nz(now_(),2.5,'bandpass',300,1800,.8,.055,.3);vo(now_(),'sine',60,40,2.5,.07,.2)}});
   ambient(0,1200,{make(g,A){A.r=bed(g,'lowpass',90,.8,.09);A.b=bed(g,'bandpass',260,1,.02)},step(now,dt,A){A.r.g.gain.setTargetAtTime(.06+.04*fbm(now/1500,4,2,2),AC.currentTime,.3)}});
@@ -2147,7 +2184,7 @@ P.push(function(){
   // the curtains move; when a storm you sent arrives they flare. tap, and hear
   // what a radio hears up there: whistlers, and a dawn chorus
   const RP={t:-1e9,x:800},RAYS=[];{const RG=stream(SEED*3+4);for(let x=50;x<=1550;x+=rd(RG,7,19))RAYS.push([x+rd(RG,-4,4),RG(),RG()])}
-  live(40,140,1520,700,{sc:.5,fps:30,frame(c,now,L){
+  live(40,140,1520,700,{sc:.5,fps:30,words:[[250,60,1300,165]],frame(c,now,L){
     wipe(c,L);
     const bo=AUR.boost*Math.exp(-(now-AUR.t)/30000),h=hand(L,now,1500),ru=(now-RP.t)/1000;
     c.globalCompositeOperation='lighter';c.lineCap='round';
@@ -2160,8 +2197,8 @@ P.push(function(){
       c.strokeStyle=rgba(bo>.2?AUR_P:AUR_T,Math.min(.8,a*.55));c.lineWidth=3+jw*5;c.beginPath();c.moveTo(x+sway*.6,yb-hh*.5);c.lineTo(x+sway,yb-hh);c.stroke()}
     c.globalCompositeOperation='source-over';
     if(AUR.said&&L.seen&&!AUR.shown){AUR.shown=now}
-    if(AUR.shown)note(c,AUR.shown,now,['de storm van daarnet is aangekomen'],800,90,18,CINK,6500);
-    note(c,RP.t,now,['zo klinkt het noorderlicht op een radio:','fluiters, en een ochtendkoor'],1100,160,16,CINK,6500);
+    if(AUR.shown)note(c,AUR.shown,now,['de storm van daarnet is aangekomen'],800,92,21,CINK,6500);
+    note(c,RP.t,now,['zo klinkt het noorderlicht op een radio:','fluiters, en een ochtendkoor'],1100,162,20,CINK,6500);
     if(AUR.shown&&now-AUR.shown>6500){AUR.shown=0;AUR.said=0}
   }});
   hit(40,140,1560,800,(x,y,t)=>{RP.t=t;RP.x=x;found('fluiter');if(audio()){whistler(MASTER,.05);setTimeout(()=>chorus(MASTER,.025),900)}},true);
@@ -2196,7 +2233,7 @@ P.push(function(){
   // a few more fly the line now; your hand is a magnet that confuses them
   const FK=[];for(let k=0;k<11;k++)FK.push({o:k/11+Math.random()*.03,dx:0,dy:0,vx:0,vy:0,s:rd(Math.random,14,22),ph:rd(Math.random,0,TAU),sp:rd(Math.random,.9,1.1)});
   const BT={t:-1e9};
-  live(0,220,1600,900,{sc:.6,fps:30,frame(c,now,L){
+  live(0,220,1600,900,{sc:.6,fps:30,words:[[150,150,1300,90]],frame(c,now,L){
     wipe(c,L);const h=hand(L,now,600);
     c.strokeStyle=rgba([246,240,255],.9);c.lineCap='round';c.lineJoin='round';
     for(const b of FK){const u=((now/46000)*b.sp+b.o)%1,p=bez(3,.04+u*.94),q=bez(3,Math.min(1,.05+u*.94));
@@ -2206,7 +2243,7 @@ P.push(function(){
       c.save();c.translate(x,y);c.rotate(ang);c.lineWidth=1.8;c.beginPath();
       c.moveTo(-s*.2,-s);c.quadraticCurveTo(-s*.1-fl*s*.3,-s*.4,0,0);c.quadraticCurveTo(-s*.1-fl*s*.3,s*.4,-s*.2,s);c.stroke();
       c.beginPath();c.moveTo(-s*.5,0);c.lineTo(s*.35,0);c.stroke();c.restore()}
-    note(c,BT.t,now,['het kompas van een vogel zit waarschijnlijk in zijn oog:','licht maakt daar een stofje gevoelig voor het veld'],800,180,16,CINK,7000);
+    note(c,BT.t,now,['het kompas van een vogel zit waarschijnlijk in zijn oog:','licht maakt daar een stofje gevoelig voor het veld'],800,180,20,CINK,7000);
   }});
   hit(0,220,1600,1120,(x,y,t)=>{BT.t=t;if(audio()){const t0=now_();for(let k=0;k<5;k++){const f=rd(RA,5200,6800);vo(t0+k*rd(RA,.12,.3),'sine',f,f*.82,.05,.02,.003)}}},true);
   ambient(0,1200,{make(g,A){A.w=bed(g,'bandpass',500,.6,.02)},step(now,dt,A){if(RA()<dt*.25){const f=rd(RA,5200,6800);vo(now_(),'sine',f,f*.8,.05,.008,.003,A.g)}}});
@@ -2247,7 +2284,7 @@ P.push(function(){
   // move calmly and the alpha wave of rest grows, move fast and the beta wave of thinking
   const SPK=[],WR=[[3,40,860,'delta · slaap'],[7,30,920,'theta · dromen'],[12,24,980,'alfa · rust'],[22,17,1040,'beta · denken']];
   let calm=.5;
-  live(0,360,1600,740,{sc:.6,fps:30,frame(c,now,L){
+  live(0,360,1600,740,{sc:.6,fps:30,words:[[0,790,340,250]],frame(c,now,L){
     wipe(c,L);const h=hand(L,now,1500);
     const tg=h?clamp(1-PTR.spd/700,0,1):.5;calm+=(tg-calm)*.03;
     c.globalCompositeOperation='lighter';
@@ -2258,7 +2295,7 @@ P.push(function(){
       if(u<=1){const f=u*(ax.length-1),p=ax[Math.floor(f)];c.globalAlpha=1;c.drawImage(GLINT,p[0]-22,p[1]-22,44,44);c.drawImage(SOFT,p[0]-10,p[1]-10,20,20)}
       else{const e=ax[ax.length-1],k=(u-1)/.6;c.globalAlpha=1-k;c.drawImage(GLINT,e[0]-40-k*30,e[1]-40-k*30,80+k*60,80+k*60)}}
     c.globalCompositeOperation='source-over';c.globalAlpha=1;
-    WR.forEach(([f,a,y,lb],i)=>sayL(c,lb,30,y-a*.6-10,13,CINK,.55+(i===2?calm*.4:i===3?(1-calm)*.4:0)));
+    WR.forEach(([f,a,y,lb],i)=>sayL(c,lb,30,y-a*.6-10,17,CINK,.7+(i===2?calm*.3:i===3?(1-calm)*.3:0)));
   }});
   hit(0,360,1600,1100,(x,y,t)=>{SPK.push(t);if(audio()){const t0=now_();nz(t0,.006,'highpass',2000,2000,1,.5,.0005);nz(t0+.9,.06,'bandpass',900,500,2,.1,.003)}},true);
   ambient(0,1200,{make(g,A){A.d=bed(g,'lowpass',200,.7,.012);const o=AC.createOscillator(),gg=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();o.frequency.value=220;l.frequency.value=10;lg.gain.value=0;gg.gain.value=.008;
@@ -2290,14 +2327,14 @@ P.push(function(){
   whispers(R,160,900,true,2);
   // it beats, and every beat sends its field out a little. tap for an honest answer
   const HT={t:-1e9,last:0,rings:[]};
-  live(80,60,1440,1000,{sc:.6,fps:30,frame(c,now,L){
+  live(80,60,1440,1000,{sc:.6,fps:30,words:[[150,835,1300,125]],frame(c,now,L){
     wipe(c,L);const per=60000/64,ph=(now%per)/per,beat=Math.exp(-ph*9)+.5*Math.exp(-Math.max(0,ph-.28)*12)*(ph>.28?1:0);
     if(Math.floor(now/per)!==HT.last){HT.last=Math.floor(now/per);HT.rings.push(now);if(HT.rings.length>5)HT.rings.shift();if(audible()&&L.seen&&now-HT.t<30000)lubdub(.05)}
     c.globalCompositeOperation='lighter';
     for(const r0 of HT.rings){const u=(now-r0)/3200;if(u>1)continue;c.strokeStyle=rgba(gr(u),.5*(1-u));c.lineWidth=2.4;c.beginPath();ePts(hx,hy+10,hs*(1.1+u*3.4),hs*(.4+u*1.4),tilt,48).forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.stroke()}
     c.globalAlpha=.35+.65*beat;c.drawImage(PINK,hx-hs*1.3,hy-hs*1.3,hs*2.6,hs*2.6);c.globalAlpha=1;
     c.globalCompositeOperation='source-over';
-    note(c,HT.t,now,['te meten tot een paar centimeter buiten je borst,','met heel gevoelige meters. verder weg','verdwijnt het tussen alle andere velden'],800,860,15,CINK,9000);
+    note(c,HT.t,now,['te meten tot een paar centimeter buiten je borst,','met heel gevoelige meters. verder weg','verdwijnt het tussen alle andere velden'],800,862,20,CINK,9000);
   }});
   hit(hx-hs,hy-hs,hx+hs,hy+hs,(x,y,t)=>{HT.t=t;found('hartslag');lubdub(.12)});
   ambient(0,1200,{make(g,A){A.h=bed(g,'lowpass',120,.7,.03)}});
@@ -2333,7 +2370,7 @@ P.push(function(){
   whispers(R,100,1000,true,2);
   const PAIRS=[];{const RP=stream(SEED*5+8);for(let y=y0;y<=y1;y+=17)PAIRS.push(pk(RP,[[SOL_Y,AUR_B],[AUR_P,AUR_G]]))}
   const DW={t:-1e9};
-  live(hx-200,y0-30,1500-hx+200,y1-y0+60,{sc:.8,fps:30,frame(c,now,L){
+  live(hx-200,y0-30,1500-hx+200,y1-y0+60,{sc:.8,fps:30,words:[[560,985,1040,70]],frame(c,now,L){
     wipe(c,L);const rot=now/1400,u=(now-DW.t)/1000;
     // a wave comes in from the right and reaches the strand
     if(u<4){const r=1430-u*300;c.globalCompositeOperation='lighter';c.strokeStyle=rgba(AUR_T,.6*Math.min(1,(4-u)));c.lineWidth=3;c.beginPath();c.arc(1900,600,r,Math.PI-.7,Math.PI+.7);c.stroke();c.globalCompositeOperation='source-over'}
@@ -2344,7 +2381,7 @@ P.push(function(){
     PAIRS.forEach((pr,k)=>{const y=y0+k*17,sxx=Math.sin((y-y0)/per*TAU+rot)*amp;if(Math.abs(sxx)<16)return;
       c.lineWidth=2.4+lit*2;c.strokeStyle=rgba(pr[0],.72+lit*.28);c.beginPath();c.moveTo(hx+sxx,y);c.lineTo(hx,y);c.stroke();c.strokeStyle=rgba(pr[1],.72+lit*.28);c.beginPath();c.moveTo(hx,y);c.lineTo(hx-sxx,y);c.stroke()});
     segs(1,true);segs(-1,true);
-    note(c,DW.t,now,['een vraag die openstaat:','dat dna als antenne werkt, is niet aangetoond'],1080,1010,16,CINK,8000);
+    note(c,DW.t,now,['een vraag die openstaat:','dat dna als antenne werkt, is niet aangetoond'],1080,1010,20,CINK,8000);
   }});
   hit(hx-200,y0-30,1560,y1+30,(x,y,t)=>{DW.t=t;if(audio()){const t0=now_();[523,659,784,1047].forEach((f,k)=>vo(t0+1.3+k*.08,'triangle',f,f,1.6,.025,.02));nz(t0,1.4,'bandpass',2600,900,3,.02,.3)}},true);
   ambient(0,1200,{make(g,A){A.h=bed(g,'bandpass',1800,5,.005);A.l=bed(g,'lowpass',140,.7,.03)}});
@@ -2382,7 +2419,7 @@ P.push(function(){
   whispers(R,100,860,true,2);
   // the layers round the one who looks breathe; keep still and yours breathe with them
   let calm9=0;const YT={t:-1e9};
-  live(fx-640,fy-420,1280,1000,{sc:.5,fps:30,frame(c,now,L){
+  live(fx-640,fy-420,1280,1000,{sc:.5,fps:30,words:[[fx-420,fy+345,840,55]],frame(c,now,L){
     wipe(c,L);const h=hand(L,now,4000);
     calm9+=((h&&stillFor(now)>1.5?1:0)-calm9)*.02;
     const br=(1+Math.sin(now/(1800+1400*calm9)))/2;
@@ -2393,7 +2430,7 @@ P.push(function(){
     if(h&&calm9>.05){for(let i=0;i<4;i++){const k=((now/3600)+i/4)%1;c.globalAlpha=(1-k)*calm9*.5;c.strokeStyle=rgba(AUR_T,1);c.beginPath();c.ellipse(h[0],h[1],40+k*200,40+k*200,0,0,TAU);c.stroke()}}
     const tu=(now-YT.t)/1000;if(tu<2){c.globalAlpha=1-tu/2;c.drawImage(GLINT,fx+4-90*(1+tu),fy-62-90*(1+tu),180*(1+tu),180*(1+tu))}
     c.globalCompositeOperation='source-over';c.globalAlpha=1;
-    if(calm9>.6)sayL(c,'jullie velden bewegen nu samen',fx,fy+380,16,CINK,.8,clamp((calm9-.6)*3,0,1),true);
+    if(calm9>.6)sayL(c,'jullie velden bewegen nu samen',fx,fy+380,20,CINK,.88,clamp((calm9-.6)*3,0,1),true);
   }});
   hit(fx-60,fy-150,fx+60,fy+120,(x,y,t)=>{YT.t=t;if(audio()){const t0=now_();[262,330,392].forEach((f,k)=>vo(t0+k*.05,'sine',f,f,2.4,.03,.08))}});
   ambient(0,1200,{make(g,A){A.p=[220,277,330].map(f=>{const o=AC.createOscillator(),gg=AC.createGain();o.type='sine';o.frequency.value=f;gg.gain.value=0;o.connect(gg);gg.connect(g);o.start();return gg})},
@@ -2433,14 +2470,14 @@ P.push(function(){
   meadowBlades(R,hz+8,1190,560,10,62,keep,{kf:y=>.3+.7*(y-hz)/(1200-hz)});
   tinyFlowers(R,30,hz+30,1180,3,7,keep);
   say(R,'mensen voegen kunstmatige velden toe aan het milieu',true,false);
-  write(R,'tik in de lucht en zoek een zender',1300,140,15,{col:INK,a:.5,cen:true});
+  write(R,'tik in de lucht en zoek een zender',1300,142,19,{col:INK,a:.72,cen:true});
   spine(R,10,0,1230);
   motes(R,10,1000,1300,30,70);
   whispers(R,200,860,false,2);
   // a radio: tap the sky to switch it on, move along the dial to tune.
   // between the hiss: a call in morse, and the time signal that sets clocks
   RADIO.dy=GEN_DY;
-  live(20,60,1560,840,{sc:.7,fps:30,frame(c,now,L){
+  live(20,60,1560,840,{sc:.7,fps:30,words:[[20,700,1560,60]],frame(c,now,L){
     wipe(c,L);
     const h=hand(L,now,8000);if(h)RADIO.x=clamp(h[0],140,1460);
     if(!RADIO.on&&RADIO.k<.01)return;
@@ -2452,7 +2489,7 @@ P.push(function(){
     for(const st of STATIONS){c.fillStyle=rgba(st.found?[200,80,60]:[150,140,120],.8);c.beginPath();c.arc(st.x,dy+14,st.found?4:2.4,0,TAU);c.fill()}
     c.strokeStyle=rgba([200,60,40],.95);c.lineWidth=3;c.beginPath();c.moveTo(RADIO.x,dy-30);c.lineTo(RADIO.x,dy+26);c.stroke();
     const st=STATIONS.find(s0=>Math.abs(s0.x-RADIO.x)<RADIO.win);
-    sayL(c,st?st.name:'ruis',RADIO.x,dy-46,15,INK,.85,a,true);
+    sayL(c,st?st.name:'ruis',clamp(RADIO.x,330,1270),dy-46,19,INK,.9,a,true);
     masts.forEach(([x,hh])=>{const k=st?1-Math.abs(st.x-RADIO.x)/RADIO.win:0;c.globalAlpha=a*(.25+.6*k*(.5+.5*Math.sin(now/120)));c.drawImage(BLUE,x-60,hz-hh-60,120,120)});
     c.globalAlpha=1;
   }});
@@ -2525,7 +2562,7 @@ P.push(function(){
   // as a flower does: you are a field too
   const BEE=sprite(200,200,RR=>beeDraw(RR,100,100,70,Math.PI+.12),SEED*131);
   const B={x:bx,y:by,vx:0,vy:0,st:'fly',t:0};const FT={t:-1e9};
-  live(40,40,1520,1180,{fps:40,frame(c,now,L){
+  live(40,40,1520,1180,{fps:40,words:[[500,790,1100,75],[300,1225,1000,40]],frame(c,now,L){
     wipe(c,L);const h=hand(L,now,6000),dt=1/40;
     let tx,ty;
     if(h&&stillFor(now)>1.2){tx=h[0]+40*Math.cos(now/500);ty=h[1]-60+20*Math.sin(now/400);B.st='you'}
@@ -2537,10 +2574,10 @@ P.push(function(){
     if(ft<3){c.globalCompositeOperation='lighter';for(let i=0;i<4;i++){const k=ft/3+i*.12;if(k>1)continue;c.strokeStyle=rgba(ramp([[0,[226,84,140]],[.5,[236,160,50]],[1,[52,150,160]]],k),.6*(1-k));c.lineWidth=3;c.beginPath();c.ellipse(fx,fy,fs*1.6+k*340,(fs*1.6+k*340)*.92,0,0,TAU);c.stroke()}c.globalCompositeOperation='source-over'}
     c.save();c.translate(B.x,B.y);c.scale(B.vx<0?1:-1,1);c.rotate((B.vx<0?-1:1)*clamp(B.vy*.04,-.5,.5));c.drawImage(BEE,-100,-100,200,200);
     c.fillStyle='rgba(240,246,255,.35)';const w=Math.sin(now/14)*6;c.beginPath();c.ellipse(-14,-62-w,40,14,.3,0,TAU);c.fill();c.beginPath();c.ellipse(-14,62+w,40,14,-.3,0,TAU);c.fill();c.restore();
-    note(c,FT.t,now,['een bloem is licht negatief geladen, een bij positief:','zij voelt het verschil, en weet of er nog nectar is'],1060,820,16,INK,8000);
+    note(c,FT.t,now,['een bloem is licht negatief geladen, een bij positief:','zij voelt het verschil, en weet of er nog nectar is'],1060,820,20,INK,8000);
     // the sounds of the field you found
     const n=MEM.found.filter(k=>SOUNDS.includes(k)).length;
-    if(n)sayL(c,n<6?`geluiden van het veld gevonden: ${n} van 6`:'alle zes geluiden van het veld gevonden',800,1250,15,INK,.6,1,true);
+    if(n)sayL(c,n<6?`geluiden van het veld gevonden: ${n} van 6`:'alle zes geluiden van het veld gevonden',800,1250,18,INK,.72,1,true);
   }});
   hit(fx-fs*1.3,fy-fs*1.3,fx+fs*1.3,fy+fs*1.3,(x,y,t)=>{FT.t=t;if(audio()){const t0=now_();for(let k=0;k<12;k++)nz(t0+k*.04+RA()*.03,.01,'highpass',4000,4000,1,.03,.001);vo(t0,'sine',880,1320,.6,.02,.05)}});
   ambient(0,1400,{make(g,A){A.bz=AC.createOscillator();A.bz.type='sawtooth';A.bz.frequency.value=230;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;A.bg=AC.createGain();A.bg.gain.value=0;A.bz.connect(lp);lp.connect(A.bg);A.bg.connect(g);A.bz.start();
