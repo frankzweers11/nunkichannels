@@ -2296,6 +2296,155 @@ requestAnimationFrame(tick);
   addEventListener('click',e=>{if(e.isTrusted&&performance.now()-last<800&&!skip(e.target)){e.stopImmediatePropagation();e.preventDefault()}},true);
 })();
 </script>
+<!-- nunki:lees -->
+<script>window.NUNKI_LEES={"lang":"nl","end":13200,"sheets":[{"y":0,"t":{"nl":"ringen","en":"rings"},"nl":["Een muur over een boom en zijn jaren.","Wie stilstaat, groeit: zolang je blijft, groeit jouw eigen ring."],"en":["A wall about a tree and its years.","Whoever stands still grows: as long as you stay, your own ring grows."]},{"y":1200,"t":{"nl":"eerst naar beneden","en":"first, downwards"},"nl":["Een boom groeit eerst naar beneden: de wortels zoeken water voordat er een stam is.","De boom is al wat hij nog niet is. Tik: een druppel water."],"en":["A tree first grows downwards: the roots look for water before there is a trunk.","The tree already is what it is not yet. Tap: a drop of water."]},{"y":2400,"t":{"nl":"elk jaar een lijn","en":"a line every year"},"nl":["1963 is het eerste jaar. Droge jaren als 1976, 2003, 2018 en 2022 blijven smal; de brand van 2002 laat een litteken.","Ook wat pijn deed blijft zichtbaar, en groeit mee.","Tik op de stam en hij speelt zijn jaren af, als een plaat (naar 'Years' van Bartholomäus Traubeck, 2011)."],"en":["1963 is the first year. Dry years like 1976, 2003, 2018 and 2022 stay narrow; the fire of 2002 leaves a scar.","What hurt stays visible too, and grows along.","Tap the trunk and it plays its years, like a record (after 'Years' by Bartholomäus Traubeck, 2011)."]},{"y":3600,"t":{"nl":"vier keer hetzelfde","en":"four times the same"},"nl":["Lente, zomer, herfst, winter: vier keer hetzelfde, nooit hetzelfde."],"en":["Spring, summer, autumn, winter: four times the same, never the same."]},{"y":4800,"t":{"nl":"wie er woonde","en":"who lived there"},"nl":["Kever, uil, zwam, slak, nest, mos, mier en schors: een boom is een huis voor velen.","Tik op wat je ziet. In het mos woont een beerdiertje, dat bijna alles overleeft."],"en":["Beetle, owl, fungus, snail, nest, moss, ant and bark: a tree is a home for many.","Tap what you see. In the moss lives a water bear, which survives almost anything."]},{"y":6000,"t":{"nl":"onder de grond praat het","en":"underground, it talks"},"nl":["Wortels en schimmeldraden verbinden de bomen. Een berk geeft suiker aan wat in de schaduw staat: zo werd het gemeten (Simard, 1997). Hoeveel bomen echt delen, is nog open.","Tik op een boom."],"en":["Roots and fungal threads connect the trees. A birch gives sugar to what stands in its shade: that is how it was measured (Simard, 1997). How much trees really share is still an open question.","Tap a tree."]},{"y":7200,"t":{"nl":"smalle jaren","en":"narrow years"},"nl":["In een droog jaar vraagt de boom niets: hij wordt smal.","Tik voor regen. Petrichor: zo ruikt regen op droge grond."],"en":["In a dry year the tree asks for nothing: it grows narrow.","Tap for rain. Petrichor: the smell of rain on dry ground."]},{"y":8400,"t":{"nl":"het litteken wordt hout","en":"the scar becomes wood"},"nl":["Wat de boom niet kan weren, groeit hij omheen."],"en":["What the tree cannot keep out, it grows around."]},{"y":9600,"t":{"nl":"wat valt wordt grond","en":"what falls becomes soil"},"nl":["Een gevallen stam wordt huis, voedsel en aarde.","Niets gaat weg, het wordt iets anders. Tik onder de stam."],"en":["A fallen trunk becomes home, food and earth.","Nothing goes away, it becomes something else. Tap beneath the trunk."]},{"y":10800,"t":{"nl":"en weer een eerste lijn","en":"and again a first line"},"nl":["Het boompje zoekt het licht: dat ben jij. Het buigt naar je hand.","Tik, en er komt een roodborst."],"en":["The sapling looks for the light: that is you. It bends towards your hand.","Tap, and a robin comes."]},{"y":12000,"t":{"nl":"elk jaar iets erbij","en":"something more each year"},"nl":["Elk jaar iets erbij, nooit iets weg; zelfs wat verloren ging staat er nog in.","Jouw bezoeken worden hier jaarringen."],"en":["Something added every year, nothing taken away; even what was lost is still in there.","Your visits become year rings here."]}]};</script>
+<script>/* nunki:lees, door scripts/build.py vóór de navigatie in elke wand gezet die
+   een tekstbestand heeft in scripts/lees/<slug>.json. Niet in de wanden
+   bewerken, wel hier.
+
+   De leeslaag: de zinnen van het vel dat je ziet, in gewone, leesbare letters.
+   - Taal kies je één keer voor de hele site: 'nunki:lang' (nl standaard, en),
+     ook via ?lang=en of ?lang=nl. Het knopje nl · en zit in de leeslaag.
+   - Op een telefoon (smal scherm) staat de laag aan: daar is de getekende
+     tekst te klein. Op een groot scherm alleen als je taal anders is dan de
+     taal van de wand. Inklappen kan; dat wordt onthouden ('nunki:lees').
+   - Welk vel in beeld is, vraagt de laag aan de wand: window.NUNKI_Y(py) geeft
+     de hoogte in wandeenheden (1600 breed) op py pixels van de bovenkant van
+     het scherm. Zonder die functie wordt hij berekend voor een wand die de
+     volle breedte vult: (scrollY + py) / (breedte / 1600).
+   - Een wand kan op taalwissel reageren via het event 'nunki:lang'.
+
+   Gegevens (window.NUNKI_LEES):
+   { lang: 'nl', end: 13200, sheets: [ { y: 0, t: {nl:'één', en:'one'},
+       nl: ['regel', ...], en: ['line', ...] }, ... ] } */
+(function () {
+  'use strict';
+  var D = window.NUNKI_LEES;
+  if (!D || !D.sheets || !D.sheets.length) return;
+  var q = new URLSearchParams(location.search);
+  if (q.has('fast') || q.has('still')) return;
+  var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+  var N = window.NUNKI = window.NUNKI || {};
+  var lang = q.get('lang');
+  if (lang === 'nl' || lang === 'en') store('nunki:lang', lang); else lang = store('nunki:lang');
+  if (lang !== 'en') lang = 'nl';
+  N.lang = lang;
+
+  var css =
+    '.nunki-lees{position:fixed;z-index:59;left:clamp(10px,1.5vw,22px);bottom:max(12px,env(safe-area-inset-bottom));' +
+      'width:min(34rem,calc(100vw - 2*clamp(10px,1.5vw,22px)));box-sizing:border-box;padding:9px 13px 11px;border-radius:14px;' +
+      'color:#2a251f;background:rgba(248,244,233,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);' +
+      'box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.08),0 10px 26px -14px rgba(0,0,0,.6);' +
+      'font:400 15px/1.42 "Avenir Next","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;' +
+      'transition:opacity .45s ease,transform .45s ease;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}' +
+    '.nunki-lees.touch{width:calc(100vw - 2*clamp(10px,1.5vw,22px) - 52px)}' +
+    '@media (max-width:760px){.nunki-lees{font-size:14px;line-height:1.38;padding:7px 11px 9px}.nunki-lees .nl-t{font-size:.98rem}}' +
+    '@media (min-width:900px){.nunki-lees:not(.touch){left:50%;transform:translateX(-50%)}.nunki-lees:not(.touch).gone{transform:translate(-50%,10px)}}' +
+    '.nunki-lees.gone{opacity:0;transform:translateY(10px);pointer-events:none}' +
+    '.nunki-lees .nl-h{display:flex;align-items:center;gap:8px;margin:0 0 3px}' +
+    '.nunki-lees .nl-t{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;' +
+      'font:400 1.02rem/1.25 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next",sans-serif;color:#ac5036}' +
+    '.nunki-lees .nl-b p{margin:0}.nunki-lees .nl-b p+p{margin-top:3px}' +
+    '.nunki-lees .nl-b{transition:opacity .3s ease}.nunki-lees .nl-b.swap{opacity:0}' +
+    '.nunki-lees button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:3px 5px;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}' +
+    '.nunki-lees .nl-lang{font-size:.82rem;letter-spacing:.04em;color:rgba(42,37,31,.5)}' +
+    '.nunki-lees .nl-lang b{font-weight:600;color:#2a251f}' +
+    '.nunki-lees .nl-x{font-size:1rem;line-height:1;color:rgba(42,37,31,.5);padding:3px 6px}' +
+    '.nunki-lees button:focus-visible{outline:2px solid #ac5036;outline-offset:1px}' +
+    '.nunki-lees.min{width:auto;padding:4px 6px;border-radius:17px}' +
+    '.nunki-lees.min .nl-t,.nunki-lees.min .nl-b{display:none}.nunki-lees.min .nl-h{margin:0;gap:2px}' +
+    '' +
+    '@media (prefers-reduced-motion:reduce){.nunki-lees,.nunki-lees .nl-b{transition:none}}' +
+    '@media print{.nunki-lees{display:none}}';
+  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+  var box = document.createElement('aside');
+  box.className = 'nunki-lees gone';
+  box.setAttribute('aria-live', 'polite');
+  box.innerHTML = '<div class="nl-h"><span class="nl-t"></span><button type="button" class="nl-lang"></button>' +
+    '<button type="button" class="nl-x"></button></div><div class="nl-b"></div>';
+  var elT = box.querySelector('.nl-t'), elB = box.querySelector('.nl-b'), bL = box.querySelector('.nl-lang'), bX = box.querySelector('.nl-x');
+  // nothing on this card reaches the wall beneath it
+  ['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(function (t) {
+    box.addEventListener(t, function (e) { e.stopPropagation(); }, { passive: true });
+  });
+
+  var UI = {
+    nl: { open: 'tekst', close: 'tekst inklappen', show: 'tekst tonen', lang: 'taal: nederlands. wissel naar engels' },
+    en: { open: 'text', close: 'fold the text away', show: 'show the text', lang: 'language: english. switch to dutch' }
+  };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var narrow = function () { return Math.min(innerWidth, screen.width || innerWidth) < 760; };
+  var touch = matchMedia('(pointer:coarse)').matches || navigator.maxTouchPoints > 0;
+  var min = store('nunki:lees') === 'min';
+  var cur = -1, shownLang = '';
+
+  // py: a height on the screen in px. the wall turns it into wall units
+  function wallY(py) {
+    if (typeof window.NUNKI_Y === 'function') { try { return window.NUNKI_Y(py); } catch (e) {} }
+    return (scrollY + py) / (innerWidth / 1600);
+  }
+  // which sheet is being read: the line we look at slides from near the top of
+  // the screen (at the top of the page) to near the bottom (at the end), so on a
+  // phone, where several sheets fit on one screen, the first and last get a turn
+  function sheetAt() {
+    var max = Math.max(1, document.documentElement.scrollHeight - innerHeight - 200);
+    var f = Math.min(1, Math.max(0, scrollY / max)), y = wallY(innerHeight * (0.18 + 0.64 * f));
+    if (D.end && y >= D.end) { if (wallY(0) >= D.end - 60) return -1; y = D.end - 1; }
+    var k = -1;
+    for (var i = 0; i < D.sheets.length; i++) if (y >= D.sheets[i].y) k = i;
+    return k;
+  }
+  function wanted() { return narrow() || lang !== (D.lang || 'nl'); }
+  function head() {
+    bL.innerHTML = lang === 'nl' ? '<b>nl</b> · en' : 'nl · <b>en</b>';
+    bL.setAttribute('aria-label', UI[lang].lang);
+    bX.textContent = min ? '▴' : '▾';
+    bX.setAttribute('aria-label', min ? UI[lang].show : UI[lang].close);
+    bX.title = min ? UI[lang].show : UI[lang].close;
+    box.classList.toggle('min', min);
+    box.classList.toggle('touch', touch && narrow());
+  }
+  function fill(k, swap) {
+    var s = D.sheets[k];
+    var t = s.t ? (s.t[lang] || s.t.nl || '') : '';
+    var lines = s[lang] || s.nl || [];
+    var put = function () {
+      elT.textContent = t;
+      elB.innerHTML = lines.map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('');
+      elB.classList.remove('swap');
+    };
+    if (swap && !matchMedia('(prefers-reduced-motion:reduce)').matches) { elB.classList.add('swap'); setTimeout(put, 280); }
+    else put();
+  }
+  function update() {
+    // a wall that opens with a gate (a full-screen invitation) keeps the layer away until it is open
+    var g = document.getElementById('gate'), gated = g && !g.classList.contains('off') && getComputedStyle(g).display !== 'none';
+    var k = sheetAt(), on = wanted() && k >= 0 && !gated;
+    if (on && (k !== cur || shownLang !== lang)) { fill(k, cur >= 0 && !box.classList.contains('gone')); cur = k; shownLang = lang; }
+    box.classList.toggle('gone', !on);
+    document.documentElement.dataset.lang = lang;
+  }
+  bL.addEventListener('click', function () {
+    lang = lang === 'nl' ? 'en' : 'nl'; N.lang = lang; store('nunki:lang', lang);
+    head(); update();
+    try { window.dispatchEvent(new CustomEvent('nunki:lang', { detail: lang })); } catch (e) {}
+  });
+  bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
+
+  function start() {
+    document.body.appendChild(box);
+    head(); update();
+    var tick = 0;
+    addEventListener('scroll', function () { if (!tick) { tick = requestAnimationFrame(function () { tick = 0; update(); }); } }, { passive: true });
+    addEventListener('resize', function () { head(); update(); });
+    // walls that move without scrolling (a film, a jump) are caught by a slow poll
+    setInterval(update, 700);
+  }
+  if (document.body) start(); else addEventListener('DOMContentLoaded', start);
+})();
+</script>
+<!-- /nunki:lees -->
 <!-- nunki:nav --><script src="/nav.js" defer></script><!-- /nunki:nav -->
 </body>
 </html>
