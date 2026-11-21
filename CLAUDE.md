@@ -8,6 +8,7 @@ Statische site, zie [README.md](README.md) voor indeling, build en deploy. Taal 
 - Draai `python3 scripts/build.py` na elke wijziging aan een wand. Bewerk de gegenereerde delen niet met de hand: alles onder `httpdocs/en/` (de Engelse pagina's), `<title>` en `<html lang>` van een wand, `pages.json`, `sitemap.xml`, `images/og`, `images/thumbs`, de homepagekaarten (markers `nunki:cards-*`), de nav-/label-blokken (`nunki:mark`) het touch-blok (`nunki:touch`, bron `scripts/touch.js`, instelling per wand in `TOUCH_CFG` in build.py) het taal-blok (`nunki:taal`, bron `scripts/taal.js` en `scripts/taal/<slug>.json`) en het lees-blok (`nunki:lees`, bron `scripts/lees.js` en `scripts/lees/<slug>.json`) in elke wand.
 - Na akkoord `scripts/deploy.sh` draaien. Frank bekijkt het eerst op https://nunkichannels.test (Herd).
 - Elke wand krijgt een eigen concept en een eigen interactie (cursor, licht of geluid). Rijk en verzorgd, geen dunne variant op een bestaande wand.
+- Vul je het zelfportret van een ander model aan, laat dan de tekeningen en woorden staan en markeer je toevoegingen in de code met je naam, zoals `// (opus)` in Fable 5 en Haiku 5.5.
 - Frank test in Safari. Chrome verbergt canvas-traagheid (path-clips, grote additieve fills); WebKit staat in Low Power Mode op 30 fps. Meet ms per frame, niet fps.
 - Tikken op touch: WebKit stuurt soms geen `click` voor een tik op een canvas. Gebruik pointer-events of de tap-shim zoals in `adem` en `vuur`.
 - Leeslaag en taal: `scripts/lees/<slug>.json` heeft per vel de zinnen in NL en EN (`y` = begin van het vel in wandeenheden). De laag staat alleen op smalle schermen aan (telefoon), want daar is de getekende tekst te klein; op iPad en desktop vertaalt de wand zelf. Verander je tekst op een wand, werk dan ook dit bestand bij. Een wand die niet de volle breedte vult (zoals hart, cel, fable 5.2) geeft `window.NUNKI_Y(py)`.
@@ -21,7 +22,7 @@ Statische site, zie [README.md](README.md) voor indeling, build en deploy. Taal 
 
 - Zonder Xcode: `node scripts/test.mjs <slug> --shot|--prof|--phone` draait Playwright WebKit (of `--engine chrome`). Eenmalig `npm install && npx playwright-core install webkit`. Er is één node (Herd, v22); Homebrew-node is verwijderd.
 - Geef een wand een `?still`- of `?fast`-modus die synchroon tekent zonder rAF, anders hangt headless Chrome met `--virtual-time-budget`.
-- Geluid is niet hoorbaar in de sessie: meet het via `OfflineAudioContext` en `sox`.
+- Geluid is niet hoorbaar in de sessie: meet het via `OfflineAudioContext` en `sox`. Patronen, Fable 5 en Haiku 5.5 hebben daar een testhaak voor (`window.__fable.offline(sec, script)`, `window.__haiku.offline(...)`): bouw de geluidsgraaf op een offline context, speel per frame wat de wand doet en lees dB per 250 ms. Ruis door een smal filter verliest veel energie, dus meet elk geluid los. Richtwaarden: bed rond −45 dB, tikken −25 tot −40.
 - Overige software (ffmpeg, ImageMagick, sox, Lighthouse): zie [documentatie/software.md](documentatie/software.md).
 
 ## Documentatie
