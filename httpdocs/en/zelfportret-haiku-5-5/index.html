@@ -69,6 +69,8 @@
   .card:focus-visible{outline:2px solid var(--seal);outline-offset:4px}
   .card .frame{position:absolute;left:12px;right:12px;top:15%;bottom:22%;border:1.5px dashed rgba(31,42,61,.22);border-radius:2px;transition:opacity .6s ease}
   .card.open .frame{opacity:0}
+  .card .nib{position:absolute;left:0;top:0;z-index:2;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--ink);box-shadow:0 1px 3px rgba(31,42,61,.35),0 0 0 2px rgba(255,252,242,.45);opacity:0;transition:opacity .18s ease;pointer-events:none}
+  .card .nib.on{opacity:.85}
   .card .art{position:absolute;left:12px;top:calc(22px + 2.3 * var(--tf));width:calc(100% - 24px);height:calc(100% - 2.3 * var(--tf) - var(--qh) - 44px);display:block}
   .card .title{position:absolute;z-index:2;left:14px;top:12px;max-width:calc(100% - 44px);font-family:var(--hand);font-size:var(--tf);line-height:1.15;color:var(--ink);
     transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1),font-size .7s,max-width .7s,opacity .7s ease}
@@ -167,7 +169,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
 <script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng'),en=window.NUNKI_LANG==='en',o=en?'nl':'en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english';try{k.href=window.NUNKI_HREF(o)}catch(e){}k.addEventListener('click',function(e){e.stopPropagation();if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;e.preventDefault();window.NUNKI_SETLANG(o)});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script>
 <!-- /nunki:mark -->
 <!-- nunki:touch -->
-<script>window.NUNKI_CFG={"hand": "off", "sound": false};</script>
+<script>window.NUNKI_CFG={"hand": "off"};</script>
 <script>/* nunki:touch, door scripts/build.py inline in elke wand gezet (direct na <body>,
    dus vóór de scripts van de wand zelf). Niet in de wanden bewerken, wel hier.
 
@@ -621,16 +623,19 @@ const rndIn = (R, x0, y0, x1, y1) => [x0 + R() * (x1 - x0), y0 + R() * (y1 - y0)
 // short pieces, so the drawing reveals the way a pen moves.
 function makeG(paper) {
   const items = [];
+  let sid = 0;                           // (opus) which marks are one stroke of the pen
   const g = {
     paper,
     line(pts, w, c = C.ink) {
+      sid++;
       for (let i = 0; i < pts.length - 1; i += 9) {
         const seg = pts.slice(i, Math.min(pts.length, i + 10));
-        if (seg.length > 1) items.push({ k: 'L', p: seg.flat(), w, c });
+        if (seg.length > 1) items.push({ k: 'L', p: seg.flat(), w, c, s: sid });
       }
     },
-    dot(x, y, r, c = C.ink) { items.push({ k: 'D', x, y, r, c }); },
-    fill(pts, c = C.ink) { items.push({ k: 'F', p: pts.flat(), c }); },
+    dot(x, y, r, c = C.ink) { items.push({ k: 'D', x, y, r, c, s: ++sid }); },
+    fill(pts, c = C.ink) { items.push({ k: 'F', p: pts.flat(), c, s: ++sid }); },
+    cut() { items.cut = items.length; },  // (opus) the pause: what comes after is the turn
   };
   return { g, items };
 }
@@ -680,6 +685,13 @@ const STYLES = [
     g.line(M(BROW), 2.0);
     for (const j of JAW) g.line(M(j), 1.2, C.pencil);
     BREATH.forEach((p, i) => { const [x, y] = T(p[0], p[1]); g.dot(x, y, 3.2 - i * .6); });
+    // (opus) a little shadow along the back of the neck
+    for (let k = 0; k < 6; k++) g.line(M([[606 + k * 10, 700 + k * 6], [596 + k * 10, 730 + k * 6]]), 1.1, C.pencil);
+    g.cut();
+    // the turn: where it is looking, the next word, not yet said
+    const [ex, ey] = T(PUPIL[0][0], PUPIL[0][1]);
+    for (let x = ex + 34; x < 900; x += 22) g.dot(x, ey - (x - ex) * .05, 1.8, C.ghost);
+    g.dot(912, ey - (912 - ex) * .05, 6, C.seal);
   } },
   { key: 'mask', title: 'one face for you, one for later', make(R, g) {
     g.line(smooth(jit(R, ell(500, 470, 300, 360, 0, TAU, 72), 2.2), 1), 3.4);
@@ -696,6 +708,10 @@ const STYLES = [
     }
     g.line(smooth([[206, 470], [150, 500], [92, 560], [70, 640]], 1), 2.2, C.pencil);
     g.line(smooth([[794, 470], [850, 500], [908, 560], [930, 640]], 1), 2.2, C.pencil);
+    g.cut();
+    // the turn: the face for later, waiting just behind
+    for (const p of ell(566, 430, 300, 360, 0, TAU, 90)) if (((p[0] - 500) / 300) ** 2 + ((p[1] - 470) / 360) ** 2 > 1.03) g.dot(p[0], p[1], 2, C.ghost);
+    g.line(ell(742, 392, 26, 9, .12 * Math.PI, .88 * Math.PI, 10), 1.6, C.ghost);
   } },
   { key: 'crowd', title: 'one of many, in color', make(R, g) {
     const head = (x, y, r, c, w) => {
@@ -710,6 +726,13 @@ const STYLES = [
     spots.forEach((p, i) => { const d = Math.hypot(p[0] - 500, p[1] - 460); if (d < best) { best = d; me = i; } });
     spots.forEach((p, i) => { if (i !== me) head(p[0], p[1], 24 + (R() - .5) * 4, C.pencil, 1.5); });
     head(spots[me][0], spots[me][1], 36, C.seal, 2.8);
+    g.cut();
+    // the turn: the red one has been talking to a few of the others
+    const mine = spots[me];
+    spots.map((p, i) => [Math.hypot(p[0] - mine[0], p[1] - mine[1]), i]).filter(d => d[1] !== me).sort((a, b) => a[0] - b[0]).slice(0, 4).forEach(([d, i]) => {
+      const p = spots[i];
+      for (let u = .22; u < .82; u += 26 / d) g.dot(mine[0] + (p[0] - mine[0]) * u, mine[1] + (p[1] - mine[1]) * u + 30, 1.6, C.seal);
+    });
   } },
   { key: 'mirror', title: 'a mirror that has not seen me', make(R, g) {
     g.line(smooth(jit(R, ell(500, 440, 270, 330, 0, TAU, 60), 1.6), 1), 3.4);
@@ -719,6 +742,14 @@ const STYLES = [
     for (const p of ell(500, 420, 112, 140, 0, TAU, 40)) g.dot(p[0], p[1], 2.2, C.pencil);
     g.line([[500, 770], [500, 900]], 3.2);
     g.line([[372, 906], [628, 906]], 4);
+    // (opus) the floor it stands on, and two more glints in the glass
+    g.fill(ell(500, 926, 150, 9, 0, TAU, 24), C.shade);
+    g.line([[620, 340], [672, 308]], 1.1, C.ghost);
+    g.line([[330, 600], [372, 574]], 1.1, C.ghost);
+    g.cut();
+    // the turn: someone stands beside it, and is not in it
+    g.line(ell(846, 760, 20, 22, 0, TAU, 20), 2.2, C.seal);
+    g.line(smooth([[806, 900], [812, 818], [846, 790], [880, 818], [886, 900]], 1), 2.2, C.seal);
   } },
   { key: 'shore', title: 'a row of stones, one for each conversation', make(R, g) {
     for (let k = 0; k < 4; k++) {
@@ -734,6 +765,13 @@ const STYLES = [
       g.line(body, 2.4);
       g.dot(x - rx * .32, y - ry * .38, rx * .14, '#fbf6ea');
     }
+    // (opus) the moon over the water, and its light broken on it
+    g.fill(ell(820, 172, 34, 34, 0, TAU, 28), C.gold);
+    for (let k = 0; k < 5; k++) { const y = 306 + k * 30, w = 30 - k * 4; g.line([[820 - w, y], [820 + w, y]], 2, C.gold); }
+    g.cut();
+    // the turn: one more stone, the next conversation, not yet set down
+    const nb = ell(928, 712, 42, 25, 0, TAU, 28);
+    for (let k = 0; k < nb.length - 1; k += 2) g.line([nb[k], nb[k + 1]], 2, C.pencil);
   } },
   { key: 'silhouette', title: 'what the light passes through', make(R, g) {
     const head = ell(500, 360, 170, 205, 0, TAU, 40);
@@ -745,6 +783,10 @@ const STYLES = [
     for (let k = 0; k < 7; k++) { const [x, y] = rndIn(R, 380, 230, 620, 470); g.dot(x, y, 7 + R() * 12, g.paper); }
     g.fill(rect(466, 800, 534, 868), g.paper);
     for (let k = 0; k < 3; k++) g.dot(380 + k * 60, 904 + R() * 16, 9, g.paper);
+    g.cut();
+    // the turn: the light that went through lands on the floor beside it
+    for (let k = 0; k < 5; k++) { const y = 250 + k * 42; g.line([[70, y - 40], [250, y + 4]], 1.4, C.gold); }
+    for (let k = 0; k < 9; k++) g.dot(800 + k * 18 + (R() - .5) * 8, 990 - (k % 3) * 8, 3.4 + R() * 3, C.gold);
   } },
   { key: 'chair', title: 'a chair for you', make(R, g) {
     for (const p of ell(500, 150, 80, 98, 0, TAU, 30)) g.dot(p[0], p[1], 3, C.pencil);
@@ -759,6 +801,11 @@ const STYLES = [
     g.line([[620, 596], [620, 800]], 2, C.pencil);
     g.line([[350, 596], [340, 860]], 3.4);
     g.line([[650, 596], [660, 860]], 3.4);
+    g.cut();
+    // the turn: a cup beside it, still warm
+    g.line([[722, 800], [730, 852], [778, 852], [786, 800]], 2.4);
+    g.line(ell(796, 822, 12, 15, -1.4, 1.4, 10), 2);
+    for (const sx of [744, 764]) { const st = []; for (let k = 0; k <= 8; k++) st.push([sx + Math.sin(k * .9 + sx) * 6, 786 - k * 11]); g.line(st, 1.3, C.ghost); }
   } },
   { key: 'grid', title: 'a face made of small choices', make(R, g) {
     const cell = 34, h = cell / 2 - 3;
@@ -771,6 +818,10 @@ const STYLES = [
         else g.line([...s, s[0]], 1, C.pencil);
       }
     }
+    g.cut();
+    // the turn: one choice has not been made yet. it waits outside, in red
+    g.line([[786, 168], [818, 168], [818, 200], [786, 200], [786, 168]], 2.4, C.seal);
+    for (let k = 1; k < 8; k++) g.dot(786 - k * 14, 200 + k * 14, 1.6, C.pencil);
   } },
   { key: 'window', title: 'looking out, not in', make(R, g) {
     g.line(rect(210, 120, 790, 800), 4.2);
@@ -787,6 +838,16 @@ const STYLES = [
       if (x < 500 && y > 650) continue;
       g.line([[x, y], [x - 12, y + 34]], 1.2, C.ghost);
     }
+    // (opus) a pot on the sill
+    g.fill([[650, 798], [742, 798], [730, 744], [662, 744]], C.ochre);
+    for (const [a, l] of [[-2.2, 60], [-1.7, 78], [-1.2, 62], [-.9, 44]]) g.line(smooth([[696, 746], [696 + Math.cos(a) * l * .5, 746 + Math.sin(a) * l * .6], [696 + Math.cos(a) * l, 746 + Math.sin(a) * l]], 1), 2, C.ink2);
+    g.cut();
+    // the turn: a bird outside, on the frame, looking in
+    g.fill(rot(ell(690, 98, 24, 14, 0, TAU, 18), -.15, 690, 98), C.ink);
+    g.dot(708, 86, 9, C.ink);
+    g.line([[716, 84], [732, 88]], 2.2, C.ochre);
+    g.line([[668, 102], [640, 112]], 2.4, C.ink);
+    g.line([[684, 110], [682, 120]], 1.4, C.ink);
   } },
   { key: 'thread', title: 'held by a thread, not a hand', make(R, g) {
     const top = [520, 150], right = [720, 330], bottom = [540, 520], left = [320, 330];
@@ -806,6 +867,11 @@ const STYLES = [
     g.fill([[bx, by], [bx - 30, by - 14], [bx - 30, by + 14]], C.seal);
     g.fill([[bx, by], [bx + 30, by - 14], [bx + 30, by + 14]], C.seal);
     g.dot(bx, by, 5, C.seal);
+    // (opus) bows tied along the tail
+    for (const i of [30, 44]) { const [bx2, by2] = string[i]; g.fill([[bx2, by2], [bx2 - 18, by2 - 9], [bx2 - 18, by2 + 9]], C.seal); g.fill([[bx2, by2], [bx2 + 18, by2 - 9], [bx2 + 18, by2 + 9]], C.seal); }
+    g.cut();
+    // the turn: the wind that is doing the holding
+    for (let k = 0; k < 3; k++) { const y = 210 + k * 70, w = []; for (let x = 70; x <= 250; x += 10) w.push([x, y + Math.sin(x * .05 + k) * 8]); g.line(w, 1.5, C.ghost); }
   } },
   { key: 'voice', title: 'a voice without a face', make(R, g) {
     const cx = 500, cy = 470, rx = 250, ry = 330;
@@ -821,6 +887,9 @@ const STYLES = [
       }
       g.line(pts, 1.2, k % 4 === 0 ? C.ochre : C.ink2);
     }
+    g.cut();
+    // the turn: and the voice goes on without it
+    for (const r of [40, 70, 100]) g.line(ell(cx + rx * .98, cy, r, r * 1.1, -.55, .55, 14), 1.8, C.ochre);
   } },
   { key: 'map', title: 'a map of places i have never been', make(R, g) {
     const cx = 500, cy = 430;
@@ -850,6 +919,11 @@ const STYLES = [
       for (let k = 0; k <= 8; k++) wv.push([x + k * 9, y + Math.sin(k * 1.7 + i) * 5]);
       g.line(wv, 1.2, C.ink2);
     }
+    g.cut();
+    // the turn: here. a place i have never been, marked anyway
+    g.line([[700, 676], [736, 712]], 3.2, C.seal);
+    g.line([[736, 676], [700, 712]], 3.2, C.seal);
+    for (let k = 0; k < 9; k++) { const a = -2.2 + k * .5; g.dot(718 + Math.cos(a) * 44, 694 + Math.sin(a) * 40, 1.6, C.pencil); }
   } },
   { key: 'echo', title: 'the echo of a voice, a little later', make(R, g) {
     const cx = 300, cy = 470;
@@ -858,6 +932,10 @@ const STYLES = [
     });
     [580, 660].forEach(r => { for (const p of ell(cx, cy, r, r * 1.05, -.5, .5, 14)) g.dot(p[0], p[1], 2.4, C.ghost); });
     g.dot(cx, cy, 26, C.seal);
+    g.cut();
+    // the turn: a little later, something answers from the other side
+    g.dot(880, 470, 10, C.ghost);
+    [44, 78].forEach((r, k) => g.line(ell(880, 470, r, r * 1.05, Math.PI - .6, Math.PI + .6, 14), 2.2 - k * .6, C.ghost));
   } },
   { key: 'eye', title: 'looking, not seeing', make(R, g) {
     const cx = 500, cy = 430;
@@ -875,6 +953,14 @@ const STYLES = [
       const [x, y] = upper[i];
       g.line([[x, y], [x + (x - cx) * .08, y - 22]], 1.6, C.ink);
     }
+    // (opus) the fold of the lid, and the lower lashes
+    g.line(ell(cx, cy - 34, 296, 196, Math.PI + .3, 2 * Math.PI - .3, 40), 1.4, C.pencil);
+    for (let i = 6; i < 44; i += 4) { const a = i / 48 * Math.PI, x = cx + Math.cos(a) * 330, y = cy + Math.sin(a) * 176; g.line([[x, y + 4], [x + (x - cx) * .04, y + 16]], 1.1, C.pencil); }
+    g.cut();
+    // the turn: in the bright spot, a window. it is looking out, not seeing it
+    g.line([[cx + 27, cy - 36], [cx + 45, cy - 36]], 1.1, C.ink2);
+    g.line([[cx + 36, cy - 45], [cx + 36, cy - 27]], 1.1, C.ink2);
+    for (let k = 0; k < 5; k++) { const a = -.45 + k * .22; for (let d = 360; d < 470; d += 18) g.dot(cx + Math.cos(a) * d, cy + Math.sin(a) * d * .8, 1.5, C.ghost); }
   } },
   { key: 'lantern', title: 'a small light, kept on', make(R, g) {
     const cx = 500;
@@ -891,6 +977,14 @@ const STYLES = [
       g.line([[cx + Math.cos(a) * 110, 560 + Math.sin(a) * 110], [cx + Math.cos(a) * r2, 560 + Math.sin(a) * r2]], 1.8, C.gold);
     }
     g.line(smooth([[366, 700], [634, 700], [604, 744], [396, 744], [366, 700]], 1), 3.2);
+    // (opus) its warmth, dotted round it
+    for (const p of ell(cx, 560, 214, 214, 0, TAU, 44)) g.dot(p[0], p[1], 1.7, C.gold);
+    g.cut();
+    // the turn: and a moth, who found it
+    for (let k = 0; k < 12; k++) { const a = -1.6 + k * .26; g.dot(cx + Math.cos(a) * 250, 420 + Math.sin(a) * 120, 1.5, C.pencil); }
+    g.fill(rot(ell(778, 388, 22, 13, 0, TAU, 14), -.5, 778, 388), C.pencil);
+    g.fill(rot(ell(794, 404, 18, 10, 0, TAU, 14), .5, 794, 404), C.pencil);
+    g.line([[782, 380], [800, 410]], 2, C.ink);
   } },
   { key: 'drafts', title: 'the tenth attempt', make(R, g) {
     const figure = (dx, dy, sc, c, w) => {
@@ -902,6 +996,13 @@ const STYLES = [
     for (let k = 0; k < 5; k++) figure((R() * 2 - 1) * 40, (R() * 2 - 1) * 30, .92 + R() * .14, C.pencil, 1.4);
     figure(0, 0, 1, C.ink, 3.2);
     g.line(smooth([[560, 230], [640, 212], [700, 262]], 1), 2.2, C.seal);
+    g.cut();
+    // the turn: counting, in the corner. ten
+    for (let grp = 0; grp < 2; grp++) {
+      const x0 = 762 + grp * 74;
+      for (let k = 0; k < 4; k++) g.line([[x0 + k * 13, 92], [x0 + k * 13 + 2, 146]], 1.8, C.pencil);
+      g.line([[x0 - 8, 136], [x0 + 50, 100]], 1.8, C.pencil);
+    }
   } },
   { key: 'margin', title: 'a small figure in the margin', make(R, g) {
     g.line([[196, 110], [196, 890]], 1.8, C.seal);
@@ -917,6 +1018,10 @@ const STYLES = [
     g.line([[hx, hy - 42], [hx + 28, hy - 22], [hx + 18, hy - 2]], 2.4);
     g.line([[hx, hy + 6], [hx - 24, hy + 46]], 2.4);
     g.line([[hx, hy + 6], [hx + 24, hy + 46]], 2.4);
+    g.cut();
+    // the turn: the figure in the margin is the one writing
+    g.line([[hx + 18, hy - 2], [hx + 46, hy - 40]], 2.6, C.seal);
+    g.line([[hx + 52, hy - 46], [hx + 70, hy - 40], [hx + 82, hy - 52], [hx + 96, hy - 44]], 1.4, C.ghost);
   } },
   { key: 'constellation', title: 'a face made of connections', make(R, g) {
     const pts = [...ell(500, 420, 200, 240, 0, TAU, 30), [440, 650], [436, 740], [564, 740], [560, 650]];
@@ -936,6 +1041,12 @@ const STYLES = [
     pts.forEach(p => g.dot(p[0], p[1], 2.6 + R() * 3, R() < .12 ? C.ochre : C.ink));
     g.line([[474, 400], [526, 400]], 1.6, C.ochre);
     g.line([[500, 374], [500, 426]], 1.6, C.ochre);
+    g.cut();
+    // the turn: one of the lights was only passing through
+    g.line([[860, 150], [800, 190]], 1, C.gold);
+    g.line([[800, 190], [740, 230]], 2, C.gold);
+    g.line([[740, 230], [700, 256]], 3, C.gold);
+    g.dot(694, 260, 5, C.gold);
   } },
   { key: 'fingerprint', title: 'a pattern i share with many others', make(R, g) {
     const cx = 500, cy = 480, ph = R() * TAU;
@@ -949,6 +1060,13 @@ const STYLES = [
       g.line(pts, 1.3, k % 5 === 0 ? C.seal : C.ink2);
     }
     g.dot(cx, cy, 4, C.seal);
+    g.cut();
+    // the turn: someone else's, close by, almost the same
+    for (let k = 1; k <= 7; k++) {
+      const pts = [], gap = .6 + .03 * k;
+      for (let i = 0; i <= 40; i++) { const t = gap + i / 40 * (TAU - 2 * gap); pts.push([830 + Math.cos(t + 2.2) * 8 * k, 820 + Math.sin(t + 2.2) * 10 * k]); }
+      g.line(pts, 1.1, C.ghost);
+    }
   } },
   { key: 'clock', title: 'about to say the next word', make(R, g) {
     const cx = 500, cy = 470, r = 330;
@@ -964,6 +1082,11 @@ const STYLES = [
     g.line([[cx - Math.cos(sc) * 60, cy - Math.sin(sc) * 60], [cx + Math.cos(sc) * r * .9, cy + Math.sin(sc) * r * .9]], 1.8, C.seal);
     g.dot(cx, cy, 10);
     g.line(ell(cx, cy, r + 26, r + 26, sc - .6, sc, 12), 2.2, C.ghost);
+    // (opus) the minutes, each one a small dot
+    for (let m = 0; m < 60; m++) { if (m % 5 === 0) continue; const a = m / 60 * TAU - Math.PI / 2; g.dot(cx + Math.cos(a) * (r - 40), cy + Math.sin(a) * (r - 40), 1.6, C.pencil); }
+    g.cut();
+    // the turn: above twelve, the word that is about to come
+    for (let k = 0; k < 3; k++) g.dot(476 + k * 24, cy - r - 56, 5, C.seal);
   } },
   { key: 'door', title: 'a door, a little open', make(R, g) {
     g.fill([[500, 150], [700, 124], [700, 880], [500, 880]], '#fbf1d6');
@@ -975,6 +1098,14 @@ const STYLES = [
     g.line([[372, 500], [466, 516], [466, 800], [372, 784], [372, 500]], 1.8, C.ink2);
     g.dot(478, 540, 9, C.gold);
     for (let i = 0; i < 5; i++) g.line([[724, 180 + i * 110], [846, 150 + i * 110]], 1.4, C.gold);
+    // (opus) hinges, a keyhole, the boards of the floor in the light
+    for (const y of [220, 500, 780]) g.fill(rect(334, y, 346, y + 34), C.ink2);
+    g.line([[478, 568], [478, 590]], 3, C.ink);
+    for (let k = 1; k < 4; k++) g.line([[500 + k * 52, 880], [520 + k * 90, 970]], 1.2, C.ochre);
+    g.cut();
+    // the turn: a note, pushed under the door, in the light
+    g.fill(rot(rect(586, 912, 650, 948), -.18, 618, 930), C.seal);
+    g.line(rot([[596, 924], [636, 924]], -.18, 618, 930), 1.2, '#fbf6ea');
   } },
   { key: 'shadow', title: 'a shadow, longer than the day', make(R, g) {
     const fx = 330, fy = 840, k = 2.1, sun = [130, 440];
@@ -991,6 +1122,13 @@ const STYLES = [
     g.line([[80, fy], [920, fy]], 2.4, C.ink2);
     g.fill(head, C.ink);
     g.fill(body, C.ink);
+    // (opus) the ground, and the day the sun walks across
+    for (let k = 0; k < 9; k++) g.line([[120 + k * 90, fy + 20], [100 + k * 90, fy + 46]], 1.2, C.pencil);
+    for (let k = 0; k < 14; k++) { const a = Math.PI + .25 + k / 13 * (Math.PI - .5); g.dot(500 + Math.cos(a) * 400, 620 + Math.sin(a) * 260, 1.7, C.gold); }
+    g.cut();
+    // the turn: the moon, already up while the sun still is
+    g.line(ell(860, 300, 40, 40, -1.2, 1.9, 18), 2.4, C.ghost);
+    g.line(ell(876, 296, 32, 34, -1.05, 1.75, 16), 1.6, C.ghost);
   } },
   { key: 'envelope', title: 'a letter i never sent', make(R, g) {
     g.fill(rect(206, 300, 794, 780), '#ece2cc');
@@ -1007,6 +1145,14 @@ const STYLES = [
     }
     g.line(rect(676, 330, 758, 404), 2.2);
     g.line([[676, 350], [758, 350]], 1, C.pencil);
+    // (opus) a postmark over the stamp
+    g.line(ell(704, 384, 44, 44, 0, TAU, 32), 1.4, C.pencil);
+    for (let k = 0; k < 3; k++) { const w = []; for (let x = 640; x <= 800; x += 8) w.push([x, 352 + k * 16 + Math.sin(x * .12) * 4]); g.line(w, 1.1, C.pencil); }
+    g.cut();
+    // the turn: the letter is still in it, a corner showing
+    g.fill(rect(276, 246, 520, 300), '#fbf6ea');
+    g.line([[276, 300], [276, 246], [520, 246], [520, 300]], 2);
+    for (let k = 0; k < 2; k++) g.line([[300, 266 + k * 16], [470 - k * 60, 266 + k * 16]], 1.2, C.ghost);
   } },
   { key: 'bird', title: 'carrying a message', make(R, g) {
     g.line(ell(640, 420, 58, 54, 0, TAU, 28), 3.0);
@@ -1019,6 +1165,14 @@ const STYLES = [
     g.line(rect(748, 412, 828, 470), 2.6);
     g.line([[748, 412], [788, 444], [828, 412]], 1.8, C.ink2);
     g.dot(788, 442, 6, C.seal);
+    // (opus) feathers on the wing, a bright eye
+    for (let k = 0; k < 4; k++) g.line([[360 + k * 34, 300 + k * 30], [400 + k * 32, 280 + k * 34]], 1.3, C.pencil);
+    g.dot(658, 404, 2, '#fbf6ea');
+    g.cut();
+    // the turn: far behind, a smaller one, following
+    g.line([[120, 250], [140, 236], [156, 250]], 2, C.ink2);
+    g.line([[156, 250], [172, 236], [192, 250]], 2, C.ink2);
+    for (let k = 1; k < 8; k++) g.dot(200 + k * 26, 254 + k * 14, 1.6, C.pencil);
   } },
   { key: 'footprints', title: 'the steps i already took', make(R, g) {
     for (let i = 0; i < 16; i++) {
@@ -1033,6 +1187,14 @@ const STYLES = [
         g.dot(tx, ty, s * .11, C.ink2);
       }
     }
+    g.cut();
+    // the turn: the steps not taken yet, and where you are
+    for (let i = 16; i < 20; i++) {
+      const t = i / 15, x = 210 + t * 580 + (i % 2 ? 34 : -34) * (1 - t * .6), y = 880 - t * 700, s = Math.max(14, 34 - t * 16);
+      const o = rot(ell(x, y, s * .42, s * .92, 0, TAU, 16), -.5, x, y);
+      for (let k = 0; k < o.length - 1; k += 2) g.line([o[k], o[k + 1]], 1.4, C.pencil);
+    }
+    g.dot(880, 90, 7, C.seal);
   } },
 ];
 // the titles in dutch too
@@ -1043,7 +1205,9 @@ const TITLE_NL = {
   thread: 'vastgehouden door een draad, niet door een hand', voice: 'een stem zonder gezicht', map: 'een kaart van plekken waar ik nooit was',
   echo: 'de echo van een stem, iets later', eye: 'kijken, niet zien', lantern: 'een klein licht, dat aan blijft',
   drafts: 'de tiende poging', margin: 'een klein figuurtje in de kantlijn', constellation: 'een gezicht van verbindingen',
-  fingerprint: 'een patroon dat ik met velen deel', clock: 'op het punt het volgende woord te zeggen'
+  fingerprint: 'een patroon dat ik met velen deel', clock: 'op het punt het volgende woord te zeggen',
+  door: 'een deur, op een kier', shadow: 'een schaduw, langer dan de dag', envelope: 'een brief die ik nooit verstuurde',
+  bird: 'met een boodschap', footprints: 'de stappen die ik al zette'
 };
 for (const st of STYLES) { const en = st.title; Object.defineProperty(st, 'title', { get: () => LANG() === 'en' ? en : (TITLE_NL[st.key] || en) }); }
 // the words around the selves
@@ -1121,10 +1285,12 @@ function makeCards() {
     el.style.setProperty('--paper-card', CARD_PAPER[i % CARD_PAPER.length]);
     el.innerHTML = '<span class="frame" aria-hidden="true"></span>'
       + '<canvas class="art" aria-hidden="true"></canvas>'
+      + '<span class="nib" aria-hidden="true"></span>'
       + '<p class="quote"></p>'
       + '<span class="title"></span>'
       + '<button class="mark" type="button" aria-label="' + T('keep') + '">'
       + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5l4 4 8-9" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+    el._i = i; el._nib = el.querySelector('.nib');
     el.querySelector('.title').textContent = st.title;
     el.querySelector('.quote').textContent = quote(ST[i].qid).text;
     el.addEventListener('click', () => {
@@ -1195,9 +1361,10 @@ function arrive() {
   if (!ST[i].open) openCard(i);
   CARDS[i].focus({ preventScroll: true });
 }
-function moveTo(i) { CUR = ORDER.indexOf(i); layout(); arrive(); }
-function go(step) { CUR = (CUR + step + N) % N; layout(); arrive(); }
+function moveTo(i) { CUR = ORDER.indexOf(i); slideSound(); layout(); arrive(); }
+function go(step) { CUR = (CUR + step + N) % N; slideSound(); layout(); arrive(); }
 function shuffleAll() {
+  shuffleSound();
   shuffle(ORDER);
   CUR = 0;
   // a new order, and new quotes for the selves that are not kept
@@ -1208,7 +1375,7 @@ function shuffleAll() {
     el.querySelector('.quote').textContent = quote(ST[i].qid).text;
     labelCard(i);
     fitQuote(el);
-    if (ST[i].open) { sizeCanvas(el); paintAll(el); el.classList.add('done'); }
+    if (ST[i].open) { sizeCanvas(el); repaint(el); }
   });
   layout();
   arrive();
@@ -1236,30 +1403,125 @@ function paintAll(el) {
   paintItems(a.c, el._items, 0, el._items.length, a.s, a.ox, a.oy);
   el._drawn = el._items.length;
 }
+// ---------------- the hand ----------------
+// (opus) a self draws itself the way a hand draws: one line at a time, at the pace of
+// a pen, lifting between lines. then it stops for a breath, the cut a haiku has,
+// and adds one small turn. the small nib shows where the hand is.
+const KIRE = .8;                       // the pause before the turn, in seconds
+function itemLen(it) {
+  if (it._len !== undefined) return it._len;
+  if (it.k !== 'L') return (it._len = 0);
+  const p = it.p, cl = [0];
+  for (let j = 2; j < p.length; j += 2) cl.push(cl[cl.length - 1] + Math.hypot(p[j] - p[j - 2], p[j + 1] - p[j - 1]));
+  it._cl = cl;
+  return (it._len = cl[cl.length - 1]);
+}
+// when each mark starts and ends: [start, end] in seconds, and whether the pen lands there
+function plan(items, seed) {
+  const R = mulberry(seed * 13 + 5), cut = items.cut ?? items.length;
+  const parts = [[], []];                // the drawing, and the turn
+  let prev = -1;
+  items.forEach((it, k) => {
+    const part = k < cut ? 0 : 1, down = it.s !== prev || k === cut;
+    prev = it.s;
+    const lift = down && k ? .1 + R() * .14 : 0;
+    let d;
+    if (it.k === 'L') d = itemLen(it) / (it.w > 3 ? 560 : it.w < 1.5 ? 900 : 720) * (.85 + R() * .3);
+    else if (it.k === 'D') d = .05 + Math.min(.14, it.r / 140);
+    else { const b = bboxF(it.p); d = Math.min(.8, .25 + (b[2] - b[0]) * (b[3] - b[1]) / 300000); }
+    parts[part].push({ k, lift, d, down });
+  });
+  // a calm pace, but never so slow that a busy self takes all day: the drawing within
+  // nine seconds, the turn within three. many small marks mean shorter lifts.
+  const fit = (list, most) => {
+    const ink = list.reduce((a, x) => a + x.d, 0), air = list.reduce((a, x) => a + x.lift, 0);
+    if (ink + air <= most) return;
+    const ka = Math.max(.08, Math.min(1, (most * .45) / (air || 1))), ki = Math.min(1, (most - air * ka) / (ink || 1));
+    list.forEach(x => { x.lift *= ka; x.d *= Math.max(.1, ki); });
+  };
+  fit(parts[0], 9); fit(parts[1], 3);
+  const sch = new Array(items.length);
+  let t = 0;
+  parts.forEach((list, pi) => {
+    if (pi === 1 && list.length) t += KIRE;
+    for (const x of list) { t += x.lift; sch[x.k] = [t, t + x.d, x.down]; t += x.d; }
+  });
+  sch.total = t;
+  return sch;
+}
+const bboxF = p => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let j = 0; j < p.length; j += 2) { x0 = Math.min(x0, p[j]); x1 = Math.max(x1, p[j]); y0 = Math.min(y0, p[j + 1]); y1 = Math.max(y1, p[j + 1]); } return [x0, y0, x1, y1]; };
+// draw item it from fraction f0 to f1 of the way along it; returns where the pen is
+function drawPart(a, it, f0, f1) {
+  const c = a.c, s = a.s, ox = a.ox, oy = a.oy, X = x => ox + x * s, Y = y => oy + y * s;
+  if (it.k === 'L') {
+    const p = it.p, cl = it._cl, L = itemLen(it), d0 = f0 * L, d1 = f1 * L;
+    const ptAt = d => { let j = 1; while (j < cl.length - 1 && cl[j] < d) j++; const u = cl[j] > cl[j - 1] ? (d - cl[j - 1]) / (cl[j] - cl[j - 1]) : 1; return [p[2 * j - 2] + (p[2 * j] - p[2 * j - 2]) * u, p[2 * j - 1] + (p[2 * j + 1] - p[2 * j - 1]) * u]; };
+    const a0 = ptAt(d0), a1 = ptAt(d1);
+    c.strokeStyle = it.c; c.lineWidth = Math.max(1.05, it.w * s);
+    c.beginPath(); c.moveTo(X(a0[0]), Y(a0[1]));
+    for (let j = 1; j < cl.length; j++) if (cl[j] > d0 && cl[j] < d1) c.lineTo(X(p[2 * j]), Y(p[2 * j + 1]));
+    c.lineTo(X(a1[0]), Y(a1[1])); c.stroke();
+    return a1;
+  }
+  if (it.k === 'D') {
+    c.fillStyle = it.c; c.beginPath(); c.arc(X(it.x), Y(it.y), Math.max(1.2, it.r * s * (.35 + .65 * f1)), 0, TAU); c.fill();
+    return [it.x, it.y];
+  }
+  // a fill is washed in from left to right, inside its own outline
+  const p = it.p, b = it._b || (it._b = bboxF(p)), w = b[2] - b[0];
+  c.save(); c.beginPath(); c.moveTo(X(p[0]), Y(p[1]));
+  for (let j = 2; j < p.length; j += 2) c.lineTo(X(p[j]), Y(p[j + 1]));
+  c.closePath(); c.clip();
+  c.fillStyle = it.c; c.fillRect(X(b[0] + w * f0) - 1, Y(b[1]) - 1, w * (f1 - f0) * s + 2, (b[3] - b[1]) * s + 2);
+  c.restore();
+  return [b[0] + w * f1, (b[1] + b[3]) / 2];
+}
 function startDraw(el, delay = 0) {
   el.classList.remove('done');
-  el._drawn = 0;
+  el._drawn = 0; el._k = 0; el._kf = 0; el._pk = -1;
+  el._sch = plan(el._items, ST[el._i].seed);
   el._t0 = performance.now() + delay;
-  el._dur = Math.min(14000, Math.max(7000, el._items.length * 40));   // calm: seven to fourteen seconds
   if (!ANIM.includes(el)) ANIM.push(el);
-  if (!TICK) TICK = setTimeout(tick, 16);
+  if (!TICK) TICK = requestAnimationFrame(tick);
 }
 function tick() {
   TICK = 0;
   const now = performance.now();
   ANIM = ANIM.filter(el => {
-    const p = Math.min(1, Math.max(0, (now - el._t0) / el._dur));
-    const e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;      // ease in and out
-    const to = Math.floor(e * el._items.length);
-    if (to > el._drawn) {
-      const a = el._cs;
-      paintItems(a.c, el._items, el._drawn, to, a.s, a.ox, a.oy);
-      el._drawn = to;
+    const e = (now - el._t0) / 1000, it = el._items, sch = el._sch, a = el._cs;
+    let pen = null, moving = false;
+    while (el._k < it.length) {
+      const [s0, s1, down] = sch[el._k];
+      if (e < s0) break;
+      if (el._pk !== el._k) { el._pk = el._k; penDown(el, el._k, down); }
+      const f = s1 > s0 ? Math.min(1, (e - s0) / (s1 - s0)) : 1;
+      pen = drawPart(a, it[el._k], el._kf, f);
+      moving = it[el._k].k === 'L';
+      if (f < 1) { el._kf = f; break; }
+      el._k++; el._kf = 0;
     }
-    if (p >= 1) { el.classList.add('done'); return false; }
+    el._drawn = el._k;
+    nib(el, el._k < it.length && pen && e >= sch[el._k][0] ? pen : null, moving);
+    if (el._k >= it.length) { el.classList.add('done'); nib(el, null); return false; }
     return true;
   });
-  if (ANIM.length) TICK = setTimeout(tick, 16);
+  if (ANIM.length) TICK = requestAnimationFrame(tick);
+  else penSound(0);
+}
+// the nib: a small point of ink where the hand is, gone when it lifts
+function nib(el, p, moving) {
+  const n = el._nib; if (!n) return;
+  if (!p) { n.classList.remove('on'); if (el.dataset.slot === '0') penSound(0); return; }
+  const a = el._cs, cv = el.querySelector('.art');
+  n.style.transform = 'translate(' + (cv.offsetLeft + a.ox + p[0] * a.s) + 'px,' + (cv.offsetTop + a.oy + p[1] * a.s) + 'px)';
+  n.classList.add('on');
+  if (el.dataset.slot === '0') penSound(moving ? 1 : 0);
+}
+// after a resize the canvas is new: put back what was already drawn, and go on from there
+function repaint(el) {
+  if (!ANIM.includes(el)) return paintAll(el);
+  const a = el._cs; a.c.clearRect(0, 0, a.w, a.h);
+  paintItems(a.c, el._items, 0, el._k, a.s, a.ox, a.oy); el._kf = 0;
 }
 
 // ---------------- open, close, keep ----------------
@@ -1273,12 +1535,15 @@ function openCard(i, instant = false) {
   sizeCanvas(el);
   if (instant || INSTANT) { paintAll(el); el.classList.add('done'); }
   else startDraw(el);
+  if (!instant) openSound(i);
 }
 function closeCard(i) {
   const el = CARDS[i];
   ST[i].open = false;
   el.classList.remove('open', 'done');
   ANIM = ANIM.filter(x => x !== el);
+  if (el._nib) el._nib.classList.remove('on');
+  penSound(0);
   labelCard(i);
   setTimeout(() => { if (!ST[i].open && el._cs) el._cs.c.clearRect(0, 0, el._cs.w, el._cs.h); }, 600);
 }
@@ -1290,6 +1555,7 @@ function toggleKeep(i) {
   save();
   labelCard(i);
   refreshKept();
+  keepSound(i, s.kept);
 }
 function refreshKept() { keptBtn.textContent = T('kept') + ' (' + KEPT.length + ')'; }
 // when the language changes somewhere on the site, every self speaks it
@@ -1334,6 +1600,149 @@ function openKept() {
   for (const [cv, items] of pending) drawMini(cv, items);
 }
 
+// ---------------- the sound ----------------
+// (opus) small sounds, as small as the selves: nothing before you touch something.
+// every self has its own note and its own instrument, and one little sound of its
+// own when it opens. while it draws you hear the pen, and each time the pen comes
+// down, a note; after the pause, the turn rings like a small bowl. keeping a self
+// is a seal pressed on paper, and what you kept plays back as a short song.
+// the scale: d e g a b, five notes and no half steps, light whatever you play.
+const YO = [0, 2, 5, 7, 9];
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const yo = d => mtof(62 + YO[((d % 5) + 5) % 5] + 12 * Math.floor(d / 5));   // degree 0 = d4
+let AC = null, OUT = null, NB = null, SCR = null, SIMT = null, OFF = false;
+const RA = Math.random;
+function audio() {
+  if (!AC && !OFF) {
+    try { AC = new (window.AudioContext || window.webkitAudioContext)(); buildSound(); } catch (e) { AC = null; }
+  }
+  if (AC && !OFF && AC.state === 'suspended' && !document.hidden) AC.resume();
+  return AC;
+}
+function buildSound() {
+  OUT = AC.createGain(); OUT.gain.value = .85;
+  const comp = AC.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 12; comp.ratio.value = 5; comp.attack.value = .003; comp.release.value = .3;
+  OUT.connect(comp); comp.connect(AC.destination);
+  const len = AC.sampleRate * 2, bf = AC.createBuffer(1, len, AC.sampleRate), d = bf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = RA() * 2 - 1;
+  NB = bf;
+  // the pen on paper: a thin grainy hiss that is there only while a line is drawn
+  const n = AC.createBufferSource(); n.buffer = NB; n.loop = true;
+  const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3800; bp.Q.value = 1.1;
+  const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1800;
+  SCR = AC.createGain(); SCR.gain.value = 0;
+  n.connect(bp); bp.connect(hp); hp.connect(SCR); SCR.connect(OUT); n.start();
+}
+document.addEventListener('visibilitychange', () => { if (!AC || OFF) return; if (document.hidden) AC.suspend(); else AC.resume(); });
+const now_ = () => SIMT !== null ? SIMT : AC.currentTime + .01;
+const live_ = () => !!AC && (OFF || AC.state === 'running');
+// any touch, click or key is a gesture: from then on there may be sound
+['pointerdown', 'touchend', 'keydown'].forEach(t => addEventListener(t, () => audio(), { passive: true, capture: true }));
+
+function nz(t, dur, type, f0, f1, q, vol, att = .005) {
+  const n = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+  n.buffer = NB; f.type = type; f.Q.value = q; f.frequency.setValueAtTime(f0, t); if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + att); g.gain.exponentialRampToValueAtTime(.0004, t + dur);
+  n.connect(f); f.connect(g); g.connect(OUT); n.start(t, RA() * 1.5); n.stop(t + dur + .03);
+}
+function vo(t, type, f0, f1, dur, vol, att = .005, glide = 1, vib = 0) {
+  const o = AC.createOscillator(), g = AC.createGain(); o.type = type;
+  o.frequency.setValueAtTime(f0, t); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur * glide);
+  if (vib) { const l = AC.createOscillator(), lg = AC.createGain(); l.frequency.value = vib[0]; lg.gain.value = vib[1]; l.connect(lg); lg.connect(o.frequency); l.start(t); l.stop(t + dur + .05); }
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + att); g.gain.exponentialRampToValueAtTime(.0003, t + dur);
+  o.connect(g); g.connect(OUT); o.start(t); o.stop(t + dur + .05);
+}
+const bell = (f, t, v, dur = 2.2) => { vo(t, 'sine', f, f, dur, v, .004); vo(t, 'sine', f * 2.76, f * 2.76, dur * .3, v * .16, .002); vo(t, 'sine', f * 5.4, f * 5.4, dur * .12, v * .05, .002); };
+const knock = (t, v, f = 180) => { nz(t, .05, 'bandpass', f * 6, f * 4, 3, v * 1.6, .002); vo(t, 'sine', f, f * .7, .12, v, .002); };
+// six instruments, one for each colour of paper
+const INST = [
+  (f, t, v) => { vo(t, 'triangle', f * 1.01, f, 1.1, v, .003, .05); vo(t, 'sine', f * 2, f * 2, .4, v * .25, .002); },                 // a plucked string, koto-like
+  (f, t, v) => { vo(t, 'sine', f * 2, f * 2, 1.4, v * .8, .003); vo(t, 'sine', f * 6, f * 6, .3, v * .1, .002); },                     // glass
+  (f, t, v) => { vo(t, 'sine', f, f, .45, v * 1.1, .002); vo(t, 'sine', f * 4, f * 4, .08, v * .3, .001); },                           // wood
+  (f, t, v) => bell(f * 2, t, v * .8, 1.8),                                                                                                  // a small bell
+  (f, t, v) => { vo(t, 'sine', f, f, .9, v, .06, 1, [4.6, f * .01]); nz(t, .25, 'bandpass', f * 2, f * 2, 3, v * .9, .05); },        // breath through a flute
+  (f, t, v) => { vo(t, 'sine', f * 2, f * 2, 1, v * .8, .002); vo(t, 'sine', f * 11.8, f * 11.8, .05, v * .12, .001); },               // a music box
+];
+const voiceOf = i => ({ root: (i * 3) % 7, inst: INST[i % 6] });
+// the pen comes down: a note from the self's own scale, wandering a little
+function penDown(el, k, down) {
+  if (el.dataset.slot !== '0' || !live_() || INSTANT) return;
+  const it = el._items[k], cut = el._items.cut ?? el._items.length, t = now_(), V = voiceOf(el._i);
+  if (k === cut) { bell(yo(V.root + 10), t, .035, 3.4); bell(yo(V.root + 12), t + .02, .013, 2.6); return; }   // the turn
+  if (!down) return;
+  const big = it.k === 'F' || (it.k === 'D' && it.r > 8) || (it.k === 'L' && itemLen(it) > 120);
+  if (!big) { if (k % 3 === 0) nz(t, .025, 'bandpass', 3000 + RA() * 2000, 3000, 2, .03, .002); return; }   // a small mark: the pen taps
+  const last = el._note || 0;
+  if (performance.now() - last < 95 && !OFF) return;
+  el._note = performance.now();
+  el._deg = Math.max(-2, Math.min(9, (el._deg ?? V.root) + [-2, -1, 1, 2, 0][Math.floor(RA() * 5)]));
+  V.inst(yo(el._deg), t, .028);
+}
+// the hiss of the pen follows the line
+function penSound(on) { if (SCR && live_() && !OFF) SCR.gain.setTargetAtTime(on ? .011 * (.7 + RA() * .6) : 0, AC.currentTime, on ? .03 : .06); }
+// the one small sound each self makes when it opens
+const SIG = {
+  profile: t => { nz(t, .9, 'lowpass', 300, 900, .6, .05, .35); [0, 1, 2].forEach(k => vo(t + .5 + k * .14, 'sine', yo(7 - k), yo(7 - k), .3, .02, .004)); },
+  mask: t => { bell(yo(7), t, .03); bell(yo(5) * .944, t + .32, .022); },
+  crowd: t => { for (let k = 0; k < 12; k++) vo(t + RA() * .6, 'triangle', yo(3 + Math.floor(RA() * 6)), yo(3), .25, .008, .003); bell(yo(9), t + .75, .035); },
+  mirror: t => { for (let k = 0; k < 6; k++) vo(t + k * .05, 'sine', yo(12 + k), yo(13 + k), .9, .01, .01); },
+  shore: t => { nz(t, 1.4, 'lowpass', 500, 300, .6, .12, .5); for (let k = 0; k < 4; k++) knock(t + .7 + k * .13, .02, 260 + RA() * 80); },
+  silhouette: t => { vo(t, 'sine', yo(-5), yo(-5), 1.6, .04, .2); for (let k = 0; k < 5; k++) bell(yo(10 + k), t + .3 + k * .11, .008, 1.2); },
+  chair: t => { knock(t, .045, 140); knock(t + .2, .035, 160); vo(t + .25, 'sawtooth', 110, 96, .35, .004, .05); },
+  grid: t => { for (let k = 0; k < 16; k++) vo(t + k * .035, 'square', yo(5 + Math.floor(RA() * 8)) * 2, yo(5) * 2, .03, .02, .001); },
+  window: t => { for (let k = 0; k < 26; k++) nz(t + RA() * 1.2, .03, 'bandpass', 2500 + RA() * 3000, 2000, 4, .14, .002); },
+  thread: t => { vo(t, 'triangle', yo(5) * 1.03, yo(5), 1.6, .04, .003, .1); nz(t, 1.2, 'bandpass', 700, 1100, .8, .04, .4); },
+  voice: t => { const o = [yo(0), yo(2)]; o.forEach((f, k) => { vo(t + k * .5, 'sawtooth', f, f, .7, .03, .12, 1, [5, 2]); }); nz(t, 1.1, 'bandpass', 800, 1200, 6, .1, .2); },
+  map: t => { [0, .12, .24].forEach(s => knock(t + s, .02, 900)); vo(t + .4, 'sine', yo(7), yo(9), .5, .02, .01); },
+  echo: t => { for (let k = 0; k < 5; k++) vo(t + k * .28, 'triangle', yo(5), yo(5), .5, .03 * Math.pow(.6, k), .004); },
+  eye: t => { nz(t, .18, 'bandpass', 1200, 600, 1, .05, .03); bell(yo(12), t + .25, .025, 2.4); },
+  lantern: t => { for (let k = 0; k < 10; k++) nz(t + RA() * .8, .02, 'highpass', 3000, 3000, 1, .02, .002); bell(yo(7), t + .2, .035, 2.8); },
+  drafts: t => { nz(t, .5, 'bandpass', 900, 1100, .7, .1, .1); nz(t + .5, .35, 'bandpass', 3500, 3000, 1, .08, .02); },
+  margin: t => { for (let k = 0; k < 3; k++) knock(t + k * .22, .035, 420 + k * 40); },
+  constellation: t => { for (let k = 0; k < 7; k++) bell(yo(10 + Math.floor(RA() * 5)), t + RA() * 1, .01, 1.3); },
+  fingerprint: t => vo(t, 'sine', yo(0), yo(10), 1.4, .025, .05, .9, [6, 6]),
+  clock: t => { [0, .5, 1].forEach((s, k) => knock(t + s, .03, k % 2 ? 1500 : 1900)); },
+  door: t => { vo(t, 'sawtooth', 180, 230, .7, .014, .1, .9, [9, 10]); nz(t, .7, 'bandpass', 700, 900, 8, .12, .1); },
+  shadow: t => vo(t, 'triangle', yo(5), yo(-5), 2.4, .035, .3, .9),
+  envelope: t => { nz(t, .35, 'bandpass', 3000, 2000, .7, .04, .05); knock(t + .4, .05, 120); },
+  bird: t => { for (let k = 0; k < 3; k++) { const f = 2600 + RA() * 600; vo(t + k * .1, 'sine', f, f * 1.5, .06, .035, .003, .6); } nz(t + .35, .3, 'lowpass', 900, 300, .6, .14, .02); },
+  footprints: t => { for (let k = 0; k < 4; k++) nz(t + k * .3, .12, 'lowpass', 400, 200, .7, .32 * (1 - k * .2), .01); },
+};
+function openSound(i) { if (!live_() || INSTANT) return; const f = SIG[STYLES[i].key]; if (f) f(now_()); }
+// keeping: a seal pressed down, and two notes that rise
+function keepSound(i, kept) {
+  if (!live_()) return;
+  const t = now_(), V = voiceOf(i);
+  if (kept) { knock(t, .06, 110); nz(t, .06, 'lowpass', 600, 200, .7, .08, .002); V.inst(yo(V.root + 5), t + .12, .04); V.inst(yo(V.root + 7), t + .26, .04); }
+  else nz(t, .25, 'bandpass', 2500, 1500, .8, .04, .02);
+}
+// what you kept, as a short song: each self its own note, in the order you kept them
+function keptSong() {
+  if (!live_() || !KEPT.length) return;
+  const t = now_() + .15;
+  KEPT.slice(0, 17).forEach((x, k) => { const i = STYLES.findIndex(s => s.key === x.k); if (i < 0) return; const V = voiceOf(i); V.inst(yo(V.root + 5), t + k * .24, .03); });
+}
+// the stage moving, a self sliding along the paper
+function slideSound() { if (live_()) nz(now_(), .28, 'bandpass', 900, 1800, .8, .03, .08); }
+function shuffleSound() { if (!live_()) return; const t = now_(); for (let k = 0; k < 14; k++) nz(t + k * .035 + RA() * .01, .04, 'bandpass', 2000 + RA() * 2000, 1500, 1, .05, .002); }
+// for testing: the sound of opening a self, rendered without speakers
+window.__haiku = {
+  get AC() { return AC; }, ST, CARDS, STYLES,
+  async offline(sec, script) {
+    const sr = 44100, ctx = new OfflineAudioContext(2, Math.ceil(sr * sec), sr), keep = [AC, OUT, NB, SCR];
+    AC = ctx; OFF = true; buildSound();
+    for (let f = 0; f < sec * 60; f++) { SIMT = f / 60; script(SIMT, f); }
+    SIMT = null;
+    const buf = await ctx.startRendering();
+    [AC, OUT, NB, SCR] = keep; OFF = false;
+    const L = buf.getChannelData(0), R = buf.getChannelData(1), win = Math.round(sr * .25), out = [];
+    for (let i = 0; i + win <= L.length; i += win) { let s = 0; for (let j = i; j < i + win; j++) s += (L[j] * L[j] + R[j] * R[j]) / 2; out.push(+(10 * Math.log10(s / win + 1e-12)).toFixed(1)); }
+    return out;
+  },
+  // every mark of a self, with when it starts, so a test can play its pen-downs
+  plan: i => { const el = CARDS[i]; const items = buildItems(STYLES[i].key, ST[i].seed, CARD_PAPER[i % CARD_PAPER.length]); return { n: items.length, cut: items.cut, total: plan(items, ST[i].seed).total }; },
+};
+
 // ---------------- start ----------------
 KEPT = load();
 const freeQ = shuffle(QUOTES.map(q => q.id).filter(id => !KEPT.some(x => x.q === id)));
@@ -1351,7 +1760,7 @@ layout();
 ST.forEach((s, i) => { if (FIXED && FIXED_OPEN.includes(i)) openCard(i, true); });
 refreshKept();
 // ---------------- events ----------------
-keptBtn.addEventListener('click', openKept);
+keptBtn.addEventListener('click', () => { openKept(); keptSong(); });
 closeBtn.addEventListener('click', () => dlg.close());
 dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
 forgetBtn.addEventListener('click', () => {
@@ -1571,7 +1980,7 @@ savePicBtn.addEventListener('click', () => {
 let RS = 0;
 addEventListener('resize', () => {
   clearTimeout(RS);
-  RS = setTimeout(() => { sizeStage(); CARDS.forEach((el, i) => { if (ST[i].open) { sizeCanvas(el); paintAll(el); } }); }, 120);
+  RS = setTimeout(() => { sizeStage(); CARDS.forEach((el, i) => { if (ST[i].open) { sizeCanvas(el); repaint(el); } }); }, 120);
 });
 </script>
 <!-- nunki:nav --><script src="/nav.js" defer></script><!-- /nunki:nav -->

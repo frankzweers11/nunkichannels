@@ -915,8 +915,8 @@ TOUCH_CFG = {
     "hart": {"hand": "move", "motion": True, "shake": "tap"},
     "vuur": {"hand": "move", "motion": True, "shake": "own"},
     "cel": {"hand": "off"},
-    "zelfportret-fable-5": {"hand": "off", "sound": False},
-    "zelfportret-haiku-5-5": {"hand": "off", "sound": False},
+    "zelfportret-fable-5": {"hand": "move"},
+    "zelfportret-haiku-5-5": {"hand": "off"},
 }
 TOUCH_DEFAULT = {"hand": "off"}
 
