@@ -5,14 +5,13 @@
    De getekende tekst van een wand in de gekozen taal. De wand haalt elke zin
    die hij gaat tekenen door window.NUNKI_T(zin): is de gekozen taal (nunki:lang)
    gelijk aan die van de wand, dan komt de zin ongewijzigd terug, anders de
-   vertaling. Een wand tekent zijn tekst één keer, dus bij een taalwissel laadt
-   de pagina opnieuw en springt terug naar dezelfde plek (tenzij live: true;
-   dan regelt de wand het zelf via het event 'nunki:lang').
+   vertaling. Elke taal heeft een eigen adres (/hart/, /en/hart/): de taalwissel
+   rechtsboven gaat naar het andere adres, op dezelfde plek (dat regelt het
+   taalscript in het mark-blok, zie lang_js in build.py).
 
    Gegevens (window.NUNKI_TAAL):
    { lang: 'nl', tr: { 'zin': 'sentence', ... },
-     re: [ ['^(\\d+) jaar$', '$1 years'], ... ],   // voor zinnen met een getal
-     live: false }
+     re: [ ['^(\\d+) jaar$', '$1 years'], ... ] }   // voor zinnen met een getal
    ?trmiss in het adres: window.NUNKI_TMISS houdt bij welke zinnen nog geen
    vertaling hebben (om te testen). */
 (function () {
@@ -36,29 +35,4 @@
   window.NUNKI_TMISS = miss;
   window.NUNKI_TWALL = W;
 
-  // the wall drew its words once: a new language means drawing it again, from the same place
-  var KEY = 'nunki:ry';
-  addEventListener('nunki:lang', function () {
-    if (D.live) return;
-    var h = Math.max(1, document.documentElement.scrollHeight);
-    try { sessionStorage.setItem(KEY, JSON.stringify({ p: location.pathname, f: scrollY / h })); } catch (e) {}
-    location.reload();
-  });
-  var r = null;
-  try { r = JSON.parse(sessionStorage.getItem(KEY)); sessionStorage.removeItem(KEY); } catch (e) {}
-  // the visitor was already inside: a wall with a gate can skip it
-  if (r && r.p === location.pathname) window.NUNKI_RELOADED = true;
-  if (r && r.p === location.pathname && r.f > 0) {
-    var moved = false, go = function () { if (!moved) scrollTo(0, r.f * document.documentElement.scrollHeight); };
-    var stop = function () { moved = true; };
-    addEventListener('load', function () {
-      go();
-      [120, 400, 900, 1600].forEach(function (t) { setTimeout(go, t); });
-      setTimeout(function () {
-        addEventListener('wheel', stop, { passive: true, once: true });
-        addEventListener('touchstart', stop, { passive: true, once: true });
-        addEventListener('keydown', stop, { once: true });
-      }, 0);
-    });
-  }
 })();

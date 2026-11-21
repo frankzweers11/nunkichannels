@@ -30,7 +30,27 @@ SHOTS_JSON = ROOT / "scripts" / "shots.json"
 CACHE_DIR = ROOT / ".cache" / "shots"
 SHOT_VERSION = "2"  # ophogen om alle screenshots opnieuw te maken
 # "zelfportret" is de oude URL van de fable-wand: alleen een doorverwijzing
-SKIP_DIRS = {"images", "css", "js", "assets", "zelfportret"}
+SKIP_DIRS = {"images", "css", "js", "assets", "zelfportret", "en"}
+
+# Elke pagina bestaat in twee talen, uit één bron: Nederlands op /<slug>/ (het
+# bronbestand zelf), Engels op /en/<slug>/ (gegenereerd, niet bewerken).
+LANGS = ("nl", "en")
+BASE_LANG = "nl"
+
+
+def lang_path(path: str, lang: str) -> str:
+    """Het adres van een pagina in een taal: /hart/ → /en/hart/."""
+    path = "/" + path.lstrip("/")
+    return path if lang == BASE_LANG else f"/{lang}{path}"
+
+
+def lang_file(rel: str, lang: str) -> Path:
+    """Waar de taalversie van httpdocs/<rel> op schijf staat."""
+    return HTTPDOCS / rel if lang == BASE_LANG else HTTPDOCS / lang / rel
+
+
+def other_lang(lang: str) -> str:
+    return "en" if lang == "nl" else "nl"
 
 W, H = 1200, 630
 CREAM = (246, 241, 228)
@@ -60,19 +80,44 @@ TAAL_DIR = Path(__file__).resolve().parent / "taal"
 I18N_JSON = Path(__file__).resolve().parent / "i18n.json"
 I18N = json.loads(I18N_JSON.read_text(encoding="utf-8")) if I18N_JSON.is_file() else {"site": {}, "pages": {}}
 
-# De taal kies je één keer voor de hele site (nunki:lang, nl standaard). Dit script
-# staat vroeg in elke pagina: het zet data-lang op <html>, zodat CSS meteen de goede
-# tekst toont (.t-nl / .t-en), en geeft NUNKI_SETLANG(taal) om te wisselen.
-LANG_JS = (
-    "(function(){var D=document.documentElement,q=null,l=null;"
-    "try{q=new URLSearchParams(location.search).get('lang')}catch(e){}"
-    "try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}"
-    "l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');"
-    "function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);"
-    "window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);"
-    "try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};"
-    "addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();"
-)
+# De taal van een pagina is de taal van haar adres: / is Nederlands, /en/ Engels.
+# Dit script staat vroeg in elke pagina. Het zet data-lang op <html>, zodat CSS meteen
+# de goede tekst toont (.t-nl / .t-en), en bewaart die taal als keuze (nunki:lang),
+# ook als de bezoeker eerder de andere koos: het adres is wat je ziet, en wie
+# verder klikt blijft in die taal. ?lang= gaat voor (screenshots, testen); zonder
+# vaste taal (P) beslist de bewaarde keuze. NUNKI_SETLANG(taal) gaat naar het adres in
+# die taal, op dezelfde plek: de scrollfractie gaat mee via sessionStorage (nunki:ry),
+# en NUNKI_RELOADED laat een wand met een poort die overslaan. Ook vanaf file://.
+def lang_js(page_lang: str | None = None, alt: dict | None = None) -> str:
+    return (
+        "(function(){var D=document.documentElement,P=" + json.dumps(page_lang) + ",A=" + json.dumps(alt)
+        + ",K='nunki:lang',q=null,l=null;"
+        "try{q=new URLSearchParams(location.search).get('lang')}catch(e){}if(q!=='nl'&&q!=='en')q=null;"
+        "try{l=localStorage.getItem(K)}catch(e){}"
+        "l=q||P||(l==='en'?'en':'nl');"
+        "if(q||P)try{localStorage.setItem(K,l)}catch(e){}"
+        "window.NUNKI_LANG=l;D.setAttribute('data-lang',l);"
+        "function href(v){var u=new URL(location.href),c=P&&A&&A[P],p=u.pathname.replace(/index\\.html$/,'');"
+        "u.searchParams.delete('lang');"
+        "if(!c||!A[v]||(u.protocol==='file:'&&p.slice(-c.length)!==c)){u.searchParams.set('lang',v);return u.href}"
+        "u.pathname=u.protocol==='file:'?p.slice(0,p.length-c.length)+A[v]+'index.html':A[v];return u.href}"
+        "window.NUNKI_HREF=href;"
+        "window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';if(v===l)return;var u=href(v);"
+        "try{localStorage.setItem(K,v)}catch(e){}"
+        "try{sessionStorage.setItem('nunki:ry',JSON.stringify({p:new URL(u).pathname,f:scrollY/Math.max(1,D.scrollHeight)}))}catch(e){}"
+        "location.href=u};"
+        "var r=null;try{r=JSON.parse(sessionStorage.getItem('nunki:ry'));sessionStorage.removeItem('nunki:ry')}catch(e){}"
+        "if(r&&r.p===location.pathname){window.NUNKI_RELOADED=true;if(r.f>0){"
+        "var mv=0,go=function(){if(!mv)scrollTo(0,r.f*D.scrollHeight)},st=function(){mv=1};"
+        "addEventListener('load',function(){go();[120,400,900,1600].forEach(function(t){setTimeout(go,t)});"
+        "setTimeout(function(){addEventListener('wheel',st,{passive:true,once:true});"
+        "addEventListener('touchstart',st,{passive:true,once:true});addEventListener('keydown',st,{once:true})},0)})}}"
+        "})();"
+    )
+
+
+def alt_paths(path: str) -> dict:
+    return {l: lang_path(path, l) for l in LANGS}
 LANG_CSS = 'html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}'
 
 
@@ -175,10 +220,14 @@ def parse_page(slug: str, html: str) -> dict:
     theme = parse_theme(html)
     path = f"/{slug}/"
     og_image = f"/images/og/{slug}.jpg"
-    lm = re.search(r"<html[^>]*\blang=[\"']([a-zA-Z-]+)", html)
+    # the language the wall itself is written in: data-wand-lang once build.py has
+    # given <html> the language of its address, before that its own lang
+    lm = re.search(r"<html[^>]*\bdata-wand-lang=[\"']([a-zA-Z-]+)", html) or re.search(
+        r"<html[^>]*\slang=[\"']([a-zA-Z-]+)", html
+    )
     return {
         "slug": slug,
-        "lang": (lm.group(1).lower() if lm else "nl"),
+        "wallLang": (lm.group(1).lower() if lm else "nl"),
         "path": path,
         "title": title,
         "subtitle": subtitle,
@@ -417,11 +466,9 @@ def clean_for_shot(html: str) -> str:
     html = re.sub(
         re.escape(LEES_START) + r".*?" + re.escape(LEES_END), "", html, flags=re.DOTALL
     )
-    html = re.sub(
-        re.escape(TAAL_START) + r".*?" + re.escape(TAAL_END), "", html, flags=re.DOTALL
-    )
-    # the language still has to be known (?lang= in the shot's address), so that script stays
-    html = re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + f"<script>{LANG_JS}</script>", html, count=1, flags=re.IGNORECASE)
+    # the language still has to be known (?lang= in the shot's address), so that script stays,
+    # and the taal block too: it draws a wall's words in the other language
+    html = re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + f"<script>{lang_js()}</script>", html, count=1, flags=re.IGNORECASE)
     return strip_julius(html)
 
 
@@ -447,10 +494,10 @@ def scroll_injection(html: str, y: int) -> str:
 
 
 def capture_page(slug: str, html: str, y: int = 0, lang: str = "nl") -> Image.Image | None:
-    """Screenshot (1200x630) van de wand op scrollpositie y, na het intekenen, in de eigen taal van de wand. Gecachet op inhoud."""
+    """Screenshot (1200x630) van de wand op scrollpositie y, na het intekenen, in taal lang. Gecachet op inhoud."""
     clean = clean_for_shot(html)
     key = hashlib.sha1(f"{SHOT_VERSION}|{y}|{lang}|{clean}".encode("utf-8")).hexdigest()[:12]
-    cached = CACHE_DIR / f"{slug}-{key}.png"
+    cached = CACHE_DIR / f"{slug}-{lang}-{key}.png"
     if cached.is_file():
         return Image.open(cached).convert("RGB")
 
@@ -489,7 +536,8 @@ def capture_page(slug: str, html: str, y: int = 0, lang: str = "nl") -> Image.Im
         img = Image.open(out).convert("RGB")
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         for old in CACHE_DIR.glob(f"{slug}-*.png"):
-            old.unlink()
+            if re.fullmatch(re.escape(slug) + r"-(" + re.escape(lang) + r"-)?[0-9a-f]{12}\.png", old.name):
+                old.unlink()
         img.save(cached, "PNG")
         return img
 
@@ -642,15 +690,17 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     return e;
   }
   function T(k) { return { nl: (DATA.t.nl || {})[k] || '', en: (DATA.t.en || {})[k] || '' }; }
+  // the links stay inside the language of the page: /hart/ or /en/hart/
+  var L = window.NUNKI_LANG === 'en' ? 'en' : 'nl';
   function card(p) {
     var li = el('li');
     var a = el('a', 'nunki-card');
-    a.href = p.path;
+    a.href = p.path[L];
     a.style.setProperty('--theme', p.theme);
     a.appendChild(el('span', 'nunki-tape')).setAttribute('aria-hidden', 'true');
     var th = el('span', 'nunki-thumb');
     var img = new Image();
-    img.src = p.thumb + '?v=' + p.v;
+    img.src = p.thumb[L] + '?v=' + p.v[L];
     img.alt = '';
     img.width = 800;
     img.height = 420;
@@ -670,12 +720,12 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     var here = location.pathname.replace(/index\.html$/, '');
     if (here.slice(-1) !== '/') here += '/';
     var nav = el('nav', 'nunki-nav');
-    nav.setAttribute('aria-label', T('nav')[window.NUNKI_LANG === 'en' ? 'en' : 'nl']);
+    nav.setAttribute('aria-label', T('nav')[L]);
     var sheet = el('div', 'nunki-sheet');
     sheet.appendChild(bi('p', 'nunki-kicker', T('more')));
     var any = false;
     DATA.series.forEach(function (g) {
-      var others = g.pages.filter(function (p) { return p.path !== here; });
+      var others = g.pages.filter(function (p) { return p.path[L] !== here; });
       if (!others.length) return;
       any = true;
       sheet.appendChild(bi('p', 'nunki-group', g.label));
@@ -687,15 +737,12 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     if (!any) return;
     var home = el('p', 'nunki-home');
     var a = el('a', 'nunki-home-mark');
-    a.href = '/';
+    a.href = L === 'en' ? '/en/' : '/';
     a.title = DATA.name;
-    a.setAttribute('aria-label', DATA.name + ', alle wanden');
+    a.setAttribute('aria-label', DATA.name + ', ' + T('home')[L]);
     a.innerHTML = LOGO + '<span class="nm-name"></span>';
     a.querySelector('.nm-name').textContent = DATA.name;
     home.appendChild(a);
-    var paint = function () { nav.setAttribute('aria-label', T('nav')[window.NUNKI_LANG === 'en' ? 'en' : 'nl']); };
-    paint();
-    addEventListener('nunki:lang', paint);
     sheet.appendChild(home);
     nav.appendChild(sheet);
     document.body.appendChild(nav);
@@ -718,12 +765,12 @@ def write_nav_assets(pages: list[dict], site: dict) -> None:
             "label": {"nl": series_label(key, "nl"), "en": series_label(key, "en")},
             "pages": [
                 {
-                    "path": p["path"],
-                    "title": {"nl": both(p)["nl"]["title"], "en": both(p)["en"]["title"]},
-                    "subtitle": {"nl": both(p)["nl"]["subtitle"], "en": both(p)["en"]["subtitle"]},
+                    "path": {l: p["l"][l]["path"] for l in LANGS},
+                    "title": {l: both(p)[l]["title"] for l in LANGS},
+                    "subtitle": {l: both(p)[l]["subtitle"] for l in LANGS},
                     "theme": p["theme"],
-                    "thumb": p["thumb"],
-                    "v": p["ogVersion"],
+                    "thumb": {l: p["l"][l]["thumb"] for l in LANGS},
+                    "v": {l: p["l"][l]["v"] for l in LANGS},
                 }
                 for p in items
             ],
@@ -781,7 +828,7 @@ BAR_CSS = """
   background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
   font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
-  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+  text-decoration:none;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
 .nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
 .nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
 html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
@@ -805,17 +852,25 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
 @media print{.nunki-bar{display:none}}
 """
 
-BAR_HTML = (
-    '<div class="nunki-bar"><button class="nunki-lng" type="button">'
-    '<span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div>'
-)
+def bar_html(lang: str, alt: dict) -> str:
+    """De taalwissel: een link naar dit adres in de andere taal."""
+    o = other_lang(lang)
+    return (
+        f'<div class="nunki-bar"><a class="nunki-lng" href="{esc(alt[o])}" hreflang="{o}">'
+        '<span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></a></div>'
+    )
 
+
+# De wissel is een gewone link (ook voor zoekmachines, en cmd-klik opent een tab);
+# een klik gaat via NUNKI_SETLANG, zodat je op dezelfde plek uitkomt.
 BAR_JS = (
-    "(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');"
-    "function lab(){var en=window.NUNKI_LANG==='en';"
+    "(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng'),"
+    "en=window.NUNKI_LANG==='en',o=en?'nl':'en';"
     "k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');"
-    "k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);"
-    "k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});"
+    "k.title=en?'nederlands':'english';"
+    "try{k.href=window.NUNKI_HREF(o)}catch(e){}"
+    "k.addEventListener('click',function(e){e.stopPropagation();if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;"
+    "e.preventDefault();window.NUNKI_SETLANG(o)});"
     "['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});"
     "window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};"
     "function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}"
@@ -823,15 +878,18 @@ BAR_JS = (
 )
 
 
-def mark_block(page: dict) -> str:
-    """Het vaste label linksboven: het logo en de naam van de wand, en een weg naar huis."""
-    name = esc(page["title"])
+def mark_block(page: dict, lang: str) -> str:
+    """Het vaste label linksboven: het logo en de naam van de wand, en een weg naar huis; rechtsboven de taalwissel."""
     b = both(page)
+    name = esc(b[lang]["title"])
+    alt = alt_paths(page["path"])
+    home = lang_path("/", lang)
+    aria = f"{name}, on nunkichannels. to all walls" if lang == "en" else f"{name}, op nunkichannels. naar alle wanden"
     return (
-        f"{MARK_START}\n<script>{LANG_JS}</script>\n<style>{MARK_CSS}</style>\n"
-        f'<a class="nunki-mark" href="/" title="alle wanden" aria-label="{name}, op nunkichannels. naar alle wanden">'
+        f"{MARK_START}\n<script>{lang_js(lang, alt)}</script>\n<style>{MARK_CSS}</style>\n"
+        f'<a class="nunki-mark" href="{home}" title="{esc(site_t("home", lang))}" aria-label="{aria}">'
         f'{LOGO_SVG}<span class="nm-name">{bi(b["nl"]["title"], b["en"]["title"])}</span></a>\n'
-        f"<style>{BAR_CSS}</style>{BAR_HTML}\n"
+        f"<style>{BAR_CSS}</style>{bar_html(lang, alt)}\n"
         f"<script>{MARK_JS}{BAR_JS}</script>\n{MARK_END}"
     )
 
@@ -954,24 +1012,49 @@ def abs_url(site: dict, path: str) -> str:
     return base + path
 
 
-def social_block(page: dict, site: dict, *, is_home: bool = False) -> str:
-    title = page["title"]
+def text_for(table: dict, key: str, lang: str, own: str = "nl") -> str:
+    """Een tekst uit descriptions.json of seo.json in een taal ({"nl": .., "en": ..}, of één tekst in de taal van de wand)."""
+    v = table.get(key, "")
+    if isinstance(v, dict):
+        return v.get(lang, "")
+    return v if lang == own else ""
+
+
+LOCALES = {"nl": "nl_NL", "en": "en_US"}
+
+
+def social_block(page: dict, site: dict, lang: str, *, is_home: bool = False) -> str:
+    """De kop van een pagina in een taal: description, canonical naar zichzelf, hreflang naar beide talen, OG/Twitter en JSON-LD."""
+    descs = json.loads(DESC_JSON.read_text(encoding="utf-8")) if DESC_JSON.is_file() else {}
     if is_home:
         title = site["name"]
-    descs = json.loads(DESC_JSON.read_text(encoding="utf-8")) if DESC_JSON.is_file() else {}
-    desc = descs.get("_home" if is_home else page.get("slug", ""), "") or page.get("subtitle") or site["name"]
-    sub = page.get("subtitle") or site["name"]
-    url = abs_url(site, page["path"] if not is_home else "/")
-    img = abs_url(site, page["ogImage"])
-    alt = f"{page['title']} — {sub}"
-    lang = page.get("lang", "nl")
-    locale = {"nl": "nl_NL", "en": "en_US"}.get(lang, lang)
+        sub = site_t("tagline", lang) or site["name"]
+        desc = text_for(descs, "_home", lang) or sub
+        alt = alt_paths("/")
+        img = abs_url(site, page["og"][lang])
+        alt_text = f"{site['name']} — {sub}"
+    else:
+        b = both(page)[lang]
+        title = b["title"]
+        sub = b["subtitle"] or site["name"]
+        desc = text_for(descs, page["slug"], lang, page["wallLang"]) or b["subtitle"] or site["name"]
+        alt = alt_paths(page["path"])
+        img = abs_url(site, page["l"][lang]["ogImage"])
+        alt_text = f"{title} — {sub}"
+    url = abs_url(site, alt[lang])
+    links = "\n".join(
+        f'<link rel="alternate" hreflang="{l}" href="{esc(abs_url(site, alt[l]))}">' for l in LANGS
+    ) + f'\n<link rel="alternate" hreflang="x-default" href="{esc(abs_url(site, alt[BASE_LANG]))}">'
+    locale = LOCALES.get(lang, lang)
+    locale_alt = "\n".join(
+        f'<meta property="og:locale:alternate" content="{LOCALES.get(l, l)}">' for l in LANGS if l != lang
+    )
     if is_home:
         ld = {
             "@context": "https://schema.org",
             "@type": "WebSite",
             "name": site["name"],
-            "url": abs_url(site, "/"),
+            "url": url,
             "description": desc,
             "inLanguage": lang,
         }
@@ -979,42 +1062,58 @@ def social_block(page: dict, site: dict, *, is_home: bool = False) -> str:
         ld = {
             "@context": "https://schema.org",
             "@type": "CreativeWork",
-            "name": page["title"],
-            "headline": f"{page['title']} · {sub}" if sub else page["title"],
+            "name": title,
+            "headline": f"{title} · {sub}" if sub else title,
             "description": desc,
             "url": url,
             "image": img,
             "inLanguage": lang,
-            "isPartOf": {"@type": "WebSite", "name": site["name"], "url": abs_url(site, "/")},
+            "isPartOf": {"@type": "WebSite", "name": site["name"], "url": abs_url(site, lang_path("/", lang))},
         }
     ld_json = json.dumps(ld, ensure_ascii=False).replace("</", "<\\/")
-    return textwrap.dedent(
-        f"""
-        {SOCIAL_START}
-        <meta name="description" content="{esc(desc)}">
-        <link rel="canonical" href="{esc(url)}">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-        <meta property="og:site_name" content="{esc(site['name'])}">
-        <meta property="og:title" content="{esc(title)}">
-        <meta property="og:description" content="{esc(desc)}">
-        <meta property="og:type" content="website">
-        <meta property="og:locale" content="{locale}">
-        <meta property="og:url" content="{esc(url)}">
-        <meta property="og:image" content="{esc(img)}">
-        <meta property="og:image:width" content="1200">
-        <meta property="og:image:height" content="630">
-        <meta property="og:image:alt" content="{esc(alt)}">
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="{esc(title)}">
-        <meta name="twitter:description" content="{esc(desc)}">
-        <meta name="twitter:image" content="{esc(img)}">
-        <meta name="twitter:image:alt" content="{esc(alt)}">
-        <script type="application/ld+json">{ld_json}</script>
-        {SOCIAL_END}
-        """
-    ).strip()
+    lines = [
+        SOCIAL_START,
+        f'<meta name="description" content="{esc(desc)}">',
+        f'<link rel="canonical" href="{esc(url)}">',
+        links,
+        '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
+        '<link rel="icon" href="/favicon.ico" sizes="any">',
+        '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
+        f'<meta property="og:site_name" content="{esc(site["name"])}">',
+        f'<meta property="og:title" content="{esc(title)}">',
+        f'<meta property="og:description" content="{esc(desc)}">',
+        '<meta property="og:type" content="website">',
+        f'<meta property="og:locale" content="{locale}">',
+        locale_alt,
+        f'<meta property="og:url" content="{esc(url)}">',
+        f'<meta property="og:image" content="{esc(img)}">',
+        '<meta property="og:image:width" content="1200">',
+        '<meta property="og:image:height" content="630">',
+        f'<meta property="og:image:alt" content="{esc(alt_text)}">',
+        '<meta name="twitter:card" content="summary_large_image">',
+        f'<meta name="twitter:title" content="{esc(title)}">',
+        f'<meta name="twitter:description" content="{esc(desc)}">',
+        f'<meta name="twitter:image" content="{esc(img)}">',
+        f'<meta name="twitter:image:alt" content="{esc(alt_text)}">',
+        f'<script type="application/ld+json">{ld_json}</script>',
+        SOCIAL_END,
+    ]
+    return "\n".join(lines)
+
+
+def set_title(html: str, text: str) -> str:
+    """De <title> van de pagina, in de taal van het adres."""
+    return re.sub(r"<title>[^<]*</title>", lambda _m: f"<title>{esc(text)}</title>", html, count=1, flags=re.IGNORECASE)
+
+
+def set_html_lang(html: str, lang: str, wall_lang: str | None = None) -> str:
+    """<html lang> in de taal van het adres; data-wand-lang onthoudt in welke taal de wand zelf geschreven is."""
+    def fix(m: re.Match) -> str:
+        tag = m.group(0)
+        tag = re.sub(r'\s(lang|data-wand-lang)="[^"]*"', "", tag)
+        extra = f' data-wand-lang="{wall_lang}"' if wall_lang else ""
+        return tag[:5] + f' lang="{lang}"{extra}' + tag[5:]
+    return re.sub(r"<html\b[^>]*>", fix, html, count=1, flags=re.IGNORECASE)
 
 
 def esc(s: str) -> str:
@@ -1041,20 +1140,28 @@ def last_modified(path: Path) -> str:
 
 
 def write_sitemap(site: dict, pages: list[dict]) -> None:
+    """Elke pagina in beide talen, met de taalversies als xhtml:link-alternates."""
     entries = [("/", last_modified(HTTPDOCS / "index.html"), "1.0")]
     for p in pages:
         entries.append((p["path"], last_modified(HTTPDOCS / p["slug"] / "index.html"), "0.8"))
     # de homepage verandert mee met de nieuwste wand
     entries[0] = ("/", max(e[1] for e in entries), "1.0")
-    urls = "\n".join(
-        f"  <url>\n    <loc>{esc(abs_url(site, path))}</loc>\n"
-        f"    <lastmod>{lm}</lastmod>\n    <priority>{pr}</priority>\n  </url>"
-        for path, lm, pr in entries
-    )
+    urls = []
+    for path, lm, pr in entries:
+        alts = "".join(
+            f'\n    <xhtml:link rel="alternate" hreflang="{l}" href="{esc(abs_url(site, lang_path(path, l)))}"/>'
+            for l in LANGS
+        ) + f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{esc(abs_url(site, path))}"/>'
+        for lang in LANGS:
+            urls.append(
+                f"  <url>\n    <loc>{esc(abs_url(site, lang_path(path, lang)))}</loc>{alts}\n"
+                f"    <lastmod>{lm}</lastmod>\n    <priority>{pr}</priority>\n  </url>"
+            )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        f"{urls}\n</urlset>\n"
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+        + "\n".join(urls)
+        + "\n</urlset>\n"
     )
     write_public(HTTPDOCS / "sitemap.xml", xml)
     write_public(
@@ -1069,13 +1176,13 @@ SEO_CSS = (
 )
 
 
-def seo_block(page: dict, html: str, text: str) -> str:
-    """Leesbare tekst voor zoekmachines en schermlezers (visueel verborgen)."""
+def seo_block(page: dict, html: str, text: str, lang: str) -> str:
+    """Leesbare tekst voor zoekmachines en schermlezers (visueel verborgen), in de taal van het adres."""
     plain = re.sub(re.escape(SEO_START) + r".*?" + re.escape(SEO_END), "", html, flags=re.DOTALL)
     has_h1 = re.search(r"<h1[\s>]", plain, re.IGNORECASE) is not None
-    head = "" if has_h1 else f"<h1>{esc(page['title'])}</h1>"
+    head = "" if has_h1 else f"<h1>{esc(both(page)[lang]['title'])}</h1>"
     return (
-        f'{SEO_START}\n<div style="{SEO_CSS}">{head}<p>{esc(text)}</p></div>\n{SEO_END}'
+        f'{SEO_START}\n<div style="{SEO_CSS}" lang="{lang}">{head}<p>{esc(text)}</p></div>\n{SEO_END}'
     )
 
 
@@ -1137,17 +1244,18 @@ def replace_block(html: str, name: str, content: str) -> str:
     return pattern.sub(lambda _m: f"{start}\n{content}\n{end}" if "\n" in content else f"{start}{content}{end}", html)
 
 
-def render_cards(pages: list[dict], start: int = 0) -> str:
+def render_cards(pages: list[dict], start: int, lang: str) -> str:
     items = []
     for k, p in enumerate(pages):
         i = start + k
         b = both(p)
+        v = p["l"][lang]
         sub = f'<span class="sub">{bi(b["nl"]["subtitle"], b["en"]["subtitle"])}</span>' if p.get("subtitle") else ""
         items.append(
             f'''      <li>
-        <a class="card" href="{esc(p["path"])}" style="--i:{i};--theme:{esc(p["theme"])}">
+        <a class="card" href="{esc(v["path"])}" style="--i:{i};--theme:{esc(p["theme"])}">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="{"eager" if i < 4 else "lazy"}" decoding="async"></span>
+          <span class="thumb"><img src="{esc(v["thumb"])}?v={v["v"]}" alt="" width="800" height="420" loading="{"eager" if i < 4 else "lazy"}" decoding="async"></span>
           <span class="caption">
             <span class="no">{i + 1:02d}</span>
             <span class="name">{bi(b["nl"]["title"], b["en"]["title"])}</span>
@@ -1160,47 +1268,145 @@ def render_cards(pages: list[dict], start: int = 0) -> str:
     return "\n".join(items)
 
 
+def render_wall(html: str, page: dict, site: dict, lang: str) -> str:
+    """De wand in een taal: dezelfde bron, met kop, label, taalwissel en SEO-tekst in die taal."""
+    b = both(page)[lang]
+    html = set_html_lang(html, lang, page["wallLang"])
+    html = set_title(html, f"{b['title']} · {b['subtitle']}" if b["subtitle"] else b["title"])
+    html = inject_social(html, social_block(page, site, lang))
+    seo_text = text_for(json.loads(SEO_JSON.read_text(encoding="utf-8")), page["slug"], lang, page["wallLang"])
+    html = inject_seo(html, seo_block(page, html, seo_text, lang) if seo_text else "")
+    html = inject_mark(html, mark_block(page, lang))
+    html = inject_touch(html, touch_block(page))
+    html = inject_taal(html, taal_block(page))
+    html = inject_nav(html, nav_block())
+    return inject_lees(html, lees_block(page))
+
+
+def render_home(html: str, pages: list[dict], site: dict, home: dict, lang: str) -> str:
+    """De homepage in een taal: kaarten naar de wanden in die taal, kop en taalwissel in die taal."""
+    alt = alt_paths("/")
+    start = 0
+    counts = []
+    for key, label, items in series_of(pages):
+        html = replace_block(html, f"cards-{key}", render_cards(items, start, lang))
+        start += len(items)
+        counts.append(bi(f"{len(items)} {series_label(key, 'nl')}", f"{len(items)} {series_label(key, 'en')}"))
+    html = replace_block(html, "count", " · ".join(counts))
+    html = replace_block(html, "lang", f"<script>{lang_js(lang, alt)}</script><style>{LANG_CSS}{BAR_CSS}</style>")
+    html = replace_block(html, "bar", f"{bar_html(lang, alt)}<script>{BAR_JS}</script>")
+    html = set_html_lang(html, lang)
+    if lang != BASE_LANG:
+        # the logo links home: the home of this language
+        html = html.replace('href="/"', f'href="{lang_path("/", lang)}"')
+    return inject_social(html, social_block(home, site, lang, is_home=True))
+
+
+def write_lang_file(rel: str, lang: str, html: str) -> None:
+    path = lang_file(rel, lang)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    write_public(path, html)
+
+
+def same_image(a: Image.Image, b: Image.Image) -> bool:
+    from PIL import ImageChops
+
+    return a.size == b.size and ImageChops.difference(a, b).getbbox() is None
+
+
+def save_jpeg(img: Image.Image, path: Path, quality: int) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(path, "JPEG", quality=quality, optimize=True, progressive=True)
+    os.chmod(path, 0o644)
+
+
+def og_rel(name: str, lang: str) -> str:
+    return f"/images/og/{name}.jpg" if lang == BASE_LANG else f"/images/og/{lang}/{name}.jpg"
+
+
+def thumb_rel(name: str, lang: str) -> str:
+    return f"/images/thumbs/{name}.jpg" if lang == BASE_LANG else f"/images/thumbs/{lang}/{name}.jpg"
+
+
+def disk(rel: str) -> Path:
+    return HTTPDOCS / rel.lstrip("/")
+
+
+def drop(rel: str) -> None:
+    """Een beeld per taal dat niet meer nodig is (de taalversie ziet er hetzelfde uit)."""
+    path = disk(rel)
+    if path.is_file():
+        path.unlink()
+
+
+def wall_images(page: dict, site: dict, html: str, y: int) -> dict[str, Image.Image | None]:
+    """Screenshot, OG-kaart en thumbnail per taal. Een taal krijgt alleen eigen
+    beelden als hij er anders uitziet: zelfde shot en zelfde titel = de Nederlandse."""
+    slug = page["slug"]
+    shots: dict[str, Image.Image | None] = {}
+    page["l"] = {}
+    base = None
+    for lang in LANGS:
+        shot = capture_page(slug, html, y, lang)
+        shots[lang] = shot
+        b = both(page)[lang]
+        view = {**page, "title": b["title"], "subtitle": b["subtitle"]}
+        same_shot = base is not None and shot is not None and shots[BASE_LANG] is not None and same_image(shot, shots[BASE_LANG])
+        og = og_rel(slug, lang)
+        if same_shot and b["title"] == base["title"]:
+            drop(og)
+            og = base["ogImage"]
+        else:
+            generate_og(view, site, shot, disk(og))
+            os.chmod(disk(og), 0o644)
+        th = thumb_rel(slug, lang)
+        if shot is None:
+            drop(th)
+            th = og
+        elif same_shot:
+            drop(th)
+            th = base["thumb"]
+        else:
+            # schone thumbnail (zonder label) voor de kaarten op de homepage en onder de wanden
+            save_jpeg(cover(shot, 800, 420), disk(th), 84)
+        page["l"][lang] = {
+            "path": lang_path(page["path"], lang),
+            "title": b["title"],
+            "subtitle": b["subtitle"],
+            "ogImage": og,
+            "thumb": th,
+            "v": hashlib.sha1(disk(th).read_bytes()).hexdigest()[:8],
+        }
+        if lang == BASE_LANG:
+            base = page["l"][lang]
+    page["ogImage"] = base["ogImage"]
+    page["thumb"] = base["thumb"]
+    return shots
+
+
 def main() -> None:
     site = load_site()
     pages: list[dict] = []
-    shots: dict[str, Image.Image] = {}
+    shots: dict[str, dict[str, Image.Image | None]] = {}
     positions = load_shot_positions()
-    sources: list[tuple[Path, str, dict]] = []
+    sources: list[tuple[str, dict]] = []
     for d in slug_dirs():
         slug = d.name
-        html_path = d / "index.html"
-        html = html_path.read_text(encoding="utf-8")
+        html = (d / "index.html").read_text(encoding="utf-8")
         page = parse_page(slug, html)
-        og_path = OG_DIR / f"{slug}.jpg"
-        shot = capture_page(slug, html, positions.get(slug, 0), page.get("lang", "nl"))
-        if shot is not None:
-            shots[slug] = shot
-        generate_og(page, site, shot, og_path)
-        # schone thumbnail (zonder label) voor de kaarten op de homepage
-        if shot is not None:
-            THUMB_DIR.mkdir(parents=True, exist_ok=True)
-            thumb_path = THUMB_DIR / f"{slug}.jpg"
-            cover(shot, 800, 420).save(thumb_path, "JPEG", quality=84, optimize=True, progressive=True)
-            os.chmod(thumb_path, 0o644)
-            page["thumb"] = f"/images/thumbs/{slug}.jpg"
-        else:
-            thumb_path = og_path
-            page["thumb"] = page["ogImage"]
-        page["ogVersion"] = hashlib.sha1(thumb_path.read_bytes()).hexdigest()[:8]
+        shots[slug] = wall_images(page, site, html, positions.get(slug, 0))
         pages.append(page)
-        sources.append((html_path, html, page))
+        sources.append((html, page))
 
-    for html_path, html, page in sources:
-        html = inject_social(html, social_block(page, site))
-        seo_text = json.loads(SEO_JSON.read_text(encoding="utf-8")).get(page["slug"], "")
-        html = inject_seo(html, seo_block(page, html, seo_text) if seo_text else "")
-        html = inject_mark(html, mark_block(page))
-        html = inject_touch(html, touch_block(page))
-        html = inject_taal(html, taal_block(page))
-        html = inject_nav(html, nav_block())
-        write_public(html_path, inject_lees(html, lees_block(page)))
+    # één bron per wand: Nederlands op /<slug>/ (het bronbestand), Engels op /en/<slug>/
+    for html, page in sources:
+        for lang in LANGS:
+            write_lang_file(f"{page['slug']}/index.html", lang, render_wall(html, page, site, lang))
 
-    public_pages = [{k: v for k, v in p.items() if k != "ogVersion"} for p in pages]
+    public_pages = [
+        {**{k: v for k, v in p.items() if k != "l"}, "languages": {l: {k: v for k, v in p["l"][l].items() if k != "v"} for l in LANGS}}
+        for p in pages
+    ]
     payload = {"site": {"name": site["name"], "baseUrl": site["baseUrl"]}, "pages": public_pages}
     write_public(
         PAGES_JSON,
@@ -1209,37 +1415,23 @@ def main() -> None:
 
     index_path = HTTPDOCS / "index.html"
     if index_path.is_file():
-        tagline = "wanden - getekend door si, scrollend en levend."
-        home = {
-            "title": site["name"],
-            "subtitle": tagline,
-            "path": "/",
-            "ogImage": "/images/og/index.jpg",
-        }
-        home_og = OG_DIR / "index.jpg"
-        rows = [[shots[p["slug"]] for p in items if p["slug"] in shots] for _k, _l, items in series_of(pages)]
-        if any(rows):
-            generate_index_og(site, rows, home_og, tagline)
-        else:
-            generate_og_fallback({**home, "slug": "index", "theme": "#13202b"}, home_og)
-        html = index_path.read_text(encoding="utf-8")
-        start = 0
-        counts = []
-        for key, label, items in series_of(pages):
-            html = replace_block(html, f"cards-{key}", render_cards(items, start))
-            start += len(items)
-            counts.append(bi(f"{len(items)} {series_label(key, 'nl')}", f"{len(items)} {series_label(key, 'en')}"))
-        html = replace_block(html, "count", " · ".join(counts))
-        html = replace_block(html, "lang", f"<script>{LANG_JS}</script><style>{LANG_CSS}{BAR_CSS}</style>")
-        html = replace_block(html, "bar", f"{BAR_HTML}<script>{BAR_JS}</script>")
-        write_public(
-            index_path,
-            inject_social(html, social_block(home, site, is_home=True)),
-        )
+        source = index_path.read_text(encoding="utf-8")
+        home = {"title": site["name"], "path": "/", "og": {}}
+        for lang in LANGS:
+            tagline = site_t("tagline", lang)
+            rel = og_rel("index", lang)
+            home["og"][lang] = rel
+            rows = [[shots[p["slug"]][lang] for p in items if shots[p["slug"]][lang] is not None] for _k, _l, items in series_of(pages)]
+            if any(rows):
+                generate_index_og(site, rows, disk(rel), tagline)
+            else:
+                generate_og_fallback({**home, "subtitle": tagline, "slug": "index", "theme": "#13202b"}, disk(rel))
+            os.chmod(disk(rel), 0o644)
+            write_lang_file("index.html", lang, render_home(source, pages, site, home, lang))
 
     write_sitemap(site, pages)
     write_nav_assets(pages, site)
-    print(f"Built {len(pages)} pages → {PAGES_JSON.relative_to(ROOT)}")
+    print(f"Built {len(pages)} pages in {len(LANGS)} languages → {PAGES_JSON.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

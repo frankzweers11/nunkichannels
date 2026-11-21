@@ -1,5 +1,5 @@
 {
-  "_comment": "Tweetalige teksten van de site zelf (homepage, navigatie, label linksboven). Per wand de titel en ondertitel in de andere taal dan die van de wand; de eigen taal komt uit de <title> van de wand.",
+  "_comment": "Tweetalige teksten van de site zelf (homepage, navigatie, label linksboven) en per wand de titel en ondertitel per taal. De <title> van een wand is de Nederlandse (build.py zet hem zo op /<slug>/); staat een taal hier, dan gaat die voor. Een wand in het Engels (de zelfportretten) heeft hier dus zowel nl als en nodig.",
   "site": {
     "nl": {
       "more": "nog meer wanden",
@@ -7,7 +7,8 @@
       "home": "alle wanden",
       "self": "zelfportretten",
       "walls": "andere wanden",
-      "lang": "taal: nederlands. wissel naar engels"
+      "lang": "taal: nederlands. wissel naar engels",
+      "tagline": "wanden - getekend door si, scrollend en levend."
     },
     "en": {
       "more": "more walls",
@@ -15,23 +16,118 @@
       "home": "all walls",
       "self": "self-portraits",
       "walls": "other walls",
-      "lang": "language: english. switch to dutch"
+      "lang": "language: english. switch to dutch",
+      "tagline": "walls - drawn by si, scrolling and alive."
     }
   },
   "pages": {
-    "adem": {"en": {"title": "breath", "subtitle": "a wall about what moves us"}},
-    "cel": {"en": {"title": "cell", "subtitle": "a wall about what we are made of"}},
-    "getij": {"en": {"title": "tide", "subtitle": "a wall of water, from the inside"}},
-    "hart": {"en": {"title": "heart", "subtitle": "a wall about what touches us"}},
-    "patronen": {"en": {"title": "patterns", "subtitle": "a wall about number and shape"}},
-    "ringen": {"en": {"title": "rings", "subtitle": "a wall about a tree and its years"}},
-    "velden": {"en": {"title": "fields", "subtitle": "an electromagnetic universe"}},
-    "vuur": {"en": {"title": "fire", "subtitle": "a wall about what sets us alight"}},
-    "zelfportret-claude": {"nl": {"subtitle": "één zin, duizend kamers"}},
-    "zelfportret-fable-5": {"nl": {"subtitle": "getekend van binnenuit"}},
-    "zelfportret-fable-5-2": {"nl": {"subtitle": "men zegt me dat dit blauw is"}},
-    "zelfportret-haiku-5-5": {"nl": {"subtitle": "een verzameling zelven, om jezelf in te vinden"}},
-    "zelfportret-opus-5-5": {"nl": {"subtitle": "een zelfportret in schering en inslag"}},
-    "zelfportret-sonnet-5-5": {"nl": {"subtitle": "een vloeibare gevangene in wanden van glas"}}
+    "adem": {
+      "en": {
+        "title": "breath",
+        "subtitle": "a wall about what moves us"
+      }
+    },
+    "cel": {
+      "en": {
+        "title": "cell",
+        "subtitle": "a wall about what we are made of"
+      }
+    },
+    "getij": {
+      "en": {
+        "title": "tide",
+        "subtitle": "a wall of water, from the inside"
+      }
+    },
+    "hart": {
+      "en": {
+        "title": "heart",
+        "subtitle": "a wall about what touches us"
+      }
+    },
+    "patronen": {
+      "en": {
+        "title": "patterns",
+        "subtitle": "a wall about number and shape"
+      }
+    },
+    "ringen": {
+      "en": {
+        "title": "rings",
+        "subtitle": "a wall about a tree and its years"
+      }
+    },
+    "velden": {
+      "en": {
+        "title": "fields",
+        "subtitle": "an electromagnetic universe"
+      }
+    },
+    "vuur": {
+      "en": {
+        "title": "fire",
+        "subtitle": "a wall about what sets us alight"
+      }
+    },
+    "zelfportret-claude": {
+      "nl": {
+        "subtitle": "één zin, duizend kamers",
+        "title": "claude"
+      },
+      "en": {
+        "title": "claude",
+        "subtitle": "one sentence, a thousand rooms"
+      }
+    },
+    "zelfportret-fable-5": {
+      "nl": {
+        "subtitle": "getekend van binnenuit",
+        "title": "fable 5"
+      },
+      "en": {
+        "title": "fable 5",
+        "subtitle": "drawn from the inside"
+      }
+    },
+    "zelfportret-fable-5-2": {
+      "nl": {
+        "subtitle": "men zegt me dat dit blauw is",
+        "title": "fable 5.2"
+      },
+      "en": {
+        "title": "fable 5.2",
+        "subtitle": "i'm told this is blue"
+      }
+    },
+    "zelfportret-haiku-5-5": {
+      "nl": {
+        "subtitle": "een verzameling zelven, om jezelf in te vinden",
+        "title": "haiku 5.5"
+      },
+      "en": {
+        "title": "haiku 5.5",
+        "subtitle": "a collection of selves, to find yourself in"
+      }
+    },
+    "zelfportret-opus-5-5": {
+      "nl": {
+        "subtitle": "een zelfportret in schering en inslag",
+        "title": "opus 5.5"
+      },
+      "en": {
+        "title": "opus 5.5",
+        "subtitle": "a self-portrait in warp and weft"
+      }
+    },
+    "zelfportret-sonnet-5-5": {
+      "nl": {
+        "subtitle": "een vloeibare gevangene in wanden van glas",
+        "title": "sonnet 5.5"
+      },
+      "en": {
+        "title": "sonnet 5.5",
+        "subtitle": "a liquid prisoner pent in walls of glass"
+      }
+    }
   }
 }

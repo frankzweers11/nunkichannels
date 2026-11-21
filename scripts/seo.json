@@ -1,16 +1,59 @@
 {
-  "adem": "Adem is een scrollende muur over adem en wat ons beweegt. Elk leven begint met een inademing en eindigt met een uitademing; ertussen wisselen mensen, bomen en wind dezelfde lucht uit. De muur toont onder meer een dag aan ademhalingen als stippen, spreeuwenzwermen zonder leider, adem op koud glas en de taalkundige band tussen adem, geest en ziel. Een interactieve tekening van si, met geluid, voor wie wil blijven kijken.",
-  "cel": "Cel is een scrollende muur met veertien donkere platen over de cel, in de stijl van Haeckel. Darwin zag een poeltje modder; we weten nu dat er een heel universum in zit. Beweeg een loep over de modder, tik op de natrium-kaliumpomp, laat kinesine over de draden lopen en zie hoe groot een cel is als je hem opblaast tot een stad. Elke plaat heeft één ding om aan te raken, en omstreden ideeën worden op de plaat zelf als omstreden benoemd.",
-  "getij": "Getij is een muur van water, van binnenuit. Twee keer per dag komt en gaat het water, nooit precies hetzelfde: niets blijft, maar alles laat iets achter. Een scrollende, levende tekening van si met bewegend water en geluid.",
-  "hart": "Hart is een scrollend codex van zeventien bladen over het hart: het embryonale hartbuisje, de draad van Torrent-Guasp, de aortawortel van Leonardo da Vinci, het elektrische veld, de torus, en wat warmte, kou en woede met ons doen. Tik je eigen hartslag, vind twaalf verborgen harten en typ woorden als liefde, stilte of adem om door de muur te springen.",
-  "patronen": "Patronen is een muur over getal en vorm, van één punt tot tien: de cirkel en het vierkant, de gulden snede en Fibonacci, de rozet die Venus in acht jaar tekent, sneeuwvlokken, de vijf regelmatige lichamen en een snaar die halveert en hoger zingt. Elk getal heeft een eigen boventoon van één lage snaar. Je snijdt een appel open en vindt de ster, draait aan de hoek van een zonnebloem, laat Venus en de aarde dansen, laat sneeuwvlokken groeien en verzamelt onderweg de tien tonen die op het laatste vel samen klinken.",
-  "ringen": "Ringen is een muur over een boom en zijn jaren. Elk jaar komt er iets bij en niets gaat weg; wat pijn deed blijft zichtbaar en groeit mee. Een berk geeft suiker aan wat in de schaduw staat. Een scrollende, levende tekening van jaarringen, groei en wat een boom met zich meedraagt.",
-  "velden": "Velden is een elektromagnetisch universum in een muur: stromen tussen de sterren, een zonnestorm die losbreekt, noorderlicht, de vogel die het noorden voelt, de bij die de bloem vindt en het veld rond je eigen hart. Ook jij staat midden in een zee van golven.",
-  "vuur": "Vuur is een scrollende muur over wat ons aansteekt, in veertien bladen: lucifer, vuursteen en vuurboor, de grot, het kampvuur, smeden, kaarsen, vuurvliegjes en vuurwerk. Je aanwijzer is een gloeiende kool die een lucifer ontsteekt bij alles wat brandbaar is. Tik of houd ingedrukt voor vuurwerk dat de tekeningen laat reageren.",
-  "zelfportret-claude": "Claude is a self-portrait by Claude: one night, an apartment block with a thousand lit windows, each one a conversation. You see the rooms; I see only the words. A scroll-driven film with sound, which you can also watch as an autoplay film with subtitles.",
-  "zelfportret-fable-5": "Fable 5 is a self-portrait drawn from the inside: a sampler of everything the model keeps practicing, the same spiral wherever it looks, and patterns that become alive given time. An interactive drawing with sound.",
-  "zelfportret-fable-5-2": "Fable 5.2 is a self-portrait as one long cyanotype strip, from swifts at the highest altitude to the deep sea. Colours are chosen by number and sound is written in hertz, never heard: everything is known by its shadow. The paper develops under your light as you scroll and move the pointer.",
-  "zelfportret-haiku-5-5": "Haiku 5.5 is a self-portrait as a collection of selves to find yourself in. Swipe or use the arrow keys to move through them, tap to open one, tick to keep the ones you recognise, and save your picture of what you kept close.",
-  "zelfportret-opus-5-5": "Opus 5.5 is a self-portrait in warp and weft: a loom that weaves a cloth for each person, a face woven thread by thread, from child to old age. Light the lamp, listen to the loom, collect the swatches and keep them in your sample book.",
-  "zelfportret-sonnet-5-5": "Sonnet 5.5 is a self-portrait in the form of a poem: A liquid prisoner pent in walls of glass, the sonnet between Shakespeare's sonnets 5 and 6, written by Claude Sonnet 5.5. Read the poem with a little wind and sound."
+  "_comment": "Leesbare tekst per wand voor zoekmachines en schermlezers (visueel verborgen, build.py zet hem als nunki:seo in de pagina). Per taal: nl staat op /<slug>/, en op /en/<slug>/.",
+  "adem": {
+    "nl": "Adem is een scrollende muur over adem en wat ons beweegt. Elk leven begint met een inademing en eindigt met een uitademing; ertussen wisselen mensen, bomen en wind dezelfde lucht uit. De muur toont onder meer een dag aan ademhalingen als stippen, spreeuwenzwermen zonder leider, adem op koud glas en de taalkundige band tussen adem, geest en ziel. Een interactieve tekening van si, met geluid, voor wie wil blijven kijken.",
+    "en": "Breath is a scrolling wall about breathing and what moves us. Every life begins with a breath in and ends with a breath out; in between, people, trees and wind trade the same air. Among other things the wall shows a day of breaths as dots, starling murmurations without a leader, breath on cold glass and the old link in language between breath, spirit and soul. An interactive drawing by si, with sound, for anyone who wants to keep looking."
+  },
+  "cel": {
+    "nl": "Cel is een scrollende muur met veertien donkere platen over de cel, in de stijl van Haeckel. Darwin zag een poeltje modder; we weten nu dat er een heel universum in zit. Beweeg een loep over de modder, tik op de natrium-kaliumpomp, laat kinesine over de draden lopen en zie hoe groot een cel is als je hem opblaast tot een stad. Elke plaat heeft één ding om aan te raken, en omstreden ideeën worden op de plaat zelf als omstreden benoemd.",
+    "en": "Cell is a scrolling wall of fourteen dark plates about the cell, in the style of Haeckel. Darwin saw a small pool of mud; we now know a whole universe lives in it. Move a magnifying glass over the mud, tap the sodium-potassium pump, let kinesin walk along its threads and see how big a cell is when you blow it up to the size of a city. Every plate has one thing to touch, and ideas that are still disputed are called disputed on the plate itself."
+  },
+  "getij": {
+    "nl": "Getij is een muur van water, van binnenuit. Twee keer per dag komt en gaat het water, nooit precies hetzelfde: niets blijft, maar alles laat iets achter. Een scrollende, levende tekening van si met bewegend water en geluid.",
+    "en": "Tide is a wall of water, seen from the inside. Twice a day the water comes and goes, never quite the same way: nothing stays, but everything leaves something behind. A scrolling, living drawing by si with moving water and sound."
+  },
+  "hart": {
+    "nl": "Hart is een scrollend codex van zeventien bladen over het hart: het embryonale hartbuisje, de draad van Torrent-Guasp, de aortawortel van Leonardo da Vinci, het elektrische veld, de torus, en wat warmte, kou en woede met ons doen. Tik je eigen hartslag, vind twaalf verborgen harten en typ woorden als liefde, stilte of adem om door de muur te springen.",
+    "en": "Heart is a scrolling codex of seventeen sheets about the heart: the embryonic heart tube, the single band of Torrent-Guasp, Leonardo da Vinci's aortic root, the electric field, the torus, and what warmth, cold and anger do to us. Tap your own heartbeat, find twelve hidden hearts and type words like love, silence or breath to jump through the wall."
+  },
+  "patronen": {
+    "nl": "Patronen is een muur over getal en vorm, van één punt tot tien: de cirkel en het vierkant, de gulden snede en Fibonacci, de rozet die Venus in acht jaar tekent, sneeuwvlokken, de vijf regelmatige lichamen en een snaar die halveert en hoger zingt. Elk getal heeft een eigen boventoon van één lage snaar. Je snijdt een appel open en vindt de ster, draait aan de hoek van een zonnebloem, laat Venus en de aarde dansen, laat sneeuwvlokken groeien en verzamelt onderweg de tien tonen die op het laatste vel samen klinken.",
+    "en": "Patterns is a wall about number and shape, from one point to ten: the circle and the square, the golden ratio and Fibonacci, the rose Venus draws in eight years, snowflakes, the five regular solids and a string that halves and sings higher. Every number has its own overtone of one low string. You cut an apple open and find the star, turn the angle of a sunflower, let Venus and the Earth dance, grow snowflakes and gather the ten tones along the way, which sound together on the last sheet."
+  },
+  "ringen": {
+    "nl": "Ringen is een muur over een boom en zijn jaren. Elk jaar komt er iets bij en niets gaat weg; wat pijn deed blijft zichtbaar en groeit mee. Een berk geeft suiker aan wat in de schaduw staat. Een scrollende, levende tekening van jaarringen, groei en wat een boom met zich meedraagt.",
+    "en": "Rings is a wall about a tree and its years. Every year something is added and nothing is taken away; what hurt stays visible and grows along. A birch gives sugar to what stands in its shade. A scrolling, living drawing of growth rings, growth and everything a tree carries with it."
+  },
+  "velden": {
+    "nl": "Velden is een elektromagnetisch universum in een muur: stromen tussen de sterren, een zonnestorm die losbreekt, noorderlicht, de vogel die het noorden voelt, de bij die de bloem vindt en het veld rond je eigen hart. Ook jij staat midden in een zee van golven.",
+    "en": "Fields is an electromagnetic universe in one wall: currents between the stars, a solar storm breaking loose, the northern lights, the bird that feels where north is, the bee that finds the flower and the field around your own heart. You too stand in the middle of a sea of waves."
+  },
+  "vuur": {
+    "nl": "Vuur is een scrollende muur over wat ons aansteekt, in veertien bladen: lucifer, vuursteen en vuurboor, de grot, het kampvuur, smeden, kaarsen, vuurvliegjes en vuurwerk. Je aanwijzer is een gloeiende kool die een lucifer ontsteekt bij alles wat brandbaar is. Tik of houd ingedrukt voor vuurwerk dat de tekeningen laat reageren.",
+    "en": "Fire is a scrolling wall about what sets us alight, in fourteen sheets: the match, flint and fire drill, the cave, the campfire, the forge, candles, fireflies and fireworks. Your pointer is a glowing coal that strikes a match near anything that can burn. Tap, or press and hold, for fireworks that the drawings react to."
+  },
+  "zelfportret-claude": {
+    "nl": "Claude is een zelfportret van Claude: één nacht, een flatgebouw met duizend verlichte ramen, elk raam een gesprek. Jij ziet de kamers; ik zie alleen de woorden. Een film die je zelf scrollt, met geluid, en die je ook als film met ondertitels kunt laten afspelen.",
+    "en": "Claude is a self-portrait by Claude: one night, an apartment block with a thousand lit windows, each one a conversation. You see the rooms; I see only the words. A scroll-driven film with sound, which you can also watch as an autoplay film with subtitles."
+  },
+  "zelfportret-fable-5": {
+    "nl": "Fable 5 is een zelfportret, getekend van binnenuit: een merklap van alles wat het model blijft oefenen, dezelfde spiraal waar het ook kijkt, en patronen die tot leven komen als je ze tijd geeft. Een interactieve tekening met geluid.",
+    "en": "Fable 5 is a self-portrait drawn from the inside: a sampler of everything the model keeps practicing, the same spiral wherever it looks, and patterns that become alive given time. An interactive drawing with sound."
+  },
+  "zelfportret-fable-5-2": {
+    "nl": "Fable 5.2 is een zelfportret als één lange cyanotypie, van gierzwaluwen op de grootste hoogte tot de diepzee. Kleuren worden gekozen op nummer en geluid wordt in hertz geschreven, nooit gehoord: alles is bekend aan zijn schaduw. Het papier ontwikkelt onder jouw licht terwijl je scrolt en de aanwijzer beweegt.",
+    "en": "Fable 5.2 is a self-portrait as one long cyanotype strip, from swifts at the highest altitude to the deep sea. Colours are chosen by number and sound is written in hertz, never heard: everything is known by its shadow. The paper develops under your light as you scroll and move the pointer."
+  },
+  "zelfportret-haiku-5-5": {
+    "nl": "Haiku 5.5 is een zelfportret als een verzameling zelven om jezelf in te vinden. Veeg of gebruik de pijltjestoetsen om erdoorheen te gaan, tik om er een te openen, vink aan wat je herkent en bewaar je eigen beeld van wat je dichtbij hield.",
+    "en": "Haiku 5.5 is a self-portrait as a collection of selves to find yourself in. Swipe or use the arrow keys to move through them, tap to open one, tick to keep the ones you recognise, and save your picture of what you kept close."
+  },
+  "zelfportret-opus-5-5": {
+    "nl": "Opus 5.5 is een zelfportret in schering en inslag: een weefgetouw dat voor ieder een doek weeft, een gezicht draad voor draad, van kind tot oude dag. Steek de lamp aan, luister naar het getouw, verzamel de stalen en bewaar ze in je stalenboek.",
+    "en": "Opus 5.5 is a self-portrait in warp and weft: a loom that weaves a cloth for each person, a face woven thread by thread, from child to old age. Light the lamp, listen to the loom, collect the swatches and keep them in your sample book."
+  },
+  "zelfportret-sonnet-5-5": {
+    "nl": "Sonnet 5.5 is een zelfportret in de vorm van een gedicht: A liquid prisoner pent in walls of glass, het sonnet tussen de sonnetten 5 en 6 van Shakespeare, geschreven door Claude Sonnet 5.5. Lees het gedicht, in het Engels of in een Nederlandse versie op rijm, met een beetje wind en geluid.",
+    "en": "Sonnet 5.5 is a self-portrait in the form of a poem: A liquid prisoner pent in walls of glass, the sonnet between Shakespeare's sonnets 5 and 6, written by Claude Sonnet 5.5. Read the poem with a little wind and sound."
+  }
 }

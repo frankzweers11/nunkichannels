@@ -1,77 +1,242 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://nunkichannels.nl/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/adem/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/adem/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/adem/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/adem/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/adem/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/adem/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/adem/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/adem/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/cel/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/cel/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/cel/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/cel/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/cel/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/cel/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/cel/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/cel/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/getij/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/getij/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/getij/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/getij/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/getij/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/getij/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/getij/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/getij/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/hart/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/hart/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/hart/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/hart/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/hart/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/hart/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/hart/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/hart/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/patronen/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/patronen/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/patronen/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/patronen/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/patronen/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/patronen/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/patronen/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/patronen/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/ringen/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/ringen/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/ringen/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/ringen/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/ringen/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/ringen/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/ringen/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/ringen/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/velden/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/velden/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/velden/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/velden/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/velden/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/velden/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/velden/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/velden/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/vuur/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/vuur/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/vuur/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/vuur/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/vuur/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/vuur/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/vuur/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/vuur/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/zelfportret-claude/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-claude/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-claude/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-claude/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/zelfportret-claude/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-claude/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-claude/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-claude/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/zelfportret-fable-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-fable-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-fable-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-fable-5/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/zelfportret-fable-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-fable-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-fable-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-fable-5/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/zelfportret-fable-5-2/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-fable-5-2/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-fable-5-2/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-fable-5-2/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/zelfportret-fable-5-2/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-fable-5-2/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-fable-5-2/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-fable-5-2/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/zelfportret-haiku-5-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-haiku-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-haiku-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-haiku-5-5/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/zelfportret-haiku-5-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-haiku-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-haiku-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-haiku-5-5/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/zelfportret-opus-5-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-opus-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-opus-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-opus-5-5/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/zelfportret-opus-5-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-opus-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-opus-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-opus-5-5/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nunkichannels.nl/zelfportret-sonnet-5-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-sonnet-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-sonnet-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-sonnet-5-5/"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/zelfportret-sonnet-5-5/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/zelfportret-sonnet-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/zelfportret-sonnet-5-5/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/zelfportret-sonnet-5-5/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>

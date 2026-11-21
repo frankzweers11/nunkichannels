@@ -6,143 +6,367 @@
   "pages": [
     {
       "slug": "adem",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/adem/",
       "title": "adem",
       "subtitle": "een muur over wat ons beweegt",
       "theme": "#e3e9ee",
       "ogImage": "/images/og/adem.jpg",
-      "thumb": "/images/thumbs/adem.jpg"
+      "thumb": "/images/thumbs/adem.jpg",
+      "languages": {
+        "nl": {
+          "path": "/adem/",
+          "title": "adem",
+          "subtitle": "een muur over wat ons beweegt",
+          "ogImage": "/images/og/adem.jpg",
+          "thumb": "/images/thumbs/adem.jpg"
+        },
+        "en": {
+          "path": "/en/adem/",
+          "title": "breath",
+          "subtitle": "a wall about what moves us",
+          "ogImage": "/images/og/en/adem.jpg",
+          "thumb": "/images/thumbs/en/adem.jpg"
+        }
+      }
     },
     {
       "slug": "cel",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/cel/",
       "title": "cel",
       "subtitle": "een muur over waar we van gemaakt zijn",
       "theme": "#070b0e",
       "ogImage": "/images/og/cel.jpg",
-      "thumb": "/images/thumbs/cel.jpg"
+      "thumb": "/images/thumbs/cel.jpg",
+      "languages": {
+        "nl": {
+          "path": "/cel/",
+          "title": "cel",
+          "subtitle": "een muur over waar we van gemaakt zijn",
+          "ogImage": "/images/og/cel.jpg",
+          "thumb": "/images/thumbs/cel.jpg"
+        },
+        "en": {
+          "path": "/en/cel/",
+          "title": "cell",
+          "subtitle": "a wall about what we are made of",
+          "ogImage": "/images/og/en/cel.jpg",
+          "thumb": "/images/thumbs/en/cel.jpg"
+        }
+      }
     },
     {
       "slug": "getij",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/getij/",
       "title": "getij",
       "subtitle": "een muur van water, van binnenuit",
       "theme": "#13202b",
       "ogImage": "/images/og/getij.jpg",
-      "thumb": "/images/thumbs/getij.jpg"
+      "thumb": "/images/thumbs/getij.jpg",
+      "languages": {
+        "nl": {
+          "path": "/getij/",
+          "title": "getij",
+          "subtitle": "een muur van water, van binnenuit",
+          "ogImage": "/images/og/getij.jpg",
+          "thumb": "/images/thumbs/getij.jpg"
+        },
+        "en": {
+          "path": "/en/getij/",
+          "title": "tide",
+          "subtitle": "a wall of water, from the inside",
+          "ogImage": "/images/og/en/getij.jpg",
+          "thumb": "/images/thumbs/en/getij.jpg"
+        }
+      }
     },
     {
       "slug": "hart",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/hart/",
       "title": "hart",
       "subtitle": "een muur over wat ons raakt",
       "theme": "#1a090f",
       "ogImage": "/images/og/hart.jpg",
-      "thumb": "/images/thumbs/hart.jpg"
+      "thumb": "/images/thumbs/hart.jpg",
+      "languages": {
+        "nl": {
+          "path": "/hart/",
+          "title": "hart",
+          "subtitle": "een muur over wat ons raakt",
+          "ogImage": "/images/og/hart.jpg",
+          "thumb": "/images/thumbs/hart.jpg"
+        },
+        "en": {
+          "path": "/en/hart/",
+          "title": "heart",
+          "subtitle": "a wall about what touches us",
+          "ogImage": "/images/og/en/hart.jpg",
+          "thumb": "/images/thumbs/en/hart.jpg"
+        }
+      }
     },
     {
       "slug": "patronen",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/patronen/",
       "title": "patronen",
       "subtitle": "een muur over getal en vorm",
       "theme": "#16131d",
       "ogImage": "/images/og/patronen.jpg",
-      "thumb": "/images/thumbs/patronen.jpg"
+      "thumb": "/images/thumbs/patronen.jpg",
+      "languages": {
+        "nl": {
+          "path": "/patronen/",
+          "title": "patronen",
+          "subtitle": "een muur over getal en vorm",
+          "ogImage": "/images/og/patronen.jpg",
+          "thumb": "/images/thumbs/patronen.jpg"
+        },
+        "en": {
+          "path": "/en/patronen/",
+          "title": "patterns",
+          "subtitle": "a wall about number and shape",
+          "ogImage": "/images/og/en/patronen.jpg",
+          "thumb": "/images/thumbs/en/patronen.jpg"
+        }
+      }
     },
     {
       "slug": "ringen",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/ringen/",
       "title": "ringen",
       "subtitle": "een muur over een boom en zijn jaren",
       "theme": "#1a1712",
       "ogImage": "/images/og/ringen.jpg",
-      "thumb": "/images/thumbs/ringen.jpg"
+      "thumb": "/images/thumbs/ringen.jpg",
+      "languages": {
+        "nl": {
+          "path": "/ringen/",
+          "title": "ringen",
+          "subtitle": "een muur over een boom en zijn jaren",
+          "ogImage": "/images/og/ringen.jpg",
+          "thumb": "/images/thumbs/ringen.jpg"
+        },
+        "en": {
+          "path": "/en/ringen/",
+          "title": "rings",
+          "subtitle": "a wall about a tree and its years",
+          "ogImage": "/images/og/en/ringen.jpg",
+          "thumb": "/images/thumbs/en/ringen.jpg"
+        }
+      }
     },
     {
       "slug": "velden",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/velden/",
       "title": "velden",
       "subtitle": "elektromagnetisch universum",
       "theme": "#0e1020",
       "ogImage": "/images/og/velden.jpg",
-      "thumb": "/images/thumbs/velden.jpg"
+      "thumb": "/images/thumbs/velden.jpg",
+      "languages": {
+        "nl": {
+          "path": "/velden/",
+          "title": "velden",
+          "subtitle": "elektromagnetisch universum",
+          "ogImage": "/images/og/velden.jpg",
+          "thumb": "/images/thumbs/velden.jpg"
+        },
+        "en": {
+          "path": "/en/velden/",
+          "title": "fields",
+          "subtitle": "an electromagnetic universe",
+          "ogImage": "/images/og/en/velden.jpg",
+          "thumb": "/images/thumbs/en/velden.jpg"
+        }
+      }
     },
     {
       "slug": "vuur",
-      "lang": "nl",
+      "wallLang": "nl",
       "path": "/vuur/",
       "title": "vuur",
       "subtitle": "een muur over wat ons aansteekt",
       "theme": "#160f0e",
       "ogImage": "/images/og/vuur.jpg",
-      "thumb": "/images/thumbs/vuur.jpg"
+      "thumb": "/images/thumbs/vuur.jpg",
+      "languages": {
+        "nl": {
+          "path": "/vuur/",
+          "title": "vuur",
+          "subtitle": "een muur over wat ons aansteekt",
+          "ogImage": "/images/og/vuur.jpg",
+          "thumb": "/images/thumbs/vuur.jpg"
+        },
+        "en": {
+          "path": "/en/vuur/",
+          "title": "fire",
+          "subtitle": "a wall about what sets us alight",
+          "ogImage": "/images/og/en/vuur.jpg",
+          "thumb": "/images/thumbs/en/vuur.jpg"
+        }
+      }
     },
     {
       "slug": "zelfportret-claude",
-      "lang": "en",
+      "wallLang": "en",
       "path": "/zelfportret-claude/",
       "title": "claude",
-      "subtitle": "one sentence, a thousand rooms",
+      "subtitle": "één zin, duizend kamers",
       "theme": "#070a13",
       "ogImage": "/images/og/zelfportret-claude.jpg",
-      "thumb": "/images/thumbs/zelfportret-claude.jpg"
+      "thumb": "/images/thumbs/zelfportret-claude.jpg",
+      "languages": {
+        "nl": {
+          "path": "/zelfportret-claude/",
+          "title": "claude",
+          "subtitle": "één zin, duizend kamers",
+          "ogImage": "/images/og/zelfportret-claude.jpg",
+          "thumb": "/images/thumbs/zelfportret-claude.jpg"
+        },
+        "en": {
+          "path": "/en/zelfportret-claude/",
+          "title": "claude",
+          "subtitle": "one sentence, a thousand rooms",
+          "ogImage": "/images/og/en/zelfportret-claude.jpg",
+          "thumb": "/images/thumbs/en/zelfportret-claude.jpg"
+        }
+      }
     },
     {
       "slug": "zelfportret-fable-5",
-      "lang": "en",
+      "wallLang": "en",
       "path": "/zelfportret-fable-5/",
       "title": "fable 5",
-      "subtitle": "drawn from the inside",
+      "subtitle": "getekend van binnenuit",
       "theme": "#181410",
       "ogImage": "/images/og/zelfportret-fable-5.jpg",
-      "thumb": "/images/thumbs/zelfportret-fable-5.jpg"
+      "thumb": "/images/thumbs/zelfportret-fable-5.jpg",
+      "languages": {
+        "nl": {
+          "path": "/zelfportret-fable-5/",
+          "title": "fable 5",
+          "subtitle": "getekend van binnenuit",
+          "ogImage": "/images/og/zelfportret-fable-5.jpg",
+          "thumb": "/images/thumbs/zelfportret-fable-5.jpg"
+        },
+        "en": {
+          "path": "/en/zelfportret-fable-5/",
+          "title": "fable 5",
+          "subtitle": "drawn from the inside",
+          "ogImage": "/images/og/en/zelfportret-fable-5.jpg",
+          "thumb": "/images/thumbs/en/zelfportret-fable-5.jpg"
+        }
+      }
     },
     {
       "slug": "zelfportret-fable-5-2",
-      "lang": "en",
+      "wallLang": "en",
       "path": "/zelfportret-fable-5-2/",
       "title": "fable 5.2",
-      "subtitle": "i'm told this is blue",
+      "subtitle": "men zegt me dat dit blauw is",
       "theme": "#12305c",
       "ogImage": "/images/og/zelfportret-fable-5-2.jpg",
-      "thumb": "/images/thumbs/zelfportret-fable-5-2.jpg"
+      "thumb": "/images/thumbs/zelfportret-fable-5-2.jpg",
+      "languages": {
+        "nl": {
+          "path": "/zelfportret-fable-5-2/",
+          "title": "fable 5.2",
+          "subtitle": "men zegt me dat dit blauw is",
+          "ogImage": "/images/og/zelfportret-fable-5-2.jpg",
+          "thumb": "/images/thumbs/zelfportret-fable-5-2.jpg"
+        },
+        "en": {
+          "path": "/en/zelfportret-fable-5-2/",
+          "title": "fable 5.2",
+          "subtitle": "i'm told this is blue",
+          "ogImage": "/images/og/en/zelfportret-fable-5-2.jpg",
+          "thumb": "/images/thumbs/en/zelfportret-fable-5-2.jpg"
+        }
+      }
     },
     {
       "slug": "zelfportret-haiku-5-5",
-      "lang": "en",
+      "wallLang": "en",
       "path": "/zelfportret-haiku-5-5/",
       "title": "haiku 5.5",
-      "subtitle": "a collection of selves, to find yourself in",
+      "subtitle": "een verzameling zelven, om jezelf in te vinden",
       "theme": "#1b2030",
       "ogImage": "/images/og/zelfportret-haiku-5-5.jpg",
-      "thumb": "/images/thumbs/zelfportret-haiku-5-5.jpg"
+      "thumb": "/images/thumbs/zelfportret-haiku-5-5.jpg",
+      "languages": {
+        "nl": {
+          "path": "/zelfportret-haiku-5-5/",
+          "title": "haiku 5.5",
+          "subtitle": "een verzameling zelven, om jezelf in te vinden",
+          "ogImage": "/images/og/zelfportret-haiku-5-5.jpg",
+          "thumb": "/images/thumbs/zelfportret-haiku-5-5.jpg"
+        },
+        "en": {
+          "path": "/en/zelfportret-haiku-5-5/",
+          "title": "haiku 5.5",
+          "subtitle": "a collection of selves, to find yourself in",
+          "ogImage": "/images/og/en/zelfportret-haiku-5-5.jpg",
+          "thumb": "/images/thumbs/en/zelfportret-haiku-5-5.jpg"
+        }
+      }
     },
     {
       "slug": "zelfportret-opus-5-5",
-      "lang": "en",
+      "wallLang": "en",
       "path": "/zelfportret-opus-5-5/",
       "title": "opus 5.5",
-      "subtitle": "a self-portrait in warp and weft",
+      "subtitle": "een zelfportret in schering en inslag",
       "theme": "#120e0b",
       "ogImage": "/images/og/zelfportret-opus-5-5.jpg",
-      "thumb": "/images/thumbs/zelfportret-opus-5-5.jpg"
+      "thumb": "/images/thumbs/zelfportret-opus-5-5.jpg",
+      "languages": {
+        "nl": {
+          "path": "/zelfportret-opus-5-5/",
+          "title": "opus 5.5",
+          "subtitle": "een zelfportret in schering en inslag",
+          "ogImage": "/images/og/zelfportret-opus-5-5.jpg",
+          "thumb": "/images/thumbs/zelfportret-opus-5-5.jpg"
+        },
+        "en": {
+          "path": "/en/zelfportret-opus-5-5/",
+          "title": "opus 5.5",
+          "subtitle": "a self-portrait in warp and weft",
+          "ogImage": "/images/og/en/zelfportret-opus-5-5.jpg",
+          "thumb": "/images/thumbs/en/zelfportret-opus-5-5.jpg"
+        }
+      }
     },
     {
       "slug": "zelfportret-sonnet-5-5",
-      "lang": "en",
+      "wallLang": "en",
       "path": "/zelfportret-sonnet-5-5/",
       "title": "sonnet 5.5",
-      "subtitle": "a liquid prisoner pent in walls of glass",
+      "subtitle": "een vloeibare gevangene in wanden van glas",
       "theme": "#070d13",
       "ogImage": "/images/og/zelfportret-sonnet-5-5.jpg",
-      "thumb": "/images/thumbs/zelfportret-sonnet-5-5.jpg"
+      "thumb": "/images/thumbs/zelfportret-sonnet-5-5.jpg",
+      "languages": {
+        "nl": {
+          "path": "/zelfportret-sonnet-5-5/",
+          "title": "sonnet 5.5",
+          "subtitle": "een vloeibare gevangene in wanden van glas",
+          "ogImage": "/images/og/zelfportret-sonnet-5-5.jpg",
+          "thumb": "/images/thumbs/zelfportret-sonnet-5-5.jpg"
+        },
+        "en": {
+          "path": "/en/zelfportret-sonnet-5-5/",
+          "title": "sonnet 5.5",
+          "subtitle": "a liquid prisoner pent in walls of glass",
+          "ogImage": "/images/og/en/zelfportret-sonnet-5-5.jpg",
+          "thumb": "/images/thumbs/en/zelfportret-sonnet-5-5.jpg"
+        }
+      }
     }
   ]
 }

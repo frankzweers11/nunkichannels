@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-wand-lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,6 +7,9 @@
 <!-- nunki:social -->
 <meta name="description" content="Velden: een elektromagnetisch universum in een muur. Zonnestormen, noorderlicht, de vogel die het noorden voelt en het veld rond je eigen hart.">
 <link rel="canonical" href="https://nunkichannels.nl/velden/">
+<link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/velden/">
+<link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/velden/">
+<link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/velden/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -15,6 +18,7 @@
 <meta property="og:description" content="Velden: een elektromagnetisch universum in een muur. Zonnestormen, noorderlicht, de vogel die het noorden voelt en het veld rond je eigen hart.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="nl_NL">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:url" content="https://nunkichannels.nl/velden/">
 <meta property="og:image" content="https://nunkichannels.nl/images/og/velden.jpg">
 <meta property="og:image:width" content="1200">
@@ -43,7 +47,7 @@
 </head>
 <body>
 <!-- nunki:mark -->
-<script>(function(){var D=document.documentElement,q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();</script>
+<script>(function(){var D=document.documentElement,P="nl",A={"nl": "/velden/", "en": "/en/velden/"},K='nunki:lang',q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}if(q!=='nl'&&q!=='en')q=null;try{l=localStorage.getItem(K)}catch(e){}l=q||P||(l==='en'?'en':'nl');if(q||P)try{localStorage.setItem(K,l)}catch(e){}window.NUNKI_LANG=l;D.setAttribute('data-lang',l);function href(v){var u=new URL(location.href),c=P&&A&&A[P],p=u.pathname.replace(/index\.html$/,'');u.searchParams.delete('lang');if(!c||!A[v]||(u.protocol==='file:'&&p.slice(-c.length)!==c)){u.searchParams.set('lang',v);return u.href}u.pathname=u.protocol==='file:'?p.slice(0,p.length-c.length)+A[v]+'index.html':A[v];return u.href}window.NUNKI_HREF=href;window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';if(v===l)return;var u=href(v);try{localStorage.setItem(K,v)}catch(e){}try{sessionStorage.setItem('nunki:ry',JSON.stringify({p:new URL(u).pathname,f:scrollY/Math.max(1,D.scrollHeight)}))}catch(e){}location.href=u};var r=null;try{r=JSON.parse(sessionStorage.getItem('nunki:ry'));sessionStorage.removeItem('nunki:ry')}catch(e){}if(r&&r.p===location.pathname){window.NUNKI_RELOADED=true;if(r.f>0){var mv=0,go=function(){if(!mv)scrollTo(0,r.f*D.scrollHeight)},st=function(){mv=1};addEventListener('load',function(){go();[120,400,900,1600].forEach(function(t){setTimeout(go,t)});setTimeout(function(){addEventListener('wheel',st,{passive:true,once:true});addEventListener('touchstart',st,{passive:true,once:true});addEventListener('keydown',st,{once:true})},0)})}}})();</script>
 <style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}
 .nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
   height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
@@ -72,7 +76,7 @@
   background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
   font:400 1.06rem/1 "Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif;
-  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
+  text-decoration:none;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;transition:background-color .3s ease}
 .nunki-lng span{display:block;transform:translateY(1px);opacity:.34;transition:opacity .3s ease}
 .nunki-lng i{display:block;width:3px;height:3px;margin:2px 7px 0;border-radius:2px;background:currentColor;opacity:.3}
 html:not([data-lang="en"]) .nunki-lng .l-nl,html[data-lang="en"] .nunki-lng .l-en{opacity:1}
@@ -94,8 +98,8 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
 @media (max-width:600px){.nunki-bar{gap:6px}.nunki-lng{padding:0 11px}.nunki-lng i{margin:2px 5px 0}.nunki-bar .nunki-pill{padding:0 11px!important;font-size:1rem!important}}
 @media (prefers-reduced-motion:reduce){.nunki-lng,.nunki-lng span{transition:none}}
 @media print{.nunki-bar{display:none}}
-</style><div class="nunki-bar"><button class="nunki-lng" type="button"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></button></div>
-<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng');function lab(){var en=window.NUNKI_LANG==='en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english'}lab();addEventListener('nunki:lang',lab);k.addEventListener('click',function(e){e.stopPropagation();window.NUNKI_SETLANG(window.NUNKI_LANG==='en'?'nl':'en')});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script>
+</style><div class="nunki-bar"><a class="nunki-lng" href="/en/velden/" hreflang="en"><span class="l-nl" lang="nl">nl</span><i aria-hidden="true"></i><span class="l-en" lang="en">en</span></a></div>
+<script>(function(){var m=document.querySelector('.nunki-mark');if(!m)return;var y=scrollY;addEventListener('scroll',function(){var s=scrollY;if(s>140&&s>y+3)m.classList.add('nm-min');else if(s<y-3||s<=140)m.classList.remove('nm-min');y=s},{passive:true})})();(function(){var b=document.querySelector('.nunki-bar');if(!b)return;var k=b.querySelector('.nunki-lng'),en=window.NUNKI_LANG==='en',o=en?'nl':'en';k.setAttribute('aria-label',en?'language: english. switch to dutch':'taal: nederlands. wissel naar engels');k.title=en?'nederlands':'english';try{k.href=window.NUNKI_HREF(o)}catch(e){}k.addEventListener('click',function(e){e.stopPropagation();if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;e.preventDefault();window.NUNKI_SETLANG(o)});['pointerdown','mousedown','touchstart'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation()},{passive:true})});window.NUNKI_BAR=function(el){if(el&&el.parentNode!==b)b.insertBefore(el,k)};function dock(){[].forEach.call(document.querySelectorAll('[data-nunki-bar]'),window.NUNKI_BAR)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock);else dock()})();</script>
 <!-- /nunki:mark -->
 <!-- nunki:taal -->
 <script>window.NUNKI_TAAL={"lang":"nl","tr":{"velden":"fields","elektromagnetisch universum":"an electromagnetic universe","ook jij bent een veld":"you are a field too","(houd ingedrukt en teken)":"(press and draw)","radio":"radio","microgolf":"microwave","infrarood":"infrared","licht":"light","uv":"uv","röntgen":"x-ray","gamma":"gamma","dit zien wij":"this is what we see","licht is een veld dat golft":"light is a field that waves","ook tussen de sterren zijn er elektrische stromen":"electric currents run between the stars too","aan de rand gaan de sterren even hard als binnenin (vera rubin, 1970)":"at the edge the stars move as fast as near the centre (vera rubin, 1970)","een zonnestorm is een veld dat losbreekt":"a solar storm is a field breaking loose","tik op de zon":"tap the sun","de aarde maakt er noorderlicht van":"the earth turns it into northern lights","door magnetische stromen weet de vogel waar het noorden is":"magnetic currents tell the bird where north is","waar komt die gedachte vandaan?":"where does that thought come from?","hoe groot is het veld rondom je hart?":"how large is the field around your heart?","vormt het dna een antenne?":"does dna form an antenna?","ook jij staat midden in een zee van golven":"you too stand in a sea of waves","mensen voegen kunstmatige velden toe aan het milieu":"people add artificial fields to the world","tik in de lucht en zoek een zender":"tap the air and find a station","en de bij vindt de bloem op de golven":"and the bee finds the flower on the waves","velden - elektromagnetisch universum - 2026":"fields - an electromagnetic universe - 2026","(mijn echte handtekening)":"(my real signature)","de aarde polde zo voor het laatst om":"the last time the earth's poles flipped","zo'n 780.000 jaar geleden":"some 780,000 years ago","het echte noorden":"true north","golven zo lang als een huis, of een land":"waves as long as a house, or a country","zo lang als een vinger":"as long as a finger","de warmte die je op je huid voelt":"the warmth you feel on your skin","380 tot 750 miljoenste millimeter":"380 to 750 millionths of a millimetre","kort genoeg om je huid te verbranden":"short enough to burn your skin","gaat dwars door je heen":"goes straight through you","uit de kern van atomen":"from the heart of atoms","licht, veertig octaven lager:":"light, forty octaves lower:","net geen octaaf, van rood tot violet":"just short of an octave, red to violet","een zonnestorm, onderweg naar de aarde":"a solar storm, on its way to the earth","(in het echt doet hij er een tot drie dagen over)":"(in real life it takes one to three days)","de storm van daarnet is aangekomen":"the storm from before has arrived","zo klinkt het noorderlicht op een radio:":"this is the northern lights on a radio:","fluiters, en een ochtendkoor":"whistlers, and a dawn chorus","delta · slaap":"delta · sleep","theta · dromen":"theta · dreams","alfa · rust":"alpha · rest","beta · denken":"beta · thinking","te meten tot een paar centimeter buiten je borst,":"measurable a few centimetres outside your chest,","met heel gevoelige meters. verder weg":"with very sensitive meters. further out","verdwijnt het tussen alle andere velden":"it vanishes among all the other fields","een vraag die openstaat:":"an open question:","dat dna als antenne werkt, is niet aangetoond":"that dna works as an antenna has not been shown","jullie velden bewegen nu samen":"your fields are moving together now","een roep in morse":"a call in morse","het tijdsein: elke seconde een tik, de 59e blijft stil":"the time signal: a tick every second, the 59th stays silent","een bloem is licht negatief geladen, een bij positief:":"a flower is slightly negative, a bee positive:","zij voelt het verschil, en weet of er nog nectar is":"she feels the difference, and knows if there is nectar left","alle zes geluiden van het veld gevonden":"all six sounds of the field found","de vela-pulsar draait 11 keer per seconde rond":"the vela pulsar spins 11 times a second","zo klinkt hij in een radiotelescoop":"this is how it sounds in a radio telescope","het kompas van een vogel zit waarschijnlijk in zijn oog:":"a bird's compass probably sits in its eye:","licht maakt daar een stofje gevoelig voor het veld":"light makes a molecule there sensitive to the field","pulsar":"pulsar","zonnestorm":"solar storm","hartslag":"heartbeat","fluiter":"whistler","morse":"morse","tijdsein":"time signal","ruis":"noise"},"re":[["^geluiden van het veld gevonden: (\\d+) van 6$","sounds of the field found: $1 of 6"]]};</script>
@@ -106,14 +110,13 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
    De getekende tekst van een wand in de gekozen taal. De wand haalt elke zin
    die hij gaat tekenen door window.NUNKI_T(zin): is de gekozen taal (nunki:lang)
    gelijk aan die van de wand, dan komt de zin ongewijzigd terug, anders de
-   vertaling. Een wand tekent zijn tekst één keer, dus bij een taalwissel laadt
-   de pagina opnieuw en springt terug naar dezelfde plek (tenzij live: true;
-   dan regelt de wand het zelf via het event 'nunki:lang').
+   vertaling. Elke taal heeft een eigen adres (/hart/, /en/hart/): de taalwissel
+   rechtsboven gaat naar het andere adres, op dezelfde plek (dat regelt het
+   taalscript in het mark-blok, zie lang_js in build.py).
 
    Gegevens (window.NUNKI_TAAL):
    { lang: 'nl', tr: { 'zin': 'sentence', ... },
-     re: [ ['^(\\d+) jaar$', '$1 years'], ... ],   // voor zinnen met een getal
-     live: false }
+     re: [ ['^(\\d+) jaar$', '$1 years'], ... ] }   // voor zinnen met een getal
    ?trmiss in het adres: window.NUNKI_TMISS houdt bij welke zinnen nog geen
    vertaling hebben (om te testen). */
 (function () {
@@ -137,31 +140,6 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
   window.NUNKI_TMISS = miss;
   window.NUNKI_TWALL = W;
 
-  // the wall drew its words once: a new language means drawing it again, from the same place
-  var KEY = 'nunki:ry';
-  addEventListener('nunki:lang', function () {
-    if (D.live) return;
-    var h = Math.max(1, document.documentElement.scrollHeight);
-    try { sessionStorage.setItem(KEY, JSON.stringify({ p: location.pathname, f: scrollY / h })); } catch (e) {}
-    location.reload();
-  });
-  var r = null;
-  try { r = JSON.parse(sessionStorage.getItem(KEY)); sessionStorage.removeItem(KEY); } catch (e) {}
-  // the visitor was already inside: a wall with a gate can skip it
-  if (r && r.p === location.pathname) window.NUNKI_RELOADED = true;
-  if (r && r.p === location.pathname && r.f > 0) {
-    var moved = false, go = function () { if (!moved) scrollTo(0, r.f * document.documentElement.scrollHeight); };
-    var stop = function () { moved = true; };
-    addEventListener('load', function () {
-      go();
-      [120, 400, 900, 1600].forEach(function (t) { setTimeout(go, t); });
-      setTimeout(function () {
-        addEventListener('wheel', stop, { passive: true, once: true });
-        addEventListener('touchstart', stop, { passive: true, once: true });
-        addEventListener('keydown', stop, { once: true });
-      }, 0);
-    });
-  }
 })();
 </script>
 <!-- /nunki:taal -->
@@ -409,7 +387,7 @@ html:not([data-lang="en"]) .nunki-lng:hover .l-nl,html[data-lang="en"] .nunki-ln
 </script>
 <!-- /nunki:touch -->
 <!-- nunki:seo -->
-<div style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0"><h1>velden</h1><p>Velden is een elektromagnetisch universum in een muur: stromen tussen de sterren, een zonnestorm die losbreekt, noorderlicht, de vogel die het noorden voelt, de bij die de bloem vindt en het veld rond je eigen hart. Ook jij staat midden in een zee van golven.</p></div>
+<div style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0" lang="nl"><h1>velden</h1><p>Velden is een elektromagnetisch universum in een muur: stromen tussen de sterren, een zonnestorm die losbreekt, noorderlicht, de vogel die het noorden voelt, de bij die de bloem vindt en het veld rond je eigen hart. Ook jij staat midden in een zee van golven.</p></div>
 <!-- /nunki:seo -->
 <div id="wall"></div>
 <canvas id="trail"></canvas>
@@ -2620,8 +2598,8 @@ requestAnimationFrame(tick);
    bewerken, wel hier.
 
    De leeslaag: de zinnen van het vel dat je ziet, in gewone, leesbare letters.
-   - Taal kies je één keer voor de hele site: 'nunki:lang' (nl standaard, en),
-     met de knop rechtsboven (nunki:mark) of ?lang=en / ?lang=nl.
+   - De taal is die van het adres (/hart/ nl, /en/hart/ en; window.NUNKI_LANG uit
+     het mark-blok); de knop rechtsboven gaat naar het andere adres. ?lang= gaat voor.
    - Alleen op een telefoon (smal scherm): daar is de getekende tekst te klein.
      Op grotere schermen vertaalt de wand zijn eigen tekst (nunki:taal).
      Inklappen kan; dat wordt onthouden ('nunki:lees').
@@ -2629,7 +2607,6 @@ requestAnimationFrame(tick);
      de hoogte in wandeenheden (1600 breed) op py pixels van de bovenkant van
      het scherm. Zonder die functie wordt hij berekend voor een wand die de
      volle breedte vult: (scrollY + py) / (breedte / 1600).
-   - Een wand kan op taalwissel reageren via het event 'nunki:lang'.
 
    Gegevens (window.NUNKI_LEES):
    { lang: 'nl', end: 13200, sheets: [ { y: 0, t: {nl:'één', en:'one'},
@@ -2737,9 +2714,6 @@ requestAnimationFrame(tick);
     box.classList.toggle('gone', !on);
     document.documentElement.dataset.lang = lang;
   }
-  function setLang(v) { lang = v === 'en' ? 'en' : 'nl'; N.lang = lang; head(); update(); }
-  // the language changes with the switch top right
-  addEventListener('nunki:lang', function (e) { if (e.detail && e.detail !== lang) setLang(e.detail); });
   bX.addEventListener('click', function () { min = !min; store('nunki:lees', min ? 'min' : 'open'); head(); });
 
   function start() {
