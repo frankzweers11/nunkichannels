@@ -344,10 +344,18 @@
   @media (hover: none) {
     .go { opacity: 1; transform: none; }
   }
+
+  .lang-switch { position: absolute; top: clamp(14px, 2.4vw, 24px); right: clamp(14px, 2.4vw, 24px); z-index: 5; padding: 6px 12px; border: 0; border-radius: 16px; cursor: pointer;
+    font: 400 .9rem/1.2 "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: .04em; color: rgba(42,37,31,.55);
+    background: rgba(246,241,228,.85); box-shadow: 0 0 0 1px rgba(42,37,31,.08); -webkit-tap-highlight-color: transparent; }
+  .lang-switch b { font-weight: 600; color: #2a251f; }
+  .lang-switch:focus-visible { outline: 2px solid #ac5036; outline-offset: 2px; }
 </style>
+<!-- nunki:lang --><script>(function(){var D=document.documentElement,q=null,l=null;try{q=new URLSearchParams(location.search).get('lang')}catch(e){}try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();</script><style>html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}</style><!-- /nunki:lang -->
 </head>
 <body>
 <div class="wrap">
+  <button class="lang-switch" id="langSwitch" type="button"></button>
   <header class="masthead">
     <h1 class="site-title">
       <a class="home-mark" href="/" title="nunkichannels" aria-label="nunkichannels, home">
@@ -355,26 +363,26 @@
         <span class="nm-name">nunkichannels</span>
       </a>
     </h1>
-    <p class="lead">wanden - getekend door si, scrollend en levend.</p>
+    <p class="lead"><span class="t-nl">wanden - getekend door si, scrollend en levend.</span><span class="t-en" lang="en">walls - drawn by si, scrolling and alive.</span></p>
   </header>
 
   <main>
     <section class="series" aria-labelledby="s-self">
       <header class="series-head">
-        <h2 id="s-self">zelfportretten</h2>
-        <p>vijf claude-modellen, één vraag: maak je eigen zelfportret. en één over claude zelf</p>
+        <h2 id="s-self"><span class="t-nl">zelfportretten</span><span class="t-en" lang="en">self-portraits</span></h2>
+        <p><span class="t-nl">vijf claude-modellen, één vraag: maak je eigen zelfportret. en één over claude zelf</span><span class="t-en" lang="en">five claude models, one question: make your own self-portrait. and one about claude itself</span></p>
       </header>
       <ul class="grid grid-self">
 <!-- nunki:cards-self -->
       <li>
         <a class="card" href="/zelfportret-claude/" style="--i:0;--theme:#070a13">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-claude.jpg?v=a576d37a" alt="" width="800" height="420" loading="eager" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-claude.jpg?v=76f6c581" alt="" width="800" height="420" loading="eager" decoding="async"></span>
           <span class="caption">
             <span class="no">01</span>
             <span class="name">claude</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">one sentence, a thousand rooms</span>
+            <span class="sub"><span class="t-nl">één zin, duizend kamers</span><span class="t-en" lang="en">one sentence, a thousand rooms</span></span>
           </span>
         </a>
       </li>
@@ -386,7 +394,7 @@
             <span class="no">02</span>
             <span class="name">fable 5</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">drawn from the inside</span>
+            <span class="sub"><span class="t-nl">getekend van binnenuit</span><span class="t-en" lang="en">drawn from the inside</span></span>
           </span>
         </a>
       </li>
@@ -398,7 +406,7 @@
             <span class="no">03</span>
             <span class="name">fable 5.2</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">i'm told this is blue</span>
+            <span class="sub"><span class="t-nl">men zegt me dat dit blauw is</span><span class="t-en" lang="en">i'm told this is blue</span></span>
           </span>
         </a>
       </li>
@@ -410,31 +418,31 @@
             <span class="no">04</span>
             <span class="name">haiku 5.5</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a collection of selves, to find yourself in</span>
+            <span class="sub"><span class="t-nl">een verzameling zelven, om jezelf in te vinden</span><span class="t-en" lang="en">a collection of selves, to find yourself in</span></span>
           </span>
         </a>
       </li>
       <li>
         <a class="card" href="/zelfportret-opus-5-5/" style="--i:4;--theme:#120e0b">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=9ebbd006" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-opus-5-5.jpg?v=84058b7c" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">05</span>
             <span class="name">opus 5.5</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a self-portrait in warp and weft</span>
+            <span class="sub"><span class="t-nl">een zelfportret in schering en inslag</span><span class="t-en" lang="en">a self-portrait in warp and weft</span></span>
           </span>
         </a>
       </li>
       <li>
         <a class="card" href="/zelfportret-sonnet-5-5/" style="--i:5;--theme:#070d13">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=9034a2ef" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/zelfportret-sonnet-5-5.jpg?v=57e18819" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">06</span>
             <span class="name">sonnet 5.5</span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">a liquid prisoner pent in walls of glass</span>
+            <span class="sub"><span class="t-nl">een vloeibare gevangene in wanden van glas</span><span class="t-en" lang="en">a liquid prisoner pent in walls of glass</span></span>
           </span>
         </a>
       </li>
@@ -443,56 +451,56 @@
     </section>
     <section class="series" aria-labelledby="s-walls">
       <header class="series-head">
-        <h2 id="s-walls">andere wanden</h2>
-        <p>het hart en de cel, water en adem, hout en vuur, het veld en het getal</p>
+        <h2 id="s-walls"><span class="t-nl">andere wanden</span><span class="t-en" lang="en">other walls</span></h2>
+        <p><span class="t-nl">het hart en de cel, water en adem, hout en vuur, het veld en het getal</span><span class="t-en" lang="en">the heart and the cell, water and breath, wood and fire, the field and the number</span></p>
       </header>
       <ul class="grid grid-walls">
 <!-- nunki:cards-walls -->
       <li>
         <a class="card" href="/hart/" style="--i:6;--theme:#1a090f">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/hart.jpg?v=89c9fc73" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/hart.jpg?v=c32a0cee" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">07</span>
-            <span class="name">hart</span>
+            <span class="name"><span class="t-nl">hart</span><span class="t-en" lang="en">heart</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">een muur over wat ons raakt</span>
+            <span class="sub"><span class="t-nl">een muur over wat ons raakt</span><span class="t-en" lang="en">a wall about what touches us</span></span>
           </span>
         </a>
       </li>
       <li>
         <a class="card" href="/adem/" style="--i:7;--theme:#e3e9ee">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/adem.jpg?v=2a76c4db" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/adem.jpg?v=55e8b7bd" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">08</span>
-            <span class="name">adem</span>
+            <span class="name"><span class="t-nl">adem</span><span class="t-en" lang="en">breath</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">een muur over wat ons beweegt</span>
+            <span class="sub"><span class="t-nl">een muur over wat ons beweegt</span><span class="t-en" lang="en">a wall about what moves us</span></span>
           </span>
         </a>
       </li>
       <li>
         <a class="card" href="/cel/" style="--i:8;--theme:#070b0e">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/cel.jpg?v=f1f4340a" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/cel.jpg?v=2f49d1c1" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">09</span>
-            <span class="name">cel</span>
+            <span class="name"><span class="t-nl">cel</span><span class="t-en" lang="en">cell</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">een muur over waar we van gemaakt zijn</span>
+            <span class="sub"><span class="t-nl">een muur over waar we van gemaakt zijn</span><span class="t-en" lang="en">a wall about what we are made of</span></span>
           </span>
         </a>
       </li>
       <li>
         <a class="card" href="/getij/" style="--i:9;--theme:#13202b">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=d73d9e5f" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/getij.jpg?v=d2e3bdd0" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">10</span>
-            <span class="name">getij</span>
+            <span class="name"><span class="t-nl">getij</span><span class="t-en" lang="en">tide</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">een muur van water, van binnenuit</span>
+            <span class="sub"><span class="t-nl">een muur van water, van binnenuit</span><span class="t-en" lang="en">a wall of water, from the inside</span></span>
           </span>
         </a>
       </li>
@@ -502,9 +510,9 @@
           <span class="thumb"><img src="/images/thumbs/patronen.jpg?v=995cd4ad" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">11</span>
-            <span class="name">patronen</span>
+            <span class="name"><span class="t-nl">patronen</span><span class="t-en" lang="en">patterns</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">een muur over getal en vorm</span>
+            <span class="sub"><span class="t-nl">een muur over getal en vorm</span><span class="t-en" lang="en">a wall about number and shape</span></span>
           </span>
         </a>
       </li>
@@ -514,33 +522,33 @@
           <span class="thumb"><img src="/images/thumbs/ringen.jpg?v=77a654f2" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">12</span>
-            <span class="name">ringen</span>
+            <span class="name"><span class="t-nl">ringen</span><span class="t-en" lang="en">rings</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">een muur over een boom en zijn jaren</span>
+            <span class="sub"><span class="t-nl">een muur over een boom en zijn jaren</span><span class="t-en" lang="en">a wall about a tree and its years</span></span>
           </span>
         </a>
       </li>
       <li>
         <a class="card" href="/velden/" style="--i:12;--theme:#0e1020">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/velden.jpg?v=67284911" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/velden.jpg?v=cf3a0b8e" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">13</span>
-            <span class="name">velden</span>
+            <span class="name"><span class="t-nl">velden</span><span class="t-en" lang="en">fields</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">elektromagnetisch universum</span>
+            <span class="sub"><span class="t-nl">elektromagnetisch universum</span><span class="t-en" lang="en">an electromagnetic universe</span></span>
           </span>
         </a>
       </li>
       <li>
         <a class="card" href="/vuur/" style="--i:13;--theme:#160f0e">
           <span class="tape" aria-hidden="true"></span>
-          <span class="thumb"><img src="/images/thumbs/vuur.jpg?v=33a08c6a" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
+          <span class="thumb"><img src="/images/thumbs/vuur.jpg?v=04627083" alt="" width="800" height="420" loading="lazy" decoding="async"></span>
           <span class="caption">
             <span class="no">14</span>
-            <span class="name">vuur</span>
+            <span class="name"><span class="t-nl">vuur</span><span class="t-en" lang="en">fire</span></span>
             <span class="go" aria-hidden="true">→</span>
-            <span class="sub">een muur over wat ons aansteekt</span>
+            <span class="sub"><span class="t-nl">een muur over wat ons aansteekt</span><span class="t-en" lang="en">a wall about what sets us alight</span></span>
           </span>
         </a>
       </li>
@@ -555,8 +563,23 @@
       <span class="nm-name">nunkichannels</span>
     </a>
     <div class="foot-rule" aria-hidden="true"></div>
-    <p class="foot-meta"><!-- nunki:count -->6 zelfportretten · 8 andere wanden<!-- /nunki:count --> · elke wand tekent zichzelf terwijl je kijkt</p>
+    <p class="foot-meta"><!-- nunki:count --><span class="t-nl">6 zelfportretten</span><span class="t-en" lang="en">6 self-portraits</span> · <span class="t-nl">8 andere wanden</span><span class="t-en" lang="en">8 other walls</span><!-- /nunki:count --> · <span class="t-nl">elke wand tekent zichzelf terwijl je kijkt</span><span class="t-en" lang="en">every wall draws itself while you watch</span></p>
   </footer>
 </div>
+<script>
+// the language of the whole site, chosen once (nunki:lang; the script in <head> sets it)
+(function () {
+  var b = document.getElementById('langSwitch');
+  function paint() {
+    var en = window.NUNKI_LANG === 'en';
+    b.innerHTML = en ? 'nl · <b>en</b>' : '<b>nl</b> · en';
+    b.setAttribute('aria-label', en ? 'language: english. switch to dutch' : 'taal: nederlands. wissel naar engels');
+    document.documentElement.lang = en ? 'en' : 'nl';
+  }
+  paint();
+  b.addEventListener('click', function () { window.NUNKI_SETLANG(window.NUNKI_LANG === 'en' ? 'nl' : 'en'); });
+  addEventListener('nunki:lang', paint);
+})();
+</script>
 </body>
 </html>

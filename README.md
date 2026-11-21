@@ -18,6 +18,7 @@ scripts/
   touch.js           geluid, vinger-als-hand, kantelen/schudden en trillen op telefoon en iPad; build.py zet het inline in elke wand
   lees.js            de leeslaag: zinnen per vel in NL/EN onderin beeld, taalkeuze nl · en; build.py zet het inline in elke wand met een tekstbestand
   lees/<slug>.json   die zinnen, per vel
+  i18n.json          site-teksten in NL en EN: navigatie, homepage-kaarten, label linksboven
   deploy.sh          build + rsync naar de VPS
   descriptions.json, seo.json, shots.json   beschrijvingen, SEO-teksten, screenshot-posities
 documentatie/        achtergrondmateriaal per wand (cel, film, one-6gmatrix, oude veld-wand)

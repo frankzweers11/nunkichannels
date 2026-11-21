@@ -53,6 +53,46 @@ LEES_START = "<!-- nunki:lees -->"
 LEES_END = "<!-- /nunki:lees -->"
 LEES_JS = Path(__file__).resolve().parent / "lees.js"
 LEES_DIR = Path(__file__).resolve().parent / "lees"
+I18N_JSON = Path(__file__).resolve().parent / "i18n.json"
+I18N = json.loads(I18N_JSON.read_text(encoding="utf-8")) if I18N_JSON.is_file() else {"site": {}, "pages": {}}
+
+# De taal kies je één keer voor de hele site (nunki:lang, nl standaard). Dit script
+# staat vroeg in elke pagina: het zet data-lang op <html>, zodat CSS meteen de goede
+# tekst toont (.t-nl / .t-en), en geeft NUNKI_SETLANG(taal) om te wisselen.
+LANG_JS = (
+    "(function(){var D=document.documentElement,q=null,l=null;"
+    "try{q=new URLSearchParams(location.search).get('lang')}catch(e){}"
+    "try{if(q==='nl'||q==='en')localStorage.setItem('nunki:lang',q);l=localStorage.getItem('nunki:lang')}catch(e){}"
+    "l=(q==='nl'||q==='en')?q:(l==='en'?'en':'nl');"
+    "function put(v){window.NUNKI_LANG=v;D.setAttribute('data-lang',v)}put(l);"
+    "window.NUNKI_SETLANG=function(v){v=v==='en'?'en':'nl';try{localStorage.setItem('nunki:lang',v)}catch(e){}put(v);"
+    "try{dispatchEvent(new CustomEvent('nunki:lang',{detail:v}))}catch(e){}};"
+    "addEventListener('nunki:lang',function(e){if(e.detail&&e.detail!==window.NUNKI_LANG)put(e.detail)})})();"
+)
+LANG_CSS = 'html:not([data-lang="en"]) .t-en{display:none!important}html[data-lang="en"] .t-nl{display:none!important}'
+
+
+def site_t(key: str, lang: str) -> str:
+    return I18N.get("site", {}).get(lang, {}).get(key, "")
+
+
+def both(page: dict) -> dict:
+    """Titel en ondertitel van een wand in beide talen."""
+    out = {}
+    for lang in ("nl", "en"):
+        tr = I18N.get("pages", {}).get(page["slug"], {}).get(lang, {})
+        out[lang] = {
+            "title": tr.get("title") or page["title"],
+            "subtitle": tr.get("subtitle") or page.get("subtitle") or "",
+        }
+    return out
+
+
+def bi(nl: str, en: str) -> str:
+    """Tekst in twee talen voor HTML: twee spans als ze verschillen."""
+    if nl == en:
+        return esc(nl)
+    return f'<span class="t-nl">{esc(nl)}</span><span class="t-en" lang="en">{esc(en)}</span>'
 
 # De wanden staan in twee series: de zelfportretten van de modellen, en de andere wanden.
 SERIES = [
@@ -74,6 +114,10 @@ def series_of(pages: list[dict]) -> list[tuple[str, str, list[dict]]]:
         )
         out.append((key, label, items))
     return out
+
+
+def series_label(key: str, lang: str) -> str:
+    return site_t(key, lang) or dict((k, l) for k, l, _t in SERIES)[key]
 
 
 def load_site() -> dict:
@@ -369,6 +413,8 @@ def clean_for_shot(html: str) -> str:
     html = re.sub(
         re.escape(LEES_START) + r".*?" + re.escape(LEES_END), "", html, flags=re.DOTALL
     )
+    # the language still has to be known (?lang= in the shot's address), so that script stays
+    html = re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + f"<script>{LANG_JS}</script>", html, count=1, flags=re.IGNORECASE)
     return strip_julius(html)
 
 
@@ -393,10 +439,10 @@ def scroll_injection(html: str, y: int) -> str:
     return html.replace("</body>", inj + "</body>", 1)
 
 
-def capture_page(slug: str, html: str, y: int = 0) -> Image.Image | None:
-    """Screenshot (1200x630) van de wand op scrollpositie y, na het intekenen. Gecachet op inhoud."""
+def capture_page(slug: str, html: str, y: int = 0, lang: str = "nl") -> Image.Image | None:
+    """Screenshot (1200x630) van de wand op scrollpositie y, na het intekenen, in de eigen taal van de wand. Gecachet op inhoud."""
     clean = clean_for_shot(html)
-    key = hashlib.sha1(f"{SHOT_VERSION}|{y}|{clean}".encode("utf-8")).hexdigest()[:12]
+    key = hashlib.sha1(f"{SHOT_VERSION}|{y}|{lang}|{clean}".encode("utf-8")).hexdigest()[:12]
     cached = CACHE_DIR / f"{slug}-{key}.png"
     if cached.is_file():
         return Image.open(cached).convert("RGB")
@@ -421,7 +467,7 @@ def capture_page(slug: str, html: str, y: int = 0) -> Image.Image | None:
                     f"--window-size={W},{H}",
                     "--virtual-time-budget=20000",
                     f"--screenshot={out}",
-                    src.as_uri() + "?fast",
+                    src.as_uri() + "?fast&lang=" + lang,
                 ],
                 capture_output=True,
                 timeout=120,
@@ -538,6 +584,11 @@ NAV_CSS = """
   font-family:"Bradley Hand","Segoe Print","Chalkboard SE","Noteworthy","Avenir Next","Helvetica Neue",Helvetica,sans-serif}
 .nunki-sub{display:block;margin-top:.2rem;color:var(--muted);font-size:.8rem;line-height:1.35}
 .nunki-home{position:relative;margin:clamp(1.8rem,4vw,2.4rem) 0 0;text-align:center;line-height:1}
+.nunki-lang{display:block;margin:14px auto 0;padding:4px 10px;border:0;border-radius:12px;background:none;cursor:pointer;
+  font:400 .86rem/1.2 "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.04em;color:var(--muted);-webkit-tap-highlight-color:transparent}
+.nunki-lang b{font-weight:600;color:var(--ink)}
+.nunki-lang:focus-visible{outline:2px solid var(--clay);outline-offset:1px}
+__LANGCSS__
 .nunki-home-mark{display:inline-flex;align-items:center;height:40px;padding:0 16px 0 8px;box-sizing:border-box;border-radius:20px;
   color:var(--ink);text-decoration:none;background:rgba(246,241,228,.97);
   box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
@@ -578,6 +629,16 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     if (text) e.textContent = text;
     return e;
   }
+  // text in both languages: two spans, css shows the chosen one (html[data-lang])
+  function bi(tag, cls, t) {
+    if (typeof t === 'string' || t.nl === t.en) return el(tag, cls, typeof t === 'string' ? t : t.nl);
+    var e = el(tag, cls);
+    var a = el('span', 't-nl', t.nl), b = el('span', 't-en', t.en);
+    b.lang = 'en';
+    e.appendChild(a); e.appendChild(b);
+    return e;
+  }
+  function T(k) { return { nl: (DATA.t.nl || {})[k] || '', en: (DATA.t.en || {})[k] || '' }; }
   function card(p) {
     var li = el('li');
     var a = el('a', 'nunki-card');
@@ -595,8 +656,8 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     th.appendChild(img);
     a.appendChild(th);
     var cap = el('span', 'nunki-cap');
-    cap.appendChild(el('span', 'nunki-name', p.title));
-    if (p.subtitle) cap.appendChild(el('span', 'nunki-sub', p.subtitle));
+    cap.appendChild(bi('span', 'nunki-name', p.title));
+    if (p.subtitle && p.subtitle.nl) cap.appendChild(bi('span', 'nunki-sub', p.subtitle));
     a.appendChild(cap);
     li.appendChild(a);
     return li;
@@ -606,15 +667,15 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     var here = location.pathname.replace(/index\.html$/, '');
     if (here.slice(-1) !== '/') here += '/';
     var nav = el('nav', 'nunki-nav');
-    nav.setAttribute('aria-label', 'Andere wanden');
+    nav.setAttribute('aria-label', T('nav')[window.NUNKI_LANG === 'en' ? 'en' : 'nl']);
     var sheet = el('div', 'nunki-sheet');
-    sheet.appendChild(el('p', 'nunki-kicker', 'nog meer wanden'));
+    sheet.appendChild(bi('p', 'nunki-kicker', T('more')));
     var any = false;
     DATA.series.forEach(function (g) {
       var others = g.pages.filter(function (p) { return p.path !== here; });
       if (!others.length) return;
       any = true;
-      sheet.appendChild(el('p', 'nunki-group', g.label));
+      sheet.appendChild(bi('p', 'nunki-group', g.label));
       var n = others.length;
       var ul = el('ul', 'nunki-grid nunki-' + g.key + (n >= 4 && n <= 6 ? ' nunki-n-' + n : ''));
       others.forEach(function (p) { ul.appendChild(card(p)); });
@@ -629,6 +690,23 @@ NAV_JS = r"""/* nunki:nav, gegenereerd door scripts/build.py. Niet met de hand a
     a.innerHTML = LOGO + '<span class="nm-name"></span>';
     a.querySelector('.nm-name').textContent = DATA.name;
     home.appendChild(a);
+    // the language of the whole site, chosen once
+    var sw = el('button', 'nunki-lang');
+    sw.type = 'button';
+    var paint = function () {
+      var en = window.NUNKI_LANG === 'en';
+      sw.innerHTML = en ? 'nl · <b>en</b>' : '<b>nl</b> · en';
+      sw.setAttribute('aria-label', T('lang')[en ? 'en' : 'nl']);
+      nav.setAttribute('aria-label', T('nav')[en ? 'en' : 'nl']);
+    };
+    paint();
+    sw.addEventListener('click', function () {
+      var v = window.NUNKI_LANG === 'en' ? 'nl' : 'en';
+      if (window.NUNKI_SETLANG) window.NUNKI_SETLANG(v);
+      else { try { localStorage.setItem('nunki:lang', v); } catch (e) {} location.reload(); }
+    });
+    addEventListener('nunki:lang', paint);
+    home.appendChild(sw);
     sheet.appendChild(home);
     nav.appendChild(sheet);
     document.body.appendChild(nav);
@@ -648,12 +726,12 @@ def write_nav_assets(pages: list[dict], site: dict) -> None:
     series = [
         {
             "key": key,
-            "label": label,
+            "label": {"nl": series_label(key, "nl"), "en": series_label(key, "en")},
             "pages": [
                 {
                     "path": p["path"],
-                    "title": p["title"],
-                    "subtitle": p.get("subtitle") or "",
+                    "title": {"nl": both(p)["nl"]["title"], "en": both(p)["en"]["title"]},
+                    "subtitle": {"nl": both(p)["nl"]["subtitle"], "en": both(p)["en"]["subtitle"]},
                     "theme": p["theme"],
                     "thumb": p["thumb"],
                     "v": p["ogVersion"],
@@ -663,19 +741,19 @@ def write_nav_assets(pages: list[dict], site: dict) -> None:
         }
         for key, label, items in series_of(pages)
     ]
-    data = {"name": site["name"], "series": series}
+    data = {"name": site["name"], "series": series, "t": I18N.get("site", {})}
     js = NAV_JS.replace("__DATA__", json.dumps(data, ensure_ascii=False)).replace(
         "__LOGO__", json.dumps(LOGO_SVG)
     )
     write_public(HTTPDOCS / "nav.js", js)
-    write_public(HTTPDOCS / "nav.css", NAV_CSS.replace("__TORN__", torn_edge()).strip() + "\n")
+    write_public(HTTPDOCS / "nav.css", NAV_CSS.replace("__TORN__", torn_edge()).replace("__LANGCSS__", LANG_CSS).strip() + "\n")
 
 
 def nav_block() -> str:
     return f'{NAV_START}<script src="/nav.js" defer></script>{NAV_END}'
 
 
-MARK_CSS = """
+MARK_CSS = LANG_CSS + """
 .nunki-mark{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);left:clamp(10px,1.5vw,22px);display:flex;align-items:center;
   height:34px;padding:0 14px 0 6px;box-sizing:border-box;border-radius:17px;color:#2a251f;text-decoration:none;
   background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
@@ -706,10 +784,11 @@ MARK_JS = (
 def mark_block(page: dict) -> str:
     """Het vaste label linksboven: het logo en de naam van de wand, en een weg naar huis."""
     name = esc(page["title"])
+    b = both(page)
     return (
-        f"{MARK_START}\n<style>{MARK_CSS}</style>\n"
+        f"{MARK_START}\n<script>{LANG_JS}</script>\n<style>{MARK_CSS}</style>\n"
         f'<a class="nunki-mark" href="/" title="alle wanden" aria-label="{name}, op nunkichannels. naar alle wanden">'
-        f'{LOGO_SVG}<span class="nm-name">{name}</span></a>\n'
+        f'{LOGO_SVG}<span class="nm-name">{bi(b["nl"]["title"], b["en"]["title"])}</span></a>\n'
         f"<script>{MARK_JS}</script>\n{MARK_END}"
     )
 
@@ -995,7 +1074,8 @@ def render_cards(pages: list[dict], start: int = 0) -> str:
     items = []
     for k, p in enumerate(pages):
         i = start + k
-        sub = f'<span class="sub">{esc(p["subtitle"])}</span>' if p.get("subtitle") else ""
+        b = both(p)
+        sub = f'<span class="sub">{bi(b["nl"]["subtitle"], b["en"]["subtitle"])}</span>' if p.get("subtitle") else ""
         items.append(
             f'''      <li>
         <a class="card" href="{esc(p["path"])}" style="--i:{i};--theme:{esc(p["theme"])}">
@@ -1003,7 +1083,7 @@ def render_cards(pages: list[dict], start: int = 0) -> str:
           <span class="thumb"><img src="{esc(p["thumb"])}?v={p["ogVersion"]}" alt="" width="800" height="420" loading="{"eager" if i < 4 else "lazy"}" decoding="async"></span>
           <span class="caption">
             <span class="no">{i + 1:02d}</span>
-            <span class="name">{esc(p["title"])}</span>
+            <span class="name">{bi(b["nl"]["title"], b["en"]["title"])}</span>
             <span class="go" aria-hidden="true">→</span>
             {sub}
           </span>
@@ -1025,7 +1105,7 @@ def main() -> None:
         html = html_path.read_text(encoding="utf-8")
         page = parse_page(slug, html)
         og_path = OG_DIR / f"{slug}.jpg"
-        shot = capture_page(slug, html, positions.get(slug, 0))
+        shot = capture_page(slug, html, positions.get(slug, 0), page.get("lang", "nl"))
         if shot is not None:
             shots[slug] = shot
         generate_og(page, site, shot, og_path)
@@ -1080,8 +1160,9 @@ def main() -> None:
         for key, label, items in series_of(pages):
             html = replace_block(html, f"cards-{key}", render_cards(items, start))
             start += len(items)
-            counts.append(f"{len(items)} {label}")
+            counts.append(bi(f"{len(items)} {series_label(key, 'nl')}", f"{len(items)} {series_label(key, 'en')}"))
         html = replace_block(html, "count", " · ".join(counts))
+        html = replace_block(html, "lang", f"<script>{LANG_JS}</script><style>{LANG_CSS}</style>")
         write_public(
             index_path,
             inject_social(html, social_block(home, site, is_home=True)),

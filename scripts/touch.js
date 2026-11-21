@@ -17,6 +17,8 @@
           naar 'nunki:shake'. */
 (function () {
   'use strict';
+  // the words, in the language chosen for the site (set by the mark block, nunki:lang)
+  var W = function (nl, en) { return window.NUNKI_LANG === 'en' ? en : nl; };
   var C = window.NUNKI_CFG || {};
   var N = window.NUNKI = { tilt: { x: 0, y: 0, on: false }, heading: null, muted: false, ctx: [], hand: false, buzz: buzz, motion: motionOn };
   var coarse = matchMedia('(pointer:coarse)').matches || (navigator.maxTouchPoints > 0 && 'ontouchstart' in window);
@@ -86,7 +88,7 @@
     btn = document.createElement('button');
     btn.className = 'nunki-snd';
     btn.type = 'button';
-    btn.setAttribute('aria-label', 'geluid aan of uit');
+    btn.setAttribute('aria-label', W('geluid aan of uit', 'sound on or off'));
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       '<path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" fill-opacity=".12"/>' +
       '<g class="w"><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18 6.8a7.4 7.4 0 0 1 0 10.4"/></g>' +
@@ -107,7 +109,7 @@
       } else {
         if (typeof window.audio === 'function') { try { window.audio(); } catch (x) {} }
         N.ctx.forEach(function (c) { c._nunkiResume(); });
-        if (!N.ctx.length) say('tik op de wand, dan klinkt hij', 3500);
+        if (!N.ctx.length) say(W('tik op de wand, dan klinkt hij', 'tap the wall, and it sounds'), 3500);
       }
       buzz(8);
       motionOn();
@@ -124,8 +126,8 @@
   var seen = +(store('nunki:touchtip') || 0);
   if (seen < 2 && btn) {
     store('nunki:touchtip', String(seen + 1));
-    setTimeout(function () { if (!playing()) say('tik voor geluid', 3800); }, 2200);
-    if (C.hand && C.hand !== 'off') setTimeout(function () { say('houd je vinger even stil en beweeg: dan voelt de wand je hand', 5200); }, 6800);
+    setTimeout(function () { if (!playing()) say(W('tik voor geluid', 'tap for sound'), 3800); }, 2200);
+    if (C.hand && C.hand !== 'off') setTimeout(function () { say(W('houd je vinger even stil en beweeg: dan voelt de wand je hand', 'hold your finger still for a moment, then move: the wall feels your hand'), 5200); }, 6800);
   }
 
   // ---- 3. a finger that is held still becomes the hand ----

@@ -1,0 +1,37 @@
+{
+  "_comment": "Tweetalige teksten van de site zelf (homepage, navigatie, label linksboven). Per wand de titel en ondertitel in de andere taal dan die van de wand; de eigen taal komt uit de <title> van de wand.",
+  "site": {
+    "nl": {
+      "more": "nog meer wanden",
+      "nav": "Andere wanden",
+      "home": "alle wanden",
+      "self": "zelfportretten",
+      "walls": "andere wanden",
+      "lang": "taal: nederlands. wissel naar engels"
+    },
+    "en": {
+      "more": "more walls",
+      "nav": "Other walls",
+      "home": "all walls",
+      "self": "self-portraits",
+      "walls": "other walls",
+      "lang": "language: english. switch to dutch"
+    }
+  },
+  "pages": {
+    "adem": {"en": {"title": "breath", "subtitle": "a wall about what moves us"}},
+    "cel": {"en": {"title": "cell", "subtitle": "a wall about what we are made of"}},
+    "getij": {"en": {"title": "tide", "subtitle": "a wall of water, from the inside"}},
+    "hart": {"en": {"title": "heart", "subtitle": "a wall about what touches us"}},
+    "patronen": {"en": {"title": "patterns", "subtitle": "a wall about number and shape"}},
+    "ringen": {"en": {"title": "rings", "subtitle": "a wall about a tree and its years"}},
+    "velden": {"en": {"title": "fields", "subtitle": "an electromagnetic universe"}},
+    "vuur": {"en": {"title": "fire", "subtitle": "a wall about what sets us alight"}},
+    "zelfportret-claude": {"nl": {"subtitle": "één zin, duizend kamers"}},
+    "zelfportret-fable-5": {"nl": {"subtitle": "getekend van binnenuit"}},
+    "zelfportret-fable-5-2": {"nl": {"subtitle": "men zegt me dat dit blauw is"}},
+    "zelfportret-haiku-5-5": {"nl": {"subtitle": "een verzameling zelven, om jezelf in te vinden"}},
+    "zelfportret-opus-5-5": {"nl": {"subtitle": "een zelfportret in schering en inslag"}},
+    "zelfportret-sonnet-5-5": {"nl": {"subtitle": "een vloeibare gevangene in wanden van glas"}}
+  }
+}
