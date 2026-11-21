@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <!-- nunki:social -->
-<meta name="description" content="Een muur over getal en vorm: gulden snede, Fibonacci, sneeuwvlokken en regelmatige lichamen, met een caleidoscoop onder je aanwijzer en klinkende patronen.">
+<meta name="description" content="Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.">
 <link rel="canonical" href="https://nunkichannels.nl/patronen/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:site_name" content="nunkichannels">
 <meta property="og:title" content="patronen">
-<meta property="og:description" content="Een muur over getal en vorm: gulden snede, Fibonacci, sneeuwvlokken en regelmatige lichamen, met een caleidoscoop onder je aanwijzer en klinkende patronen.">
+<meta property="og:description" content="Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="nl_NL">
 <meta property="og:url" content="https://nunkichannels.nl/patronen/">
@@ -22,10 +22,10 @@
 <meta property="og:image:alt" content="patronen — een muur over getal en vorm">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="patronen">
-<meta name="twitter:description" content="Een muur over getal en vorm: gulden snede, Fibonacci, sneeuwvlokken en regelmatige lichamen, met een caleidoscoop onder je aanwijzer en klinkende patronen.">
+<meta name="twitter:description" content="Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.">
 <meta name="twitter:image" content="https://nunkichannels.nl/images/og/patronen.jpg">
 <meta name="twitter:image:alt" content="patronen — een muur over getal en vorm">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "patronen", "headline": "patronen · een muur over getal en vorm", "description": "Een muur over getal en vorm: gulden snede, Fibonacci, sneeuwvlokken en regelmatige lichamen, met een caleidoscoop onder je aanwijzer en klinkende patronen.", "url": "https://nunkichannels.nl/patronen/", "image": "https://nunkichannels.nl/images/og/patronen.jpg", "inLanguage": "nl", "isPartOf": {"@type": "WebSite", "name": "nunkichannels", "url": "https://nunkichannels.nl/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "patronen", "headline": "patronen · een muur over getal en vorm", "description": "Een muur over getal en vorm, van één punt tot tien. Elk getal heeft zijn eigen boventoon: snijd een appel, laat Venus dansen, verzamel de tien tonen.", "url": "https://nunkichannels.nl/patronen/", "image": "https://nunkichannels.nl/images/og/patronen.jpg", "inLanguage": "nl", "isPartOf": {"@type": "WebSite", "name": "nunkichannels", "url": "https://nunkichannels.nl/"}}</script>
 <!-- /nunki:social -->
 <title>patronen · een muur over getal en vorm</title>
 <style>
@@ -39,6 +39,23 @@
   #wall canvas.live.on{opacity:1}
   #trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
   #hud{position:fixed;right:8px;bottom:8px;z-index:70;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.6);color:#eee;font:11px/1.3 ui-monospace,Menlo,monospace;white-space:pre}
+  /* the ten overtones you have heard, as pebbles: tap it and they sound together */
+  #tet{position:fixed;z-index:60;top:clamp(10px,1.7vh,18px);right:clamp(10px,1.5vw,22px);width:46px;height:42px;padding:0;border:0;border-radius:21px;cursor:pointer;
+    background:rgba(246,241,228,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(42,37,31,.07),0 8px 20px -12px rgba(0,0,0,.55);
+    opacity:0;transform:translateY(-6px);transition:opacity .8s ease,transform .8s ease,box-shadow .4s ease;-webkit-tap-highlight-color:transparent}
+  #tet.show{opacity:1;transform:none}
+  #tet[hidden]{display:none}
+  #tet svg{display:block;width:30px;height:27px;margin:6px auto 0}
+  #tet circle{fill:none;stroke:rgba(42,37,31,.32);stroke-width:1.2;transition:fill .6s ease,stroke .6s ease}
+  #tet circle.on{fill:#d6a64a;stroke:#9a6e2a}
+  #tet circle{transform-box:fill-box;transform-origin:center}
+  #tet circle.new{animation:tetnew 1.6s ease}
+  #tet.all{box-shadow:0 0 0 2px #d6b26c,0 0 22px -2px rgba(240,200,110,.8)}
+  #tet:focus-visible{outline:none;box-shadow:0 0 0 2px #ac5036}
+  @keyframes tetnew{0%{fill:#fff6d8;stroke:#d6a64a;transform:scale(1.7)}100%{transform:scale(1)}}
+  @media (prefers-reduced-motion:reduce){#tet,#tet circle{transition:none}#tet circle.new{animation:none}}
+  @media print{#tet{display:none}}
 </style>
 </head>
 <body>
@@ -308,10 +325,11 @@
 </script>
 <!-- /nunki:touch -->
 <!-- nunki:seo -->
-<div style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0"><h1>patronen</h1><p>Patronen is een muur over getal en vorm: de cirkel en het vierkant, de gulden snede en Fibonacci, de rozet die Venus in acht jaar tekent, sneeuwvlokken, de vijf regelmatige lichamen en een snaar die halveert en hoger zingt. De muur werkt als een caleidoscoop onder je aanwijzer en laat patronen klinken als Chladni-figuren.</p></div>
+<div style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0"><h1>patronen</h1><p>Patronen is een muur over getal en vorm, van één punt tot tien: de cirkel en het vierkant, de gulden snede en Fibonacci, de rozet die Venus in acht jaar tekent, sneeuwvlokken, de vijf regelmatige lichamen en een snaar die halveert en hoger zingt. Elk getal heeft een eigen boventoon van één lage snaar. Je snijdt een appel open en vindt de ster, draait aan de hoek van een zonnebloem, laat Venus en de aarde dansen, laat sneeuwvlokken groeien en verzamelt onderweg de tien tonen die op het laatste vel samen klinken.</p></div>
 <!-- /nunki:seo -->
 <div id="wall"></div>
 <canvas id="trail"></canvas>
+<button id="tet" type="button" hidden aria-label="de boventonen die je hoorde"><svg viewBox="0 0 40 36" aria-hidden="true"></svg></button>
 <script>
 'use strict';
 // ---------------------------------------------------------------------------
@@ -328,8 +346,15 @@
 // move, your line is repeated in the symmetry of the figure you are near.
 // the engine (tiles, queued strokes, torn paper, pencil lettering) follows
 // the technique of the fable wall that inspired it, like ringen, getij and velden.
+// and every number has a tone. the wall is tuned to one low string, F0, and
+// its overtones: the second vibrates twice as fast, the third three times, and
+// so on to ten. each sheet has one living part, and what you do there sounds
+// its number; the pebbles top right remember which ones you heard, and at ten
+// they sound together. under it all a soft drone holds the overtones of the
+// sheet you are on, and grows richer the further down you are.
 // ?fast draws at full speed (the build's stills), ?still draws everything at
 // once without any animation (for checking renders), ?hud shows frame timing.
+// localStorage 'nunki:patronen' keeps the overtones you heard.
 // ---------------------------------------------------------------------------
 const TAU = Math.PI*2;
 const qs = new URLSearchParams(location.search);
@@ -404,7 +429,8 @@ let COMP=null; // when set (e.g. 'lighter'), every mark queued meanwhile is draw
 function emit(y0,y1,fn){
   if(COMP){const f0=fn,cm=COMP;fn=c=>{c.save();c.globalCompositeOperation=cm;f0(c);c.restore()}}
   if(DIRECT){
-    DIRECT.cx.setTransform(S,0,0,S,0,-DIRECT.y0*S);
+    const ds=DIRECT.sc||S;
+    DIRECT.cx.setTransform(ds,0,0,ds,-(DIRECT.x0||0)*ds,-DIRECT.y0*ds);
     if(GEN_DY){DIRECT.cx.save();DIRECT.cx.translate(0,GEN_DY);fn(DIRECT.cx);DIRECT.cx.restore()}
     else fn(DIRECT.cx);
     return;
@@ -874,8 +900,10 @@ addEventListener('resize',()=>{CSSK=innerWidth/LW;sizeTrail()});
 const LIVE=[];
 // a pause in the drawing of one sheet, so a construction can be watched
 function pause(ms,y=600){if(DIRECT)return;const i=clamp(Math.floor((y+GEN_DY)/TILEH),0,NT-1);TILES[i].q.push({pause:ms})}
+// with local:true a frame draws in the sheet's own coordinates (0..1200 down),
+// and L.ly is the top of the glass on its sheet
 function live(x,y,w,h,o){
-  const L={x,y:y+GEN_DY,w,h,...o,cv:null,cx:null,on:false};
+  const L={x,y:y+GEN_DY,ly:y,w,h,dy:GEN_DY,...o,cv:null,cx:null,on:false};
   LIVE.push(L);
   return L;
 }
@@ -888,7 +916,7 @@ function makeLive(L){
   cv.style.zIndex=2;
   wallEl.appendChild(cv);
   const cx=cv.getContext('2d');
-  cx.setTransform(sc,0,0,sc,-L.x*sc,-L.y*sc);
+  cx.setTransform(sc,0,0,sc,-L.x*sc,-(L.local?L.ly:L.y)*sc);
   cx.lineCap='round';cx.lineJoin='round';
   L.cv=cv;L.cx=cx;L.sc=sc;L.on=true;
   if(L.init)L.init(cx,L);
@@ -900,8 +928,9 @@ function liveReady(L){
 }
 let HUD=null,hudN=0,hudT=0,hudBusy=0,hudMax=0;
 if(qs.has('hud')){HUD=document.createElement('div');HUD.id='hud';document.body.appendChild(HUD)}
+let lastNow=0;
 function tick(now){
-  const tb=performance.now();
+  const tb=performance.now(),dt=Math.min(.1,(now-(lastNow||now))/1000);lastNow=now;
   const sy=scrollY/CSSK, vh=innerHeight/CSSK;
   for(const T of TILES) if(!T.active && T.y0 < sy+vh*1.8) T.active=true;
   const budget=(FAST||RM)?200:7;
@@ -933,6 +962,7 @@ function tick(now){
     if(L.frame&&(!RM||!L.drawn)&&L.y+L.h>sy-60&&L.y<sy+vh+60){L.frame(L.cx,now,L);L.drawn=true}
   }
   drawTrail(now);
+  runDrone(dt);
   if(HUD){
     const busy=performance.now()-tb;hudBusy+=busy;hudMax=Math.max(hudMax,busy);hudN++;
     if(now-hudT>1000){HUD.textContent=`${(hudN*1000/(now-hudT)).toFixed(0)} fps\n${(hudBusy/hudN).toFixed(1)} ms busy\n${hudMax.toFixed(1)} ms max`;hudN=0;hudBusy=0;hudMax=0;hudT=now}
@@ -1417,27 +1447,218 @@ function solidWire(R,k,cx,cy,s,yaw,pitch,o={}){
 }
 
 // ---------------- sound ----------------
-// only ever after a tap or a click, and quiet
-let AC=null;
+// only ever after a tap or a click, and quiet. the whole wall is tuned to one
+// low string, F0 (a low c), and its overtones: F0 × 2, × 3, × 4 ... every
+// number on the wall has its own, and the sheets you are on hum theirs.
+const F0=65.406;
+let AC=null,MASTER=null,NB=null,DRONE=null;
 function audio(){
-  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}
-  if(AC&&AC.state==='suspended')AC.resume();
+  if(!AC){
+    try{
+      AC=new (window.AudioContext||window.webkitAudioContext)();
+      MASTER=AC.createGain();MASTER.gain.value=.85;
+      // a soft limiter, so a chord of ten never cracks a speaker
+      const comp=AC.createDynamicsCompressor();comp.threshold.value=-16;comp.knee.value=12;comp.ratio.value=5;comp.attack.value=.003;comp.release.value=.3;
+      MASTER.connect(comp);comp.connect(AC.destination);
+      const len=AC.sampleRate*3,bf=AC.createBuffer(1,len,AC.sampleRate),d=bf.getChannelData(0);
+      let b0=0,b1=0,b2=0;
+      for(let i=0;i<len;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0526;d[i]=(b0+b1+b2+w*.1848)*.12}
+      NB=bf;
+      makeDrone();
+    }catch(e){AC=null}
+  }
+  if(AC&&AC.state==='suspended'&&!document.hidden)AC.resume();
   return AC;
 }
+// a page you cannot see makes no sound
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
+const RA=Math.random;
+const now_=()=>AC.currentTime+.01;
+const live_=()=>AC&&AC.state==='running';
+// a short breath of noise through a filter
+function nz(t,dur,type,f0,f1,q,vol,att=.005,out=MASTER){
+  const n=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
+  n.buffer=NB;f.type=type;f.Q.value=q;f.frequency.setValueAtTime(f0,t);if(f1!==f0)f.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0004,t+dur);
+  n.connect(f);f.connect(g);g.connect(out);n.start(t,RA()*2.5);n.stop(t+dur+.03);
+}
+// one voice: a pitch that glides from f0 to f1, a quick rise and a long fall
+function vo(t,type,f0,f1,dur,vol,att=.005,out=MASTER,glide=1,vib=0){
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type;
+  o.frequency.setValueAtTime(f0,t);if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t+dur*glide);
+  if(vib){const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=vib[0];lg.gain.value=vib[1];l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(t+dur+.05)}
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(.0003,t+dur);
+  o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.05);
+  return o;
+}
 function tone(f,t0,dur,vol,type='triangle'){
-  const ac=audio();if(!ac)return;
-  const t=ac.currentTime+t0,o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
+  if(!audio())return;
+  const t=now_()+t0,o=AC.createOscillator(),g=AC.createGain(),lp=AC.createBiquadFilter();
   o.type=type;o.frequency.value=f;lp.type='lowpass';lp.frequency.value=2600;
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0006,t+dur);
-  o.connect(lp);lp.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.05);
+  o.connect(lp);lp.connect(g);g.connect(MASTER);o.start(t);o.stop(t+dur+.05);
 }
 function pluck(f,t0=0,vol=.11){tone(f,t0,2.8,vol,'triangle');tone(f*2,t0,1.5,vol*.22,'sine');tone(f*3,t0,.9,vol*.1,'sine')}
-// places on the wall that answer a tap
+// a struck bell: the tone and two of the odd partials a bell has
+function bell(f,t,vol,dur=2.6){vo(t,'sine',f,f,dur,vol,.004);vo(t,'sine',f*2.76,f*2.76,dur*.32,vol*.16,.002);vo(t,'sine',f*5.4,f*5.4,dur*.14,vol*.06,.002)}
+// a knock on wood
+function knock(t,vol,f=170){nz(t,.07,'bandpass',f*6,f*4,3,vol*.8,.002);vo(t,'sine',f,f*.7,.12,vol,.002)}
+// overtone n of the low string: the tone of a number
+function harm(n,t,vol=.06,dur=3.4){
+  const f=F0*n;
+  vo(t,n<3?'triangle':'sine',f,f,dur,vol*(n<3?1.3:1),.02);
+  vo(t,'sine',f*2,f*2,dur*.4,vol*.12,.01);
+}
+
+// the drone: under the whole wall the low string sounds, and with it the
+// overtones of the sheet in view. what you have heard sounds clearer.
+// the sheets that are not a number have the overtones of their own story:
+// fibonacci holds 1 2 3 5 8 13, venus 1 5 8 13, the solids 1 4 6 8 12.
+const SHEETN=[1,2,3,4,5,0,0,6,0,7,8,9,10];
+const upto=n=>Array.from({length:n},(_,i)=>i+1);
+const DRONE_SET=[upto(1),upto(2),upto(3),upto(4),upto(5),[1,2,3,5,8,13],[1,5,8,13],upto(6),[1,4,6,8,12],upto(7),upto(8),upto(9),upto(10)];
+function makeDrone(){
+  const g=AC.createGain(),lp=AC.createBiquadFilter();g.gain.value=0;
+  lp.type='lowpass';lp.frequency.value=1500;lp.Q.value=.4;g.connect(lp);lp.connect(MASTER);
+  DRONE={g,p:[],v:0};
+  for(let n=1;n<=13;n++){
+    const o=AC.createOscillator(),pg=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();
+    o.type=n===1?'triangle':'sine';o.frequency.value=F0*n;pg.gain.value=0;
+    // each overtone breathes at its own slow pace
+    l.frequency.value=.035+.1*((n*.618)%1);lg.gain.value=0;l.connect(lg);lg.connect(pg.gain);
+    o.connect(pg);pg.connect(g);o.start();l.start();
+    DRONE.p.push({pg,lg});
+  }
+}
+function droneW(s,n){
+  if(!DRONE_SET[s].includes(n))return 0;
+  const k=n===1||HEARD.has(n)||!SHEETN[s]?1:.38;
+  return k*.0105/Math.pow(n,.55);
+}
+function runDrone(dt){
+  if(!DRONE||!live_())return;
+  const c=(scrollY+innerHeight/2)/CSSK/PH-.5,i0=clamp(Math.floor(c),0,NP-1),i1=clamp(i0+1,0,NP-1),u=sm(c-i0);
+  const t=AC.currentTime;
+  // the drone rises when sound first comes, and is gone below the wall
+  const bottom=clamp(1-((scrollY+innerHeight/2)/CSSK-TOTALH+200)/400,0,1);
+  DRONE.v+=(bottom-DRONE.v)*Math.min(1,dt*.8);
+  DRONE.g.gain.setTargetAtTime(RM?DRONE.v*.6:DRONE.v,t,.3);
+  for(let n=1;n<=13;n++){
+    const w=droneW(i0,n)*(1-u)+droneW(i1,n)*u,P=DRONE.p[n-1];
+    P.pg.gain.setTargetAtTime(w,t,.8);P.lg.gain.setTargetAtTime(w*.55,t,.8);
+  }
+}
+
+// ---------------- what the wall remembers ----------------
+const MEM=(()=>{try{return JSON.parse(localStorage.getItem('nunki:patronen'))||{}}catch(e){return{}}})();
+function memSave(){if(FAST||STILL)return;try{localStorage.setItem('nunki:patronen',JSON.stringify(MEM))}catch(e){}}
+MEM.heard=Array.isArray(MEM.heard)?MEM.heard.filter(n=>n>=1&&n<=10):[];
+const BACK={visits:MEM.visits||0,heard:MEM.heard.length};
+if(!FAST&&!STILL){MEM.visits=(MEM.visits||0)+1;memSave()}
+const HEARD=new Set(MEM.heard);
+const NAMES=['','één','twee','drie','vier','vijf','zes','zeven','acht','negen','tien'];
+
+// the pebbles top right: one for every overtone, lit once you heard it
+const TET=document.getElementById('tet');
+const TETP=[[20,5],[14.5,14],[25.5,14],[9,23],[20,23],[31,23],[3.5,32],[14.5,32],[25.5,32],[36.5,32]];
+TET.querySelector('svg').innerHTML=TETP.map(([x,y],i)=>`<circle cx="${x}" cy="${y-1.5}" r="3.4" data-n="${i+1}"/>`).join('');
+function tetUpdate(fresh){
+  if(FAST||STILL)return;
+  const cs=TET.querySelectorAll('circle');
+  cs.forEach(c=>{const n=+c.dataset.n;c.classList.toggle('on',HEARD.has(n));if(n===fresh){c.classList.remove('new');void c.getBBox();c.classList.add('new')}});
+  TET.classList.toggle('all',HEARD.size>=10);
+  TET.title=HEARD.size>=10?'alle tien boventonen · tik, en ze klinken samen':`boventonen: ${HEARD.size} van de tien · tik, en ze klinken samen`;
+  if(HEARD.size&&TET.hidden){TET.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>TET.classList.add('show')))}
+}
+tetUpdate(0);
+// the overtones you heard, one after another and then together
+function chord(list,t,vol=.045,gap=.16){
+  list.forEach((n,i)=>harm(n,t+i*gap,vol*1.3,1.6));
+  const te=t+list.length*gap+.1;
+  list.forEach(n=>harm(n,te,vol/Math.sqrt(list.length)*1.6,4.5));
+  return te;
+}
+TET.addEventListener('click',e=>{
+  e.stopPropagation();
+  if(!audio()||!HEARD.size)return;
+  chord([...HEARD].sort((a,b)=>a-b),now_());
+});
+// a number was made to sound: light its pebble, and let its overtone ring
+function heard(n,play=true,vol=.055){
+  if(play&&audio())harm(n,now_()+.05,vol);
+  if(!HEARD.has(n)){HEARD.add(n);MEM.heard=[...HEARD].sort((a,b)=>a-b);memSave();tetUpdate(n)}
+}
+
+// ---------------- the visitor's hand ----------------
+// where the hand is, in wall coordinates; t is when it last moved
+const PTR={x:-1e4,y:-1e4,t:-1e9,tap:-1e9,in:false};
+// is the hand on this live glass, or was it tapped there a moment ago? then where, in sheet coordinates
+function hand(L,now,ms=2600){
+  if(!(PTR.in&&now-PTR.t<ms)&&now-PTR.tap>4000)return null;
+  const x=PTR.x,y=PTR.y-L.dy;
+  if(x<L.x||x>L.x+L.w||y<L.ly||y>L.ly+L.h)return null;
+  return[x,y];
+}
+// how far a thing that started at t0 has come, over dur ms (at once, for reduced motion)
+const prog=(now,t0,dur)=>RM?1:clamp((now-t0)/dur,0,1);
+// places on the wall that answer a tap. later ones lie on top of earlier ones;
+// a quiet one covers a whole sheet without turning the pointer into a hand
 const HITS=[];
-function hit(x0,y0,x1,y1,fn){HITS.push({x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,fn})}
-const hitAt=(x,y)=>HITS.find(h=>x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1);
-addEventListener('click',e=>{const x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK,h=hitAt(x,y);if(h)h.fn(x,y)});
-addEventListener('pointermove',e=>{const h=hitAt(e.clientX/CSSK,(e.clientY+scrollY)/CSSK);document.body.style.cursor=h?'pointer':''},{passive:true});
+function hit(x0,y0,x1,y1,fn,quiet=false){const h={x0,y0:y0+GEN_DY,x1,y1:y1+GEN_DY,dy:GEN_DY,fn,quiet};HITS.push(h);return h}
+const hitAt=(x,y)=>{for(let i=HITS.length-1;i>=0;i--){const h=HITS[i];if(x>=h.x0&&x<=h.x1&&y>=h.y0&&y<=h.y1)return h}return null};
+let curHand=false;
+addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch')return;
+  const x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK;
+  PTR.x=x;PTR.y=y;PTR.t=performance.now();PTR.in=true;
+  const h=hitAt(x,y),hd=!!(h&&!h.quiet);
+  if(hd!==curHand){curHand=hd;document.body.style.cursor=hd?'pointer':''}
+},{passive:true});
+document.addEventListener('mouseout',e=>{if(!e.relatedTarget)PTR.in=false});
+addEventListener('click',e=>{
+  if(e.target&&e.target.closest&&e.target.closest('a,nav,button'))return;
+  const x=e.clientX/CSSK,y=(e.clientY+scrollY)/CSSK,t=performance.now();
+  if(y>TOTALH)return;
+  audio();
+  // a finger has no hover: the tap is where the hand is, for a while
+  if(e.isTrusted===false||!PTR.in){PTR.x=x;PTR.y=y;PTR.t=t}
+  PTR.tap=t;
+  const h=hitAt(x,y);if(h)h.fn(x,y-h.dy,t);
+});
+
+// ---------------- live writing ----------------
+// a hand-drawn thing on its own small canvas, to be laid down on a live glass
+function sprite(w,h,fn,seed=1,sc=S){
+  const cv=document.createElement('canvas');
+  cv.width=Math.max(1,Math.ceil(w*sc));cv.height=Math.max(1,Math.ceil(h*sc));
+  const cx=cv.getContext('2d');cx.lineCap='round';cx.lineJoin='round';
+  const pD=DIRECT,pG=GEN_DY,pC=COMP;DIRECT={cx,y0:0,x0:0,sc};GEN_DY=0;COMP=null;
+  try{fn(stream(seed))}finally{DIRECT=pD;GEN_DY=pG;COMP=pC}
+  cv.w=w;cv.h=h;return cv;
+}
+// a line of pencil writing as a sprite; the same words are written only once
+const TXT=new Map();
+function textSpr(t,sz,col=INK,a=.85){
+  const k=t+'|'+sz+'|'+col+'|'+a;
+  let s=TXT.get(k);
+  if(!s){let h=7;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;
+    const w=measure(t,sz)+sz*.8;
+    s=sprite(w,sz*1.9,R=>write(R,t,sz*.4,sz*1.3,sz,{col,a}),h,Math.max(S,1.5));
+    s.ox=sz*.4;s.oy=sz*1.3;TXT.set(k,s);if(TXT.size>260)TXT.delete(TXT.keys().next().value)}
+  return s;
+}
+// put a line of writing down: x,y is the start of its baseline (or its middle, cen)
+function sayL(c,t,x,y,sz,col,a,alpha=1,cen=false){
+  if(alpha<=0)return;const s=textSpr(t,sz,col,a);
+  c.globalAlpha=alpha;c.drawImage(s,x-s.ox-(cen?(s.w-sz*.8)/2:0),y-s.oy,s.w,s.h);c.globalAlpha=1;
+}
+// a small light, drawn once and laid down many times
+function glowSpr(col,core=[255,250,236]){const g=document.createElement('canvas');g.width=g.height=64;const c=g.getContext('2d');const r=c.createRadialGradient(32,32,0,32,32,32);
+  r.addColorStop(0,rgba(core,1));r.addColorStop(.2,rgba(col,.8));r.addColorStop(.55,rgba(col,.22));r.addColorStop(1,rgba(col,0));c.fillStyle=r;c.fillRect(0,0,64,64);return g}
+const GLINT=glowSpr([255,214,120]),COOL=glowSpr([150,200,255],[240,248,255]),ROSEG=glowSpr([255,170,170],[255,240,236]);
+function glowAt(c,spr,x,y,r,a=1){if(a<=0)return;c.globalAlpha=a;c.drawImage(spr,x-r,y-r,2*r,2*r);c.globalAlpha=1}
+const NUM=n=>{const s=String(n);return s.replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
+const bump=u=>u<0||u>1?0:Math.sin(Math.PI*u);
 
 // ---------------- margin whispers ----------------
 // small figures in the margins, the way a geometer doodles while thinking
@@ -1544,6 +1765,54 @@ P.push(function(){
   note(R,'een punt is wat geen delen heeft · euclides',800,1098,18,CINK,.58);
   sym(cx,cy,12,{r:430,dark:true});
   whispers(R,500,1150,true,3);
+  note(R,'tik op het zwart: een punt wordt een bloem · elk getal heeft een toon',800,1146,15,CINK,.42);
+  // the living part: wherever you tap, a needle goes in, a circle goes round it,
+  // and six more step round that one: the seed of a flower. the seven circles
+  // sound the first seven overtones of the low string, one after another.
+  const FL=[];
+  const P0L=live(0,0,1600,1200,{local:true,dirty:true,
+    frame(c,now,L){
+      if(!FL.length&&!L.dirty)return;
+      c.clearRect(0,0,1600,1200);L.dirty=false;
+      // a word for someone who comes back
+      if(BACK.visits&&!FAST&&!STILL){
+        const k=prog(now,L.t0||(L.t0=now),2500),a=sm(k)*(1-sm(prog(now,L.t0+14000,3000)));
+        const t=BACK.heard?`welkom terug · je hoorde al ${NAMES[BACK.heard]} van de tien tonen`:'welkom terug';
+        sayL(c,t,800,330,17,CINK,.6,a,true);
+        if(a>0)L.dirty=true;
+      }
+      c.lineCap='round';
+      for(let i=FL.length-1;i>=0;i--){
+        const f=FL[i],age=(now-f.t)/1000;
+        if(age>11){FL.splice(i,1);continue}
+        const fade=age<8.5?1:1-(age-8.5)/2.5,r=f.r;
+        glowAt(c,GLINT,f.x,f.y,40,(1-clamp(age/1.4,0,1))*.8*fade);
+        c.globalCompositeOperation='lighter';
+        for(let k=0;k<7;k++){
+          const st=k?.75+(k-1)*.2:.05,p=RM?1:clamp((age-st)/.45,0,1);
+          if(p<=0)continue;
+          const ox=k?f.x+Math.cos(f.a+(k-1)*TAU/6)*r:f.x,oy=k?f.y+Math.sin(f.a+(k-1)*TAU/6)*r:f.y;
+          const a0=k?f.a+(k-1)*TAU/6+Math.PI:f.a;
+          c.strokeStyle=rgba(k?GOLD:GOLDL,(k?.55:.8)*fade);c.lineWidth=k?1.3:1.8;
+          c.beginPath();c.arc(ox,oy,r,a0,a0+TAU*p);c.stroke();
+          c.fillStyle=rgba(GOLDL,.8*fade);c.beginPath();c.arc(ox,oy,1.8,0,TAU);c.fill();
+        }
+        // and, once all seven are round, the circle that holds them
+        const pr=RM?1:clamp((age-2.1)/.6,0,1);
+        if(pr>0){c.strokeStyle=rgba(GOLD,.35*fade);c.lineWidth=1;c.beginPath();c.arc(f.x,f.y,2*r,f.a,f.a+TAU*pr);c.stroke()}
+        c.globalCompositeOperation='source-over';
+      }
+    }});
+  hit(0,0,1600,1200,(x,y,t)=>{
+    if(y<40)return;
+    if(FL.length>=4)FL.shift();
+    FL.push({x,y,t,r:54+RA()*16,a:RA()*TAU});P0L.dirty=true;P0L.drawn=false;
+    if(!audio())return;
+    const t0=now_();
+    nz(t0,.04,'highpass',5000,5000,1,.03,.001);
+    for(let k=1;k<=7;k++)harm(k,t0+(k===1?.05:.85+(k-2)*.2),k===1?.05:.03,k===1?3.6:2.4);
+    heard(1,false);
+  },true);
 });
 
 // a lens: where two circles of the same size overlap, each through the other's centre
@@ -1640,7 +1909,50 @@ P.push(function(){
     note(R,'plus en min',x,y+120,20,INK);
   }
   sentence(R,'twee cirkels, elk door het hart van de ander',1104,INK);
+  note(R,'(beweeg over de twee cirkels: ze klinken samen)',800,1134,14,INK,.48);
   whispers(R,140,1120,false,4);
+  // the living part: your hand pulls the two circles apart or together, and
+  // they sound as two strings. how far apart they are is how far apart the
+  // tones are: on top of each other a unison, each through the other's heart
+  // exactly an octave. anywhere near it the two beat against each other.
+  const VL=live(330,372,940,520,{local:true,d:r,act:-1e9,lt:0,lock:false,snd:null,
+    frame(c,now,L){
+      const dt=Math.min(.1,(now-(L.lt||now))/1000);L.lt=now;
+      let h=hand(L,now,1500);
+      if(h&&(Math.abs(h[0]-800)>370||Math.abs(h[1]-cy)>250))h=null;
+      let tg=r;
+      if(h){tg=clamp(Math.abs(h[0]-800)*2,20,2*r);L.act=now}
+      else if(now-L.act<1500)tg=L.d;
+      L.d+=(tg-L.d)*Math.min(1,dt*(h?9:2.2));
+      if(RM)L.d=tg;
+      const off=Math.abs(L.d-r),rho=1+L.d/r;
+      // the sound: two bowed strings, through a soft filter
+      if(live_()){
+        if(!L.snd&&h){const g=AC.createGain(),lp=AC.createBiquadFilter();g.gain.value=0;lp.type='lowpass';lp.frequency.value=950;lp.Q.value=.6;g.connect(lp);lp.connect(MASTER);
+          const o1=AC.createOscillator(),o2=AC.createOscillator();o1.type=o2.type='sawtooth';o1.frequency.value=F0*2;o2.frequency.value=F0*2*rho;o1.connect(g);o2.connect(g);o1.start();o2.start();L.snd={g,o1,o2}}
+        if(L.snd){const tt=AC.currentTime;L.snd.o2.frequency.setTargetAtTime(F0*2*rho,tt,.03);L.snd.g.gain.setTargetAtTime(h?.022:0,tt,h?.08:.5)}
+      }
+      if(off<4&&h){if(!L.lock){L.lock=true;heard(2,false);if(live_())bell(F0*8,now_(),.03,2)}}
+      else if(off>10)L.lock=false;
+      const busy=h||off>.6;
+      if(!busy&&!L.dirty)return;
+      c.clearRect(L.x,L.ly,L.w,L.h);L.dirty=busy;
+      if(!busy)return;
+      const fade=h?1:clamp(off/40,0,1);
+      const xa=800-L.d/2,xb=800+L.d/2;
+      // the lens between them
+      if(L.d<2*r-1){
+        const th=Math.acos(clamp(L.d/2/r,-1,1));
+        c.fillStyle=rgba(off<4?GOLD:ROSE,(off<4?.28:.14)*fade);
+        c.beginPath();c.arc(xa,cy,r,-th,th);c.arc(xb,cy,r,Math.PI-th,Math.PI+th);c.closePath();c.fill();
+      }
+      c.strokeStyle=rgba(VERM,.7*fade);c.lineWidth=1.7;
+      for(const x of[xa,xb]){c.beginPath();c.arc(x,cy,r,0,TAU);c.stroke();c.fillStyle=rgba(VERM,.85*fade);c.beginPath();c.arc(x,cy,3.2,0,TAU);c.fill()}
+      if(off<4){const hh=r*Math.sqrt(3)/2;glowAt(c,GLINT,800,cy-hh,26,.9);glowAt(c,GLINT,800,cy+hh,26,.9)}
+      // what the two strings are to each other
+      const name=off<4?'1 : 2 · een octaaf':Math.abs(rho-1.5)<.03?'2 : 3 · een kwint':L.d<10?'1 : 1 · één toon':`1 : ${rho.toFixed(2).replace('.',',')}`;
+      sayL(c,name,1012,872,18,off<4?VERM:INK,.85,fade);
+    }});
 });
 
 // P2 · drie: the triangle -----------------------------------------------------
@@ -1715,6 +2027,48 @@ P.push(function(){
   }
   sentence(R,'met drie poten wiebelt niets',1112,CHALK);
   whispers(R,140,1120,true,4);
+  // the living part: next to the stool on three legs, one on four. three points
+  // always lie in one plane, so three legs always stand; of four, one is always
+  // a little too short. lean on it and it rocks, knocking on the floor. tap the
+  // three-legged one: it stands, and sounds the third overtone.
+  note(R,'(tik erop)',1340,516,14,PALE,.5);
+  const SX=1340,SY4=610,FL4=SY4+188;
+  sk(R,[[SX-130,FL4],[SX+136,FL4-3]],{col:PALE,w:1,a:.35,amp:.6,gap:.06});
+  note(R,'vier poten',SX,FL4+46,18,PALE,.72);
+  note(R,'(leun erop, of tik)',SX,FL4+70,14,PALE,.5);
+  const T0=.068;
+  const ST=live(SX-150,SY4-60,300,FL4-SY4+80,{local:true,th:T0,om:0,lt:0,dirty:true,
+    frame(c,now,L){
+      const dt=Math.min(.05,(now-(L.lt||now))/1000);L.lt=now;
+      const h=hand(L,now,700),press=h&&h[1]<SY4+40&&Math.abs(h[0]-SX)<110;
+      // one leg too short: it falls toward the side it leans to, or where you press
+      const acc=press?Math.sign(h[0]-SX||1)*34:(L.th>=0?1:-1)*9;
+      L.om+=acc*dt;L.th+=L.om*dt;
+      for(const s of[1,-1]){
+        if(L.th*s>T0){L.th=T0*s;
+          if(L.om*s>.12){if(live_())knock(now_(),clamp(L.om*s*.05,.012,.07),150+RA()*30);L.dirty=true}
+          L.om=-L.om*.42;if(Math.abs(L.om)<.05)L.om=0}
+      }
+      if(RM){L.th=press?Math.sign(h[0]-SX||1)*T0:L.th;L.om=0}
+      const moving=Math.abs(L.om)>.001||press;
+      if(!moving&&!L.dirty)return;
+      L.dirty=moving;
+      c.clearRect(L.x,L.ly,L.w,L.h);
+      c.save();c.translate(SX,FL4);c.rotate(L.th);c.translate(-SX,-FL4);
+      c.lineCap='round';
+      const rx=92,ry=27,x=SX,y=SY4;
+      for(const [t,back] of[[Math.PI*1.25,true],[Math.PI*1.75,true],[Math.PI*.25,false],[Math.PI*.75,false]]){
+        const px=x+Math.cos(t)*rx*.72,py=y+Math.sin(t)*ry*.72,fx=x+Math.cos(t)*rx*1.06,fy=FL4-(back?12:0)+Math.sin(t)*ry*.4;
+        c.strokeStyle=rgba(back?PALE:CHALK,back?.45:.85);c.lineWidth=back?1.6:2.4;
+        c.beginPath();c.moveTo(px,py);c.lineTo(fx,fy);c.stroke();
+      }
+      c.beginPath();c.ellipse(x,y,rx,ry,0,0,TAU);c.fillStyle=rgba(PALE,.1);c.fill();
+      c.strokeStyle=rgba(CHALK,.9);c.lineWidth=2;c.stroke();
+      c.strokeStyle=rgba(PALE,.5);c.lineWidth=1.2;c.beginPath();c.ellipse(x,y+9,rx,ry,0,0,Math.PI);c.stroke();
+      c.restore();
+    }});
+  hit(SX-120,SY4-50,SX+120,FL4+20,()=>{ST.om=(ST.th>=0?-1:1)*(1.5+RA()*.4);ST.dirty=true;ST.drawn=false});
+  hit(1230,200,1450,470,()=>{if(audio()){knock(now_(),.07,120);knock(now_()+.004,.03,240)}heard(3,true,.06)});
 });
 
 // P3 · vier: the square --------------------------------------------------------
@@ -1826,6 +2180,52 @@ P.push(function(){
   }
   sentence(R,'de hemel is rond, de aarde is vierkant',1112,SEPIA);
   whispers(R,140,1120,false,4);
+  // the living part: a race. tap, and two lights set off from the top at the
+  // same speed, one round the square and one round the red circle. they come
+  // home together: on this drawing 1808 against 1807, in michell's miles 31.680
+  // against 31.667. the square clicks at its corners, the circle hums.
+  note(R,'(tik: een wedren)',800,968,14,SEPIA,.5);
+  const SQ=4*2*Re,CIRC=TAU*Rb,DUR=7600;
+  const sqAt=s=>{s=((s%SQ)+SQ)%SQ;const a=Re,x0=E[0]-a,x1=E[0]+a,y0=E[1]-a,y1=E[1]+a;
+    if(s<a)return[E[0]+s,y0];s-=a;if(s<2*a)return[x1,y0+s];s-=2*a;if(s<2*a)return[x1-s,y1];s-=2*a;if(s<2*a)return[x0,y1-s];s-=2*a;return[x0+s,y0]};
+  const ciAt=s=>{const t=-Math.PI/2+s/Rb;return[E[0]+Math.cos(t)*Rb,E[1]+Math.sin(t)*Rb]};
+  const RC=live(480,380,830,650,{local:true,t0:-1e9,dirty:false,corner:0,
+    frame(c,now,L){
+      const k=(now-L.t0)/DUR,busy=k<1.9;
+      if(!busy&&!L.dirty)return;
+      L.dirty=busy;
+      c.clearRect(L.x,L.ly,L.w,L.h);
+      if(!busy)return;
+      const s=Math.min(k,1)*SQ,fade=k<1.4?1:1-(k-1.4)/.5;
+      c.lineCap='round';
+      // the two trails
+      c.strokeStyle=rgba(SANG,.85*fade);c.lineWidth=3;c.beginPath();
+      for(let u=0;u<=s;u+=8){const p=sqAt(u);u?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])}
+      const ps=sqAt(s);c.lineTo(ps[0],ps[1]);c.stroke();
+      const sc=Math.min(s,CIRC);
+      c.strokeStyle=rgba(OCHRE,.85*fade);c.beginPath();c.arc(E[0],E[1],Rb,-Math.PI/2,-Math.PI/2+sc/Rb);c.stroke();
+      const pc=ciAt(sc);
+      glowAt(c,ROSEG,ps[0],ps[1],22,fade);glowAt(c,GLINT,pc[0],pc[1],22,fade);
+      // the corners, as they are passed
+      const corner=Math.floor((s+Re)/(2*Re));
+      if(corner>L.corner&&corner<=4&&k<1){L.corner=corner;if(live_())knock(now_(),.05,260+corner*20)}
+      if(k>=1){
+        if(!L.home){L.home=true;if(live_()){const t=now_();bell(F0*4,t,.05,3.5);bell(F0*8,t+.02,.03,3);L.hum&&L.hum.stop(t+.2)}heard(4,false)}
+        const a=sm(clamp((k-1)/.12,0,1))*fade;
+        sayL(c,'samen thuis',1104,540,17,SEPIA,.85,a);
+        sayL(c,'het scheelt 13 mijl',1104,568,15,SANG,.85,a);
+        sayL(c,'op 31.680',1104,592,15,SANG,.85,a);
+      }
+    }});
+  hit(E[0]-Rb,E[1]-Rb,E[0]+Rb,E[1]+Rb,(x,y,t)=>{
+    if((t-RC.t0)/DUR<1)return;
+    RC.t0=t;RC.corner=0;RC.home=false;RC.dirty=true;RC.drawn=false;
+    if(!audio())return;
+    // the circle hums all the way round, the fourth overtone
+    const t0=now_(),o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=F0*4;
+    g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.025,t0+.4);g.gain.setValueAtTime(.025,t0+DUR/1000-.3);g.gain.linearRampToValueAtTime(0,t0+DUR/1000+.1);
+    o.connect(g);g.connect(MASTER);o.start(t0);o.stop(t0+DUR/1000+.3);RC.hum=o;
+  });
 });
 
 // P4 · vijf: the pentagram and the golden cut ----------------------------------
@@ -1887,7 +2287,76 @@ P.push(function(){
     }
     poly(R,skin,{col:shade([188,48,40],.4),w:2,a:.85});
     note(R,'snijd hem dwars door',x,y+Ra+52,20,INK);
+    note(R,'(tik op de appel)',x,y+Ra+76,14,INK,.5);
     sym(x,y,5,{r:240});
+    // the living part: the apple comes whole. tap, and a knife goes through it
+    // across the core; the top lifts away and there is the star of five rooms.
+    // tap again and it closes. the cut sounds the fifth overtone.
+    const pad=26,AW=2*(Ra+pad),sc=Math.max(S,1.5);
+    const whole=document.createElement('canvas');whole.width=whole.height=Math.ceil(AW*sc);
+    {
+      const g=whole.getContext('2d');g.scale(sc,sc);g.translate(Ra+pad,Ra+pad);
+      const out=skin.map(p=>[p[0]-x,p[1]-y]);
+      const path=()=>{g.beginPath();out.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath()};
+      g.save();g.translate(6,9);path();g.fillStyle='rgba(60,30,30,.22)';g.fill();g.restore();
+      path();
+      const rg=g.createRadialGradient(-Ra*.35,-Ra*.4,Ra*.1,0,0,Ra*1.05);
+      rg.addColorStop(0,'rgb(222,96,58)');rg.addColorStop(.45,'rgb(190,46,38)');rg.addColorStop(1,'rgb(128,26,30)');
+      g.fillStyle=rg;g.fill();
+      g.save();path();g.clip();
+      // the yellow where the sun did not reach, and streaks running out from the stem
+      const yg=g.createRadialGradient(Ra*.55,Ra*.5,0,Ra*.55,Ra*.5,Ra*.8);yg.addColorStop(0,'rgba(236,190,70,.55)');yg.addColorStop(1,'rgba(236,190,70,0)');
+      g.fillStyle=yg;g.fillRect(-Ra,-Ra,2*Ra,2*Ra);
+      const RR=stream(SEED*31+5);
+      for(let k=0;k<150;k++){const t=rd(RR,0,TAU),r0=Ra*rd(RR,.25,.6),r1=Ra*rd(RR,.7,1);
+        g.strokeStyle=`rgba(${pk(RR,['250,200,90','236,140,70','120,20,24'])},${rd(RR,.12,.32)})`;g.lineWidth=rd(RR,1,3.2);
+        g.beginPath();g.moveTo(Math.cos(t)*r0,Math.sin(t)*r0);g.quadraticCurveTo(Math.cos(t+.08)*(r0+r1)/2,Math.sin(t+.08)*(r0+r1)/2,Math.cos(t+.04)*r1,Math.sin(t+.04)*r1);g.stroke()}
+      for(let k=0;k<90;k++){const t=rd(RR,0,TAU),r0=Ra*Math.sqrt(rd(RR,.05,.9));g.fillStyle='rgba(250,226,170,.35)';g.beginPath();g.arc(Math.cos(t)*r0,Math.sin(t)*r0,rd(RR,.8,1.6),0,TAU);g.fill()}
+      const hg=g.createRadialGradient(-Ra*.42,-Ra*.45,0,-Ra*.42,-Ra*.45,Ra*.5);hg.addColorStop(0,'rgba(255,255,255,.34)');hg.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle=hg;g.fillRect(-Ra,-Ra,2*Ra,2*Ra);
+      g.restore();
+      // the hollow the stem grows from
+      const cg=g.createRadialGradient(0,0,0,0,0,Ra*.3);cg.addColorStop(0,'rgba(88,70,30,.85)');cg.addColorStop(.5,'rgba(120,60,30,.45)');cg.addColorStop(1,'rgba(120,30,30,0)');
+      g.fillStyle=cg;g.beginPath();g.arc(0,0,Ra*.3,0,TAU);g.fill();
+      path();g.strokeStyle='rgba(90,24,22,.85)';g.lineWidth=2;g.stroke();
+      // the leaf, then the stem over it
+      g.save();g.translate(4,-4);g.rotate(-.75);
+      g.beginPath();g.moveTo(0,0);g.bezierCurveTo(30,-30,92,-26,118,0);g.bezierCurveTo(90,22,32,26,0,0);
+      g.fillStyle='rgb(104,140,62)';g.fill();g.strokeStyle='rgba(50,74,30,.9)';g.lineWidth=1.4;g.stroke();
+      g.strokeStyle='rgba(200,220,150,.6)';g.lineWidth=1;g.beginPath();g.moveTo(4,0);g.quadraticCurveTo(60,-3,112,0);g.stroke();
+      for(let k=1;k<6;k++){const u=k*18;g.beginPath();g.moveTo(u,-1);g.lineTo(u+12,-11+k*.6);g.moveTo(u,1);g.lineTo(u+12,10-k*.6);g.stroke()}
+      g.restore();
+      g.lineCap='round';g.strokeStyle='rgb(92,62,36)';g.lineWidth=6;g.beginPath();g.moveTo(-2,2);g.quadraticCurveTo(-10,-20,-6,-42);g.stroke();
+      g.strokeStyle='rgba(180,140,90,.6)';g.lineWidth=1.5;g.beginPath();g.moveTo(-3,-2);g.quadraticCurveTo(-10,-20,-7,-40);g.stroke();
+    }
+    const pips=[];for(let k=0;k<5;k++){const t=-Math.PI/2+k*TAU/5;pips.push([x+Math.cos(t)*Ra*.28,y+Math.sin(t)*Ra*.28])}
+    const AL=live(x-Ra-60,y-Ra-80,2*Ra+170,2*Ra+130,{local:true,cut:(FAST||STILL)?1:0,t0:-1e9,dirty:true,
+      frame(c,now,L){
+        const k=prog(now,L.t0,L.cut?1300:800),busy=k<1;
+        if(!busy&&!L.dirty)return;
+        L.dirty=busy;
+        c.clearRect(L.x,L.ly,L.w,L.h);
+        // u is how far the top has lifted: 0 whole, 1 gone
+        let u;
+        if(L.cut){const kk=clamp((k-.22)/.78,0,1);u=1-Math.pow(1-kk,3)}else u=1-sm(k);
+        if(u<1){
+          c.save();c.globalAlpha=1-u*u;
+          c.translate(x+u*90,y-u*56);c.rotate(u*.16);c.scale(1+u*.04,1+u*.04);
+          c.drawImage(whole,-(Ra+pad),-(Ra+pad),AW,AW);c.restore();
+        }
+        // the knife: a bright line drawn across, before the top comes off
+        if(L.cut&&k<.3){const kk=k/.3,xx=x-Ra-30+kk*(2*Ra+60);
+          c.strokeStyle=`rgba(255,250,236,${.9*(1-kk*.4)})`;c.lineWidth=2.4;c.beginPath();c.moveTo(x-Ra-30,y+2);c.lineTo(xx,y+2);c.stroke();glowAt(c,GLINT,xx,y+2,18,.9)}
+        // five rooms, each with a pip, glint once the star is seen
+        if(L.cut&&k>.55){const a=bump(clamp((k-.55)/.45,0,1));for(const p of pips)glowAt(c,GLINT,p[0],p[1],20,a*.9)}
+      }});
+    hit(x-Ra,y-Ra,x+Ra,y+Ra,(xx,yy,t)=>{
+      AL.cut=AL.cut?0:1;AL.t0=t;AL.dirty=true;AL.drawn=false;
+      if(!audio())return;
+      const t0=now_();
+      if(AL.cut){for(let i=0;i<4;i++)nz(t0+i*.045+RA()*.02,.07,'highpass',2600+RA()*1600,1800,1,.05,.002);vo(t0,'sine',150,70,.18,.06,.003);heard(5,false);harm(5,t0+.45,.06);for(let i=0;i<5;i++)bell(F0*10*[1,1.125,1.25,1.5,1.667][i],t0+.75+i*.09,.012,1.4)}
+      else{knock(t0+.5,.04,220);nz(t0+.48,.1,'lowpass',900,500,1,.03,.004)}
+    });
   }
   // apple blossom: five petals
   {
@@ -2012,6 +2481,44 @@ P.push(function(){
     }
     sym(cx,cy,13,{phi:true,r:330});
     COMP=null;
+    note(R,'(beweeg over het hart: elke pit een andere hoek verder)',cx,cy+Rd+172,14,INK,.5);
+    // the living part: move over the head and every seed is set a different
+    // angle further round than the one before. only at 137,5 degrees do they
+    // fill the head without gaps; a rounder number makes arms and spokes.
+    const GD=360*(1-1/PHI);
+    const SF=live(cx-Rd-10,cy-Rd-10,2*Rd+20,2*Rd+20,{local:true,ang:GD,act:-1e9,lt:0,acc:0,away:0,dirty:false,
+      frame(c2,now,L){
+        const dt=Math.min(.1,(now-(L.lt||now))/1000);L.lt=now;
+        let h=hand(L,now,1500);if(h&&Math.hypot(h[0]-cx,h[1]-cy)>Rd)h=null;
+        let tg=GD;
+        if(h){tg=GD+(h[0]-cx)/Rd*26;L.act=now}else if(now-L.act<1400)tg=L.ang;
+        const prev=L.ang;
+        L.ang+=(tg-L.ang)*Math.min(1,dt*(h?8:1.5));if(RM)L.ang=tg;
+        const off=Math.abs(L.ang-GD);
+        // the seeds rustle as they move, and a chord sounds when they find the golden angle again
+        L.acc+=Math.abs(L.ang-prev);
+        if(L.acc>.7&&live_()){L.acc=0;nz(now_(),.03,'highpass',3000+RA()*3000,3000,1,.012,.002)}
+        if(off>3)L.away=1;
+        if(off<.06&&L.away){L.away=0;if(live_()){const t=now_();[1,2,3,5,8,13].forEach((n,i)=>harm(n,t+i*.11,.03,2.2))}}
+        const al=clamp(off/1.1,0,1);
+        if(al<.01&&!L.dirty)return;
+        L.dirty=al>=.01;
+        c2.clearRect(L.x,L.ly,L.w,L.h);
+        if(al<.01)return;
+        c2.globalAlpha=al;
+        c2.fillStyle='rgb(46,30,18)';c2.beginPath();c2.arc(cx,cy,Rd+4,0,TAU);c2.fill();
+        const a=L.ang/180*Math.PI;
+        for(const [k0,k1,col] of[[1,70,'rgb(176,160,78)'],[70,N+1,'rgb(124,86,46)']]){
+          c2.fillStyle=col;c2.beginPath();
+          for(let k=k0;k<k1;k++){const r=c*Math.sqrt(k),t=k*a,x=cx+Math.cos(t)*r,y=cy+Math.sin(t)*r,sz=c*.5*(.62+.38*Math.min(1,k/90));c2.moveTo(x+sz,y);c2.arc(x,y,sz,0,TAU)}
+          c2.fill();
+        }
+        c2.globalAlpha=1;
+        const deg=L.ang.toFixed(1).replace('.',',')+'°';
+        const what=Math.abs(L.ang-120)<1.2?'drie armen, en gaten ertussen':Math.abs(L.ang-135)<.7?'acht spaken':Math.abs(L.ang-144)<1.2?'vijf armen':Math.abs(L.ang-150)<1.2?'twaalf spaken':off<.25?'geen gaten':'';
+        sayL(c2,deg,cx,cy+Rd-52,22,CINK,.9,al,true);
+        if(what)sayL(c2,what,cx,cy+Rd-24,15,CINK,.75,al,true);
+      }});
   }
   // a nautilus, sawn through: chamber after chamber, each the same shape, only larger
   {
@@ -2097,16 +2604,56 @@ P.push(function(){
   // the moving planet, on a glass of its own
   const glowSprite=(()=>{const g=document.createElement('canvas');g.width=g.height=64;const c=g.getContext('2d');const rg=c.createRadialGradient(32,32,0,32,32,32);rg.addColorStop(0,'rgba(255,246,226,1)');rg.addColorStop(.25,'rgba(255,214,190,.55)');rg.addColorStop(1,'rgba(255,190,170,0)');c.fillStyle=rg;c.fillRect(0,0,64,64);return g})();
   const lx=cx-440,ly=cy-440,lw=880,lh=880;
-  live(lx,ly,lw,lh,{sc:1,start:0,
+  // the dance: put the sun in the middle instead of the earth, draw a line from
+  // the earth to venus every four days, and in eight years a flower of five
+  // appears. the earth goes round 8 times, venus 13, and 5 times they meet.
+  const DC=document.createElement('canvas');DC.width=lw;DC.height=lh;
+  const DCX=DC.getContext('2d');
+  const Tv=224.701,RE=330,RV=RE*.7233,DANCE=13,DAYS=8*Te;
+  const dpos=d=>{const ae=-Math.PI/2+TAU*d/Te,av=-Math.PI/2+TAU*d/Tv;return[[cx+Math.cos(ae)*RE,cy+Math.sin(ae)*RE],[cx+Math.cos(av)*RV,cy+Math.sin(av)*RV]]};
+  const VZ=live(lx,ly,lw,lh,{sc:1,start:0,dance:-1e9,dd:0,
     frame(c,now,L){
       if(!L.start)L.start=now;
       c.clearRect(lx,ly+L.dy,lw,lh);
+      const D=(now-L.dance)/1000;
+      if(D<DANCE+7){
+        const days=RM?DAYS:Math.min(D/DANCE,1)*DAYS,fade=D<DANCE+2?1:1-(D-DANCE-2)/5;
+        DCX.globalCompositeOperation='lighter';DCX.lineWidth=1;DCX.strokeStyle='rgba(255,214,196,.2)';DCX.beginPath();
+        for(;L.dd<=days;L.dd+=4){const [e,v]=dpos(L.dd);DCX.moveTo(e[0]-lx,e[1]-ly);DCX.lineTo(v[0]-lx,v[1]-ly)}
+        DCX.stroke();
+        c.globalAlpha=fade;c.drawImage(DC,lx,ly+L.dy,lw,lh);
+        const [e,v]=dpos(days);
+        c.strokeStyle='rgba(226,236,246,.18)';c.lineWidth=1;
+        for(const rr of[RE,RV]){c.beginPath();c.arc(cx,cy+L.dy,rr,0,TAU);c.stroke()}
+        if(D<DANCE+.5){
+          c.strokeStyle='rgba(255,236,220,.7)';c.lineWidth=1.4;c.beginPath();c.moveTo(e[0],e[1]+L.dy);c.lineTo(v[0],v[1]+L.dy);c.stroke();
+          c.drawImage(glowSprite,cx-30,cy+L.dy-30,60,60);
+          glowAt(c,COOL,e[0],e[1]+L.dy,16,1);c.drawImage(glowSprite,v[0]-14,v[1]+L.dy-14,28,28);
+        }
+        c.globalAlpha=1;
+        const yr=Math.min(8,Math.floor(days/Te)),vr=Math.min(13,Math.floor(days/Tv)),mt=Math.min(5,Math.floor(days/(Te*8/5)+.001)+1);
+        sayL(c,`de aarde ${yr} keer rond · venus ${vr} keer · ${mt===1?'één':NAMES[mt]} keer samen`,cx,1012+L.dy,17,CINK,.7,fade*sm(clamp(D/1.2,0,1)),true);
+        if(D>=DANCE+7){L.dance=-1e9;DCX.clearRect(0,0,lw,lh);L.dd=0}
+        return;
+      }
       const u=((now-L.start)/80000)%1,i0=Math.floor(u*(n-1)),TR=150;
       c.lineCap='round';
       for(let j=TR;j>0;j-=3){const a=V[(i0-j+n)%n],b=V[(i0-j+3+n)%n],k=1-j/TR;c.strokeStyle=`rgba(255,226,206,${.5*k*k})`;c.lineWidth=1+2*k;c.beginPath();c.moveTo(a[0],a[1]+L.dy);c.lineTo(b[0],b[1]+L.dy);c.stroke()}
       const p=V[i0];c.drawImage(glowSprite,p[0]-22,p[1]+L.dy-22,44,44);
       c.fillStyle='rgba(255,252,240,1)';c.beginPath();c.arc(p[0],p[1]+L.dy,3,0,TAU);c.fill();
     },dy:GEN_DY});
+  hit(cx-420,cy-420,cx+420,cy+420,(x,y,t)=>{
+    if((t-VZ.dance)/1000<DANCE+1)return;
+    VZ.dance=t;VZ.dd=0;DCX.clearRect(0,0,lw,lh);VZ.drawn=false;
+    if(!audio())return;
+    // in sound too: the earth's years, venus's years, and the five meetings: 8, 13 and 5
+    const t0=now_(),k=DANCE/DAYS;
+    for(let i=1;i<=8;i++)vo(t0+i*Te*k,'sine',F0*8,F0*8,.5,.03,.004);
+    for(let i=1;i<=13;i++)vo(t0+i*Tv*k,'sine',F0*13,F0*13,.35,.018,.003);
+    for(let i=0;i<5;i++)bell(F0*10,t0+i*Te*8/5*k,.04,3);
+    bell(F0*10,t0+DANCE,.05,4.5);harm(5,t0+DANCE,.03,5);harm(8,t0+DANCE+.02,.025,5);
+  });
+  note(R,'(tik: zet de zon in het midden)',800,134,14,CINK,.45);
   write(R,'vijf · acht · dertien',800,100,30,{col:CINK,a:.85,cen:true});
   ['in acht jaar gaat venus','dertien keer om de zon','en staat ze vijf keer','precies tussen ons en de zon'].forEach((t,i)=>note(R,t,250,930+i*27,17,CINK,.55));
   ['zo ziet het eruit','als je vanaf de aarde kijkt'].forEach((t,i)=>note(R,t,1350,960+i*27,17,CINK,.5));
@@ -2212,7 +2759,58 @@ P.push(function(){
   {
     for(const [x,y,rad] of[[1330,318,96],[1176,500,56],[1440,530,50]]){snowflake(R,x,y,rad,CHALK);sym(x,y,6,{r:rad+40})}
     note(R,'nooit twee dezelfde',1330,640,18,INK);
+    note(R,'(tik op het papier)',1330,664,14,INK,.5);
   }
+  // the living part: tap anywhere on the paper and a snowflake grows there.
+  // one arm is invented, then repeated six times and mirrored, so no two are
+  // alike, and every one has six. it chimes the sixth overtone while it grows.
+  const SN=[];
+  const SNL=live(60,42,1480,1116,{local:true,dirty:false,lt:0,
+    frame(c,now,L){
+      if(!SN.length&&!L.dirty)return;
+      L.dirty=SN.length>0;
+      c.clearRect(L.x,L.ly,L.w,L.h);
+      c.lineCap='round';
+      for(let i=SN.length-1;i>=0;i--){
+        const f=SN[i],age=(now-f.t)/1000;
+        if(age>16){SN.splice(i,1);continue}
+        const g=RM?1:1-Math.pow(1-clamp(age/1.8,0,1),2),fade=age<12?1:1-(age-12)/4;
+        const yy=f.y+(RM?0:age*5),rot=f.rot+(RM?0:age*.03),rad=f.rad;
+        c.save();c.translate(f.x,yy);c.rotate(rot);
+        glowAt(c,GLINT,0,0,rad*.7,(1-clamp(age/1.2,0,1))*.5);
+        c.strokeStyle=rgba(CHALK,.92*fade);
+        for(let k=0;k<6;k++){
+          c.save();c.rotate(k*TAU/6);
+          c.lineWidth=Math.max(1.2,rad*.03);c.beginPath();c.moveTo(0,0);c.lineTo(0,-rad*g);c.stroke();
+          c.lineWidth=Math.max(1,rad*.022);
+          for(const [bf,bl,tw] of f.br){
+            const p=clamp((g-bf)/.28,0,1);if(p<=0)continue;
+            const L2=rad*bl*p,py=-rad*bf;
+            for(const sd of[-1,1]){
+              const bx=Math.sin(sd*Math.PI/3)*L2,by=py-Math.cos(Math.PI/3)*L2;
+              c.beginPath();c.moveTo(0,py);c.lineTo(bx,by);c.stroke();
+              if(tw&&p>.6){const qx=bx*.55,qy=py+(by-py)*.55;c.beginPath();c.moveTo(qx,qy);c.lineTo(qx,qy-L2*.35*(p-.6)/.4);c.stroke()}
+            }
+          }
+          c.restore();
+        }
+        if(f.plate&&g>.3){const pr=rad*f.plate*clamp((g-.3)/.3,0,1);c.beginPath();for(let k=0;k<6;k++){const t=-Math.PI/2+k*TAU/6;c[k?'lineTo':'moveTo'](Math.cos(t)*pr,Math.sin(t)*pr)}c.closePath();c.fillStyle=rgba(CHALK,.16*fade);c.fill();c.lineWidth=1.2;c.stroke()}
+        c.restore();
+      }
+    }});
+  const SR=stream(SEED*101+707);
+  hit(60,42,1540,1158,(x,y,t)=>{
+    if(SN.length>=7)SN.shift();
+    const br=[],nb=ri(SR,3,5);
+    for(let i=0;i<nb;i++)br.push([rd(SR,.22,.86),rd(SR,.12,.38)*(1-i*.12),ch_(SR,.4)]);
+    br.sort((a,b)=>a[0]-b[0]);
+    SN.push({x,y,t,rad:rd(SR,38,70),br,plate:ch_(SR,.55)?rd(SR,.12,.24):0,rot:rd(SR,-.3,.3)});
+    SNL.dirty=true;SNL.drawn=false;
+    if(!audio())return;
+    const t0=now_();
+    heard(6,false);harm(6,t0,.04,3);
+    br.forEach(([bf],i)=>{const tt=t0+.15+(1-Math.sqrt(1-bf))*1.8;bell(F0*pk(SR,[18,24,27,30,36]),tt,.014,1.3)});
+  },true);
   // a snake biting its own tail: kekulé saw it in a dream, and found the ring of benzene
   {
     const x=320,y=872,hr=56;
@@ -2266,6 +2864,18 @@ function solidLive(c,k,cx,cy,s,yaw,pitch,wood,ink){
     c.strokeStyle=rgba(ink,front?.85:.45);c.lineWidth=front?1.5:1;c.stroke();
   }
 }
+// each solid counts its faces in pings, then sounds the element plato gave it
+const FACES=[4,6,8,20,12];
+function solidSound(k,t){
+  const n=FACES[k],gap=Math.min(.09,1.1/n);
+  for(let i=0;i<n;i++)vo(t+i*gap,'sine',F0*16,F0*16,.12,.026,.002);
+  const e=t+n*gap+.08;
+  if(k===0){for(let i=0;i<18;i++)nz(e+RA()*1.1,.03+RA()*.04,'highpass',2000+RA()*3000,1600,1,.08+RA()*.07,.001);nz(e,1.2,'bandpass',500,300,.8,.07,.2)}
+  else if(k===1){vo(e,'sine',95,48,.7,.09,.004);nz(e,.25,'lowpass',380,160,1,.06,.004)}
+  else if(k===2){nz(e,1.4,'bandpass',380,2400,1.4,.12,.45);nz(e+.3,1.2,'bandpass',900,500,1.2,.07,.4)}
+  else if(k===3){for(let i=0;i<5;i++){const s=e+i*.16+RA()*.08,f=380+RA()*260;vo(s,'sine',f,f*2.3,.09,.07,.003,MASTER,.5)}}
+  else{for(let i=0;i<7;i++){const f=F0*[12,15,18,20,24,27,30][i];vo(e+i*.07,'sine',f,f,2.6,.014,.04,MASTER,1,[5+i*.3,f*.004])}}
+}
 P.push(function(){
   const R=stream(SEED*101+8);
   darkBand(-20,720);
@@ -2299,16 +2909,22 @@ P.push(function(){
     tape(R,x-92,y-140,rd(R,.5,.8));tape(R,x+96,y-138,rd(R,-.8,-.5));
     const s=k===0?86:k===1?78:82,yaw=[.95,.5,.3,.2,.4][k],pitch=[-.62,-.45,-.35,-.3,-.38][k];
     // the solid lies on a glass of its own, and turns slowly while you look at it
-    live(x-112,y-130,224,218,{k,sx:x,sy:y-22,s,yaw,pitch,sp:.12+k*.025,last:0,dy:GEN_DY,
+    const SL=live(x-112,y-130,224,218,{k,sx:x,sy:y-22,s,yaw,pitch,sp:.12+k*.025,last:0,dy:GEN_DY,spin:0,vs:0,kick:-1e9,
       frame(c,now,L){
-        if(now-L.last<33)return;L.last=now;
+        if(now-L.last<(L.vs>.05?16:33))return;
+        const dt=Math.min(.1,(now-(L.last||now))/1000);L.last=now;
+        L.spin+=L.vs*dt;L.vs*=Math.exp(-dt*1.4);
         c.clearRect(L.x,L.y,L.w,L.h);
-        const t=now/1000;
-        solidLive(c,L.k,L.sx,L.sy+L.dy,L.s,L.yaw+t*L.sp,L.pitch+Math.sin(t*L.sp*1.7)*.25,wood,SEPIA);
+        const t=now/1000,kk=clamp((now-L.kick)/900,0,1);
+        if(kk<1)c.drawImage(GLINT,L.sx-L.s*1.2,L.sy+L.dy-L.s*1.2,L.s*2.4,L.s*2.4);
+        solidLive(c,L.k,L.sx,L.sy+L.dy,L.s*(1+.08*bump(kk)),L.yaw+t*L.sp+L.spin,L.pitch+Math.sin(t*L.sp*1.7)*.25+L.spin*.3,wood,SEPIA);
       }});
     write(R,names[k][0],x,y+92,20,{col:SEPIA,a:.85,cen:true});
     write(R,names[k][1],x,y+118,16,{col:SANG,a:.75,cen:true});
+    // tap a solid: it spins, counts its faces in little pings, and sounds its element
+    hit(x-124,y-150,x+124,y+138,(xx,yy,t)=>{SL.vs+=11;SL.kick=t;if(audio())solidSound(k,now_())});
   }
+  note(R,'(tik op een vorm: hij telt zijn vlakken)',800,1170,14,CINK,.45);
   sentence(R,'vijf vormen, en meer zijn er niet',1100,CINK,28);
   note(R,'leonardo tekende ze zo voor het boek van pacioli, 1509',800,1140,16,CINK,.5);
   whispers(R,100,700,true,3);
@@ -2406,6 +3022,49 @@ P.push(function(){
   }
   sentence(R,'de week is een ster',1112,CH.white,30);
   whispers(R,140,1120,true,3);
+  // the living part: today's planet is marked. tap the star and a light walks
+  // the week from today, every third planet round the ring, and each planet
+  // sings its note: slowest lowest, saturn do and the moon si. a week of seven
+  // ends on the seventh overtone, the one no piano has.
+  const SCALE=[1,9/8,5/4,4/3,3/2,5/3,15/8].map(r=>F0*4*r);
+  const DAYK=[3,6,2,5,1,4,0],today=DAYK[new Date().getDay()];
+  const lab=k=>{const t=-Math.PI/2+k*TAU/7;return[cx+Math.cos(t)*(r+132),cy+Math.sin(t)*(r+132)+7]};
+  const WK=live(360,150,880,910,{local:true,t0:-1e9,last:0,said:false,
+    frame(c,now,L){
+      if(now-L.last<40)return;L.last=now;
+      c.clearRect(L.x,L.ly,L.w,L.h);
+      // today
+      const [tx,ty]=node(today),tl=lab(today),pt=-Math.PI/2+today*TAU/7,px=cx+Math.cos(pt)*(r+62),py=cy+Math.sin(pt)*(r+62);
+      const pa=RM?.5:.42+.18*Math.sin(now/700);
+      c.strokeStyle=rgba(PL[today][2],pa);c.lineWidth=1.6;c.beginPath();c.arc(px,py,36,0,TAU);c.stroke();
+      sayL(c,'vandaag',tl[0],tl[1]+24,14,CH.white,.6,1,true);
+      // the walk
+      const D=(now-L.t0)/1000,EDGE=.62;
+      if(D<7*EDGE+5){
+        let k=today;
+        for(let d=0;d<7;d++){
+          const nk=(k+3)%7,a=node(k),b=node(nk),p=RM?1:clamp((D-d*EDGE)/EDGE,0,1);
+          if(p<=0)break;
+          const fade=D<7*EDGE+2?1:1-(D-7*EDGE-2)/3;
+          c.strokeStyle=rgba(PL[k][2],.9*fade);c.lineWidth=3.4;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p);c.stroke();
+          if(p<1)glowAt(c,GLINT,a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p,16,1);
+          else glowAt(c,GLINT,b[0],b[1],22,(1-clamp((D-(d+1)*EDGE)/1.2,0,1))*fade);
+          k=nk;
+        }
+        if(D>7*EDGE){const a=sm(clamp((D-7*EDGE)/.8,0,1))*(D<7*EDGE+3.5?1:1-(D-7*EDGE-3.5)/1.5);
+          sayL(c,'en de zevende boventoon staat op geen enkele piano',cx,1046,16,CH.pink,.8,a,true)}
+      }
+    }});
+  hit(cx-330,cy-330,cx+330,cy+330,(x,y,t)=>{
+    if((t-WK.t0)/1000<4.5)return;
+    WK.t0=t;WK.drawn=false;
+    if(!audio())return;
+    const t0=now_();let k=today;
+    for(let d=0;d<7;d++){k=(k+3)%7;bell(SCALE[k],t0+(d+1)*.62,.045,2.2)}
+    heard(7,false);harm(7,t0+7*.62+.5,.06,4.5);
+  });
+  // the seven notes on the stave can be sung one by one
+  for(let i=0;i<7;i++){const nx=1196+28+i*40,ny=300+70-i*7;hit(nx-16,ny-46,nx+16,ny+14,()=>{if(audio())bell(SCALE[i],now_(),.05,2)})}
 });
 
 // P10 · acht: the octave ------------------------------------------------------------
@@ -2471,7 +3130,8 @@ P.push(function(){
   SY.forEach((y,i)=>hit(nut0,y-13,nut1,y+13,()=>{
     ML.pl[i]=performance.now();ML.dirty=true;
     const f0=196,r=[2,3/2,4/3][i];
-    pluck(f0,0,.1);pluck(f0*r,.42,.1);pluck(f0,.95,.07);pluck(f0*r,.95,.07);
+    pluck(f0,0,.08);pluck(f0*r,.42,.08);pluck(f0,.95,.056);pluck(f0*r,.95,.056);
+    heard(8,false);
   }));
   // a string can also sing in halves, thirds and quarters, all at once
   {
@@ -2541,7 +3201,7 @@ P.push(function(){
         c.fill();
       }
     }});
-  hit(PX,PY,PX+PS,PY+PS,()=>{const now=performance.now();if(CL.to){CL.next(CL,now);CL.auto=now+14000}const f=CHL_F[CL.mode];tone(f,0,2.2,.08,'sine');tone(f*2,0,1.2,.02,'sine')});
+  hit(PX,PY,PX+PS,PY+PS,()=>{const now=performance.now();if(CL.to){CL.next(CL,now);CL.auto=now+14000}const f=CHL_F[CL.mode];tone(f,0,2.2,.08,'sine');tone(f*2,0,1.2,.02,'sine');heard(8,false)});
   sym(PX+PS/2,PY+PS/2,4,{r:210});
   // the eye of horus, made of halves of halves
   {
@@ -2635,6 +3295,43 @@ P.push(function(){
   }
   sentence(R,'de negen komt altijd terug',1114,BALL,28);
   whispers(R,140,1120,false,3);
+  // the living part: a bead on the circle. tap inside it and the number
+  // doubles; the digits are added up until one is left, and the bead hops
+  // there: 1 2 4 8 7 5, round and round. tap a number on the circle to start
+  // from it: from 3 you only ever reach 6 and 3, and 9 stays 9.
+  note(R,'(tik in de cirkel: verdubbel · tik op een getal: begin daar)',cx,912,14,BALL,.5);
+  const root=s=>{const steps=[];let t=s;while(t.length>1){const d=[...t].reduce((a,c)=>a+ +c,0);steps.push([t,d]);t=String(d)}return{r:+t,steps}};
+  const NG9=live(250,280,940,640,{local:true,N:1n,prev:0n,at:1,from:1,t0:-1e9,txt:null,dirty:true,
+    frame(c,now,L){
+      const k=prog(now,L.t0,420),busy=k<1||now-L.t0<900;
+      if(!busy&&!L.dirty)return;L.dirty=busy;
+      c.clearRect(L.x,L.ly,L.w,L.h);
+      const a=pos(L.from),b=pos(L.at),e=sm(k),p=[a[0]+(b[0]-a[0])*e,a[1]+(b[1]-a[1])*e];
+      if(k<1&&L.from!==L.at){c.strokeStyle=rgba(L.at%3?BALL:REDPEN,.5*(1-k));c.lineWidth=4;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(p[0],p[1]);c.stroke()}
+      glowAt(c,L.at%3?COOL:ROSEG,p[0],p[1],30,.9);
+      c.fillStyle=rgba(L.at%3?BALL:REDPEN,.95);c.beginPath();c.arc(p[0],p[1],8,0,TAU);c.fill();
+      c.fillStyle='rgba(255,255,255,.7)';c.beginPath();c.arc(p[0]-2.5,p[1]-2.5,2.4,0,TAU);c.fill();
+      if(L.txt){let y=770;const al=sm(clamp((now-L.t0)/300,0,1));for(const [t,col,sz] of L.txt){sayL(c,t,874,y,sz,col,.88,al);y+=sz*1.7}}
+    }});
+  hit(cx-r-50,cy-r-50,cx+r+50,cy+r+50,(x,y,t)=>{
+    const L=NG9;let start=0;
+    for(let n=1;n<=9;n++){const q=pos(n);if(Math.hypot(x-q[0],y-q[1])<36)start=n}
+    if(start){L.prev=0n;L.N=BigInt(start);L.txt=[[`begin bij ${start}`,BALL,18]];
+      if(start===9)L.txt.push(['9 × 2 = 18 → 1 + 8 = 9',REDPEN,16]);
+      else if(start%3===0)L.txt.push(['de 3 en de 6 wisselen elkaar af',REDPEN,16])}
+    else{
+      L.prev=L.N;L.N*=2n;
+      if(L.N>(1n<<30n)){L.N=1n;L.prev=0n;L.txt=[['en zo voort, altijd weer:',BALL,16],['1 → 2 → 4 → 8 → 7 → 5 → 1',REDPEN,18]]}
+      else{const s=String(L.N),R9=root(s);
+        L.txt=[[`${NUM(L.prev)} × 2 = ${NUM(L.N)}`,BALL,s.length>7?16:18]];
+        for(const [t,d] of R9.steps)L.txt.push([`${[...t].join(t.length>6?'+':' + ')} = ${d}`,REDPEN,t.length>7?15:17]);
+      }
+    }
+    L.from=L.at;L.at=root(String(L.N)).r;L.t0=t;L.dirty=true;L.drawn=false;
+    if(!audio())return;
+    bell(F0*2*L.at,now_()+.12,.05,2.2);
+    heard(9,false);
+  });
 });
 
 // P12 · tien: and back to one ------------------------------------------------------------
@@ -2694,6 +3391,51 @@ P.push(function(){
     note(R,'naar franks dertien bloemen',tx,300,15,INK,.55);
     sym(tx,yb-2*d,1,{mir:true,ax:Math.PI/2,r:430});
   }
+  // the living part: the ten pebbles are the ten overtones. the ones you have
+  // not heard yet on the way down are still pale. tap them: they sound one by
+  // one, from the low string up, with a silence where one is missing, and then
+  // together. when all ten are there, the chord comes down to the one tone.
+  {
+    const ax=330,ay=330,sp=70,rh=sp*.87,TP10=[];
+    for(let r=0;r<4;r++)for(let i=0;i<=r;i++)TP10.push([ax+(i-r/2)*sp,ay+r*rh]);
+    note(R,'(tik op de stenen: elke steen is een boventoon)',ax+40,268,14,INK,.5);
+    const GAP=.3;
+    const TT=live(150,250,720,500,{local:true,t0:-1e9,list:null,full:false,dirty:true,
+      frame(c,now,L){
+        const D=(now-L.t0)/1000,busy=D<10*GAP+6;
+        if(L.hv!==HEARD.size){L.hv=HEARD.size;L.dirty=true}
+        if(!busy&&!L.dirty)return;L.dirty=busy;
+        c.clearRect(L.x,L.ly,L.w,L.h);
+        TP10.forEach(([x,y],i)=>{
+          const n=i+1,on=HEARD.has(n)||FAST||STILL;
+          if(!on){c.fillStyle='rgba(246,240,226,.74)';c.beginPath();c.arc(x,y,18,0,TAU);c.fill();c.strokeStyle='rgba(42,37,31,.35)';c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.arc(x,y,16,0,TAU);c.stroke();c.setLineDash([])}
+          if(busy){const u=D-i*GAP;
+            if(u>0&&u<1.6&&on)glowAt(c,GLINT,x,y,34,1-u/1.6);
+            const ch=D-(10*GAP+.1);if(ch>0&&on)glowAt(c,GLINT,x,y,28,.5*(1-clamp(ch/3,0,1)));}
+        });
+        const k=HEARD.size;
+        const t1=FAST||STILL?'':k>=10?'alle tien · tik, en ze worden weer één':`je hoorde er ${NAMES[k]||'nog geen'} van de tien`;
+        const miss=upto(10).filter(n=>!HEARD.has(n));
+        if(t1)sayL(c,t1,470,700,15,INK,.75);
+        if(t1&&miss.length&&miss.length<10)sayL(c,'nog stil: '+miss.join(' · '),470,724,13,INK,.6);
+        if(L.full&&D>10*GAP+1.6)sayL(c,'tien is weer één',470,738,17,VERM,.85,sm(clamp((D-10*GAP-1.6)/.8,0,1))*(1-clamp((D-10*GAP-5)/1,0,1)));
+      }});
+    hit(ax-2*sp,ay-40,ax+2*sp,ay+3*rh+36,(x,y,t)=>{
+      if((t-TT.t0)/1000<10*GAP+2)return;
+      heard(10,false);
+      TT.t0=t;TT.full=HEARD.size>=10;TT.dirty=true;TT.drawn=false;
+      if(!audio())return;
+      const t0=now_();
+      for(let n=1;n<=10;n++){if(HEARD.has(n))harm(n,t0+(n-1)*GAP,.055,1.8);else vo(t0+(n-1)*GAP,'sine',F0*n,F0*n,.08,.004,.002)}
+      const tc=t0+10*GAP+.1,list=[...HEARD].sort((a,b)=>a-b);
+      list.forEach(n=>harm(n,tc,.075/Math.sqrt(list.length),TT.full?2.4:5));
+      if(TT.full)harm(1,tc+1.6,.065,7),harm(2,tc+1.6,.022,6);
+    });
+    // and ten is one again: tap the circle, and you go back up to the first point
+    const x1=330,y1=840;
+    note(R,'(tik: terug naar één)',x1,y1+78+70,14,INK,.5);
+    hit(x1-90,y1-90,x1+90,y1+90,()=>{if(audio())harm(1,now_(),.08,4);scrollTo({top:0,behavior:RM?'auto':'smooth'})});
+  }
   sentence(R,'tien is weer één',1068,INK,34);
   write(R,'patronen · van één tot tien · 2026',800,1110,18,{a:.8,cen:true});
   aword(R,690,1144,13,5,{a:.6});
@@ -2739,6 +3481,10 @@ function genStep(){
 }
 genStep();
 if(!STILL)requestAnimationFrame(tick);
+// for testing: finish every drawing at once, and look inside
+window.__nunki={TILES,LIVE,HITS,HEARD,MEM,PTR,get AC(){return AC},
+  finish(){if(!GENDONE)return false;for(const T of TILES){if(T.done)continue;T.cx.setTransform(S,0,0,S,0,-T.y0*S);while(T.qi<T.q.length){const it=T.q[T.qi++];if(typeof it==='function')it(T.cx)}T.done=true;T.q=null;readyRestless(T)}
+    for(const L of LIVE)if(!L.on){makeLive(L);L.cv.classList.add('on')}return true}};
 </script>
 <script>
 // a tap with a finger counts as a click. a phone does not always send a click
