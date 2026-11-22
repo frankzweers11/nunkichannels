@@ -151,7 +151,7 @@ SERIES = [
 
 
 # wanden die voorop mogen staan, in deze volgorde, vóór de rest (alfabetisch)
-PINNED = ["hart"]
+PINNED = ["scherf", "hart"]
 
 
 def series_of(pages: list[dict]) -> list[tuple[str, str, list[dict]]]:
@@ -915,6 +915,7 @@ TOUCH_CFG = {
     "hart": {"hand": "move", "motion": True, "shake": "tap"},
     "vuur": {"hand": "move", "motion": True, "shake": "own"},
     "cel": {"hand": "off"},
+    "scherf": {"hand": "press", "motion": True, "shake": "tap"},
     "zelfportret-fable-5": {"hand": "move"},
     "zelfportret-haiku-5-5": {"hand": "off"},
 }

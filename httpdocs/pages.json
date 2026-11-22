@@ -161,6 +161,32 @@
       }
     },
     {
+      "slug": "scherf",
+      "wallLang": "nl",
+      "path": "/scherf/",
+      "title": "scherf",
+      "subtitle": "een muur over hoe alles in elkaar zit",
+      "theme": "#070a11",
+      "ogImage": "/images/og/scherf.jpg",
+      "thumb": "/images/thumbs/scherf.jpg",
+      "languages": {
+        "nl": {
+          "path": "/scherf/",
+          "title": "scherf",
+          "subtitle": "een muur over hoe alles in elkaar zit",
+          "ogImage": "/images/og/scherf.jpg",
+          "thumb": "/images/thumbs/scherf.jpg"
+        },
+        "en": {
+          "path": "/en/scherf/",
+          "title": "shard",
+          "subtitle": "a wall about how everything holds everything",
+          "ogImage": "/images/og/en/scherf.jpg",
+          "thumb": "/images/thumbs/scherf.jpg"
+        }
+      }
+    },
+    {
       "slug": "velden",
       "wallLang": "nl",
       "path": "/velden/",
