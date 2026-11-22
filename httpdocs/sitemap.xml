@@ -5,7 +5,7 @@
     <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/"/>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-22</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
@@ -13,7 +13,7 @@
     <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/"/>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-22</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
@@ -110,6 +110,22 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/ringen/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/ringen/"/>
     <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/scherf/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/scherf/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/scherf/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/scherf/"/>
+    <lastmod>2026-11-22</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nunkichannels.nl/en/scherf/</loc>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://nunkichannels.nl/scherf/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nunkichannels.nl/en/scherf/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nunkichannels.nl/scherf/"/>
+    <lastmod>2026-11-22</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
